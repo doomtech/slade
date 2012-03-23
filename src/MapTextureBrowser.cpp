@@ -65,11 +65,14 @@ MapTextureBrowser::MapTextureBrowser(wxWindow* parent, int type, string texture)
 
 	// Textures
 	if (type == 0 || theGameConfiguration->mixTexFlats()) {
+		// No texture '-'
+		addItem(new MapTexBrowserItem("-", 0, 0), "Textures");
+
 		// Composite textures
 		vector<TextureResource::tex_res_t> textures;
 		theResourceManager->getAllTextures(textures, NULL);
 		for (unsigned a = 0; a < textures.size(); a++)
-			addItem(new MapTexBrowserItem(textures[a].tex->getName(), 0, textures[a].tex->getIndex()), "Textures/TEXTUREx");
+			addItem(new MapTexBrowserItem(textures[a].tex->getName(), 0, textures[a].tex->getIndex()+1), "Textures/TEXTUREx");
 
 		// Texture namespace patches (TX_)
 		if (theGameConfiguration->txTextures()) {

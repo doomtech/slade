@@ -44,6 +44,7 @@
 #include "MapTextureBrowser.h"
 #include "MapObjectPropsPanel.h"
 #include "SectorTextureOverlay.h"
+#include "LineTextureOverlay.h"
 
 
 /*******************************************************************
@@ -1111,7 +1112,6 @@ void MapCanvas::changeSectorTexture() {
 		else if (editor->sectorEditMode() == MapEditor::SECTOR_CEILING)
 			texture = selection[0]->stringProperty("textureceiling");
 		else {
-			// For now only supported in floors or ceilings edit mode
 			if (overlay_current) delete overlay_current;
 			SectorTextureOverlay* sto = new SectorTextureOverlay();
 			sto->openSectors(selection);
@@ -1288,6 +1288,21 @@ void MapCanvas::onKeyBindPress(string name) {
 		}
 	}
 
+	// Change line texture
+	else if (name == "me2d_line_change_texture" && editor->editMode() == MapEditor::MODE_LINES) {
+		// Get selection
+		vector<MapLine*> selection;
+		editor->getSelectedLines(selection);
+
+		// Open line texture overlay if anything is selected
+		if (selection.size() > 0) {
+			if (overlay_current) delete overlay_current;
+			LineTextureOverlay* lto = new LineTextureOverlay();
+			lto->openLines(selection);
+			overlay_current = lto;
+		}
+	}
+
 	// Change thing type
 	else if (name == "me2d_thing_change_type" && editor->editMode() == MapEditor::MODE_THINGS)
 		changeThingType();
@@ -1375,6 +1390,23 @@ bool MapCanvas::handleAction(string id) {
 			panel_props->applyChanges();
 			renderer_2d->forceUpdate(fade_lines);
 			Refresh();
+		}
+	}
+
+	// --- Line context menu ---
+
+	// Change line texture
+	else if (id == "mapw_line_changetexture") {
+		// Get selection
+		vector<MapLine*> selection;
+		editor->getSelectedLines(selection);
+
+		// Open line texture overlay if anything is selected
+		if (selection.size() > 0) {
+			if (overlay_current) delete overlay_current;
+			LineTextureOverlay* lto = new LineTextureOverlay();
+			lto->openLines(selection);
+			overlay_current = lto;
 		}
 	}
 
@@ -1548,7 +1580,9 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 			wxMenu menu_context;
 
 			// Mode-specific items
-			if (editor->editMode() == MapEditor::MODE_THINGS)
+			if (editor->editMode() == MapEditor::MODE_LINES)
+				theApp->getAction("mapw_line_changetexture")->addToMenu(&menu_context);
+			else if (editor->editMode() == MapEditor::MODE_THINGS)
 				theApp->getAction("mapw_thing_changetype")->addToMenu(&menu_context);
 			else if (editor->editMode() == MapEditor::MODE_SECTORS)
 				theApp->getAction("mapw_sector_changetexture")->addToMenu(&menu_context);

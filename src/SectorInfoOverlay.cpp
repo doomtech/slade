@@ -135,7 +135,7 @@ void SectorInfoOverlay::drawTexture(float alpha, int x, int y, string texture, s
 		// Draw texture
 		if (tex) {
 			rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
-			Drawing::drawTextureWithin(tex, x, y - 96, x + 80, y - 16, 0, true);
+			Drawing::drawTextureWithin(tex, x, y - 96, x + 80, y - 16, 0, 100);
 		}
 
 		glDisable(GL_TEXTURE_2D);

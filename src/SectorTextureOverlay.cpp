@@ -43,6 +43,8 @@ void SectorTextureOverlay::draw(int width, int height, float fade) {
 	col_bg.a *= fade;
 	col_fg.a *= fade;
 
+	// Draw background
+	glDisable(GL_TEXTURE_2D);
 	col_bg.set_gl();
 	Drawing::drawFilledRect(0, 0, width, height);
 
@@ -79,13 +81,13 @@ void SectorTextureOverlay::draw(int width, int height, float fade) {
 
 	// Floor texture
 	drawTexture(fade, middlex - border - tex_size*0.5 - cur_size*0.5, middley - cur_size*0.5, cur_size, tex_floor, hover_floor);
-	Drawing::drawText("Floor:", middlex - border - tex_size*0.5, middley - tex_size*0.5 - 16, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-	Drawing::drawText(ftex, middlex - border - tex_size*0.5, middley + tex_size*0.5, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+	Drawing::drawText("Floor:", middlex - border - tex_size*0.5, middley - tex_size*0.5 - 18, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+	Drawing::drawText(ftex, middlex - border - tex_size*0.5, middley + tex_size*0.5 + 2, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 
 	// Ceiling texture
 	drawTexture(fade, middlex + border + tex_size*0.5 - cur_size*0.5, middley - cur_size*0.5, cur_size, tex_ceil, hover_ceil);
-	Drawing::drawText("Ceiling:", middlex + border + tex_size*0.5, middley - tex_size*0.5 - 16, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-	Drawing::drawText(ctex, middlex + border + tex_size*0.5, middley + tex_size*0.5, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+	Drawing::drawText("Ceiling:", middlex + border + tex_size*0.5, middley - tex_size*0.5 - 18, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+	Drawing::drawText(ctex, middlex + border + tex_size*0.5, middley + tex_size*0.5 + 2, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 }
 
 void SectorTextureOverlay::drawTexture(float alpha, int x, int y, int size, vector<string>& textures, bool hover) {
@@ -105,12 +107,12 @@ void SectorTextureOverlay::drawTexture(float alpha, int x, int y, int size, vect
 
 	// Draw first texture
 	rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
-	Drawing::drawTextureWithin(theMapEditor->textureManager().getFlat(textures[0]), x, y, x + size, y + size, 0, true);
+	Drawing::drawTextureWithin(theMapEditor->textureManager().getFlat(textures[0]), x, y, x + size, y + size, 0, 100);
 
 	// Draw up to 4 subsequent textures (overlaid)
 	rgba_t(255, 255, 255, 127*alpha, 0).set_gl();
 	for (unsigned a = 1; a < textures.size() && a < 5; a++)
-		Drawing::drawTextureWithin(theMapEditor->textureManager().getFlat(textures[a]), x, y, x + size, y + size, 0, true);
+		Drawing::drawTextureWithin(theMapEditor->textureManager().getFlat(textures[a]), x, y, x + size, y + size, 0, 100);
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -143,8 +145,8 @@ void SectorTextureOverlay::openSectors(vector<MapSector*>& list) {
 
 		// Add floor texture if different
 		bool exists = false;
-		for (unsigned a = 0; a < tex_floor.size(); a++) {
-			if (tex_floor[a] == ftex) {
+		for (unsigned t = 0; t < tex_floor.size(); t++) {
+			if (tex_floor[t] == ftex) {
 				exists = true;
 				break;
 			}
@@ -154,8 +156,8 @@ void SectorTextureOverlay::openSectors(vector<MapSector*>& list) {
 
 		// Add ceiling texture if different
 		exists = false;
-		for (unsigned a = 0; a < tex_ceil.size(); a++) {
-			if (tex_ceil[a] == ctex) {
+		for (unsigned t = 0; t < tex_ceil.size(); t++) {
+			if (tex_ceil[t] == ctex) {
 				exists = true;
 				break;
 			}
@@ -237,6 +239,7 @@ void SectorTextureOverlay::browseFloorTexture() {
 
 	// Open texture browser
 	MapTextureBrowser browser(theMapEditor, 1, texture);
+	browser.SetTitle("Browse Floor Texture");
 	if (browser.ShowModal() == wxID_OK) {
 		// Set texture
 		tex_floor.clear();
@@ -255,6 +258,7 @@ void SectorTextureOverlay::browseCeilingTexture() {
 
 	// Open texture browser
 	MapTextureBrowser browser(theMapEditor, 1, texture);
+	browser.SetTitle("Browse Ceiling Texture");
 	if (browser.ShowModal() == wxID_OK) {
 		// Set texture
 		tex_ceil.clear();

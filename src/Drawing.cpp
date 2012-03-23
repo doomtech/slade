@@ -280,7 +280,7 @@ void Drawing::drawFilledRect(double x1, double y1, double x2, double y2) {
  * texture will be zoomed to fit the rectangle. Returns the resulting
  * texture rectangle coordinates
  *******************************************************************/
-frect_t Drawing::fitTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, bool upscale) {
+frect_t Drawing::fitTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, double max_scale) {
 	// Ignore null texture
 	if (!tex)
 		return frect_t();
@@ -299,9 +299,9 @@ frect_t Drawing::fitTextureWithin(GLTexture* tex, double x1, double y1, double x
 	// Set scale to smallest of the 2 (so that none of the texture will be clipped)
 	double scale = MIN(x_scale, y_scale);
 
-	// If we don't want to magnify the image, clamp scale to a max of 1.0
-	if (!upscale && scale > 1)
-		scale = 1;
+	// Clamp scale to maximum desired scale
+	if (scale > max_scale)
+		scale = max_scale;
 
 	// Return the fitted rectangle
 	return frect_t(x1 + width*0.5 - (scale*tex->getWidth()*0.5),
@@ -315,7 +315,7 @@ frect_t Drawing::fitTextureWithin(GLTexture* tex, double x1, double y1, double x
  * and keeping the correct aspect ratio. If [upscale] is true the
  * texture will be zoomed to fit the rectangle
  *******************************************************************/
-void Drawing::drawTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, bool upscale) {
+void Drawing::drawTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, double max_scale) {
 	// Ignore null texture
 	if (!tex)
 		return;
@@ -334,9 +334,9 @@ void Drawing::drawTextureWithin(GLTexture* tex, double x1, double y1, double x2,
 	// Set scale to smallest of the 2 (so that none of the texture will be clipped)
 	double scale = MIN(x_scale, y_scale);
 
-	// If we don't want to magnify the image, clamp scale to a max of 1.0
-	if (!upscale && scale > 1)
-		scale = 1;
+	// Clamp scale to maximum desired scale
+	if (scale > max_scale)
+		scale = max_scale;
 
 	// Now draw the texture
 	glPushMatrix();

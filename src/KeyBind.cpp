@@ -344,6 +344,9 @@ void KeyBind::initBinds() {
 	addBind("me2d_edit_accept", keypress_t("return"), "Accept edit");
 	addBind("me2d_edit_cancel", keypress_t("escape"), "Cancel edit");
 
+	// Map Editor 2D Lines mode (me2d_line*)
+	addBind("me2d_line_change_texture", keypress_t("T", KPM_CTRL), "Change texture(s)");
+
 	// Map Editor 2D Sectors mode (me2d_sector*)
 	addBind("me2d_sector_light_up16", keypress_t("'"), "Light level up 16");
 	addBind("me2d_sector_light_up", keypress_t("'", KPM_SHIFT), "Light level up 1");

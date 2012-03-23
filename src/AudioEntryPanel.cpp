@@ -311,7 +311,9 @@ bool AudioEntryPanel::openAudio(MemChunk& audio, string filename) {
 	// Stop if sound currently playing
 	sound.stop();
 	music.stop();
+#ifndef NOLIBMODPLUG
 	mod.stop();
+#endif
 
 	// (Re)create sound buffer
 	if (sound_buffer)
@@ -518,8 +520,10 @@ void AudioEntryPanel::stopStream() {
 		sound.pause(); break;
 	case AUTYPE_MUSIC:
 		music.pause(); break;
+#ifndef NOLIBMODPLUG
 	case AUTYPE_MOD:
 		mod.pause(); break;
+#endif
 #endif
 	case AUTYPE_MIDI:
 		theMIDIPlayer->pause(); break;
@@ -610,8 +614,10 @@ void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 		pos = sound.getPlayingOffset().asMilliseconds(); break;
 	case AUTYPE_MUSIC:
 		pos = music.getPlayingOffset().asMilliseconds(); break;
+#ifndef NOLIBMODPLUG
 	case AUTYPE_MOD:
 		pos = mod.getPlayingOffset().asMilliseconds(); break;
+#endif
 #endif
 	case AUTYPE_MIDI:
 		pos = theMIDIPlayer->getPosition(); break;
@@ -654,8 +660,10 @@ void AudioEntryPanel::onSliderSeekChanged(wxCommandEvent& e) {
 		sound.setPlayingOffset(sf::milliseconds(slider_seek->GetValue())); break;
 	case AUTYPE_MUSIC:
 		music.setPlayingOffset(sf::milliseconds(slider_seek->GetValue())); break;
+#ifndef NOLIBMODPLUG
 	case AUTYPE_MOD:
 		mod.setPlayingOffset(sf::milliseconds(slider_seek->GetValue())); break;
+#endif
 #endif
 	case AUTYPE_MIDI:
 		theMIDIPlayer->setPosition(slider_seek->GetValue()); break;

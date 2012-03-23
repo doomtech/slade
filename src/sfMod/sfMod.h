@@ -32,6 +32,8 @@
 #ifndef SFMOD_H
 #define SFMOD_H
 
+#ifndef NOLIBMODPLUG
+
 #define SFMOD_BUFFERSIZE 4096
 
 #include <string>
@@ -267,6 +269,6 @@ private:
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
+#endif//NOLIBMODPLUG
 
 #endif //SFMOD_H

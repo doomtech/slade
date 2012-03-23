@@ -813,6 +813,9 @@
     <ClCompile Include="src\SectorTextureOverlay.cpp">
       <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClCompile>
+    <ClCompile Include="src\LineTextureOverlay.cpp">
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1519,6 +1522,9 @@
       <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClInclude>
     <ClInclude Include="src\SectorTextureOverlay.h">
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LineTextureOverlay.h">
       <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClInclude>
   </ItemGroup>
