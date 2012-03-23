@@ -1697,6 +1697,9 @@
     <None Include="dist\res\config\games\include\sectors\zdoom_sectors.cfg">
       <Filter>Map Editor\GameConfiguration\Configurations\Sectors</Filter>
     </None>
+    <None Include="dist\res\config\games\doom2_udmf.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SLADE.rc" />

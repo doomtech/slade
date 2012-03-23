@@ -13,6 +13,7 @@ protected:
 	unsigned		index;
 	GLTexture*		image;
 	BrowserWindow*	parent;
+	bool			blank;
 
 public:
 	BrowserItem(string name, unsigned index = 0, string type = "item");

@@ -192,6 +192,7 @@ void LineTextureOverlay::draw(int width, int height, float fade) {
 	Drawing::drawFilledRect(0, 0, width, height);
 
 	// Draw textures
+	glEnable(GL_LINE_SMOOTH);
 	int cur_size = tex_size*fade;
 	if (!active)
 		cur_size = tex_size;

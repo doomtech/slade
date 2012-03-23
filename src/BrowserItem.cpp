@@ -47,6 +47,7 @@ BrowserItem::BrowserItem(string name, unsigned index, string type) {
 	this->index = index;
 	this->type = type;
 	this->image = NULL;
+	this->blank = false;
 }
 
 /* BrowserItem::~BrowserItem
@@ -68,16 +69,32 @@ bool BrowserItem::loadImage() {
  * ratio of it's image
  *******************************************************************/
 void BrowserItem::draw(int size, int x, int y, int font, int nametype, int viewtype, rgba_t colour, bool text_shadow) {
-	// Try to load image if it isn't already
-	if (!image || (image && !image->isLoaded()))
-		loadImage();
-
 	// Determine item name string (for normal viewtype)
 	string draw_name = "";
 	if (nametype == 0)
 		draw_name = name;
 	else if (nametype == 1)
 		draw_name = S_FMT("%d", index);
+
+	// Item name
+	if (viewtype == 0) {
+		if (text_shadow) Drawing::drawText(draw_name, x+(size*0.5+1), y+size+5, COL_BLACK, font, Drawing::ALIGN_CENTER);
+		Drawing::drawText(draw_name, x+(size*0.5), y+size+4, colour, font, Drawing::ALIGN_CENTER);
+	}
+	else if (viewtype == 1) {
+		if (text_shadow) Drawing::drawText(name, x+size+9, y+(size*0.5)+1, COL_BLACK, font);
+		Drawing::drawText(name, x+size+8, y+(size*0.5), colour, font);
+		if (text_shadow) Drawing::drawText(S_FMT("%d", index), x+size+9, y+(size*0.5)-15, COL_BLACK, font);
+		Drawing::drawText(S_FMT("%d", index), x+size+8, y+(size*0.5)-16, colour, font);
+	}
+
+	// If the item is blank don't bother with the image
+	if (blank)
+		return;
+
+	// Try to load image if it isn't already
+	if (!image || (image && !image->isLoaded()))
+		loadImage();
 
 	// If it still isn't just draw a red box with an X
 	if (!image || (image && !image->isLoaded())) {
@@ -101,18 +118,6 @@ void BrowserItem::draw(int size, int x, int y, int font, int nametype, int viewt
 		glVertex2i(x, y+size);
 		glVertex2i(x+size, y);
 		glEnd();
-
-		// Item name
-		if (viewtype == 0) {
-			if (text_shadow) Drawing::drawText(draw_name, x+(size*0.5+1), y+size+5, COL_BLACK, font, Drawing::ALIGN_CENTER);
-			Drawing::drawText(draw_name, x+(size*0.5), y+size+4, colour, font, Drawing::ALIGN_CENTER);
-		}
-		else if (viewtype == 1) {
-			if (text_shadow) Drawing::drawText(name, x+size+9, y+(size*0.5)+1, COL_BLACK, font);
-			Drawing::drawText(name, x+size+8, y+(size*0.5), colour, font);
-			if (text_shadow) Drawing::drawText(S_FMT("%d", index), x+size+9, y+(size*0.5)-15, COL_BLACK, font);
-			Drawing::drawText(S_FMT("%d", index), x+size+8, y+(size*0.5)-16, colour, font);
-		}
 
 		glPopAttrib();
 
@@ -161,18 +166,6 @@ void BrowserItem::draw(int size, int x, int y, int font, int nametype, int viewt
 	glTexCoord2f(1.0f, 1.0f);	glVertex2d(left + width, top + height);
 	glTexCoord2f(1.0f, 0.0f);	glVertex2d(left + width, top);
 	glEnd();
-
-	// Item name
-	if (viewtype == 0) {
-		if (text_shadow) Drawing::drawText(draw_name, x+(size*0.5+1), y+size+5, COL_BLACK, font, Drawing::ALIGN_CENTER);
-		Drawing::drawText(draw_name, x+(size*0.5), y+size+4, colour, font, Drawing::ALIGN_CENTER);
-	}
-	else if (viewtype == 1) {
-		if (text_shadow) Drawing::drawText(name, x+size+9, y+(size*0.5)+1, COL_BLACK, font);
-		Drawing::drawText(name, x+size+8, y+(size*0.5), colour, font);
-		if (text_shadow) Drawing::drawText(S_FMT("%d", index), x+size+9, y+(size*0.5)-15, COL_BLACK, font);
-		Drawing::drawText(S_FMT("%d", index), x+size+8, y+(size*0.5)-16, colour, font);
-	}
 }
 
 /* BrowserItem::clearImage

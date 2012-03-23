@@ -13,6 +13,10 @@ MapTexBrowserItem::MapTexBrowserItem(string name, int type, unsigned index) : Br
 		this->type = "texture";
 	else if (type == 1)
 		this->type = "flat";
+
+	// Check for blank texture
+	if (name == "-" && type == 0)
+		blank = true;
 }
 
 MapTexBrowserItem::~MapTexBrowserItem() {
@@ -37,6 +41,10 @@ bool MapTexBrowserItem::loadImage() {
 
 string MapTexBrowserItem::itemInfo() {
 	string info;
+
+	// Check for blank texture
+	if (name == "-")
+		return "No Texture";
 
 	// Add dimensions if known
 	if (image)

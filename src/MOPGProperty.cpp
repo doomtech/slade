@@ -428,6 +428,11 @@ void MOPGLineFlagProperty::openObjects(vector<MapObject*>& objects) {
 			return;
 		}
 	}
+
+	// Set to common value
+	noupdate = true;
+	SetValue(first);
+	noupdate = false;
 }
 
 void MOPGLineFlagProperty::applyValue() {
@@ -470,6 +475,11 @@ void MOPGThingFlagProperty::openObjects(vector<MapObject*>& objects) {
 			return;
 		}
 	}
+
+	// Set to common value
+	noupdate = true;
+	SetValue(first);
+	noupdate = false;
 }
 
 void MOPGThingFlagProperty::applyValue() {

@@ -575,6 +575,7 @@
     <None Include="dist\res\config\games\doom1.cfg" />
     <None Include="dist\res\config\games\doom2.cfg" />
     <None Include="dist\res\config\games\doom2_boom.cfg" />
+    <None Include="dist\res\config\games\doom2_udmf.cfg" />
     <None Include="dist\res\config\games\doom2_zd_hexen.cfg" />
     <None Include="dist\res\config\games\doom2_zd_udmf.cfg" />
     <None Include="dist\res\config\games\doom64.cfg" />

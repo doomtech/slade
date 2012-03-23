@@ -80,6 +80,7 @@ void SectorTextureOverlay::draw(int width, int height, float fade) {
 	}
 
 	// Floor texture
+	glEnable(GL_LINE_SMOOTH);
 	drawTexture(fade, middlex - border - tex_size*0.5 - cur_size*0.5, middley - cur_size*0.5, cur_size, tex_floor, hover_floor);
 	Drawing::drawText("Floor:", middlex - border - tex_size*0.5, middley - tex_size*0.5 - 18, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 	Drawing::drawText(ftex, middlex - border - tex_size*0.5, middley + tex_size*0.5 + 2, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);

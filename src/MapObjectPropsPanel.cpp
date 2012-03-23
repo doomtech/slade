@@ -648,17 +648,8 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	for (unsigned a = 0; a < properties.size(); a++)
 		properties[a]->openObjects(objects);
 
-	// Handle line sides and flags (temporary)
+	// Handle line sides
 	if (objects[0]->getObjType() == MOBJ_LINE) {
-		// Set flags
-		for (int a = 0; a < theGameConfiguration->nLineFlags(); a++) {
-			wxPGProperty* prop = pg_properties->GetProperty(S_FMT("flag%d", a));
-			for (unsigned b = 0; b < objects.size(); b++) {
-				if (setBoolProperty(prop, theGameConfiguration->lineFlagSet(a, (MapLine*)objects[b]), b == 0))
-					break;
-			}
-		}
-
 		// Enable/disable side properties
 		wxPGProperty* prop = pg_properties->GetProperty("sidefront");
 		if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
@@ -673,18 +664,6 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 		else {
 			pg_props_side2->DisableProperty(pg_props_side2->GetGrid()->GetRoot());
 			pg_props_side2->SetPropertyValueUnspecified(pg_props_side2->GetGrid()->GetRoot());
-		}
-	}
-
-	// Handle thing flags (temporary)
-	if (objects[0]->getObjType() == MOBJ_THING) {
-		// Set flags
-		for (int a = 0; a < theGameConfiguration->nThingFlags(); a++) {
-			wxPGProperty* prop = pg_properties->GetProperty(S_FMT("flag%d", a));
-			for (unsigned b = 0; b < objects.size(); b++) {
-				if (setBoolProperty(prop, theGameConfiguration->thingFlagSet(a, (MapThing*)objects[b]), b == 0))
-					break;
-			}
 		}
 	}
 
