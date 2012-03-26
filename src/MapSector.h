@@ -54,6 +54,7 @@ public:
 
 	string	stringProperty(string key);
 	void	setStringProperty(string key, string value);
+	void	setFloatProperty(string key, double value);
 
 	fpoint2_t			midPoint();
 	void				resetBBox() { bbox.reset(); }

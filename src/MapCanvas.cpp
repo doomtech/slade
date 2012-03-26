@@ -483,6 +483,27 @@ void MapCanvas::drawSelectionNumbers() {
 	}
 }
 
+void MapCanvas::drawThingQuickAngleLines() {
+	// Check if any selection exists
+	vector<MapThing*> selection;
+	editor->getSelectedThings(selection);
+	if (selection.size() == 0)
+		return;
+
+	// Get moving colour
+	rgba_t col = ColourConfiguration::getColour("map_moving");
+	col.set_gl();
+
+	// Draw lines
+	glLineWidth(2.0f);
+	glBegin(GL_LINES);
+	for (unsigned a = 0; a < selection.size(); a++) {
+		glVertex2d(selection[a]->xPos(), selection[a]->yPos());
+		glVertex2d(mouse_pos_m.x, mouse_pos_m.y);
+	}
+	glEnd();
+}
+
 /* MapCanvas::draw
  * Draw the 2d map on the map gl canvas
  *******************************************************************/
@@ -595,10 +616,15 @@ void MapCanvas::draw() {
 			renderer_2d->renderFlatHilight(editor->hilightItem(), anim_flash_level);
 	}
 	else if (editor->editMode() == MapEditor::MODE_THINGS) {
+		// Check if we should force thing angles visible
+		bool force_dir = false;
+		if (mouse_state == MSTATE_THING_ANGLE)
+			force_dir = true;
+
 		// Things mode
 		renderer_2d->renderVertices(fade_vertices);				// Vertices
 		renderer_2d->renderLines(line_tabs_always, fade_lines);	// Lines
-		renderer_2d->renderThings(fade_things);					// Things
+		renderer_2d->renderThings(fade_things, force_dir);		// Things
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE && !overlayActive())
@@ -623,6 +649,10 @@ void MapCanvas::draw() {
 	// Draw selection numbers if needed
 	//if (editor->selectionSize() > 0)
 	//	drawSelectionNumbers();
+
+	// Draw thing quick angle lines if needed
+	if (mouse_state == MSTATE_THING_ANGLE)
+		drawThingQuickAngleLines();
 
 
 	// Draw selection box if active
@@ -1306,9 +1336,18 @@ void MapCanvas::onKeyBindPress(string name) {
 		}
 	}
 
-	// Change thing type
+
+	// --- Things mode keys ---
+
+	// Change type
 	else if (name == "me2d_thing_change_type" && editor->editMode() == MapEditor::MODE_THINGS)
 		changeThingType();
+
+	// Quick angle
+	else if (name == "me2d_thing_quick_angle" && editor->editMode() == MapEditor::MODE_THINGS) {
+		if (mouse_state == MSTATE_NORMAL)
+			mouse_state = MSTATE_THING_ANGLE;
+	}
 
 	// Change sector texture
 	else if (name == "me2d_sector_change_texture" && editor->editMode() == MapEditor::MODE_SECTORS)
@@ -1324,6 +1363,11 @@ void MapCanvas::onKeyBindRelease(string name) {
 		mouse_state = MSTATE_NORMAL;
 		editor->updateHilight(mouse_pos_m);
 		SetCursor(wxNullCursor);
+	}
+
+	else if (name == "me2d_thing_quick_angle") {
+		mouse_state = MSTATE_NORMAL;
+		editor->updateHilight(mouse_pos_m);
 	}
 }
 
@@ -1630,6 +1674,10 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 		mouse_state = MSTATE_MOVE;
 		renderer_2d->forceUpdate();
 	}
+
+	// Check if we are in thing quick angle state
+	if (mouse_state == MSTATE_THING_ANGLE)
+		editor->thingQuickAngle(mouse_pos_m);
 
 	e.Skip();
 }

@@ -19,6 +19,7 @@ namespace MathStuff {
 							double& x, double& y);
 	double		distanceRayLine(fpoint2_t ray_origin, fpoint2_t ray_dir, double x1, double y1, double x2, double y2);
 	double		angle2DRad(fpoint2_t p1, fpoint2_t p2, fpoint2_t p3);
+	fpoint2_t	rotatePoint(fpoint2_t origin, fpoint2_t point, double angle);
 }
 
 #endif//__MATHSTUFF_H__

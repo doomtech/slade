@@ -145,6 +145,7 @@ public:
 	void	mergeVerticesPoint(double x, double y);
 	void	splitLine(unsigned line, unsigned vertex);
 	void	moveThing(unsigned thing, double nx, double ny);
+	void	thingSetAnglePoint(unsigned thing, fpoint2_t point);
 
 	// Checks
 	int		removeDetachedVertices();

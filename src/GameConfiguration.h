@@ -6,6 +6,17 @@
 #include "ThingType.h"
 #include "UDMFProperty.h"
 
+#ifndef __ARCHIVE_H__
+// Define map types
+enum MapTypes {
+	MAP_UNKNOWN,
+	MAP_DOOM,
+	MAP_HEXEN,
+	MAP_DOOM64,
+	MAP_UDMF,
+};
+#endif//__ARCHIVE_H__
+
 struct tt_t {
 	ThingType*	type;
 	int			number;

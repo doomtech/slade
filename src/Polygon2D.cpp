@@ -93,20 +93,42 @@ bool Polygon2D::openSector(MapSector* sector) {
 	return splitter.doSplitting(this);
 }
 
-void Polygon2D::updateTextureCoords(double scale_x, double scale_y, double offset_x, double offset_y) {
+void Polygon2D::updateTextureCoords(double scale_x, double scale_y, double offset_x, double offset_y, double rotation) {
 	// Can't do this if there is no texture
 	if (!texture)
 		return;
 
+	// Check dimensions and scale
+	double width = texture->getWidth();
+	double height = texture->getHeight();
+	if (scale_x == 0) scale_x = 1;
+	if (scale_y == 0) scale_y = 1;
+	if (width == 0) width = 1;
+	if (height == 0) height = 1;
+
 	// Get texture info
-	double owidth = 1.0 / ((double)texture->getWidth() * scale_x);
-	double oheight = 1.0 / ((double)texture->getHeight() * scale_y);
+	double owidth = 1.0 / scale_x / width;
+	double oheight = 1.0 / scale_y / height;
 
 	// Set texture coordinates
+	double x, y;
 	for (unsigned p = 0; p < subpolys.size(); p++) {
 		for (unsigned a = 0; a < subpolys[p]->n_vertices; a++) {
-			subpolys[p]->vertices[a].tx = (offset_x + subpolys[p]->vertices[a].x) * owidth;
-			subpolys[p]->vertices[a].ty = (offset_y - subpolys[p]->vertices[a].y) * oheight;
+			x = (scale_x*offset_x) + subpolys[p]->vertices[a].x;
+			y = (scale_y*offset_y) - subpolys[p]->vertices[a].y;
+
+			// Apply rotation if any
+			/* (doesn't want to work)
+			if (rotation != 0) {
+				fpoint2_t np = MathStuff::rotatePoint(fpoint2_t(0, 0), fpoint2_t(x, y), rotation);
+				x = np.x;
+				y = np.y;
+			}
+			*/
+
+			// Set texture coordinate for vertex
+			subpolys[p]->vertices[a].tx = x * owidth;
+			subpolys[p]->vertices[a].ty = y * oheight;
 		}
 	}
 

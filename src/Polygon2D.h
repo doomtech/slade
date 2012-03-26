@@ -63,7 +63,7 @@ public:
 	unsigned		totalVertices();
 
 	bool	openSector(MapSector* sector);
-	void	updateTextureCoords(double scale_x = 1, double scale_y = 1, double offset_x = 0, double offset_y = 0);
+	void	updateTextureCoords(double scale_x = 1, double scale_y = 1, double offset_x = 0, double offset_y = 0, double rotation = 0);
 
 	unsigned	vboDataSize();
 	unsigned	writeToVBO(unsigned offset, unsigned index);

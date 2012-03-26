@@ -113,6 +113,7 @@ public:
 	void	changeSectorHeight(int amount, bool floor = true, bool ceiling = true);
 	void	changeSectorLight(int amount);
 	void	changeThingType(int newtype);
+	void	thingQuickAngle(fpoint2_t mouse_pos);
 
 	// Editor messages
 	unsigned	numEditorMessages();

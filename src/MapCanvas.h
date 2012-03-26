@@ -34,6 +34,7 @@ private:
 		MSTATE_SELECTION,
 		MSTATE_PANNING,
 		MSTATE_MOVE,
+		MSTATE_THING_ANGLE,
 	};
 	point2_t	mouse_pos;			// 'Raw' mouse position
 	point2_t	mouse_downpos;
@@ -97,6 +98,7 @@ public:
 	void	drawGrid();
 	void	drawEditorMessages();
 	void	drawSelectionNumbers();
+	void	drawThingQuickAngleLines();
 	void	draw();
 	void	update(long frametime);
 

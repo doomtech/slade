@@ -553,14 +553,14 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 	glColor4f(tt->getColour().fr(), tt->getColour().fg(), tt->getColour().fb(), alpha);
 
 	// Check for custom thing icon
-	if (!tt->getIcon().IsEmpty())
+	if (!tt->getIcon().IsEmpty() && !thing_force_dir && !things_angles)
 		tex = theMapEditor->textureManager().getEditorImage(S_FMT("thing/%s", CHR(tt->getIcon())));
 
 	if (!tex) {
 		// Otherwise, normal thing image
 
 		// Check if we want an angle indicator
-		if (tt->isAngled() || thing_force_dir) {
+		if (tt->isAngled() || thing_force_dir || things_angles) {
 			if (angle != 0) rotate = true;	// Also rotate to angle
 			tex = theMapEditor->textureManager().getEditorImage("thing/normal_d");
 		}
@@ -691,7 +691,7 @@ bool MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	glColor4f(tt->getColour().fr(), tt->getColour().fg(), tt->getColour().fb(), alpha);
 
 	// Check for custom thing icon
-	if (!tt->getIcon().IsEmpty() && showicon)
+	if (!tt->getIcon().IsEmpty() && showicon && !thing_force_dir && !things_angles)
 		tex = theMapEditor->textureManager().getEditorImage(S_FMT("thing/square/%s", CHR(tt->getIcon())));
 
 	// Otherwise, no icon
@@ -699,7 +699,7 @@ bool MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	if (!tex) {
 		tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_n");
 
-		if (tt->isAngled() && showicon) {
+		if (tt->isAngled() && showicon || thing_force_dir || things_angles) {
 			tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_d1");
 
 			// Setup variables depending on angle
@@ -820,11 +820,12 @@ void MapRenderer2D::renderSimpleSquareThing(double x, double y, double angle, Th
 	glPopMatrix();
 }
 
-void MapRenderer2D::renderThings(float alpha) {
+void MapRenderer2D::renderThings(float alpha, bool force_dir) {
 	// Don't bother if (practically) invisible
 	if (alpha <= 0.01f)
 		return;
 
+	things_angles = force_dir;
 	renderThingsImmediate(alpha);
 }
 
@@ -1200,7 +1201,34 @@ void MapRenderer2D::renderFlatsImmediate(int type, bool texture, float alpha) {
 		Polygon2D* poly = sector->getPolygon();
 		if (texture && poly->getTexture() != tex) {
 			poly->setTexture(tex);
-			poly->updateTextureCoords();
+
+			// Get scaling/offset info
+			double ox = 0;
+			double oy = 0;
+			double sx = 1;
+			double sy = 1;
+			double rot = 0;
+			// Check for UDMF + ZDoom extensions
+			if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+				// Floor
+				if (type <= 1) {
+					ox = sector->floatProperty("xpanningfloor");
+					oy = sector->floatProperty("ypanningfloor");
+					sx = sector->floatProperty("xscalefloor");
+					sy = sector->floatProperty("yscalefloor");
+					rot = sector->floatProperty("rotationfloor");
+				}
+				// Ceiling
+				else {
+					ox = sector->floatProperty("xpanningceiling");
+					oy = sector->floatProperty("ypanningceiling");
+					sx = sector->floatProperty("xscaleceiling");
+					sy = sector->floatProperty("yscaleceiling");
+					rot = sector->floatProperty("rotationceiling");
+				}
+			}
+
+			poly->updateTextureCoords(sx, sy, ox, oy, rot);
 		}
 
 		// Render the polygon
@@ -1279,7 +1307,34 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 		Polygon2D* poly = sector->getPolygon();
 		if (texture && poly->getTexture() != tex) {
 			poly->setTexture(tex);			// Set polygon texture
-			poly->updateTextureCoords();	// Update polygon texture coordinates
+			
+			// Get scaling/offset info
+			double ox = 0;
+			double oy = 0;
+			double sx = 1;
+			double sy = 1;
+			double rot = 0;
+			// Check for UDMF + ZDoom extensions
+			if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+				// Floor
+				if (type <= 1) {
+					ox = sector->floatProperty("xpanningfloor");
+					oy = sector->floatProperty("ypanningfloor");
+					sx = sector->floatProperty("xscalefloor");
+					sy = sector->floatProperty("yscalefloor");
+					rot = sector->floatProperty("rotationfloor");
+				}
+				// Ceiling
+				else {
+					ox = sector->floatProperty("xpanningceiling");
+					oy = sector->floatProperty("ypanningceiling");
+					sx = sector->floatProperty("xscaleceiling");
+					sy = sector->floatProperty("yscaleceiling");
+					rot = sector->floatProperty("rotationceiling");
+				}
+			}
+
+			poly->updateTextureCoords(sx, sy, ox, oy, rot);
 		}
 
 		// Update polygon VBO data if needed

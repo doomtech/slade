@@ -122,26 +122,6 @@ fpoint2_t MathStuff::closestPointOnLine(double x, double y, double x1, double y1
  * line from [x1,y1] to [x2,y2]
  *******************************************************************/
 double MathStuff::distanceToLine(double x, double y, double x1, double y1, double x2, double y2) {
-	/*
-	// Get line length
-	double len = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
-
-	// Calculate intersection distance
-	double u = 0;
-	if (len > 0) {
-		u = ((x-x1)*(x2-x1) + (y-y1)*(y2-y1)) / (len*len);
-
-		// Limit intersection distance to the line
-		double lbound = 1 / len;
-		if(u < lbound) u = lbound;
-		if(u > (1.0-lbound)) u = 1.0-lbound;
-	}
-
-	// Calculate intersection point
-	double ix = x1 + u*(x2 - x1);
-	double iy = y1 + u*(y2 - y1);
-	*/
-
 	// Calculate intersection point
 	fpoint2_t i = closestPointOnLine(x, y, x1, y1, x2, y2);
 
@@ -291,6 +271,22 @@ double MathStuff::angle2DRad(fpoint2_t p1, fpoint2_t p2, fpoint2_t p3) {
 		rs = (2*PI) - rs;
 
 	return rs;
+}
+
+fpoint2_t MathStuff::rotatePoint(fpoint2_t origin, fpoint2_t point, double angle) {
+	// Translate to origin
+	double x = point.x - origin.x;
+	double y = point.y - origin.y;
+
+	// Maths yay
+	double rot = (PI * 2.0) * ((360.0 - angle) / 360.0);
+	double srot = sin(rot);
+	double crot = cos(rot);
+	x = crot * x - srot * y;
+	y = srot * x + crot * y;
+
+	// Return rotated point
+	return fpoint2_t(x + origin.x, y + origin.y);
 }
 
 

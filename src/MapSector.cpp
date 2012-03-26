@@ -4,6 +4,7 @@
 #include "MapLine.h"
 #include "MapSide.h"
 #include "MapVertex.h"
+#include "GameConfiguration.h"
 
 MapSector::MapSector(SLADEMap* parent) : MapObject(MOBJ_SECTOR, parent) {
 	// Init variables
@@ -36,6 +37,20 @@ void MapSector::setStringProperty(string key, string value) {
 		c_tex = value;
 	else
 		MapObject::setStringProperty(key, value);
+}
+
+void MapSector::setFloatProperty(string key, double value) {
+	// Check if flat offset/scale/rotation is changing (if UDMF + ZDoom)
+	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+		if (key == "xpanningfloor" || key == "ypanningfloor" ||
+			key == "xpanningceiling" || key == "ypanningceiling" ||
+			key == "xscalefloor" || key == "yscalefloor" ||
+			key == "xscaleceiling" || key == "yscaleceiling" ||
+			key == "rotationfloor" || key == "rotationceiling")
+			polygon.setTexture(NULL);	// Clear texture to force update
+	}
+
+	MapObject::setFloatProperty(key, value);
 }
 
 fpoint2_t MapSector::midPoint() {

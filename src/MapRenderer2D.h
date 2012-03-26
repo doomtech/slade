@@ -53,6 +53,7 @@ private:
 	int		n_things;
 	double	view_scale;
 	double	view_scale_inv;
+	bool	things_angles;
 
 public:
 	MapRenderer2D(SLADEMap* map);
@@ -84,7 +85,7 @@ public:
 	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool fitradius = false);
 	void	renderSimpleSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
 	bool	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool showicon = true);
-	void	renderThings(float alpha = 1.0f);
+	void	renderThings(float alpha = 1.0f, bool force_dir = false);
 	void	renderThingsImmediate(float alpha);
 	void	renderThingHilight(int index, float fade);
 	void	renderThingSelection(vector<int>& selection, float fade = 1.0f);

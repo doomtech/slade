@@ -368,6 +368,7 @@ void KeyBind::initBinds() {
 
 	// Map Editor 2D Things mode (me2d_thing*)
 	addBind("me2d_thing_change_type", keypress_t("T", KPM_CTRL), "Change type");
+	addBind("me2d_thing_quick_angle", keypress_t("D"), "Quick angle edit");
 
 	// Map Editor 3D (me3d*)
 

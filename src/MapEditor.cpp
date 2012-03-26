@@ -996,6 +996,22 @@ void MapEditor::changeThingType(int newtype) {
 	updateDisplay();
 }
 
+void MapEditor::thingQuickAngle(fpoint2_t mouse_pos) {
+	// Do nothing if not in things mode
+	if (edit_mode != MODE_THINGS)
+		return;
+
+	// If selection is empty, check for hilight
+	if (selection.size() == 0 && hilight_item >= 0) {
+		map.thingSetAnglePoint(hilight_item, mouse_pos);
+		return;
+	}
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++)
+		map.thingSetAnglePoint(selection[a], mouse_pos);
+}
+
 unsigned MapEditor::numEditorMessages() {
 	return editor_messages.size();
 }
