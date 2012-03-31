@@ -54,6 +54,12 @@ CVAR(Bool, mew_maximized, true, CVAR_SAVE);
 
 
 /*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(Int, flat_drawtype);
+
+
+/*******************************************************************
  * MAPEDITORWINDOW CLASS FUNCTIONS
  *******************************************************************/
 
@@ -61,10 +67,11 @@ CVAR(Bool, mew_maximized, true, CVAR_SAVE);
  * MapEditorWindow class constructor
  *******************************************************************/
 MapEditorWindow::MapEditorWindow()
-: wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(mew_left, mew_top), wxSize(mew_width, mew_height)) {
+: STopWindow("SLADE", mew_left, mew_top, mew_width, mew_height) {
 	if (mew_maximized) Maximize();
 	setupLayout();
 	Show(false);
+	custom_menus_begin = 2;
 
 	// Set icon
 	string icon_filename = appPath("slade.ico", DIR_TEMP);
@@ -135,19 +142,31 @@ void MapEditorWindow::setupLayout() {
 	toolbar = new SToolBar(this);
 
 	// Map toolbar
-	SToolBarGroup* tbg_map = new SToolBarGroup(toolbar, "Map");
+	SToolBarGroup* tbg_map = new SToolBarGroup(toolbar, "_Map");
 	tbg_map->addActionButton("mapw_save");
 	tbg_map->addActionButton("mapw_rename");
 	toolbar->addGroup(tbg_map);
 
 	// Mode toolbar
-	SToolBarGroup* tbg_mode = new SToolBarGroup(toolbar, "Mode");
+	SToolBarGroup* tbg_mode = new SToolBarGroup(toolbar, "_Mode");
 	tbg_mode->addActionButton("mapw_mode_vertices");
 	tbg_mode->addActionButton("mapw_mode_lines");
 	tbg_mode->addActionButton("mapw_mode_sectors");
 	tbg_mode->addActionButton("mapw_mode_things");
 	theApp->toggleAction("mapw_mode_lines");	// Lines mode by default
 	toolbar->addGroup(tbg_mode);
+
+	// Flat type toolbar
+	SToolBarGroup* tbg_flats = new SToolBarGroup(toolbar, "_Flats Type");
+	tbg_flats->addActionButton("mapw_flat_none");
+	tbg_flats->addActionButton("mapw_flat_untextured");
+	tbg_flats->addActionButton("mapw_flat_textured");
+	toolbar->addGroup(tbg_flats);
+
+	// Toggle current flat type
+	if (flat_drawtype == 0) theApp->toggleAction("mapw_flat_none");
+	else if (flat_drawtype == 1) theApp->toggleAction("mapw_flat_untextured");
+	else theApp->toggleAction("mapw_flat_textured");
 
 	// Add toolbar
 	m_mgr->AddPane(toolbar, wxAuiPaneInfo().Top().CaptionVisible(false).MinSize(-1, 30).Resizable(false).PaneBorder(false).Name("toolbar"));

@@ -51,7 +51,7 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Int, things_always, 2, CVAR_SAVE)
-CVAR(Int, vertices_always, 2, CVAR_SAVE)
+CVAR(Int, vertices_always, 0, CVAR_SAVE)
 CVAR(Bool, line_tabs_always, 0, CVAR_SAVE)
 CVAR(Bool, flat_fade, 1, CVAR_SAVE)
 CVAR(Bool, line_fade, 0, CVAR_SAVE)
@@ -67,6 +67,7 @@ PolygonSplitter splitter;	// for testing
  * EXTERNAL VARIABLES
  *******************************************************************/
 EXTERN_CVAR(Int, vertex_size)
+EXTERN_CVAR(Bool, vertex_round)
 
 
 /* MapCanvas::MapCanvas
@@ -504,6 +505,49 @@ void MapCanvas::drawThingQuickAngleLines() {
 	glEnd();
 }
 
+void MapCanvas::drawLineDrawLines() {	// Best function name ever
+	// Get line draw colour
+	rgba_t col = ColourConfiguration::getColour("map_linedraw");
+	col.set_gl();
+
+	// Determine end point
+	fpoint2_t end = mouse_pos_m;
+	if (modifiers_current & wxMOD_SHIFT) {
+		// If shift is held down, snap to the nearest vertex (if any)
+		int vertex = editor->getMap().nearestVertex(end.x, end.y);
+		if (vertex >= 0) {
+			end.x = editor->getMap().getVertex(vertex)->xPos();
+			end.y = editor->getMap().getVertex(vertex)->yPos();
+		}
+	}
+	else if (editor->gridSnap()) {
+		// Otherwise, snap to grid if needed
+		end.x = editor->snapToGrid(end.x);
+		end.y = editor->snapToGrid(end.y);
+	}
+
+	// Draw lines
+	glLineWidth(2.0f);
+	glBegin(GL_LINE_STRIP);
+	for (unsigned a = 0; a < editor->nLineDrawPoints(); a++) {
+		fpoint2_t point = editor->lineDrawPoint(a);
+		glVertex2d(point.x, point.y);
+	}
+	glVertex2d(end.x, end.y);
+	glEnd();
+
+	// Draw points
+	glPointSize(vertex_size);
+	if (vertex_round) glEnable(GL_POINT_SMOOTH);
+	glBegin(GL_POINTS);
+	for (unsigned a = 0; a < editor->nLineDrawPoints(); a++) {
+		fpoint2_t point = editor->lineDrawPoint(a);
+		glVertex2d(point.x, point.y);
+	}
+	glVertex2d(end.x, end.y);
+	glEnd();
+}
+
 /* MapCanvas::draw
  * Draw the 2d map on the map gl canvas
  *******************************************************************/
@@ -523,6 +567,10 @@ void MapCanvas::draw() {
 	rgba_t col_bg = ColourConfiguration::getColour("map_background");
 	glClearColor(col_bg.fr(), col_bg.fg(), col_bg.fb(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisable(GL_TEXTURE_2D);
 	//glEnable(GL_COLOR_MATERIAL);
 
 	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
@@ -653,6 +701,10 @@ void MapCanvas::draw() {
 	// Draw thing quick angle lines if needed
 	if (mouse_state == MSTATE_THING_ANGLE)
 		drawThingQuickAngleLines();
+
+	// Draw line drawing lines if needed
+	if (mouse_state == MSTATE_LINE_DRAW)
+		drawLineDrawLines();
 
 
 	// Draw selection box if active
@@ -1110,6 +1162,48 @@ void MapCanvas::forceRefreshRenderer() {
 	renderer_2d->forceUpdate();
 }
 
+void MapCanvas::changeEditMode(int mode) {
+	// Set edit mode
+	int mode_prev = editor->editMode();
+	editor->setEditMode(mode);
+
+	// Update toolbar
+	if (mode != mode_prev) theMapEditor->removeAllCustomToolBars();
+	if (mode == MapEditor::MODE_VERTICES)
+		theApp->toggleAction("mapw_mode_vertices");
+	else if (mode == MapEditor::MODE_LINES)
+		theApp->toggleAction("mapw_mode_lines");
+	else if (mode == MapEditor::MODE_SECTORS) {
+		theApp->toggleAction("mapw_mode_sectors");
+
+		// Sector mode toolbar
+		if (mode_prev != MapEditor::MODE_SECTORS) {
+			wxArrayString actions;
+			actions.Add("mapw_sectormode_normal");
+			actions.Add("mapw_sectormode_floor");
+			actions.Add("mapw_sectormode_ceiling");
+			theMapEditor->addCustomToolBar("Sector Mode", actions);
+		}
+
+		// Toggle current sector mode
+		if (editor->sectorEditMode() == MapEditor::SECTOR_BOTH)
+			theApp->toggleAction("mapw_sectormode_normal");
+		else if (editor->sectorEditMode() == MapEditor::SECTOR_FLOOR)
+			theApp->toggleAction("mapw_sectormode_floor");
+		else if (editor->sectorEditMode() == MapEditor::SECTOR_CEILING)
+			theApp->toggleAction("mapw_sectormode_ceiling");
+	}
+	else if (mode == MapEditor::MODE_THINGS)
+		theApp->toggleAction("mapw_mode_things");
+	theMapEditor->refreshToolBar();
+
+	// Refresh
+	if (mode != MapEditor::MODE_LINES)
+		renderer_2d->forceUpdate(fade_lines);
+	else
+		renderer_2d->forceUpdate(1.0f);
+}
+
 void MapCanvas::changeThingType() {
 	// Determine the initial type
 	int type = -1;
@@ -1190,6 +1284,21 @@ void MapCanvas::onKeyBindPress(string name) {
 		return;
 	}
 
+	// Check if line drawing mode is active
+	if (mouse_state == MSTATE_LINE_DRAW) {
+		// Accept line draw
+		if (name == "me2d_edit_accept") {
+			mouse_state = MSTATE_NORMAL;
+			editor->endLineDraw();
+		}
+
+		// Cancel line draw
+		else if (name == "me2d_edit_cancel") {
+			mouse_state = MSTATE_NORMAL;
+			editor->endLineDraw(false);
+		}
+	}
+
 	// Pan left
 	if (name == "me2d_left")
 		pan(-128/view_scale, 0);
@@ -1234,56 +1343,24 @@ void MapCanvas::onKeyBindPress(string name) {
 	else if (name == "me2d_show_all")
 		viewFitToMap();
 
-	// Accept edit
-	else if (name == "me2d_edit_accept") {
-		if (overlay_current) {
-			delete overlay_current;
-			overlay_current = NULL;
-		}
-	}
-
-	// Cancel edit
-	else if (name == "me2d_edit_cancel") {
-		if (overlay_current) {
-			delete overlay_current;
-			overlay_current = NULL;
-		}
-	}
-
 	// Vertices mode
-	else if (name == "me2d_mode_vertices") {
-		editor->setEditMode(MapEditor::MODE_VERTICES);
-		theApp->toggleAction("mapw_mode_vertices");
-		theMapEditor->refreshToolBar();
-		renderer_2d->forceUpdate(fade_lines);
-	}
+	else if (name == "me2d_mode_vertices" && mouse_state == MSTATE_NORMAL)
+		changeEditMode(MapEditor::MODE_VERTICES);
 
 	// Lines mode
-	else if (name == "me2d_mode_lines") {
-		editor->setEditMode(MapEditor::MODE_LINES);
-		theApp->toggleAction("mapw_mode_lines");
-		theMapEditor->refreshToolBar();
-		renderer_2d->forceUpdate(1.0f);
-	}
+	else if (name == "me2d_mode_lines" && mouse_state == MSTATE_NORMAL)
+		changeEditMode(MapEditor::MODE_LINES);
 
 	// Sectors mode
-	else if (name == "me2d_mode_sectors") {
-		editor->setEditMode(MapEditor::MODE_SECTORS);
-		theApp->toggleAction("mapw_mode_sectors");
-		theMapEditor->refreshToolBar();
-		renderer_2d->forceUpdate(fade_lines);
-	}
+	else if (name == "me2d_mode_sectors" && mouse_state == MSTATE_NORMAL)
+		changeEditMode(MapEditor::MODE_SECTORS);
 
 	// Things mode
-	else if (name == "me2d_mode_things") {
-		editor->setEditMode(MapEditor::MODE_THINGS);
-		theApp->toggleAction("mapw_mode_things");
-		theMapEditor->refreshToolBar();
-		renderer_2d->forceUpdate(fade_lines);
-	}
+	else if (name == "me2d_mode_things" && mouse_state == MSTATE_NORMAL)
+		changeEditMode(MapEditor::MODE_THINGS);
 
 	// Pan view
-	else if (name == "me2d_pan_view") {
+	else if (name == "me2d_pan_view" && mouse_state == MSTATE_NORMAL) {
 		mouse_downpos.set(mouse_pos);
 		mouse_state = MSTATE_PANNING;
 		editor->clearHilight();
@@ -1296,18 +1373,19 @@ void MapCanvas::onKeyBindPress(string name) {
 		if (flat_drawtype > 2)
 			flat_drawtype = 0;
 
-		// Editor message
+		// Editor message and toolbar update
 		switch (flat_drawtype) {
-		case 0: editor->addEditorMessage("Flats: None"); break;
-		case 1: editor->addEditorMessage("Flats: Light Level"); break;
-		case 2: editor->addEditorMessage("Flats: Textured"); break;
-		//case 3: editor->addEditorMessage("Flats: Ceiling Texture"); break;
+		case 0: editor->addEditorMessage("Flats: None"); theApp->toggleAction("mapw_flat_none"); break;
+		case 1: editor->addEditorMessage("Flats: Untextured"); theApp->toggleAction("mapw_flat_untextured"); break;
+		case 2: editor->addEditorMessage("Flats: Textured"); theApp->toggleAction("mapw_flat_textured"); break;
 		default: break;
 		};
+
+		theMapEditor->refreshToolBar();
 	}
 
 	// Move items (toggle)
-	else if (name == "me2d_move") {
+	else if (name == "me2d_move" && mouse_state == MSTATE_NORMAL) {
 		if (mouse_state == MSTATE_NORMAL) {
 			if (editor->beginMove(mouse_pos_m)) {
 				mouse_state = MSTATE_MOVE;
@@ -1322,7 +1400,7 @@ void MapCanvas::onKeyBindPress(string name) {
 	}
 
 	// Change line texture
-	else if (name == "me2d_line_change_texture" && editor->editMode() == MapEditor::MODE_LINES) {
+	else if (name == "me2d_line_change_texture" && editor->editMode() == MapEditor::MODE_LINES && mouse_state == MSTATE_NORMAL) {
 		// Get selection
 		vector<MapLine*> selection;
 		editor->getSelectedLines(selection);
@@ -1336,36 +1414,42 @@ void MapCanvas::onKeyBindPress(string name) {
 		}
 	}
 
+	// Begin line drawing
+	else if (name == "me2d_begin_linedraw" && mouse_state == MSTATE_NORMAL) {
+		if (mouse_state == MSTATE_NORMAL)
+			mouse_state = MSTATE_LINE_DRAW;
+	}
+
 
 	// --- Things mode keys ---
 
 	// Change type
-	else if (name == "me2d_thing_change_type" && editor->editMode() == MapEditor::MODE_THINGS)
+	else if (name == "me2d_thing_change_type" && editor->editMode() == MapEditor::MODE_THINGS && mouse_state == MSTATE_NORMAL)
 		changeThingType();
 
 	// Quick angle
-	else if (name == "me2d_thing_quick_angle" && editor->editMode() == MapEditor::MODE_THINGS) {
+	else if (name == "me2d_thing_quick_angle" && editor->editMode() == MapEditor::MODE_THINGS && mouse_state == MSTATE_NORMAL) {
 		if (mouse_state == MSTATE_NORMAL)
 			mouse_state = MSTATE_THING_ANGLE;
 	}
 
 	// Change sector texture
-	else if (name == "me2d_sector_change_texture" && editor->editMode() == MapEditor::MODE_SECTORS)
+	else if (name == "me2d_sector_change_texture" && editor->editMode() == MapEditor::MODE_SECTORS && mouse_state == MSTATE_NORMAL)
 		changeSectorTexture();
 
 	// Not handled here, send to editor
-	else
+	else if (mouse_state == MSTATE_NORMAL)
 		editor->handleKeyBind(name, mouse_pos_m);
 }
 
 void MapCanvas::onKeyBindRelease(string name) {
-	if (name == "me2d_pan_view") {
+	if (name == "me2d_pan_view" && mouse_state == MSTATE_PANNING) {
 		mouse_state = MSTATE_NORMAL;
 		editor->updateHilight(mouse_pos_m);
 		SetCursor(wxNullCursor);
 	}
 
-	else if (name == "me2d_thing_quick_angle") {
+	else if (name == "me2d_thing_quick_angle" && mouse_state == MSTATE_THING_ANGLE) {
 		mouse_state = MSTATE_NORMAL;
 		editor->updateHilight(mouse_pos_m);
 	}
@@ -1382,31 +1466,39 @@ bool MapCanvas::handleAction(string id) {
 
 	// Vertices mode
 	if (id == "mapw_mode_vertices") {
-		editor->setEditMode(MapEditor::MODE_VERTICES);
-		renderer_2d->forceUpdate(fade_lines);
+		changeEditMode(MapEditor::MODE_VERTICES);
 		return true;
 	}
 
 	// Lines mode
 	else if (id == "mapw_mode_lines") {
-		editor->setEditMode(MapEditor::MODE_LINES);
-		renderer_2d->forceUpdate(1.0f);
+		changeEditMode(MapEditor::MODE_LINES);
 		return true;
 	}
 
 	// Sectors mode
 	else if (id == "mapw_mode_sectors") {
-		editor->setEditMode(MapEditor::MODE_SECTORS);
-		renderer_2d->forceUpdate(fade_lines);
+		changeEditMode(MapEditor::MODE_SECTORS);
 		return true;
 	}
 
 	// Things mode
 	else if (id == "mapw_mode_things") {
-		editor->setEditMode(MapEditor::MODE_THINGS);
-		renderer_2d->forceUpdate(fade_lines);
+		changeEditMode(MapEditor::MODE_THINGS);
 		return true;
 	}
+
+	// 'None' (wireframe) flat type
+	else if (id == "mapw_flat_none")
+		flat_drawtype = 0;
+
+	// 'Untextured' flat type
+	else if (id == "mapw_flat_untextured")
+		flat_drawtype = 1;
+
+	// 'Textured' flat type
+	else if (id == "mapw_flat_textured")
+		flat_drawtype = 2;
 
 	// --- Context menu ---
 
@@ -1492,6 +1584,9 @@ void MapCanvas::onSize(wxSizeEvent& e) {
 }
 
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
+	// Set current modifiers
+	modifiers_current = e.GetModifiers();
+
 	// Let keybind system handle it
 	KeyBind::keyPressed(KeyBind::asKeyPress(e.GetKeyCode(), e.GetModifiers()));
 
@@ -1524,6 +1619,9 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 }
 
 void MapCanvas::onKeyUp(wxKeyEvent& e) {
+	// Set current modifiers
+	modifiers_current = e.GetModifiers();
+
 	// Let keybind system handle it
 	KeyBind::keyReleased(KeyBind::keyName(e.GetKeyCode()));
 
@@ -1531,12 +1629,6 @@ void MapCanvas::onKeyUp(wxKeyEvent& e) {
 }
 
 void MapCanvas::onMouseDown(wxMouseEvent& e) {
-	// Do nothing if the cursor isn't in the normal state
-	if (mouse_state != MSTATE_NORMAL) {
-		e.Skip();
-		return;
-	}
-
 	// Update mouse variables
 	mouse_downpos.set(e.GetX(), e.GetY());
 	mouse_downpos_m.set(translateX(e.GetX()), translateY(e.GetY()));
@@ -1556,27 +1648,45 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 
 	// Left button
 	if (e.LeftDown()) {
-		// Begin box selection if shift is held down, otherwise toggle selection on hilighted object
-		if (e.ShiftDown())
-			mouse_state = MSTATE_SELECTION;
-		else
-			mouse_selbegin = !editor->selectCurrent(selection_clear_click);
+		// Line drawing state, add line draw point
+		if (mouse_state == MSTATE_LINE_DRAW) {
+			// Snap point to nearest vertex if shift is held down
+			bool nearest_vertex = false;
+			if (e.GetModifiers() & wxMOD_SHIFT)
+				nearest_vertex = true;
+
+			if (editor->addLineDrawPoint(mouse_downpos_m, nearest_vertex)) {
+				// If line drawing finished, revert to normal state
+				mouse_state = MSTATE_NORMAL;
+			}
+		}
+		else if (mouse_state == MSTATE_NORMAL) {
+			// Begin box selection if shift is held down, otherwise toggle selection on hilighted object
+			if (e.ShiftDown())
+				mouse_state = MSTATE_SELECTION;
+			else
+				mouse_selbegin = !editor->selectCurrent(selection_clear_click);
+		}
 	}
 
 	// Right button
 	else if (e.RightDown()) {
-		//if (editor->beginMove(mouse_downpos_m)) {
-		if (editor->isHilightOrSelection()) {
-			//mouse_state = MSTATE_MOVE;
-			//renderer_2d->forceUpdate();
-			mouse_movebegin = true;
+		// Remove line draw point if in line drawing state
+		if (mouse_state == MSTATE_LINE_DRAW)
+			editor->removeLineDrawPoint();
+
+		// Normal state
+		else if (mouse_state == MSTATE_NORMAL) {
+			// Begin move if something is selected/hilighted
+			if (editor->isHilightOrSelection())
+				mouse_movebegin = true;
+			else if (editor->editMode() == MapEditor::MODE_VERTICES)
+				editor->splitLine(mouse_pos_m.x, mouse_pos_m.y, 16/view_scale);
 		}
-		else if (editor->editMode() == MapEditor::MODE_VERTICES)
-			editor->splitLine(mouse_pos_m.x, mouse_pos_m.y, 16/view_scale);
 	}
 
 	// Any other mouse button (let keybind system handle it)
-	else
+	else if (mouse_state == MSTATE_NORMAL)
 		KeyBind::keyPressed(keypress_t(KeyBind::mbName(e.GetButton()), e.AltDown(), e.CmdDown(), e.ShiftDown()));
 
 	// Set focus
@@ -1622,7 +1732,7 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 			renderer_2d->forceUpdate();
 		}
 
-		else {
+		else if (mouse_state == MSTATE_NORMAL) {
 			// Context menu
 			wxMenu menu_context;
 

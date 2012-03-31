@@ -18,6 +18,7 @@ private:
 	vector<int>	selection;
 	int			gridsize;
 	int			sector_mode;
+	bool		grid_snap;
 
 	// Tagged items
 	vector<MapSector*>	tagged_sectors;
@@ -29,6 +30,9 @@ private:
 	fpoint2_t	move_vec;
 	vector<int>	move_items;
 	int			move_item_closest;
+
+	// Drawing
+	vector<fpoint2_t>	draw_points;
 
 	// Editor messages
 	struct editor_msg_t {
@@ -67,6 +71,7 @@ public:
 	vector<MapThing*>&	taggedThings() { return tagged_things; }
 	bool				hilightLocked() { return hilight_locked; }
 	void				lockHilight(bool lock = true) { hilight_locked = lock; }
+	bool				gridSnap() { return grid_snap; }
 
 	void	setEditMode(int mode);
 	void	setCanvas(MapCanvas* canvas) { this->canvas = canvas; }
@@ -114,6 +119,13 @@ public:
 	void	changeSectorLight(int amount);
 	void	changeThingType(int newtype);
 	void	thingQuickAngle(fpoint2_t mouse_pos);
+
+	// Line drawing
+	unsigned	nLineDrawPoints() { return draw_points.size(); }
+	fpoint2_t	lineDrawPoint(unsigned index);
+	bool		addLineDrawPoint(fpoint2_t point, bool nearest = false);
+	void		removeLineDrawPoint();
+	void		endLineDraw(bool apply = true);
 
 	// Editor messages
 	unsigned	numEditorMessages();

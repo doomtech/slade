@@ -27,6 +27,7 @@ private:
 	int						fr_idle;
 	sf::Clock				sfclock;
 	MapRenderer2D*			renderer_2d;
+	int						modifiers_current;
 
 	// Mouse stuff
 	enum {
@@ -35,6 +36,7 @@ private:
 		MSTATE_PANNING,
 		MSTATE_MOVE,
 		MSTATE_THING_ANGLE,
+		MSTATE_LINE_DRAW,
 	};
 	point2_t	mouse_pos;			// 'Raw' mouse position
 	point2_t	mouse_downpos;
@@ -99,6 +101,7 @@ public:
 	void	drawEditorMessages();
 	void	drawSelectionNumbers();
 	void	drawThingQuickAngleLines();
+	void	drawLineDrawLines();
 	void	draw();
 	void	update(long frametime);
 
@@ -106,6 +109,7 @@ public:
 	void	itemsSelected(vector<int>& items, bool selected = true);
 	void	updateInfoOverlay();
 	void	forceRefreshRenderer();
+	void	changeEditMode(int mode);
 
 	// Keybind/action handlers (that use UI features - anything else goes to MapEditor)
 	void	changeThingType();

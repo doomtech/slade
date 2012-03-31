@@ -275,8 +275,8 @@ bool KeyBind::keyReleased(string key) {
 
 		// Go through all keys bound to this keybind
 		for (unsigned a = 0; a < kb.keys.size(); a++) {
-			// Check for match with keypress
-			if (kb.keys[a].key == key) {
+			// Check for match with keypress, and that it is currently pressed
+			if (kb.keys[a].key == key && kb.pressed) {
 				// Set bind state
 				kb.pressed = false;
 
@@ -318,7 +318,7 @@ void KeyBind::initBinds() {
 	// Map Editor 2D (me2d*)
 	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection");
 	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan view");
-	addBind("me2d_pan_view", keypress_t("space", true));
+	addBind("me2d_pan_view", keypress_t("space", KPM_CTRL));
 	addBind("me2d_move", keypress_t("Z"), "Toggle item move mode");
 	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom in (towards mouse)");
 	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom out (towards mouse)");
@@ -343,6 +343,8 @@ void KeyBind::initBinds() {
 	addBind("me2d_lock_hilight", keypress_t("H", KPM_CTRL), "Lock/unlock hilight");
 	addBind("me2d_edit_accept", keypress_t("return"), "Accept edit");
 	addBind("me2d_edit_cancel", keypress_t("escape"), "Cancel edit");
+	addBind("me2d_begin_linedraw", keypress_t("space"), "Begin line drawing");
+	addBind("me2d_begin_shapedraw", keypress_t("space", KPM_SHIFT), "Begin shape drawing");
 
 	// Map Editor 2D Lines mode (me2d_line*)
 	addBind("me2d_line_change_texture", keypress_t("T", KPM_CTRL), "Change texture(s)");

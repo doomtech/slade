@@ -21,6 +21,7 @@ MapEditor::MapEditor() {
 	canvas = NULL;
 	hilight_locked = false;
 	sector_mode = SECTOR_BOTH;
+	grid_snap = true;
 }
 
 MapEditor::~MapEditor() {
@@ -1012,8 +1013,60 @@ void MapEditor::thingQuickAngle(fpoint2_t mouse_pos) {
 		map.thingSetAnglePoint(selection[a], mouse_pos);
 }
 
+fpoint2_t MapEditor::lineDrawPoint(unsigned index) {
+	// Check index
+	if (index >= draw_points.size())
+		return fpoint2_t(0, 0);
+	
+	return draw_points[index];
+}
+
+bool MapEditor::addLineDrawPoint(fpoint2_t point, bool nearest) {
+	// Snap to nearest vertex if necessary
+	if (nearest) {
+		int vertex = map.nearestVertex(point.x, point.y);
+		if (vertex >= 0) {
+			point.x = map.getVertex(vertex)->xPos();
+			point.y = map.getVertex(vertex)->yPos();
+		}
+	}
+
+	// Otherwise, snap to grid if necessary
+	else if (grid_snap) {
+		point.x = snapToGrid(point.x);
+		point.y = snapToGrid(point.y);
+	}
+
+	// Check if this is the same as the last point
+	if (draw_points.size() > 0 && point.x == draw_points.back().x && point.y == draw_points.back().y) {
+		// End line drawing
+		endLineDraw(true);
+		return true;
+	}
+
+	// Add point
+	draw_points.push_back(point);
+
+	// Check if first and last points match
+	if (draw_points.size() > 1 && point.x == draw_points[0].x && point.y == draw_points[0].y) {
+		endLineDraw(true);
+		return true;
+	}
+
+	return false;
+}
+
+void MapEditor::removeLineDrawPoint() {
+	draw_points.pop_back();
+}
+
 unsigned MapEditor::numEditorMessages() {
 	return editor_messages.size();
+}
+
+void MapEditor::endLineDraw(bool apply) {
+	// Clear draw points
+	draw_points.clear();
 }
 
 string MapEditor::getEditorMessage(int index) {

@@ -6,6 +6,7 @@
 #include "MapEditor.h"
 #include "MapTextureManager.h"
 #include "MainApp.h"
+#include "STopWindow.h"
 
 // The below is needed because, if I add a toolbar or dockable window to the main window,
 // then a previously saved perspective is loaded from slade3.cfg, the new item won't show
@@ -16,13 +17,12 @@
 class MapObject;
 class MapObjectPropsPanel;
 class SToolBar;
-class MapEditorWindow : public wxFrame, public SActionHandler {
+class MapEditorWindow : public STopWindow, public SActionHandler {
 private:
 	MapCanvas*				map_canvas;
 	MapEditor				editor;
 	MapTextureManager		tex_man;
 	MapObjectPropsPanel*	panel_obj_props;
-	SToolBar*				toolbar;
 
 	// Singleton instance
 	static MapEditorWindow*		instance;

@@ -8,6 +8,7 @@
 #include <wx/aui/aui.h>
 #include "PaletteChooser.h"
 #include "MainApp.h"
+#include "STopWindow.h"
 
 // The below is needed because, if I add a toolbar or dockable window to the main window,
 // then a previously saved perspective is loaded from slade3.cfg, the new item won't show
@@ -16,7 +17,7 @@
 #define MW_LAYOUT_VERS 9
 
 class SToolBar;
-class MainWindow : public wxFrame, SActionHandler {
+class MainWindow : public STopWindow, SActionHandler {
 private:
 	ArchiveManagerPanel*	panel_archivemanager;
 	wxAuiNotebook*			notebook_tabs;
@@ -24,8 +25,6 @@ private:
 	wxAuiManager*			m_mgr;
 	int						lasttipindex;
 	PaletteChooser*			palette_chooser;
-	vector<wxMenu*>			custom_menus;
-	SToolBar*				toolbar;
 
 	// Singleton instance
 	static MainWindow*		instance;
@@ -59,17 +58,6 @@ public:
 	void	openTextureEditor(Archive* archive);
 	void	openMapEditor(Archive* archive);
 	void	openEntry(ArchiveEntry* entry);
-
-	// Custom menu
-	void	addCustomMenu(wxMenu* menu, string title);
-	void	removeCustomMenu(wxMenu* menu);
-	void	removeAllCustomMenus();
-
-	// Toolbars
-	void	enableToolBar(string name, bool enable = true);
-	void	addCustomToolBar(string name, wxArrayString actions);
-	void	removeCustomToolBar(string name);
-	void	removeAllCustomToolBars();
 
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);

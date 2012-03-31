@@ -89,8 +89,9 @@ public:
  * MainWindow class constructor
  *******************************************************************/
 MainWindow::MainWindow()
-: wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(mw_left, mw_top), wxSize(mw_width, mw_height)) {
+: STopWindow("SLADE", mw_left, mw_top, mw_width, mw_height) {
 	lasttipindex = 0;
+	custom_menus_begin = 2;
 	if (mw_maximized) Maximize();
 	setupLayout();
 	SetDropTarget(new MainWindowDropTarget());
@@ -447,75 +448,6 @@ void MainWindow::openMapEditor(Archive* archive) {
  *******************************************************************/
 void MainWindow::openEntry(ArchiveEntry* entry) {
 	panel_archivemanager->openEntryTab(entry);
-}
-
-/* MainWindow::addCustomMenu
- * Adds [menu] to the menu bar after the 'Entry' menu
- *******************************************************************/
-void MainWindow::addCustomMenu(wxMenu* menu, string title) {
-	// Check menu doesn't already exist
-	for (unsigned a = 0; a < custom_menus.size(); a++) {
-		if (custom_menus[a] == menu)
-			return;
-	}
-
-	// Insert custom menu after the last existing custom menu
-	GetMenuBar()->Insert(2 + custom_menus.size(), menu, title);
-	GetMenuBar()->Refresh();
-	custom_menus.push_back(menu);
-}
-
-/* MainWindow::removeCustomMenu
- * Removes the menu matching [title] from the menu bar
- *******************************************************************/
-void MainWindow::removeCustomMenu(wxMenu* menu) {
-	// Go through custom menus
-	for (unsigned a = 0; a < custom_menus.size(); a++) {
-		if (custom_menus[a] == menu) {
-			// Menu found, remove it
-			custom_menus.erase(custom_menus.begin() + a);
-			GetMenuBar()->Remove(2 + a);
-			return;
-		}
-	}
-}
-
-/* MainWindow::removeAllCustomMenus
- * Removes all custom menus from the menu bar
- *******************************************************************/
-void MainWindow::removeAllCustomMenus() {
-	// Remove all custom menus from menubar
-	while (custom_menus.size() > 0)
-		removeCustomMenu(custom_menus[0]);
-}
-
-/* MainWindow::enableToolBar
- * Enables/disables the toolbar group matching [name]
- *******************************************************************/
-void MainWindow::enableToolBar(string name, bool enable) {
-	toolbar->enableGroup(name, enable);
-}
-
-/* MainWindow::addCustomToolBar
- * Adds a custom toolbar group to the toolbar, with buttons for each
- * action in [actions]
- *******************************************************************/
-void MainWindow::addCustomToolBar(string name, wxArrayString actions) {
-	toolbar->addActionGroup(name, actions);
-}
-
-/* MainWindow::removeCustomToolBar
- * Removes the toolbar group matching [name]
- *******************************************************************/
-void MainWindow::removeCustomToolBar(string name) {
-	toolbar->deleteGroup(name);
-}
-
-/* MainWindow::removeAllCustomToolBars
- * Removes all custom toolbar groups
- *******************************************************************/
-void MainWindow::removeAllCustomToolBars() {
-	toolbar->deleteCustomGroups();
 }
 
 /* MainWindow::handleAction
