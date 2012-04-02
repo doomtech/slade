@@ -1499,6 +1499,18 @@ bool MapCanvas::handleAction(string id) {
 	// 'Textured' flat type
 	else if (id == "mapw_flat_textured")
 		flat_drawtype = 2;
+		
+	// Normal sector edit mode
+	else if (id == "mapw_sectormode_normal")
+		editor->setSectorEditMode(MapEditor::SECTOR_BOTH);
+	
+	// Floors sector edit mode
+	else if (id == "mapw_sectormode_floor")
+		editor->setSectorEditMode(MapEditor::SECTOR_FLOOR);
+		
+	// Ceilings sector edit mode
+	else if (id == "mapw_sectormode_ceiling")
+		editor->setSectorEditMode(MapEditor::SECTOR_CEILING);
 
 	// --- Context menu ---
 

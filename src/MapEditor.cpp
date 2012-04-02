@@ -32,38 +32,49 @@ double MapEditor::gridSize() {
 }
 
 void MapEditor::setEditMode(int mode) {
-	// If the current mode is sectors and we're setting it to sectors, cycle the sector edit mode
-	if (edit_mode == MODE_SECTORS && mode == MODE_SECTORS) {
-		sector_mode++;
-		if (sector_mode > SECTOR_CEILING)
-			sector_mode = SECTOR_BOTH;
+	// Check if we are changing to the same mode
+	if (mode == edit_mode) {
+		// Cycle sector edit mode
+		if (mode == MODE_SECTORS)
+			setSectorEditMode(sector_mode + 1);
+		
+		// Do nothing otherwise
+		return;
 	}
-	else {
-		sector_mode = SECTOR_BOTH;
-		selection.clear();
-	}
-
+	
+	// Set edit mode
 	edit_mode = mode;
+	
+	// Clear hilight and selection stuff
 	hilight_item = -1;
-
-	// Clear tagged lists
+	selection.clear();
 	tagged_sectors.clear();
 	tagged_lines.clear();
 	tagged_things.clear();
-
-	// Determine sectors mode string
-	string smode = "Normal";
-	if (sector_mode == SECTOR_FLOOR)		smode = "Floors";
-	else if (sector_mode == SECTOR_CEILING)	smode = "Ceilings";
 
 	// Add editor message
 	switch (edit_mode) {
 	case MODE_VERTICES: addEditorMessage("Vertices mode"); break;
 	case MODE_LINES:	addEditorMessage("Lines mode"); break;
-	case MODE_SECTORS:	addEditorMessage(S_FMT("Sectors mode (%s)", CHR(smode))); break;
+	case MODE_SECTORS:	addEditorMessage("Sectors mode (Normal)"); break;
 	case MODE_THINGS:	addEditorMessage("Things mode"); break;
 	default: break;
 	};
+}
+
+void MapEditor::setSectorEditMode(int mode) {
+	// Set sector mode
+	sector_mode = mode;
+	if (sector_mode > SECTOR_CEILING || sector_mode < 0)
+		sector_mode = SECTOR_BOTH;
+	
+	// Editor message
+	if (sector_mode == SECTOR_BOTH)
+		addEditorMessage("Sectors mode (Normal)");
+	else if (sector_mode == SECTOR_FLOOR)
+		addEditorMessage("Sectors mode (Floors)");
+	else
+		addEditorMessage("Sectors mode (Ceilings)");
 }
 
 bool MapEditor::openMap(Archive::mapdesc_t map) {

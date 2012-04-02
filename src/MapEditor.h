@@ -74,6 +74,7 @@ public:
 	bool				gridSnap() { return grid_snap; }
 
 	void	setEditMode(int mode);
+	void	setSectorEditMode(int mode);
 	void	setCanvas(MapCanvas* canvas) { this->canvas = canvas; }
 
 	// Map loading

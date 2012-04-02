@@ -110,6 +110,7 @@ public:
 	void	updateInfoOverlay();
 	void	forceRefreshRenderer();
 	void	changeEditMode(int mode);
+	void	changeFlatType(int type);
 
 	// Keybind/action handlers (that use UI features - anything else goes to MapEditor)
 	void	changeThingType();
