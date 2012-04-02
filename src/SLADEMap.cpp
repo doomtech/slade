@@ -1647,16 +1647,16 @@ MapVertex* SLADEMap::vertexAt(double x, double y) {
 }
 
 // Sorting functions for SLADEMap::cutLines
-bool sortVPosXAsc(fpoint2_t& left, fpoint2_t& right) {
+bool sortVPosXAsc(const fpoint2_t& left, const fpoint2_t& right) {
 	return left.x < right.x;
 }
-bool sortVPosXDesc(fpoint2_t& left, fpoint2_t& right) {
+bool sortVPosXDesc(const fpoint2_t& left, const fpoint2_t& right) {
 	return left.x > right.x;
 }
-bool sortVPosYAsc(fpoint2_t& left, fpoint2_t& right) {
+bool sortVPosYAsc(const fpoint2_t& left, const fpoint2_t& right) {
 	return left.y < right.y;
 }
-bool sortVPosYDesc(fpoint2_t& left, fpoint2_t& right) {
+bool sortVPosYDesc(const fpoint2_t& left, const fpoint2_t& right) {
 	return left.y > right.y;
 }
 
