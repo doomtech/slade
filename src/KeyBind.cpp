@@ -345,6 +345,8 @@ void KeyBind::initBinds() {
 	addBind("me2d_edit_cancel", keypress_t("escape"), "Cancel edit");
 	addBind("me2d_begin_linedraw", keypress_t("space"), "Begin line drawing");
 	addBind("me2d_begin_shapedraw", keypress_t("space", KPM_SHIFT), "Begin shape drawing");
+	addBind("me2d_create_object", keypress_t("insert"), "Create object");
+	addBind("me2d_delete_object", keypress_t("delete"), "Delete objecr");
 
 	// Map Editor 2D Lines mode (me2d_line*)
 	addBind("me2d_line_change_texture", keypress_t("T", KPM_CTRL), "Change texture(s)");

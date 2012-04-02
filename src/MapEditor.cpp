@@ -44,6 +44,7 @@ void MapEditor::setEditMode(int mode) {
 	
 	// Set edit mode
 	edit_mode = mode;
+	sector_mode = SECTOR_BOTH;
 	
 	// Clear hilight and selection stuff
 	hilight_item = -1;
@@ -841,6 +842,7 @@ void MapEditor::endMove() {
 				continue;
 			fpoint2_t np(map.getVertex(a)->xPos() + move_vec.x, map.getVertex(a)->yPos() + move_vec.y);
 			map.moveVertex(a, np.x, np.y);
+			map.splitLinesAt(map.getVertex(a), 1);
 			merge_points.push_back(np);
 		}
 
@@ -1024,6 +1026,171 @@ void MapEditor::thingQuickAngle(fpoint2_t mouse_pos) {
 		map.thingSetAnglePoint(selection[a], mouse_pos);
 }
 
+void MapEditor::createObject(double x, double y) {
+	// Vertices mode
+	if (edit_mode == MODE_VERTICES) {
+		// If there are less than 2 vertices currently selected, just create a vertex at x,y
+		if (selection.size() < 2)
+			createVertex(x, y);
+		else {
+			// Otherwise, create lines between selected vertices
+			for (unsigned a = 0; a < selection.size() - 1; a++)
+				map.createLine(map.getVertex(selection[a]), map.getVertex(selection[a+1]));
+
+			// Editor message
+			addEditorMessage(S_FMT("Created %d line(s)", selection.size() - 1));
+
+			// Then switch to lines mode
+			setEditMode(MODE_LINES);
+		}
+
+		return;
+	}
+
+	// Things mode
+	if (edit_mode == MODE_THINGS) {
+		createThing(x, y);
+		return;
+	}
+}
+
+void MapEditor::createVertex(double x, double y) {
+	// Snap coordinates to grid if necessary
+	if (grid_snap) {
+		x = snapToGrid(x);
+		y = snapToGrid(y);
+	}
+
+	// Create vertex
+	MapVertex* vertex = map.createVertex(x, y, 2);
+
+	// Editor message
+	if (vertex)
+		addEditorMessage(S_FMT("Created vertex at (%d, %d)", (int)vertex->xPos(), (int)vertex->yPos()));
+}
+
+void MapEditor::createThing(double x, double y) {
+	// Snap coordinates to grid if necessary
+	if (grid_snap) {
+		x = snapToGrid(x);
+		y = snapToGrid(y);
+	}
+
+	// Create thing
+	MapThing* thing = map.createThing(x, y);
+
+	// Editor message
+	if (thing)
+		addEditorMessage(S_FMT("Created thing at (%d, %d)", (int)thing->xPos(), (int)thing->yPos()));
+}
+
+void MapEditor::deleteObject() {
+	// Vertices mode
+	if (edit_mode == MODE_VERTICES) {
+		// Get selected vertices
+		vector<MapVertex*> verts;
+		getSelectedVertices(verts);
+		int index = -1;
+		if (verts.size() == 1)
+			index = verts[0]->getIndex();
+
+		// Delete them (if any)
+		for (unsigned a = 0; a < verts.size(); a++)
+			map.removeVertex(verts[a]);
+
+		// Editor message
+		if (verts.size() == 1)
+			addEditorMessage(S_FMT("Deleted vertex #%d", index));
+		else if (verts.size() > 1)
+			addEditorMessage(S_FMT("Deleted %d vertices", verts.size()));
+	}
+
+	// Lines mode
+	else if (edit_mode == MODE_LINES) {
+		// Get selected lines
+		vector<MapLine*> lines;
+		getSelectedLines(lines);
+		int index = -1;
+		if (lines.size() == 1)
+			index = lines[0]->getIndex();
+
+		// Delete them (if any)
+		for (unsigned a = 0; a < lines.size(); a++)
+			map.removeLine(lines[a]);
+
+		// Editor message
+		if (lines.size() == 1)
+			addEditorMessage(S_FMT("Deleted line #%d", index));
+		else if (lines.size() > 1)
+			addEditorMessage(S_FMT("Deleted %d lines", lines.size()));
+	}
+
+	// Sectors mode
+	else if (edit_mode == MODE_SECTORS) {
+		// Get selected sectors
+		vector<MapSector*> sectors;
+		getSelectedSectors(sectors);
+		int index = -1;
+		if (sectors.size() == 1)
+			index = sectors[0]->getIndex();
+
+		// Delete them (if any), and keep a list of connected sides
+		vector<MapSide*> connected_sides;
+		for (unsigned a = 0; a < sectors.size(); a++) {
+			for (unsigned s = 0; s < sectors[a]->connectedSides().size(); s++)
+				connected_sides.push_back(sectors[a]->connectedSides()[s]);
+
+			map.removeSector(sectors[a]);
+		}
+
+		// Remove all connected sides
+		for (unsigned a = 0; a < connected_sides.size(); a++) {
+			// Before removing the side, check if we should flip the line
+			MapLine* line = connected_sides[a]->getParentLine();
+			if (connected_sides[a] == line->s1() && line->s2())
+				line->flip();
+
+			map.removeSide(connected_sides[a]);
+		}
+
+		// Editor message
+		if (sectors.size() == 1)
+			addEditorMessage(S_FMT("Deleted sector #%d", index));
+		else if (sectors.size() > 1)
+			addEditorMessage(S_FMT("Deleted %d sector", sectors.size()));
+
+		// Refresh map view
+		theMapEditor->forceRefresh(true);
+	}
+
+	// Things mode
+	else if (edit_mode == MODE_THINGS) {
+		// Get selected things
+		vector<MapThing*> things;
+		getSelectedThings(things);
+		int index = -1;
+		if (things.size() == 1)
+			index = things[0]->getIndex();
+
+		// Delete them (if any)
+		for (unsigned a = 0; a < things.size(); a++)
+			map.removeThing(things[a]);
+
+		// Editor message
+		if (things.size() == 1)
+			addEditorMessage(S_FMT("Deleted thing #%d", index));
+		else if (things.size() > 1)
+			addEditorMessage(S_FMT("Deleted %d things", things.size()));
+	}
+
+	// Remove detached vertices
+	map.removeDetachedVertices();
+
+	// Clear hilight and selection
+	selection.clear();
+	hilight_item = -1;
+}
+
 fpoint2_t MapEditor::lineDrawPoint(unsigned index) {
 	// Check index
 	if (index >= draw_points.size())
@@ -1076,6 +1243,37 @@ unsigned MapEditor::numEditorMessages() {
 }
 
 void MapEditor::endLineDraw(bool apply) {
+	// Check if we want to 'apply' the line draw (ie. create the lines)
+	if (apply && draw_points.size() > 1) {
+		// Create vertices
+		for (unsigned a = 0; a < draw_points.size(); a++)
+			map.createVertex(draw_points[a].x, draw_points[a].y, 1);
+
+		// Create lines
+		for (unsigned a = 0; a < draw_points.size() - 1; a++) {
+			// Check for intersections
+			vector<fpoint2_t> intersect = map.cutLines(draw_points[a].x, draw_points[a].y, draw_points[a+1].x, draw_points[a+1].y);
+			//wxLogMessage("%d intersect points", intersect.size());
+
+			// Create line normally if no intersections
+			if (intersect.size() == 0)
+				map.createLine(draw_points[a].x, draw_points[a].y, draw_points[a+1].x, draw_points[a+1].y, 1);
+			else {
+				// Intersections exist, create multiple lines between intersection points
+
+				// From first point to first intersection
+				map.createLine(draw_points[a].x, draw_points[a].y, intersect[0].x, intersect[0].y, 1);
+
+				// Between intersection points
+				for (unsigned p = 0; p < intersect.size() - 1; p++)
+					map.createLine(intersect[p].x, intersect[p].y, intersect[p+1].x, intersect[p+1].y, 1);
+
+				// From last intersection to next point
+				map.createLine(intersect.back().x, intersect.back().y, draw_points[a+1].x, draw_points[a+1].y, 1);
+			}
+		}
+	}
+
 	// Clear draw points
 	draw_points.clear();
 }
@@ -1205,4 +1403,13 @@ void MapEditor::updateDisplay() {
 CONSOLE_COMMAND(m_show_item, 1) {
 	int index = atoi(CHR(args[0]));
 	theMapEditor->mapEditor().showItem(index);
+}
+
+CONSOLE_COMMAND(m_vertex_attached, 1) {
+	MapVertex* vertex = theMapEditor->mapEditor().getMap().getVertex(atoi(CHR(args[0])));
+	if (vertex) {
+		wxLogMessage("Attached lines:");
+		for (unsigned a = 0; a < vertex->nConnectedLines(); a++)
+			wxLogMessage("Line #%d", vertex->connectedLine(a)->getIndex());
+	}
 }

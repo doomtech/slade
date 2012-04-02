@@ -91,6 +91,9 @@ public:
 	double		getLength();
 	bool		doubleSector();
 	fpoint2_t	dirTabPoint();
+
+	void	resetInternals();
+	void	flip(bool sides = true);
 };
 
 #endif //__MAPLINE_H__

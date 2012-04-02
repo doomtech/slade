@@ -40,11 +40,13 @@
 
 SLADEMap::SLADEMap() {
 	// Init variables
+	/*
 	this->i_lines = false;
 	this->i_sides = false;
 	this->i_sectors = false;
 	this->i_vertices = false;
 	this->i_things = false;
+	*/
 	this->geometry_updated = 0;
 	this->position_frac = false;
 }
@@ -98,13 +100,15 @@ int	SLADEMap::vertexIndex(MapVertex* v) {
 		return -1;
 
 	// Check if item index is valid
-	if (i_vertices)
+	if (v->index >= 0)
 		return v->index;
 
 	// Find vertex
 	for (unsigned a = 0; a < vertices.size(); a++) {
-		if (vertices[a] == v)
+		if (vertices[a] == v) {
+			v->index = a;
 			return a;
+		}
 	}
 
 	// Not found
@@ -117,13 +121,15 @@ int	SLADEMap::sideIndex(MapSide* s) {
 		return -1;
 
 	// Check if item index is valid
-	if (i_sides)
+	if (s->index >= 0)
 		return s->index;
 
 	// Find side
 	for (unsigned a = 0; a < sides.size(); a++) {
-		if (sides[a] == s)
+		if (sides[a] == s) {
+			s->index = a;
 			return a;
+		}
 	}
 
 	// Not found
@@ -136,13 +142,15 @@ int	SLADEMap::lineIndex(MapLine* l) {
 		return -1;
 
 	// Check if item index is valid
-	if (i_lines)
+	if (l->index >= 0)
 		return l->index;
 
 	// Find line
 	for (unsigned a = 0; a < lines.size(); a++) {
-		if (lines[a] == l)
+		if (lines[a] == l) {
+			l->index = a;
 			return a;
+		}
 	}
 
 	// Not found
@@ -155,13 +163,15 @@ int	SLADEMap::sectorIndex(MapSector* s) {
 		return -1;
 
 	// Check if item index is valid
-	if (i_sectors)
+	if (s->index >= 0)
 		return s->index;
 
 	// Find sector
 	for (unsigned a = 0; a < sectors.size(); a++) {
-		if (sectors[a] == s)
+		if (sectors[a] == s) {
+			s->index = a;
 			return a;
+		}
 	}
 
 	// Not found
@@ -174,13 +184,15 @@ int	SLADEMap::thingIndex(MapThing* t) {
 		return -1;
 
 	// Check if item index is valid
-	if (i_things)
+	if (t->index >= 0)
 		return t->index;
 
 	// Find thing
 	for (unsigned a = 0; a < things.size(); a++) {
-		if (things[a] == t)
+		if (things[a] == t) {
+			t->index = a;
 			return a;
+		}
 	}
 
 	// Not found
@@ -207,27 +219,27 @@ int SLADEMap::objectIndex(MapObject* o) {
 
 void SLADEMap::refreshIndices() {
 	// Vertex indices
-	i_vertices = true;
+	//i_vertices = true;
 	for (unsigned a = 0; a < vertices.size(); a++)
 		vertices[a]->index = a;
 
 	// Side indices
-	i_sides = true;
+	//i_sides = true;
 	for (unsigned a = 0; a < sides.size(); a++)
 		sides[a]->index = a;
 
 	// Line indices
-	i_lines = true;
+	//i_lines = true;
 	for (unsigned a = 0; a < lines.size(); a++)
 		lines[a]->index = a;
 
 	// Sector indices
-	i_sectors = true;
+	//i_sectors = true;
 	for (unsigned a = 0; a < sectors.size(); a++)
 		sectors[a]->index = a;
 
 	// Thing indices
-	i_things = true;
+	//i_things = true;
 	for (unsigned a = 0; a < things.size(); a++)
 		things[a]->index = a;
 }
@@ -1305,46 +1317,30 @@ void SLADEMap::clearMap() {
 }
 
 bool SLADEMap::removeVertex(MapVertex* vertex) {
-	// Check line was given
+	// Check vertex was given
 	if (!vertex)
 		return false;
 
-	// Get line index
-	int index = vertexIndex(vertex);
-
-	if (index >= 0) {
-		// Remove all connected lines
-		for (unsigned a = 0; a < vertex->connected_lines.size(); a++)
-			removeLine(vertex->connectedLine(a));
-
-		// Remove the vertex
-		delete vertex;
-		vertices.erase(vertices.begin() + index);
-
-		// Vertex indices are now invalid
-		i_vertices = false;
-
-		return true;
-	}
-	else
-		return false;
+	return removeVertex(vertexIndex(vertex));
 }
 
 bool SLADEMap::removeVertex(unsigned index) {
 	// Check index
-	if (index > vertices.size())
+	if (index >= vertices.size())
 		return false;
 
 	// Remove all connected lines
-	for (unsigned a = 0; a < vertices[index]->connected_lines.size(); a++)
-		removeLine(vertices[index]->connectedLine(a));
+	vector<MapLine*> clines = vertices[index]->connected_lines;
+	for (unsigned a = 0; a < clines.size(); a++)
+		removeLine(clines[a]);
 
 	// Remove the vertex
 	delete vertices[index];
-	vertices.erase(vertices.begin() + index);
+	vertices[index] = vertices.back();
+	vertices[index]->index = index;
+	vertices.pop_back();
 
-	// Vertex indices are now invalid
-	i_vertices = false;
+	geometry_updated = theApp->runTimer();
 
 	return true;
 }
@@ -1359,31 +1355,104 @@ bool SLADEMap::removeLine(MapLine* line) {
 
 bool SLADEMap::removeLine(unsigned index) {
 	// Check index
-	if (index > lines.size())
+	if (index >= lines.size())
 		return false;
 
-	// Detach line from its vertices
-	lines[index]->vertex1->disconnectLine(lines[index]);
-	lines[index]->vertex2->disconnectLine(lines[index]);
+	// Init
+	lines[index]->resetInternals();
+	MapVertex* v1 = lines[index]->vertex1;
+	MapVertex* v2 = lines[index]->vertex2;
 
-	// Delete the line's sides
-	if (lines[index]->side1) {
-		sides.erase(sides.begin() + sideIndex(lines[index]->side1));
-		delete lines[index]->side1;
-		i_sides = false;
-	}
-	if (lines[index]->side2) {
-		sides.erase(sides.begin() + sideIndex(lines[index]->side2));
-		delete lines[index]->side2;
-		i_sides = false;
-	}
+	// Remove the line's sides
+	if (lines[index]->side1)
+		removeSide(lines[index]->side1);
+	if (lines[index]->side2)
+		removeSide(lines[index]->side2);
 
 	// Remove the line
 	delete lines[index];
-	lines.erase(lines.begin() + index);
+	lines[index] = lines[lines.size()-1];
+	lines[index]->index = index;
+	lines.pop_back();
 
-	// Line indices are now invalid
-	i_lines = false;
+	geometry_updated = theApp->runTimer();
+
+	return true;
+}
+
+bool SLADEMap::removeSide(MapSide* side) {
+	// Check side was given
+	if (!side)
+		return false;
+
+	return removeSide(sideIndex(side));
+}
+
+bool SLADEMap::removeSide(unsigned index) {
+	// Check index
+	if (index >= sides.size())
+		return false;
+
+	// Remove from parent line
+	MapLine* l = sides[index]->parent;
+	if (l->side1 == sides[index])
+		l->side1 = NULL;
+	if (l->side2 == sides[index])
+		l->side2 = NULL;
+
+	// Remove the side
+	delete sides[index];
+	sides[index] = sides.back();
+	sides[index]->index = index;
+	sides.pop_back();
+
+	return true;
+}
+
+bool SLADEMap::removeSector(MapSector* sector) {
+	// Check sector was given
+	if (!sector)
+		return false;
+
+	return removeSector(sectorIndex(sector));
+}
+
+bool SLADEMap::removeSector(unsigned index) {
+	// Check index
+	if (index >= sectors.size())
+		return false;
+
+	// Clear connected sides' sectors
+	for (unsigned a = 0; a < sectors[index]->connected_sides.size(); a++)
+		sectors[index]->connected_sides[a]->sector = NULL;
+
+	// Remove the sector
+	delete sectors[index];
+	sectors[index] = sectors.back();
+	sectors[index]->index = index;
+	sectors.pop_back();
+
+	return true;
+}
+
+bool SLADEMap::removeThing(MapThing* thing) {
+	// Check thing was given
+	if (!thing)
+		return false;
+
+	return removeThing(thingIndex(thing));
+}
+
+bool SLADEMap::removeThing(unsigned index) {
+	// Check index
+	if (index >= things.size())
+		return false;
+
+	// Remove the thing
+	delete things[index];
+	things[index] = things.back();
+	things[index]->index = index;
+	things.pop_back();
 
 	return true;
 }
@@ -1566,6 +1635,70 @@ bbox_t SLADEMap::getMapBBox() {
 	return bbox;
 }
 
+MapVertex* SLADEMap::vertexAt(double x, double y) {
+	// Go through all vertices
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		if (vertices[a]->x == x && vertices[a]->y == y)
+			return vertices[a];
+	}
+
+	// No vertex at [x,y]
+	return NULL;
+}
+
+// Sorting functions for SLADEMap::cutLines
+bool sortVPosXAsc(fpoint2_t& left, fpoint2_t& right) {
+	return left.x < right.x;
+}
+bool sortVPosXDesc(fpoint2_t& left, fpoint2_t& right) {
+	return left.x > right.x;
+}
+bool sortVPosYAsc(fpoint2_t& left, fpoint2_t& right) {
+	return left.y < right.y;
+}
+bool sortVPosYDesc(fpoint2_t& left, fpoint2_t& right) {
+	return left.y > right.y;
+}
+
+vector<fpoint2_t> SLADEMap::cutLines(double x1, double y1, double x2, double y2) {
+	// Init
+	vector<fpoint2_t> intersect_points;
+	double x, y;
+
+	// Go through map lines
+	for (unsigned a = 0; a < lines.size(); a++) {
+		// Check for intersection
+		if (MathStuff::linesIntersect(x1, y1, x2, y2, lines[a]->x1(), lines[a]->y1(), lines[a]->x2(), lines[a]->y2(), x, y)) {
+			// Add intersection point to vector
+			intersect_points.push_back(fpoint2_t(x, y));
+		}
+	}
+
+	// Return if no intersections
+	if (intersect_points.size() == 0)
+		return intersect_points;
+
+	// Check cutting line direction
+	double xdif = x2 - x1;
+	double ydif = y2 - y1;
+	if ((xdif*xdif) > (ydif*ydif)) {
+		// Sort points along x axis
+		if (xdif >= 0)
+			std::sort(intersect_points.begin(), intersect_points.end(), sortVPosXAsc);
+		else
+			std::sort(intersect_points.begin(), intersect_points.end(), sortVPosXDesc);
+	}
+	else {
+		// Sort points along y axis
+		if (ydif >= 0)
+			std::sort(intersect_points.begin(), intersect_points.end(), sortVPosYAsc);
+		else
+			std::sort(intersect_points.begin(), intersect_points.end(), sortVPosYDesc);
+	}
+
+	return intersect_points;
+}
+
 bool SLADEMap::lineInSector(MapLine* line, MapSector* sector) {
 	if (line->side1 && line->side1->sector == sector ||
 		line->side2 && line->side2->sector == sector)
@@ -1693,7 +1826,7 @@ rgba_t SLADEMap::getSectorColour(MapSector* sector, int where) {
 	}
 }
 
-MapVertex* SLADEMap::createVertex(double x, double y) {
+MapVertex* SLADEMap::createVertex(double x, double y, double split_dist) {
 	// Round position to integral if fractional positions are disabled
 	if (!position_frac) {
 		x = MathStuff::round(x);
@@ -1711,7 +1844,95 @@ MapVertex* SLADEMap::createVertex(double x, double y) {
 	nv->index = vertices.size();
 	vertices.push_back(nv);
 
+	// Check if this vertex splits any lines (if needed)
+	if (split_dist >= 0) {
+		int nlines = lines.size();
+		for (unsigned a = 0; a < nlines; a++) {
+			// Skip line if it shares the vertex
+			if (lines[a]->v1() == nv || lines[a]->v2() == nv)
+				continue;
+
+			if (fastDistanceToLine(x, y, a, split_dist) < split_dist) {
+				wxLogMessage("Vertex at (%1.2f,%1.2f) splits line %d", x, y, a);
+				splitLine(a, nv->index);
+			}
+		}
+	}
+
+	// Set geometry age
+	geometry_updated = theApp->runTimer();
+
 	return nv;
+}
+
+MapLine* SLADEMap::createLine(double x1, double y1, double x2, double y2, double split_dist) {
+	// Round coordinates to integral if fractional positions are disabled
+	if (!position_frac) {
+		x1 = MathStuff::round(x1);
+		y1 = MathStuff::round(y1);
+		x2 = MathStuff::round(x2);
+		y2 = MathStuff::round(y2);
+	}
+
+	//wxLogMessage("Create line (%1.2f,%1.2f) to (%1.2f,%1.2f)", x1, y1, x2, y2);
+
+	// Get vertices at points
+	MapVertex* vertex1 = vertexAt(x1, y1);
+	MapVertex* vertex2 = vertexAt(x2, y2);
+
+	// Create vertices if required
+	if (!vertex1)
+		vertex1 = createVertex(x1, y1, split_dist);
+	if (!vertex2)
+		vertex2 = createVertex(x2, y2, split_dist);
+
+	// Create line between vertices
+	return createLine(vertex1, vertex2);
+}
+
+MapLine* SLADEMap::createLine(MapVertex* vertex1, MapVertex* vertex2) {
+	// Check both vertices were given
+	if (!vertex1 || vertex1->parent_map != this)
+		return NULL;
+	if (!vertex2 || vertex2->parent_map != this)
+		return NULL;
+
+	// Check if there is already a line along the two given vertices
+	for (unsigned a = 0; a < lines.size(); a++) {
+		if ((lines[a]->vertex1 == vertex1 && lines[a]->vertex2 == vertex2) ||
+			(lines[a]->vertex2 == vertex1 && lines[a]->vertex1 == vertex2))
+			return lines[a];
+	}
+
+	// Create new line between vertices
+	MapLine* nl = new MapLine(vertex1, vertex2, NULL, NULL, this);
+	nl->index = lines.size();
+	lines.push_back(nl);
+
+	// Connect line to vertices
+	vertex1->connectLine(nl);
+	vertex2->connectLine(nl);
+
+	// Set geometry age
+	geometry_updated = theApp->runTimer();
+
+	return nl;
+}
+
+MapThing* SLADEMap::createThing(double x, double y) {
+	// Create the thing
+	MapThing* nt = new MapThing(this);
+
+	// Setup initial values
+	nt->x = x;
+	nt->y = y;
+	nt->index = things.size();
+	nt->type = 1;
+
+	// Add to things
+	things.push_back(nt);
+
+	return nt;
 }
 
 void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
@@ -1724,27 +1945,9 @@ void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
 	v->x = nx;
 	v->y = ny;
 
-	// Go through attached lines
-	for (unsigned a = 0; a < v->connected_lines.size(); a++) {
-		MapLine* line = v->connected_lines[a];
-		MapSector* s1 = line->frontSector();
-		MapSector* s2 = line->backSector();
-
-		// Reset line internals
-		line->length = -1;
-
-		// Reset front sector internals
-		if (s1) {
-			s1->resetPolygon();
-			s1->resetBBox();
-		}
-
-		// Reset back sector internals
-		if (s2) {
-			s2->resetPolygon();
-			s2->resetBBox();
-		}
-	}
+	// Reset all attached lines' geometry info
+	for (unsigned a = 0; a < v->connected_lines.size(); a++)
+		v->connected_lines[a]->resetInternals();
 
 	geometry_updated = theApp->runTimer();
 }
@@ -1781,8 +1984,9 @@ void SLADEMap::mergeVertices(unsigned vertex1, unsigned vertex2) {
 
 	// Delete the vertex
 	delete v2;
-	vertices.erase(vertices.begin() + vertex2);
-	i_vertices = false;
+	vertices[vertex2] = vertices.back();
+	vertices[vertex2]->index = vertex2;
+	vertices.pop_back();
 
 	// Delete any resulting zero-length lines
 	for (unsigned a = 0; a < zlines.size(); a++)
@@ -1829,24 +2033,34 @@ void SLADEMap::splitLine(unsigned line, unsigned vertex) {
 	v->connectLine(l);
 	l->length = -1;
 
-	// Create new sides
+	// Create and add new sides
 	MapSide* s1 = NULL;
 	MapSide* s2 = NULL;
 	if (l->side1) {
+		// Create side 1
 		s1 = new MapSide(*l->side1);
 		s1->setSector(l->side1->sector);
 		if (s1->sector) {
 			s1->sector->resetBBox();
 			s1->sector->resetPolygon();
 		}
+
+		// Add side
+		s1->index = sides.size();
+		sides.push_back(s1);
 	}
 	if (l->side2) {
+		// Create side 2
 		s2 = new MapSide(*l->side2);
 		s2->setSector(l->side2->sector);
 		if (s2->sector) {
 			s2->sector->resetBBox();
 			s2->sector->resetPolygon();
 		}
+
+		// Add side
+		s2->index = sides.size();
+		sides.push_back(s2);
 	}
 
 	// Create and add new line
@@ -1904,9 +2118,23 @@ void SLADEMap::thingSetAnglePoint(unsigned thing, fpoint2_t point) {
 	t->setIntProperty("angle", angle);
 }
 
+void SLADEMap::splitLinesAt(MapVertex* vertex, double split_dist) {
+	// Check if this vertex splits any lines (if needed)
+	int nlines = lines.size();
+	for (unsigned a = 0; a < nlines; a++) {
+		// Skip line if it shares the vertex
+		if (lines[a]->v1() == vertex || lines[a]->v2() == vertex)
+			continue;
+
+		if (fastDistanceToLine(vertex->x, vertex->y, a, split_dist) < split_dist) {
+			wxLogMessage("Vertex at (%1.2f,%1.2f) splits line %d", vertex->x, vertex->y, a);
+			splitLine(a, vertexIndex(vertex));
+		}
+	}
+}
+
 int SLADEMap::removeDetachedVertices() {
 	int count = 0;
-
 	for (int a = vertices.size() - 1; a >= 0; a--) {
 		if (vertices[a]->nConnectedLines() == 0) {
 			delete vertices[a];
@@ -1915,18 +2143,7 @@ int SLADEMap::removeDetachedVertices() {
 		}
 	}
 
-	/*
-	vector<MapVertex*>::iterator i = vertices.begin();
-	while (i != vertices.end()) {
-		if ((*i)->nConnectedLines() == 0) {
-			delete (*i);
-			vertices.erase(i);
-			count++;
-		}
-		else
-			i++;
-	}
-	*/
+	refreshIndices();
 
 	return count;
 }

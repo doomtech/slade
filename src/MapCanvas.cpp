@@ -1420,6 +1420,19 @@ void MapCanvas::onKeyBindPress(string name) {
 			mouse_state = MSTATE_LINE_DRAW;
 	}
 
+	// Create object
+	else if (name == "me2d_create_object" && mouse_state == MSTATE_NORMAL) {
+		// If in lines mode, begin line drawing
+		if (editor->editMode() == MapEditor::MODE_LINES)
+			mouse_state = MSTATE_LINE_DRAW;
+		else
+			editor->createObject(mouse_pos_m.x, mouse_pos_m.y);
+	}
+
+	// Delete object
+	else if (name == "me2d_delete_object" && mouse_state == MSTATE_NORMAL)
+		editor->deleteObject();
+
 
 	// --- Things mode keys ---
 

@@ -120,6 +120,12 @@ public:
 	void	changeSectorLight(int amount);
 	void	changeThingType(int newtype);
 	void	thingQuickAngle(fpoint2_t mouse_pos);
+	
+	// Object creation/deletion
+	void	createObject(double x, double y);
+	void	createVertex(double x, double y);
+	void	createThing(double x, double y);
+	void	deleteObject();
 
 	// Line drawing
 	unsigned	nLineDrawPoints() { return draw_points.size(); }

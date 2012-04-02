@@ -26,11 +26,13 @@ private:
 	// Map structure index status
 	// These are true if the per-item index of that type is up-to-date
 	// (used for faster item index lookup in certain cases)
+	/*
 	bool	i_lines;
 	bool	i_sides;
 	bool	i_sectors;
 	bool	i_vertices;
 	bool	i_things;
+	*/
 
 	// The last time the map geometry was updated
 	long	geometry_updated;
@@ -112,15 +114,23 @@ public:
 	bool	removeVertex(unsigned index);
 	bool	removeLine(MapLine* line);
 	bool	removeLine(unsigned index);
+	bool	removeSide(MapSide* side);
+	bool	removeSide(unsigned index);
+	bool	removeSector(MapSector* sector);
+	bool	removeSector(unsigned index);
+	bool	removeThing(MapThing* thing);
+	bool	removeThing(unsigned index);
 
 	// Geometry
-	double		fastDistanceToLine(double x, double y, unsigned line, double mindist = 64);
-	int			nearestVertex(double x, double y, double min = 64);
-	int			nearestLine(double x, double y, double min = 64);
-	int			nearestThing(double x, double y, double min = 64);
-	vector<int>	nearestThingMulti(double x, double y);
-	int			inSector(double x, double y);
-	bbox_t		getMapBBox();
+	double				fastDistanceToLine(double x, double y, unsigned line, double mindist = 64);
+	int					nearestVertex(double x, double y, double min = 64);
+	int					nearestLine(double x, double y, double min = 64);
+	int					nearestThing(double x, double y, double min = 64);
+	vector<int>			nearestThingMulti(double x, double y);
+	int					inSector(double x, double y);
+	bbox_t				getMapBBox();
+	MapVertex*			vertexAt(double x, double y);
+	vector<fpoint2_t>	cutLines(double x1, double y1, double x2, double y2);
 
 	bool	lineInSector(MapLine* line, MapSector* sector);
 	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);
@@ -137,7 +147,10 @@ public:
 	rgba_t	getSectorColour(MapSector* sector, int where = 0);
 
 	// Creation
-	MapVertex*	createVertex(double x, double y);
+	MapVertex*	createVertex(double x, double y, double split_dist = -1);
+	MapLine*	createLine(double x1, double y1, double x2, double y2, double split_dist = -1);
+	MapLine*	createLine(MapVertex* vertex1, MapVertex* vertex2);
+	MapThing*	createThing(double x, double y);
 
 	// Editing
 	void	moveVertex(unsigned vertex, double nx, double ny);
@@ -146,6 +159,7 @@ public:
 	void	splitLine(unsigned line, unsigned vertex);
 	void	moveThing(unsigned thing, double nx, double ny);
 	void	thingSetAnglePoint(unsigned thing, fpoint2_t point);
+	void	splitLinesAt(MapVertex* vertex, double split_dist = 0);
 
 	// Checks
 	int		removeDetachedVertices();

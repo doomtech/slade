@@ -37,8 +37,12 @@ void MapSide::setSector(MapSector* sector) {
 }
 
 int MapSide::intProperty(string key) {
-	if (key == "sector")
-		return sector->getIndex();
+	if (key == "sector") {
+		if (sector)
+			return sector->getIndex();
+		else
+			return -1;
+	}
 	else
 		return MapObject::intProperty(key);
 }

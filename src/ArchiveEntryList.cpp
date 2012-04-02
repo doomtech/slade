@@ -614,7 +614,11 @@ vector<ArchiveTreeNode*> ArchiveEntryList::getSelectedDirectories() {
  *******************************************************************/
 void ArchiveEntryList::labelEdited(int col, int index, string new_label) {
 	// Rename the entry
-	getEntry(index)->rename(new_label);
+	ArchiveEntry* entry = getEntry(index);
+	if (entry->getParent())
+		entry->getParent()->renameEntry(entry, new_label);
+	else
+		entry->rename(new_label);
 }
 
 /* ArchiveEntryList::onAnnouncement

@@ -33,6 +33,8 @@ MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2, SLADEMa
 }
 
 MapLine::~MapLine() {
+	if (vertex1) vertex1->disconnectLine(this);
+	if (vertex2) vertex2->disconnectLine(this);
 }
 
 MapSector* MapLine::frontSector() {
@@ -211,4 +213,39 @@ fpoint2_t MapLine::dirTabPoint() {
 	fpoint2_t invdir(-(vertex2->yPos() - vertex1->yPos()), vertex2->xPos() - vertex1->xPos());
 	invdir.normalize();
 	return fpoint2_t(mid.x - invdir.x*tablen, mid.y - invdir.y*tablen);
+}
+
+void MapLine::resetInternals() {
+	// Reset line internals
+	length = -1;
+
+	// Reset front sector internals
+	MapSector* s1 = frontSector();
+	if (s1) {
+		s1->resetPolygon();
+		s1->resetBBox();
+	}
+
+	// Reset back sector internals
+	MapSector* s2 = backSector();
+	if (s2) {
+		s2->resetPolygon();
+		s2->resetBBox();
+	}
+}
+
+void MapLine::flip(bool sides) {
+	// Flip vertices
+	MapVertex* v = vertex1;
+	vertex1 = vertex2;
+	vertex2 = v;
+
+	// Flip sides if needed
+	if (sides) {
+		MapSide* s = side1;
+		side1 = side2;
+		side2 = s;
+	}
+
+	resetInternals();
 }
