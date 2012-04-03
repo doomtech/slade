@@ -1230,14 +1230,19 @@ void MapCanvas::changeThingType() {
 void MapCanvas::changeSectorTexture() {
 	// Determine the initial texture
 	string texture = "";
+	string browser_title;
 	vector<MapSector*> selection;
 	editor->getSelectedSectors(selection);
 	if (selection.size() > 0) {
 		// Check edit mode
-		if (editor->sectorEditMode() == MapEditor::SECTOR_FLOOR)
+		if (editor->sectorEditMode() == MapEditor::SECTOR_FLOOR) {
 			texture = selection[0]->stringProperty("texturefloor");
-		else if (editor->sectorEditMode() == MapEditor::SECTOR_CEILING)
+			browser_title = "Browse Floor Texture";
+		}
+		else if (editor->sectorEditMode() == MapEditor::SECTOR_CEILING) {
 			texture = selection[0]->stringProperty("textureceiling");
+			browser_title = "Browse Ceiling Texture";
+		}
 		else {
 			if (overlay_current) delete overlay_current;
 			SectorTextureOverlay* sto = new SectorTextureOverlay();
@@ -1255,6 +1260,7 @@ void MapCanvas::changeSectorTexture() {
 
 	// Open texture browser
 	MapTextureBrowser browser(theMapEditor, 1, texture);
+	browser.SetTitle(browser_title);
 	if (browser.ShowModal() == wxID_OK) {
 		// Set texture depending on edit mode
 		for (unsigned a = 0; a < selection.size(); a++) {
@@ -1398,6 +1404,10 @@ void MapCanvas::onKeyBindPress(string name) {
 			renderer_2d->forceUpdate();
 		}
 	}
+
+	// Split line
+	else if (name == "me2d_split_line" && mouse_state == MSTATE_NORMAL)
+		editor->splitLine(mouse_pos_m.x, mouse_pos_m.y, 16/view_scale);
 
 	// Change line texture
 	else if (name == "me2d_line_change_texture" && editor->editMode() == MapEditor::MODE_LINES && mouse_state == MSTATE_NORMAL) {
@@ -1705,8 +1715,8 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 			// Begin move if something is selected/hilighted
 			if (editor->isHilightOrSelection())
 				mouse_movebegin = true;
-			else if (editor->editMode() == MapEditor::MODE_VERTICES)
-				editor->splitLine(mouse_pos_m.x, mouse_pos_m.y, 16/view_scale);
+			//else if (editor->editMode() == MapEditor::MODE_VERTICES)
+			//	editor->splitLine(mouse_pos_m.x, mouse_pos_m.y, 16/view_scale);
 		}
 	}
 
@@ -1757,7 +1767,7 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 			renderer_2d->forceUpdate();
 		}
 
-		else if (mouse_state == MSTATE_NORMAL) {
+		else if (mouse_state == MSTATE_NORMAL && (editor->selectionSize() > 0 || editor->hilightItem() >= 0)) {
 			// Context menu
 			wxMenu menu_context;
 
