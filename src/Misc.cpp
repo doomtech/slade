@@ -44,6 +44,7 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, size_as_string, true, CVAR_SAVE)
+CVAR(Bool, percent_encoding, false, CVAR_SAVE)
 
 
 /*******************************************************************
@@ -254,6 +255,55 @@ string Misc::sizeAsString(uint32_t size) {
 		double mb = (double)size / (1024*1024);
 		return S_FMT("%1.2fmb", mb);
 	}
+}
+
+/* Misc::lumpNameToFileName
+ * Sanitizes a wad lump name for exporting as a file name.
+ * ZDoom merely substitutes \ to ^, but Doomsday requires
+ * percent encoding of every non-alphanumeric character.
+ *******************************************************************/
+string Misc::lumpNameToFileName(string lump) {
+	if (percent_encoding) {
+		// Doomsday: everything but [a-zA-Z0-9._ ~-]
+		string file;
+		int chr;
+		for (size_t a = 0; a < lump.Len(); ++a) {
+			chr = lump[a];
+			if ((chr < 'a' || chr > 'z') && (chr < 'A' || chr > 'Z') && (chr < '0' || chr > '9')
+					&& chr != '-' && chr != '.' && chr != '_' && chr != '~') {
+				file += S_FMT("%%%02X", chr);
+			} else file += S_FMT("%c", chr);
+		}
+		return file;
+	} else {
+		// ZDoom
+		lump.Replace("\\", "^");
+		lump.Replace("/", "^");
+	}
+	return lump;
+}
+
+/* Misc::fileNameToLumpName
+ * Turns a file name into a lump name
+ *******************************************************************/
+string Misc::fileNameToLumpName(string file) {
+	if (percent_encoding) {
+		string lump;
+		for (size_t a = 0; a < file.Len(); ++a) {
+			if (file[a] == '%' && file.Len() > a+2) {
+				string code = file.Mid(a+1, 2);
+				unsigned long percent;
+				if (!code.ToULong(&percent, 16)) percent = 0;
+				lump += S_FMT("%c", percent);
+				a+=2;
+			} else lump += S_FMT("%c", file[a]);
+		}
+		return lump;
+	} else {
+		// ZDoom
+		if (file[4] == '^') file[4] = '\\';
+	}
+	return file;
 }
 
 /* Misc::massRenameFilter
@@ -486,3 +536,5 @@ uint32_t update_crc(uint32_t crc, const uint8_t *buf, uint32_t len) {
 uint32_t Misc::crc(const uint8_t *buf, uint32_t len) {
 	return update_crc(0xffffffffL, buf, len) ^ 0xffffffffL;
 }
+
+

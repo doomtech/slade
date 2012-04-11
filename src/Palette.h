@@ -54,7 +54,7 @@ public:
 	void	invert(int start, int end);
 
 	// For automated palette generation
-	void	idtint(int r, int g, int b, double amount);
+	void	idtint(int r, int g, int b, int shift, int steps);
 };
 
 #endif //__PALETTE_H__

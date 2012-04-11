@@ -30,6 +30,7 @@
 #include "Main.h"
 #include "Archive.h"
 #include "MainApp.h"
+#include "Misc.h"
 #include <wx/filename.h>
 #include <wx/dir.h>
 
@@ -316,12 +317,8 @@ bool ArchiveTreeNode::merge(ArchiveTreeNode* node, unsigned position) {
 
 	// Merge entries
 	for (unsigned a = 0; a < node->numEntries(); a++) {
-		// Safe substitution of special characters, using the ZDoom
-		// convention of changing folder separators into carets.
 		if (node->getEntry(a)) {
-			string name = node->getEntry(a)->getName();
-			name.Replace("\\", "^");
-			name.Replace("/", "^");
+			string name = Misc::lumpNameToFileName(node->getEntry(a)->getName());
 			node->getEntry(a)->setName(name);
 		}
 		addEntry(new ArchiveEntry(*(node->getEntry(a))), position);

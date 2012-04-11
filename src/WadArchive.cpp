@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "WadArchive.h"
 #include "SplashWindow.h"
+#include "Misc.h"
 #include <wx/filename.h>
 
 
@@ -476,21 +477,8 @@ ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
 	if (copy)
 		entry = new ArchiveEntry(*entry);
 
-	// Duplication of WadArchive::renameEntry logic without checkEntry call.
-	string name = entry->getName();
-
-	// Check for \ character (e.g., from Arch-Viles graphics). They have to be kept.
-	if (name.length() <= 8 && name.find('\\') != wxNOT_FOUND) {
-	} // Don't process as a file name
-
-	// Process name (must be 8 characters max, also cut any extension as wad entries don't usually want them)
-	else {
-		wxFileName fn(name);
-		name = fn.GetName().Truncate(8);
-	}
-	if (wad_force_uppercase) name.MakeUpper();
-
 	// Set new wad-friendly name
+	string name = processEntryName(entry->getName());
 	entry->setName(name);
 
 	// Do default entry addition (to root directory)
@@ -557,15 +545,13 @@ bool WadArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 		return false;
 }
 
-/* WadArchive::renameEntry
- * Override of Archive::renameEntry to update namespaces if needed
- * and rename the entry if necessary to be wad-friendly (8 characters
- * max and no file extension)
+/* WadArchive::processEntryName
+ * Contains the WadArchive::renameEntry logic
  *******************************************************************/
-bool WadArchive::renameEntry(ArchiveEntry* entry, string name) {
-	// Check entry
-	if (!checkEntry(entry))
-		return false;
+string WadArchive::processEntryName(string name) {
+
+	// Perform character substitution if needed
+	name = Misc::fileNameToLumpName(name);
 
 	// Check for \ character (e.g., from Arch-Viles graphics). They have to be kept.
 	if (name.length() <= 8 && name.find('\\') != wxNOT_FOUND) {
@@ -578,6 +564,19 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string name) {
 	}
 	if (wad_force_uppercase) name.MakeUpper();
 
+	return name;
+}
+/* WadArchive::renameEntry
+ * Override of Archive::renameEntry to update namespaces if needed
+ * and rename the entry if necessary to be wad-friendly (8 characters
+ * max and no file extension)
+ *******************************************************************/
+bool WadArchive::renameEntry(ArchiveEntry* entry, string name) {
+	// Check entry
+	if (!checkEntry(entry))
+		return false;
+	name = processEntryName(name);
+
 	// Do default rename
 	bool ok = Archive::renameEntry(entry, name);
 
@@ -589,8 +588,7 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string name) {
 
 		return true;
 	}
-	else
-		return false;
+	return false;
 }
 
 /* WadArchive::swapEntries

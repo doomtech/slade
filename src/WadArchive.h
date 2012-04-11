@@ -53,6 +53,7 @@ public:
 	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
 
 	// Entry modification
+	string	processEntryName(string name);
 	bool	renameEntry(ArchiveEntry* entry, string name);
 
 	// Entry moving

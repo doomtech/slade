@@ -913,7 +913,7 @@ bool PaletteEntryPanel::invert() {
 /* PaletteEntryPanel::generatePalette
  * Just a helper for generatePalettes to make the code less redundant
  *******************************************************************/
-void PaletteEntryPanel::generatePalette(int r, int g, int b, double a) {
+void PaletteEntryPanel::generatePalette(int r, int g, int b, int shift, int steps) {
 	// Create a new palette
 	Palette8bit * pal = new Palette8bit;
 	if (pal == NULL) return;
@@ -922,7 +922,7 @@ void PaletteEntryPanel::generatePalette(int r, int g, int b, double a) {
 	pal->copyPalette(palettes[0]);
 
 	// Tint palette with given values
-	pal->idtint(r, g, b, a);
+	pal->idtint(r, g, b, shift, steps);
 
 	// Add it to the palette list
 	palettes.push_back(pal);
@@ -944,48 +944,39 @@ bool PaletteEntryPanel::generatePalettes() {
 		// The first thirteen palettes are common
 
 		// Generate the eight REDPALS
-		// TODO: Check if using an oversaturated red at 256 would allow a regular amount
-		// progression instead of these silly values. Anyway, what matters is that they work.
-		double redpals[8] = { 0.1114, 0.22267, 0.33407, 0.4448, 0.556, 0.66667, 0.778, 0.889 };
-		for (int a = 0; a < 8; ++a)
-			generatePalette(255, 0, 0, redpals[a]);
+		for (int a = 1; a < 9; ++a)
+			generatePalette(255, 0, 0, a, 9);
 
 		// Then the four BONUSPALS, no table-based mess here, just a plain factor. :)
 		for (int a = 1; a < 5; ++a)
-			generatePalette(215, 186, 69, (double)a * 0.125);
+			generatePalette(215, 186, 69, a, 8);
 
 		// And here we are at the crossroad
 		if (choice == 1) {
 			// Write the Doom/Heretic/Strife palettes, that is to say:
 
 			// Write RADIATIONPAL with its oversaturated green
-			generatePalette(0, 256, 0, 0.125);
+			generatePalette(0, 256, 0, 1, 8);
 
 		} else {
 			// Write all the Hexen palettes
 
 			// Starting with the eight POISONPALS
-			// TODO: See if the rounding issue in the next to last could be
-			// addressed to use a regular progression instead. It's a shame
-			// to have it fail only with three off-by-one discrepancies when
-			// using 0.7 -- especially given that the others can't be made
-			// to use multiples of 0.10001...
-			double poisonpals[8] = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.70007, 0.8 };
-			for (int a = 0; a < 8; ++a)
-				generatePalette(44, 92, 36, poisonpals[a]);
+			for (int a = 1; a < 9; ++a)
+				generatePalette(44, 92, 36, a, 10);
 
 			// Then the ICEPAL
-			generatePalette(0, 0, 224, 0.5);
+			generatePalette(0, 0, 224, 1, 2);
 
 			// The three HOLYPALS
-			generatePalette(130, 130, 130, 0.5);
-			generatePalette(100, 100, 100, 0.5);
-			generatePalette(70, 70, 70, 0.5);
+			generatePalette(130, 130, 130, 1, 2);
+			generatePalette(100, 100, 100, 1, 2);
+			generatePalette(70, 70, 70, 1, 2);
 
 			// And lastly the three SCOURGEPAL
-			generatePalette(150, 110, 0, 0.5);
-			generatePalette(125, 92, 0, 0.5);
-			generatePalette(100, 73, 0, 0.5);
+			generatePalette(150, 110, 0, 1, 2);
+			generatePalette(125, 92, 0, 1, 2);
+			generatePalette(100, 73, 0, 1, 2);
 		}
 
 		// Refresh view to show changed amount of palettes

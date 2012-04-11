@@ -968,6 +968,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\src\LineTextureOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\LineTextureOverlay.h"
+						>
+					</File>
+					<File
 						RelativePath=".\src\MCOverlay.h"
 						>
 					</File>
@@ -1140,6 +1148,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\dist\res\config\games\doom2_prboom+.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\doom2_udmf.cfg"
+						>
+					</File>
+					<File
 						RelativePath=".\dist\res\config\games\doom2_zd_hexen.cfg"
 						>
 					</File>
@@ -1256,6 +1272,10 @@
 						</File>
 						<File
 							RelativePath=".\dist\res\config\games\include\things\mbf_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\musinfo_things.cfg"
 							>
 						</File>
 						<File
@@ -1907,6 +1927,14 @@
 			</File>
 			<File
 				RelativePath=".\src\SplashWindow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\STopWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\STopWindow.h"
 				>
 			</File>
 			<Filter

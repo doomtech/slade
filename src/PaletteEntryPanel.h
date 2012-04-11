@@ -29,7 +29,7 @@ private:
 	wxStaticText*			text_curpal;
 
 	// A helper for generatePalettes() which has no reason to be called outside
-	void					generatePalette(int r, int g, int b, double a);
+	void					generatePalette(int r, int g, int b, int shift, int steps);
 
 public:
 	PaletteEntryPanel(wxWindow* parent);

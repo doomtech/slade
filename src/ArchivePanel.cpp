@@ -983,11 +983,7 @@ bool ArchivePanel::exportEntry() {
 
 	// If we're just exporting 1 entry
 	if (selection.size() == 1) {
-		// Setup filename and perform in-place renaming of backslash to caret.
-		// This should only happen for certain rare sprite frames, so only the 
-		// fifth character really needs to be checked.
-		string name = selection[0]->getName();
-		if (name[4] == '\\') name[4] = '^';
+		string name = Misc::lumpNameToFileName(selection[0]->getName());
 		wxFileName fn(name);
 
 		// Add appropriate extension if needed
@@ -1223,11 +1219,7 @@ bool ArchivePanel::gfxExportPNG() {
 
 	// If we're just exporting 1 entry
 	if (selection.size() == 1) {
-		// Setup filename and perform in-place renaming of backslash to caret.
-		// This should only happen for certain rare sprite frames, so only the 
-		// fifth character really needs to be checked.
-		string name = selection[0]->getName();
-		if (name[4] == '\\') name[4] = '^';
+		string name = Misc::lumpNameToFileName(selection[0]->getName());
 		wxFileName fn(name);
 
 		// Set extension

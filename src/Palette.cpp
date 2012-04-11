@@ -593,22 +593,19 @@ void Palette8bit::tint(rgba_t colour, float amount, int start, int end) {
 /* Palette8bit::idtint
  * Tints the palette to [colour] by [amount]
  * This one uses a different method to tint the colours, which is
- * apparently perfectly accurate to what Id's palette tool generated.
- * Contrarily to normal tint, it can use oversaturated colours, such
- * as the green tint of 256 from the radsuit palette, which cannot be
- * expressed through an rgba_t.
+ * taken from Carmack's own dcolors.c.
  *******************************************************************/
-void Palette8bit::idtint(int r, int g, int b, double amount) {
+void Palette8bit::idtint(int r, int g, int b, int shift, int steps) {
 	// Tint all colours in the range
 	for (int i = 0; i <= 255; ++i) {
-		// Compute the colour deltas and round them down
-		int rd = (int)((double)(colours[i].r - r) * amount);
-		int gd = (int)((double)(colours[i].g - g) * amount);
-		int bd = (int)((double)(colours[i].b - b) * amount);
-		// Then the final colours and clamp them
-		int fr = colours[i].r - rd; if (fr < 0) fr = 0; else if (fr > 255) fr = 255;
-		int fg = colours[i].g - gd; if (fg < 0) fg = 0; else if (fg > 255) fg = 255;
-		int fb = colours[i].b - bd; if (fb < 0) fb = 0; else if (fb > 255) fb = 255;
+		// Compute the colour differences
+		int dr = r - colours[i].r;
+		int dg = g - colours[i].g;
+		int db = b - colours[i].b;
+		// Then adjust and clamp for safety
+		int fr = colours[i].r + dr*shift/steps; if (fr < 0) fr = 0; else if (fr > 255) fr = 255;
+		int fg = colours[i].g + dg*shift/steps; if (fg < 0) fg = 0; else if (fg > 255) fg = 255;
+		int fb = colours[i].b + db*shift/steps; if (fb < 0) fb = 0; else if (fb > 255) fb = 255;
 		// Set the result in the palette
 		rgba_t col(fr, fg, fb, colours[i].a, colours[i].blend);
 		setColour(i, col);
