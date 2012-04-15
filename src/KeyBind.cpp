@@ -346,7 +346,9 @@ void KeyBind::initBinds() {
 	addBind("me2d_begin_linedraw", keypress_t("space"), "Begin line drawing");
 	addBind("me2d_begin_shapedraw", keypress_t("space", KPM_SHIFT), "Begin shape drawing");
 	addBind("me2d_create_object", keypress_t("insert"), "Create object");
-	addBind("me2d_delete_object", keypress_t("delete"), "Delete objecr");
+	addBind("me2d_delete_object", keypress_t("delete"), "Delete object");
+	addBind("me2d_copy_properties", keypress_t("C", KPM_CTRL|KPM_SHIFT), "Copy object properties");
+	addBind("me2d_paste_properties", keypress_t("V", KPM_CTRL|KPM_SHIFT), "Paste object properties");
 
 	// Map Editor 2D Lines mode (me2d_line*)
 	addBind("me2d_line_change_texture", keypress_t("T", KPM_CTRL), "Change texture(s)");

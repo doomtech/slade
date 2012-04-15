@@ -10,6 +10,7 @@
 #include "Console.h"
 #include "MapCanvas.h"
 #include "MapObjectPropsPanel.h"
+#include "SectorBuilder.h"
 
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 
@@ -22,9 +23,13 @@ MapEditor::MapEditor() {
 	hilight_locked = false;
 	sector_mode = SECTOR_BOTH;
 	grid_snap = true;
+	copy_thing = new MapThing(NULL);
+	copy_sector = new MapSector(NULL);
 }
 
 MapEditor::~MapEditor() {
+	delete copy_thing;
+	delete copy_sector;
 }
 
 double MapEditor::gridSize() {
@@ -842,13 +847,14 @@ void MapEditor::endMove() {
 				continue;
 			fpoint2_t np(map.getVertex(a)->xPos() + move_vec.x, map.getVertex(a)->yPos() + move_vec.y);
 			map.moveVertex(a, np.x, np.y);
-			map.splitLinesAt(map.getVertex(a), 1);
 			merge_points.push_back(np);
 		}
 
-		// Merge vertices
-		for (unsigned a = 0; a < merge_points.size(); a++)
-			map.mergeVerticesPoint(merge_points[a].x, merge_points[a].y);
+		// Merge vertices and split lines
+		for (unsigned a = 0; a < merge_points.size(); a++) {
+			MapVertex* v = map.mergeVerticesPoint(merge_points[a].x, merge_points[a].y);
+			if (v) map.splitLinesAt(v, 1);
+		}
 	}
 
 	// Un-filter objects
@@ -860,8 +866,49 @@ void MapEditor::endMove() {
 	// Clear moving items
 	move_items.clear();
 
+	// Remove any resulting zero-length lines
+	map.removeZeroLengthLines();
+
 	// Update map item indices
 	map.refreshIndices();
+}
+
+void MapEditor::copyProperties() {
+	// Sectors mode
+	if (edit_mode == MODE_SECTORS) {
+		// Copy selection/hilight properties
+		if (selection.size() > 0)
+			copy_sector->copyPropsFrom(map.getSector(selection[0]));
+		else if (hilight_item >= 0)
+			copy_sector->copyPropsFrom(map.getSector(hilight_item));
+		else
+			return;
+
+		// Editor message
+		addEditorMessage("Copied sector properties");
+	}
+}
+
+void MapEditor::pasteProperties() {
+	// Sectors mode
+	if (edit_mode == MODE_SECTORS) {
+		// Do nothing if no properties have been copied
+		if (copy_sector->ceilingTexture().IsEmpty())
+			return;
+
+		// Paste properties to selection/hilight
+		if (selection.size() > 0) {
+			for (unsigned a = 0; a < selection.size(); a++)
+				map.getSector(selection[a])->copyPropsFrom(copy_sector);
+		}
+		else if (hilight_item >= 0)
+			map.getSector(hilight_item)->copyPropsFrom(copy_sector);
+		else
+			return;
+
+		// Editor message
+		addEditorMessage("Pasted sector properties");
+	}
 }
 
 void MapEditor::splitLine(double x, double y, double min_dist) {
@@ -1047,6 +1094,12 @@ void MapEditor::createObject(double x, double y) {
 		return;
 	}
 
+	// Sectors mode
+	if (edit_mode == MODE_SECTORS) {
+		createSector(x, y);
+		return;
+	}
+
 	// Things mode
 	if (edit_mode == MODE_THINGS) {
 		createThing(x, y);
@@ -1082,6 +1135,48 @@ void MapEditor::createThing(double x, double y) {
 	// Editor message
 	if (thing)
 		addEditorMessage(S_FMT("Created thing at (%d, %d)", (int)thing->xPos(), (int)thing->yPos()));
+}
+
+void MapEditor::createSector(double x, double y) {
+	// Find nearest line
+	int nearest = map.nearestLine(x, y, 99999999);
+	MapLine* line = map.getLine(nearest);
+
+	// Determine side
+	double side = MathStuff::lineSide(x, y, line->x1(), line->y1(), line->x2(), line->y2());
+
+	// Get sector to copy if we're in sectors mode
+	MapSector* sector_copy = NULL;
+	if (edit_mode == MODE_SECTORS && selection.size() > 0)
+		sector_copy = map.getSector(selection[0]);
+
+	// Run sector builder
+	SectorBuilder builder;
+	bool ok;
+	if (side >= 0)
+		ok = builder.buildSector(&map, line, true, sector_copy);
+	else
+		ok = builder.buildSector(&map, line, false, sector_copy);
+
+	// Set some temporary sector defaults if needed
+	if (!sector_copy) {
+		MapSector* n_sector = map.getSector(map.nSectors()-1);
+		if (n_sector->ceilingTexture().IsEmpty()) {
+			n_sector->setStringProperty("texturefloor", "MFLR8_1");
+			n_sector->setStringProperty("textureceiling", "MFLR8_1");
+			n_sector->setIntProperty("heightceiling", 128);
+			n_sector->setIntProperty("lightlevel", 160);
+		}
+	}
+
+	// Editor message
+	if (ok)
+		addEditorMessage(S_FMT("Created sector #%d", map.nSectors() - 1));
+	else
+		addEditorMessage("Sector creation failed: " + builder.getError());
+
+	// Refresh map canvas
+	canvas->forceRefreshRenderer();
 }
 
 void MapEditor::deleteObject() {
@@ -1250,6 +1345,7 @@ void MapEditor::endLineDraw(bool apply) {
 			map.createVertex(draw_points[a].x, draw_points[a].y, 1);
 
 		// Create lines
+		unsigned nl_start = map.nLines();
 		for (unsigned a = 0; a < draw_points.size() - 1; a++) {
 			// Check for intersections
 			vector<fpoint2_t> intersect = map.cutLines(draw_points[a].x, draw_points[a].y, draw_points[a+1].x, draw_points[a+1].y);
@@ -1271,6 +1367,62 @@ void MapEditor::endLineDraw(bool apply) {
 				// From last intersection to next point
 				map.createLine(intersect.back().x, intersect.back().y, draw_points[a+1].x, draw_points[a+1].y, 1);
 			}
+		}
+
+		// Create a list of line sides (edges) to perform sector creation with
+		struct ls_t {
+			MapLine*	line;
+			bool		front;
+			bool		ignore;
+			ls_t(MapLine* line, bool front) { this->line = line; this->front = front; ignore = false; }
+		};
+		vector<ls_t> edges;
+		for (unsigned a = nl_start; a < map.nLines(); a++) {
+			edges.push_back(ls_t(map.getLine(a), true));
+			edges.push_back(ls_t(map.getLine(a), false));
+		}
+		
+		// Build sectors
+		SectorBuilder builder;
+		int runs = 0;
+		for (unsigned a = 0; a < edges.size(); a++) {
+			// Skip if edge is ignored
+			if (edges[a].ignore)
+				continue;
+
+			// Run sector builder on current edge
+			builder.buildSector(&map, edges[a].line, edges[a].front);
+			runs++;
+
+			// Set some temporary sector defaults
+			MapSector* n_sector = map.getSector(map.nSectors()-1);
+			if (n_sector->ceilingTexture().IsEmpty()) {
+				n_sector->setStringProperty("texturefloor", "MFLR8_1");
+				n_sector->setStringProperty("textureceiling", "MFLR8_1");
+				n_sector->setIntProperty("heightceiling", 128);
+				n_sector->setIntProperty("lightlevel", 160);
+			}
+
+			// Ignore any subsequent edges that were part of the sector created
+			for (unsigned e = a; e < edges.size(); e++) {
+				if (edges[e].ignore)
+					continue;
+
+				for (unsigned b = 0; b < builder.nEdges(); b++) {
+					if (edges[e].line == builder.getEdgeLine(b) &&
+						edges[e].front == builder.edgeIsFront(b))
+						edges[e].ignore = true;
+				}
+			}
+		}
+
+		wxLogMessage("Ran sector builder %d times", runs);
+
+		// Check if any of the created lines should be flipped
+		for (unsigned a = nl_start; a < map.nLines(); a++) {
+			MapLine* line = map.getLine(a);
+			if (line->backSector() && !line->frontSector())
+				line->flip(true);
 		}
 	}
 

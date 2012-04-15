@@ -46,6 +46,8 @@
 #include "SectorTextureOverlay.h"
 #include "LineTextureOverlay.h"
 
+#include "SectorBuilder.h"
+
 
 /*******************************************************************
  * VARIABLES
@@ -60,7 +62,10 @@ CVAR(Bool, scroll_smooth, true, CVAR_SAVE)
 CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
 CVAR(Bool, selection_clear_click, false, CVAR_SAVE)
 CVAR(Bool, map_showfps, false, CVAR_SAVE)
-PolygonSplitter splitter;	// for testing
+
+// for testing
+PolygonSplitter splitter;
+SectorBuilder sbuilder;
 
 
 /*******************************************************************
@@ -705,6 +710,9 @@ void MapCanvas::draw() {
 	// Draw line drawing lines if needed
 	if (mouse_state == MSTATE_LINE_DRAW)
 		drawLineDrawLines();
+
+	// Draw sectorbuilder test stuff
+	//sbuilder.drawResult();
 
 
 	// Draw selection box if active
@@ -1443,6 +1451,14 @@ void MapCanvas::onKeyBindPress(string name) {
 	else if (name == "me2d_delete_object" && mouse_state == MSTATE_NORMAL)
 		editor->deleteObject();
 
+	// Copy properties
+	else if (name == "me2d_copy_properties" && mouse_state == MSTATE_NORMAL)
+		editor->copyProperties();
+
+	// Paste properties
+	else if (name == "me2d_paste_properties" && mouse_state == MSTATE_NORMAL)
+		editor->pasteProperties();
+
 
 	// --- Things mode keys ---
 
@@ -1640,6 +1656,19 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 		}
 		//int ms = clock.GetElapsedTime() * 1000;
 		//wxLogMessage("Polygon generation took %dms", ms);
+	}
+	if (e.GetKeyCode() == WXK_F7) {
+		// Get nearest line
+		int nearest = editor->getMap().nearestLine(mouse_pos_m.x, mouse_pos_m.y, 999999);
+		MapLine* line = editor->getMap().getLine(nearest);
+		if (line) {
+			// Determine line side
+			double side = MathStuff::lineSide(mouse_pos_m.x, mouse_pos_m.y, line->x1(), line->y1(), line->x2(), line->y2());
+			if (side >= 0)
+				sbuilder.buildSector(&(editor->getMap()), line, true);
+			else
+				sbuilder.buildSector(&(editor->getMap()), line, false);
+		}
 	}
 
 	if (e.GetKeyCode() == WXK_F5 && editor->editMode() == MapEditor::MODE_SECTORS) {

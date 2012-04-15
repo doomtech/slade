@@ -1935,6 +1935,19 @@ MapThing* SLADEMap::createThing(double x, double y) {
 	return nt;
 }
 
+MapSector* SLADEMap::createSector() {
+	// Create the sector
+	MapSector* ns = new MapSector(this);
+
+	// Setup initial values
+	ns->index = sectors.size();
+
+	// Add to sectors
+	sectors.push_back(ns);
+
+	return ns;
+}
+
 void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
 	// Check index
 	if (vertex >= vertices.size())
@@ -1995,7 +2008,7 @@ void SLADEMap::mergeVertices(unsigned vertex1, unsigned vertex2) {
 	geometry_updated = theApp->runTimer();
 }
 
-void SLADEMap::mergeVerticesPoint(double x, double y) {
+MapVertex* SLADEMap::mergeVerticesPoint(double x, double y) {
 	// Go through all vertices
 	int merge = -1;
 	for (unsigned a = 0; a < vertices.size(); a++) {
@@ -2015,6 +2028,9 @@ void SLADEMap::mergeVerticesPoint(double x, double y) {
 	}
 
 	geometry_updated = theApp->runTimer();
+
+	// Return the final merged vertex
+	return getVertex(merge);
 }
 
 void SLADEMap::splitLine(unsigned line, unsigned vertex) {
@@ -2133,6 +2149,36 @@ void SLADEMap::splitLinesAt(MapVertex* vertex, double split_dist) {
 	}
 }
 
+void SLADEMap::setLineSector(unsigned line, unsigned sector, bool front) {
+	// Check indices
+	if (line >= lines.size() || sector >= sectors.size())
+		return;
+
+	// Get the MapSide to set
+	MapSide* side = NULL;
+	if (front)
+		side = lines[line]->side1;
+	else
+		side = lines[line]->side2;
+
+	// Create side if needed
+	if (!side) {
+		side = new MapSide(sectors[sector], this);
+		side->index = sides.size();
+		side->parent = lines[line];
+		sides.push_back(side);
+
+		if (front)
+			lines[line]->side1 = side;
+		else
+			lines[line]->side2 = side;
+	}
+	else {
+		// Set the side's sector
+		side->setSector(sectors[sector]);
+	}
+}
+
 int SLADEMap::removeDetachedVertices() {
 	int count = 0;
 	for (int a = vertices.size() - 1; a >= 0; a--) {
@@ -2144,6 +2190,19 @@ int SLADEMap::removeDetachedVertices() {
 	}
 
 	refreshIndices();
+
+	return count;
+}
+
+int SLADEMap::removeZeroLengthLines() {
+	int count = 0;
+	for (unsigned a = 0; a < lines.size(); a++) {
+		if (lines[a]->vertex1 == lines[a]->vertex2) {
+			removeLine(a);
+			a--;
+			count++;
+		}
+	}
 
 	return count;
 }

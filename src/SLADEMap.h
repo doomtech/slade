@@ -23,17 +23,6 @@ private:
 	PropertyList		udmf_props;
 	bool				position_frac;
 
-	// Map structure index status
-	// These are true if the per-item index of that type is up-to-date
-	// (used for faster item index lookup in certain cases)
-	/*
-	bool	i_lines;
-	bool	i_sides;
-	bool	i_sectors;
-	bool	i_vertices;
-	bool	i_things;
-	*/
-
 	// The last time the map geometry was updated
 	long	geometry_updated;
 
@@ -151,18 +140,21 @@ public:
 	MapLine*	createLine(double x1, double y1, double x2, double y2, double split_dist = -1);
 	MapLine*	createLine(MapVertex* vertex1, MapVertex* vertex2);
 	MapThing*	createThing(double x, double y);
+	MapSector*	createSector();
 
 	// Editing
-	void	moveVertex(unsigned vertex, double nx, double ny);
-	void	mergeVertices(unsigned vertex1, unsigned vertex2);
-	void	mergeVerticesPoint(double x, double y);
-	void	splitLine(unsigned line, unsigned vertex);
-	void	moveThing(unsigned thing, double nx, double ny);
-	void	thingSetAnglePoint(unsigned thing, fpoint2_t point);
-	void	splitLinesAt(MapVertex* vertex, double split_dist = 0);
+	void		moveVertex(unsigned vertex, double nx, double ny);
+	void		mergeVertices(unsigned vertex1, unsigned vertex2);
+	MapVertex*	mergeVerticesPoint(double x, double y);
+	void		splitLine(unsigned line, unsigned vertex);
+	void		moveThing(unsigned thing, double nx, double ny);
+	void		thingSetAnglePoint(unsigned thing, fpoint2_t point);
+	void		splitLinesAt(MapVertex* vertex, double split_dist = 0);
+	void		setLineSector(unsigned line, unsigned sector, bool front = true);
 
 	// Checks
 	int		removeDetachedVertices();
+	int		removeZeroLengthLines();
 };
 
 #endif //__SLADEMAP_H__

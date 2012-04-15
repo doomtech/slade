@@ -130,6 +130,21 @@ double MathStuff::distanceToLine(double x, double y, double x1, double y1, doubl
 	return sqrt((i.x-x)*(i.x-x) + (i.y-y)*(i.y-y));
 }
 
+/* MathStuff::distanceToLineFast
+ * Returns the shortest 'distance' between the point at [x,y] and the
+ * line from [x1,y1] to [x2,y2]. The distance returned isn't the
+ * real distance, but can be used to find the 'closest' line to the
+ * point
+ *******************************************************************/
+double MathStuff::distanceToLineFast(double x, double y, double x1, double y1, double x2, double y2) {
+	// Calculate intersection point
+	fpoint2_t i = closestPointOnLine(x, y, x1, y1, x2, y2);
+
+	// Return fast distance between intersection and point
+	// which is the shortest distance to the line
+	return (i.x-x)*(i.x-x) + (i.y-y)*(i.y-y);
+}
+
 /* MathStuff::linesIntersect
  * Checks for an intersection between two lines [l1x1,l1y1]-[l1x2,l1y2]
  * and [l2x1,l2y1]-[l2x2,l2y2]. Returns true if they intersect and

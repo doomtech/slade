@@ -819,6 +819,9 @@
     <ClCompile Include="src\STopWindow.cpp">
       <Filter>UI Elements</Filter>
     </ClCompile>
+    <ClCompile Include="src\SectorBuilder.cpp">
+      <Filter>Map Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1532,6 +1535,9 @@
     </ClInclude>
     <ClInclude Include="src\STopWindow.h">
       <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SectorBuilder.h">
+      <Filter>Map Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

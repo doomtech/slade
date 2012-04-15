@@ -21,6 +21,15 @@ MapSector::MapSector(string f_tex, string c_tex, SLADEMap* parent) : MapObject(M
 MapSector::~MapSector() {
 }
 
+void MapSector::copyPropsFrom(MapSector* sector) {
+	// Basic variables
+	this->f_tex = sector->f_tex;
+	this->c_tex = sector->c_tex;
+
+	// Copy all properties
+	sector->properties.copyTo(properties);
+}
+
 string MapSector::stringProperty(string key) {
 	if (key == "texturefloor")
 		return f_tex;
