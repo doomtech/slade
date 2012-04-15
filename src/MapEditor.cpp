@@ -1337,6 +1337,13 @@ unsigned MapEditor::numEditorMessages() {
 	return editor_messages.size();
 }
 
+struct me_ls_t {
+	MapLine*	line;
+	bool		front;
+	bool		ignore;
+	me_ls_t(MapLine* line, bool front) { this->line = line; this->front = front; ignore = false; }
+};
+
 void MapEditor::endLineDraw(bool apply) {
 	// Check if we want to 'apply' the line draw (ie. create the lines)
 	if (apply && draw_points.size() > 1) {
@@ -1370,16 +1377,10 @@ void MapEditor::endLineDraw(bool apply) {
 		}
 
 		// Create a list of line sides (edges) to perform sector creation with
-		struct ls_t {
-			MapLine*	line;
-			bool		front;
-			bool		ignore;
-			ls_t(MapLine* line, bool front) { this->line = line; this->front = front; ignore = false; }
-		};
-		vector<ls_t> edges;
+		vector<me_ls_t> edges;
 		for (unsigned a = nl_start; a < map.nLines(); a++) {
-			edges.push_back(ls_t(map.getLine(a), true));
-			edges.push_back(ls_t(map.getLine(a), false));
+			edges.push_back(me_ls_t(map.getLine(a), true));
+			edges.push_back(me_ls_t(map.getLine(a), false));
 		}
 		
 		// Build sectors
