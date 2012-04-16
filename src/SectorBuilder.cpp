@@ -370,7 +370,24 @@ MapSector* SectorBuilder::findCopySector() {
 	return sector_copy;
 }
 
-bool SectorBuilder::buildSector(SLADEMap* map, MapLine* line, bool front, MapSector* sector_copy) {
+MapSector* SectorBuilder::findExistingSector() {
+	// Go through new sector edges
+	for (unsigned a = 0; a < sector_edges.size(); a++) {
+		// Check if the edge's corresponding MapSide has a front sector
+		if (sector_edges[a].front && sector_edges[a].line->frontSector()) {
+			return sector_edges[a].line->frontSector();
+		}
+
+		// Check if the edge's corresponding MapSide has a back sector
+		if (!sector_edges[a].front && sector_edges[a].line->backSector()) {
+			return sector_edges[a].line->backSector();
+		}
+	}
+
+	return NULL;
+}
+
+bool SectorBuilder::traceSector(SLADEMap* map, MapLine* line, bool front) {
 	// Check info was given
 	if (!line || !map)
 		return false;
@@ -443,6 +460,10 @@ bool SectorBuilder::buildSector(SLADEMap* map, MapLine* line, bool front, MapSec
 		}
 	}
 
+	return true;
+}
+
+void SectorBuilder::createSector(MapSector* sector_copy) {
 	// Create the sector
 	MapSector* sector = map->createSector();
 	if (!sector_copy)
@@ -453,8 +474,6 @@ bool SectorBuilder::buildSector(SLADEMap* map, MapLine* line, bool front, MapSec
 	// Set sides to new sector
 	for (unsigned a = 0; a < sector_edges.size(); a++)
 		map->setLineSector(sector_edges[a].line->getIndex(), sector->getIndex(), sector_edges[a].front);
-
-	return true;
 }
 
 void SectorBuilder::drawResult() {

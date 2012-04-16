@@ -1665,9 +1665,9 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 			// Determine line side
 			double side = MathStuff::lineSide(mouse_pos_m.x, mouse_pos_m.y, line->x1(), line->y1(), line->x2(), line->y2());
 			if (side >= 0)
-				sbuilder.buildSector(&(editor->getMap()), line, true);
+				sbuilder.traceSector(&(editor->getMap()), line, true);
 			else
-				sbuilder.buildSector(&(editor->getMap()), line, false);
+				sbuilder.traceSector(&(editor->getMap()), line, false);
 		}
 	}
 

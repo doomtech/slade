@@ -21,11 +21,9 @@ TODO List ---------------------------------------------------------------
 	- Will probably have to implement some kind of resize for this (perhaps FreeImage can do it nicely?)
 - 3d mode
 - Editing:
-	- Object creation
-	- Line drawing
-	- Object modification
 	- Map saving
 	- Generalised sector and line specials
+	- Rotate/scale objects
 - Better UDMF property handling
 - 'Tag edit' mode
 

@@ -48,8 +48,10 @@ public:
 	edge_t		findOuterEdge();
 	edge_t		findInnerEdge();
 	MapSector*	findCopySector();
+	MapSector*	findExistingSector();
 
-	bool	buildSector(SLADEMap* map, MapLine* line, bool front = true, MapSector* sector_copy = NULL);
+	bool	traceSector(SLADEMap* map, MapLine* line, bool front = true);
+	void	createSector(MapSector* sector_copy = NULL);
 
 	// Testing
 	void	drawResult();

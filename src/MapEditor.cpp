@@ -1154,12 +1154,16 @@ void MapEditor::createSector(double x, double y) {
 	SectorBuilder builder;
 	bool ok;
 	if (side >= 0)
-		ok = builder.buildSector(&map, line, true, sector_copy);
+		ok = builder.traceSector(&map, line, true);
 	else
-		ok = builder.buildSector(&map, line, false, sector_copy);
+		ok = builder.traceSector(&map, line, false);
+
+	// Create sector from builder result
+	if (ok)
+		builder.createSector(sector_copy);
 
 	// Set some temporary sector defaults if needed
-	if (!sector_copy) {
+	if (!sector_copy && ok) {
 		MapSector* n_sector = map.getSector(map.nSectors()-1);
 		if (n_sector->ceilingTexture().IsEmpty()) {
 			n_sector->setStringProperty("texturefloor", "MFLR8_1");
@@ -1386,23 +1390,43 @@ void MapEditor::endLineDraw(bool apply) {
 		// Build sectors
 		SectorBuilder builder;
 		int runs = 0;
+		unsigned ns_start = map.nSectors();
+		vector<MapSector*> sectors_reused;
 		for (unsigned a = 0; a < edges.size(); a++) {
 			// Skip if edge is ignored
 			if (edges[a].ignore)
 				continue;
 
 			// Run sector builder on current edge
-			builder.buildSector(&map, edges[a].line, edges[a].front);
+			builder.traceSector(&map, edges[a].line, edges[a].front);
 			runs++;
 
-			// Set some temporary sector defaults
-			MapSector* n_sector = map.getSector(map.nSectors()-1);
-			if (n_sector->ceilingTexture().IsEmpty()) {
-				n_sector->setStringProperty("texturefloor", "MFLR8_1");
-				n_sector->setStringProperty("textureceiling", "MFLR8_1");
-				n_sector->setIntProperty("heightceiling", 128);
-				n_sector->setIntProperty("lightlevel", 160);
+			// Check if we traced over an existing sector (or part of one)
+			MapSector* sector_existing = builder.findExistingSector();
+			bool create = true;
+			if (sector_existing) {
+				// Check if it's already been (re)used
+				bool reused = false;
+				for (unsigned s = 0; s < sectors_reused.size(); s++) {
+					if (sectors_reused[s] == sector_existing) {
+						reused = true;
+						break;
+					}
+				}
+
+				// If we can reuse the sector, do so
+				if (!reused) {
+					sectors_reused.push_back(sector_existing);
+					create = false;
+
+					for (unsigned e = 0; e < builder.nEdges(); e++)
+						map.setLineSector(builder.getEdgeLine(e)->getIndex(), sector_existing->getIndex(), builder.edgeIsFront(e));
+				}
 			}
+			
+			// Create sector if needed
+			if (create)
+				builder.createSector();
 
 			// Ignore any subsequent edges that were part of the sector created
 			for (unsigned e = a; e < edges.size(); e++) {
@@ -1417,13 +1441,54 @@ void MapEditor::endLineDraw(bool apply) {
 			}
 		}
 
-		wxLogMessage("Ran sector builder %d times", runs);
+		//wxLogMessage("Ran sector builder %d times", runs);
 
 		// Check if any of the created lines should be flipped
 		for (unsigned a = nl_start; a < map.nLines(); a++) {
 			MapLine* line = map.getLine(a);
 			if (line->backSector() && !line->frontSector())
 				line->flip(true);
+		}
+
+		// Find an adjacent sector to copy properties from
+		MapSector* sector_copy = NULL;
+		for (unsigned a = nl_start; a < map.nLines(); a++) {
+			// Check front sector
+			MapSector* sector = map.getLine(a)->frontSector();
+			if (sector && sector->getIndex() < ns_start) {
+				// Copy this sector if it isn't newly created
+				sector_copy = sector;
+				break;
+			}
+
+			// Check back sector
+			sector = map.getLine(a)->backSector();
+			if (sector && sector->getIndex() < ns_start) {
+				// Copy this sector if it isn't newly created
+				sector_copy = sector;
+				break;
+			}
+		}
+
+		// Go through newly created sectors
+		for (unsigned a = ns_start; a < map.nSectors(); a++) {
+			MapSector* sector = map.getSector(a);
+
+			// Skip if sector already has properties
+			if (!sector->ceilingTexture().IsEmpty())
+				continue;
+
+			// Copy from adjacent sector if any
+			if (sector_copy) {
+				sector->copyPropsFrom(sector_copy);
+				continue;
+			}
+
+			// Otherwise, set some temporary sector defaults
+			sector->setStringProperty("texturefloor", "MFLR8_1");
+			sector->setStringProperty("textureceiling", "MFLR8_1");
+			sector->setIntProperty("heightceiling", 128);
+			sector->setIntProperty("lightlevel", 160);
 		}
 	}
 
