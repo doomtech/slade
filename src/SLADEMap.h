@@ -32,17 +32,28 @@ private:
 	bool	addLine(doomline_t& l);
 	bool	addSector(doomsector_t& s);
 	bool	addThing(doomthing_t& t);
+
 	bool	readDoomVertexes(ArchiveEntry* entry);
 	bool	readDoomSidedefs(ArchiveEntry* entry);
 	bool	readDoomLinedefs(ArchiveEntry* entry);
 	bool	readDoomSectors(ArchiveEntry* entry);
 	bool	readDoomThings(ArchiveEntry* entry);
 
+	bool	writeDoomVertexes(ArchiveEntry* entry);
+	bool	writeDoomSidedefs(ArchiveEntry* entry);
+	bool	writeDoomLinedefs(ArchiveEntry* entry);
+	bool	writeDoomSectors(ArchiveEntry* entry);
+	bool	writeDoomThings(ArchiveEntry* entry);
+
 	// Hexen format
 	bool	addLine(hexenline_t& l);
 	bool	addThing(hexenthing_t& t);
+
 	bool	readHexenLinedefs(ArchiveEntry* entry);
 	bool	readHexenThings(ArchiveEntry* entry);
+
+	bool	writeHexenLinedefs(ArchiveEntry* entry);
+	bool	writeHexenThings(ArchiveEntry* entry);
 
 	// Doom 64 format
 	bool	addVertex(doom64vertex_t& v);
@@ -50,6 +61,7 @@ private:
 	bool	addLine(doom64line_t& l);
 	bool	addSector(doom64sector_t& s);
 	bool	addThing(doom64thing_t& t);
+
 	bool	readDoom64Vertexes(ArchiveEntry* entry);
 	bool	readDoom64Sidedefs(ArchiveEntry* entry);
 	bool	readDoom64Linedefs(ArchiveEntry* entry);
@@ -66,6 +78,15 @@ private:
 public:
 	SLADEMap();
 	~SLADEMap();
+
+	// Map entry ordering
+	enum {
+		THINGS = 0,
+		LINEDEFS,
+		SIDEDEFS,
+		VERTEXES,
+		SECTORS
+	};
 
 	MapVertex*	getVertex(unsigned index);
 	MapSide*	getSide(unsigned index);
@@ -97,6 +118,12 @@ public:
 	bool	readHexenMap(Archive::mapdesc_t map);
 	bool	readDoom64Map(Archive::mapdesc_t map);
 	bool	readUDMFMap(Archive::mapdesc_t map);
+
+	// Map saving
+	bool	writeDoomMap(vector<ArchiveEntry*>& map_entries);
+	bool	writeHexenMap(vector<ArchiveEntry*>& map_entries);
+	bool	writeDoom64Map(vector<ArchiveEntry*>& map_entries);
+	bool	writeUDMFMap(ArchiveEntry* textmap);
 
 	// Item removal
 	bool	removeVertex(MapVertex* vertex);

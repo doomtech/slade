@@ -38,6 +38,8 @@
 #include "MapObjectPropsPanel.h"
 #include "MainWindow.h"
 #include "SToolBar.h"
+#include "WadArchive.h"
+#include "SFileDialog.h"
 #include <wx/aui/aui.h>
 
 
@@ -110,6 +112,7 @@ void MapEditorWindow::setupLayout() {
 	// Map menu
 	wxMenu* menu_map = new wxMenu("");
 	theApp->getAction("mapw_save")->addToMenu(menu_map);
+	theApp->getAction("mapw_saveas")->addToMenu(menu_map);
 	theApp->getAction("mapw_rename")->addToMenu(menu_map);
 	menu->Append(menu_map, "&Map");
 
@@ -144,6 +147,7 @@ void MapEditorWindow::setupLayout() {
 	// Map toolbar
 	SToolBarGroup* tbg_map = new SToolBarGroup(toolbar, "_Map");
 	tbg_map->addActionButton("mapw_save");
+	tbg_map->addActionButton("mapw_saveas");
 	tbg_map->addActionButton("mapw_rename");
 	toolbar->addGroup(tbg_map);
 
@@ -226,13 +230,21 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	tex_man.setArchive(archive);
 
 	// Clear current map
-	editor.clearMap();
+	closeMap();
 
 	// Attempt to open map
 	bool ok = editor.openMap(map);
 
 	// Show window if opened ok
 	if (ok) {
+		// Lock map entries
+		mdesc_current = map;
+		ArchiveEntry* entry = map.head;
+		while (entry && entry != map.end->nextEntry()) {
+			entry->lock();
+			entry = entry->nextEntry();
+		}
+
 		this->Show(true);
 		map_canvas->viewFitToMap();
 		map_canvas->Refresh();
@@ -242,6 +254,128 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	}
 
 	return ok;
+}
+
+bool MapEditorWindow::saveMap() {
+	// Get map data entries
+	vector<ArchiveEntry*> map_data;
+	if (theGameConfiguration->getMapFormat() == MAP_DOOM)
+		editor.getMap().writeDoomMap(map_data);
+	else // TODO: other formats
+		return false;
+
+	// Add map data to temporary wad
+	WadArchive wad;
+	wad.addNewEntry("MAP01");
+	for (unsigned a = 0; a < map_data.size(); a++)
+		wad.addEntry(map_data[a]);
+	if (theGameConfiguration->getMapFormat() == MAP_UDMF)
+		wad.addNewEntry("ENDMAP");
+	
+	// TODO: node build
+
+	// Go through current map entries
+	ArchiveEntry* entry = mdesc_current.head;
+	while (entry && entry != mdesc_current.end->nextEntry()) {
+		entry->unlock();
+
+		// VERTEXES
+		if (entry->getName() == "VERTEXES") {
+			ArchiveEntry* data = map_data[SLADEMap::VERTEXES];
+			entry->importMemChunk(data->getMCData(false));
+		}
+
+		// LINEDEFS
+		else if (entry->getName() == "LINEDEFS") {
+			ArchiveEntry* data = map_data[SLADEMap::LINEDEFS];
+			entry->importMemChunk(data->getMCData(false));
+		}
+
+		// SIDEDEFS
+		else if (entry->getName() == "SIDEDEFS") {
+			ArchiveEntry* data = map_data[SLADEMap::SIDEDEFS];
+			entry->importMemChunk(data->getMCData(false));
+		}
+
+		// SECTORS
+		else if (entry->getName() == "SECTORS") {
+			ArchiveEntry* data = map_data[SLADEMap::SECTORS];
+			entry->importMemChunk(data->getMCData(false));
+		}
+
+		// THINGS
+		else if (entry->getName() == "THINGS") {
+			ArchiveEntry* data = map_data[SLADEMap::THINGS];
+			entry->importMemChunk(data->getMCData(false));
+		}
+
+		entry->lock();
+		entry = entry->nextEntry();
+	}
+
+	return true;
+}
+
+bool MapEditorWindow::saveMapAs() {
+	// Show dialog
+	SFileDialog::fd_info_t info;
+	if (!SFileDialog::saveFile(info, "Save Map As", "Wad Archives (*.wad)|*.wad", this))
+		return false;
+
+	// Unlock current map entries
+	ArchiveEntry* entry = mdesc_current.head;
+	while (entry && entry != mdesc_current.end->nextEntry()) {
+		entry->unlock();
+		entry = entry->nextEntry();
+	}
+	mdesc_current.head = NULL;
+
+	// Create new, empty wad
+	WadArchive wad;
+	ArchiveEntry* head = wad.addNewEntry(mdesc_current.name);
+	ArchiveEntry* end = NULL;
+	if (theGameConfiguration->getMapFormat() == MAP_UDMF) {
+		// TODO: UDMF
+		return false;
+	}
+	else {
+		wad.addNewEntry("THINGS");
+		wad.addNewEntry("LINEDEFS");
+		wad.addNewEntry("SIDEDEFS");
+		wad.addNewEntry("VERTEXES");
+		end = wad.addNewEntry("SECTORS");
+	}
+
+	// Update current map description
+	mdesc_current.head = head;
+	mdesc_current.archive = false;
+	mdesc_current.end = end;
+	mdesc_current.format = theGameConfiguration->getMapFormat();
+
+	// Save map data
+	saveMap();
+
+	// Write wad to file
+	wad.save(info.filenames[0]);
+	theArchiveManager->openArchive(info.filenames[0], true, true);
+
+	// Set window title
+	SetTitle(S_FMT("SLADE - %s of %s", CHR(mdesc_current.name), CHR(wad.getFilename(false))));
+
+	return true;
+}
+
+void MapEditorWindow::closeMap() {
+	// Close map in editor
+	editor.clearMap();
+
+	// Unlock map entries
+	ArchiveEntry* entry = mdesc_current.head;
+	while (entry && entry != mdesc_current.end->nextEntry()) {
+		entry->unlock();
+		entry = entry->nextEntry();
+	}
+	mdesc_current.head = NULL;
 }
 
 void MapEditorWindow::forceRefresh(bool renderer) {
@@ -261,6 +395,18 @@ bool MapEditorWindow::handleAction(string id) {
 	// Don't handle actions if hidden
 	if (!IsShown())
 		return false;
+
+	// File->Save
+	if (id == "mapw_save") {
+		saveMap();
+		return true;
+	}
+
+	// File->Save As
+	if (id == "mapw_saveas") {
+		saveMapAs();
+		return true;
+	}
 
 	// Editor->Set Base Resource Archive
 	if (id == "mapw_setbra") {
@@ -337,7 +483,7 @@ void MapEditorWindow::onClose(wxCloseEvent& e) {
 	map_window_layout = m_mgr->SavePerspective();
 
 	this->Show(false);
-	editor.clearMap();
+	closeMap();
 }
 
 /* MapEditorWindow::onSize

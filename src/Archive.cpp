@@ -928,6 +928,10 @@ bool Archive::swapEntries(unsigned index1, unsigned index2, ArchiveTreeNode* dir
 	if (!dir)
 		dir = dir_root;
 
+	// Check if either entry is locked
+	if (dir->getEntry(index1)->isLocked() || dir->getEntry(index2)->isLocked())
+		return false;
+
 	// Do swap
 	if (dir->swapEntries(index1, index2)) {
 		// Announce the swap

@@ -284,6 +284,7 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 
 	// Update list
 	list_patches->updateList();
+	parent->pnamesModified(true);
 }
 
 /* PatchTablePanel::onBtnPatchFromFile
@@ -348,6 +349,7 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 
 		// Refresh patch list
 		list_patches->updateList();
+		parent->pnamesModified(true);
 	}
 }
 
@@ -388,6 +390,7 @@ void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 
 	// Update list
 	list_patches->updateList();
+	parent->pnamesModified(true);
 }
 
 /* PatchTablePanel::onBtnChangePatch
@@ -412,6 +415,7 @@ void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 
 		// Update the list
 		list_patches->updateList();
+		parent->pnamesModified(true);
 	}
 }
 

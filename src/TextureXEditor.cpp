@@ -335,6 +335,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 
 	// Update variables
 	this->archive = archive;
+	pnames_modified = false;
 
 	// Lock pnames entry if it exists
 	if (pnames)
@@ -390,6 +391,8 @@ void TextureXEditor::saveChanges() {
 		pnames->unlock();	// Have to unlock it to write
 		patch_table.writePNAMES(pnames);
 		pnames->lock();
+
+		pnames_modified = false;
 	}
 }
 
@@ -406,6 +409,10 @@ bool TextureXEditor::close() {
 		if (texture_editors[a]->isModified())
 			modified = true;
 	}
+
+	// Check if patch table was modified
+	if (pnames_modified)
+		modified = true;
 
 	// Ask to save changes
 	if (modified) {

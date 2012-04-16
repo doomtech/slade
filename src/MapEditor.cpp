@@ -1398,8 +1398,24 @@ void MapEditor::endLineDraw(bool apply) {
 				continue;
 
 			// Run sector builder on current edge
-			builder.traceSector(&map, edges[a].line, edges[a].front);
+			bool ok = builder.traceSector(&map, edges[a].line, edges[a].front);
 			runs++;
+
+			// Ignore any subsequent edges that were part of the sector created
+			for (unsigned e = a; e < edges.size(); e++) {
+				if (edges[e].ignore)
+					continue;
+
+				for (unsigned b = 0; b < builder.nEdges(); b++) {
+					if (edges[e].line == builder.getEdgeLine(b) &&
+						edges[e].front == builder.edgeIsFront(b))
+						edges[e].ignore = true;
+				}
+			}
+
+			// Don't create sector if trace failed
+			if (!ok)
+				continue;
 
 			// Check if we traced over an existing sector (or part of one)
 			MapSector* sector_existing = builder.findExistingSector();
@@ -1427,18 +1443,6 @@ void MapEditor::endLineDraw(bool apply) {
 			// Create sector if needed
 			if (create)
 				builder.createSector();
-
-			// Ignore any subsequent edges that were part of the sector created
-			for (unsigned e = a; e < edges.size(); e++) {
-				if (edges[e].ignore)
-					continue;
-
-				for (unsigned b = 0; b < builder.nEdges(); b++) {
-					if (edges[e].line == builder.getEdgeLine(b) &&
-						edges[e].front == builder.edgeIsFront(b))
-						edges[e].ignore = true;
-				}
-			}
 		}
 
 		//wxLogMessage("Ran sector builder %d times", runs);
@@ -1631,3 +1635,16 @@ CONSOLE_COMMAND(m_vertex_attached, 1) {
 			wxLogMessage("Line #%d", vertex->connectedLine(a)->getIndex());
 	}
 }
+
+/*
+CONSOLE_COMMAND(m_test_save, 1) {
+	vector<ArchiveEntry*> entries;
+	theMapEditor->mapEditor().getMap().writeDoomMap(entries);
+	WadArchive temp;
+	temp.addNewEntry("MAP01");
+	for (unsigned a = 0; a < entries.size(); a++)
+		temp.addEntry(entries[a]);
+	temp.save(args[0]);
+	temp.close();
+}
+*/

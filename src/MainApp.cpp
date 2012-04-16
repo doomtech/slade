@@ -483,8 +483,9 @@ void MainApp::initActions() {
 	new SAction("ppal_generate", "Generate Palettes", "e_palette", "Generate full range of palettes from the first");
 
 	// Map Editor Window
-	new SAction("mapw_save", "Save Map Changes", "t_save", "Save any changes to the current map");
-	new SAction("mapw_rename", "Rename Map", "t_rename", "Rename the current map");
+	new SAction("mapw_save", "&Save Map Changes", "t_save", "Save any changes to the current map", "Ctrl+S");
+	new SAction("mapw_saveas", "Save Map &As", "t_saveas", "Save the map to a new wad archive", "Ctrl+Shift+S");
+	new SAction("mapw_rename", "&Rename Map", "t_rename", "Rename the current map");
 	new SAction("mapw_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
 	new SAction("mapw_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences");
 	int group_mode = SAction::newGroup();

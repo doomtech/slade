@@ -23,6 +23,7 @@ private:
 	MapEditor				editor;
 	MapTextureManager		tex_man;
 	MapObjectPropsPanel*	panel_obj_props;
+	Archive::mapdesc_t		mdesc_current;
 
 	// Singleton instance
 	static MapEditorWindow*		instance;
@@ -44,6 +45,9 @@ public:
 
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);
+	bool	saveMap();
+	bool	saveMapAs();
+	void	closeMap();
 	void	forceRefresh(bool renderer = false);
 	void	refreshToolBar();
 

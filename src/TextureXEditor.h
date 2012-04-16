@@ -25,6 +25,7 @@ private:
 	wxMenu*				menu_texture;
 
 	bool	pb_update;
+	bool	pnames_modified;
 
 public:
 	TextureXEditor(wxWindow* parent);
@@ -32,6 +33,7 @@ public:
 
 	Archive*	getArchive() { return archive; }
 	PatchTable&	patchTable() { return patch_table; }
+	void		pnamesModified(bool mod = true) { pnames_modified = mod; }
 
 	bool	openArchive(Archive* archive);
 	void	updateTexturePalette();
