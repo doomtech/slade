@@ -45,6 +45,7 @@
 #include "Drawing.h"
 #include "MapEditorWindow.h"
 #include "GameConfiguration.h"
+#include "NodeBuilders.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -597,6 +598,9 @@ bool MainApp::OnInit() {
 	wxLogMessage("Loading colour configuration");
 	ColourConfiguration::init();
 
+	// Init nodebuilders
+	NodeBuilders::init();
+
 	// Init actions
 	initActions();
 
@@ -754,6 +758,19 @@ void MainApp::readConfigFile() {
 			KeyBind::readBinds(tz);
 		}
 
+		// Read nodebuilder paths
+		if (token == "nodebuilder_paths") {
+			token = tz.getToken();	// Skip {
+
+			// Read paths until closing brace found
+			token = tz.getToken();
+			while (token != "}") {
+				string path = tz.getToken();
+				NodeBuilders::addBuilderPath(token, path);
+				token = tz.getToken();
+			}
+		}
+
 		// Get next token
 		token = tz.getToken();
 	}
@@ -803,6 +820,10 @@ void MainApp::saveConfigFile() {
 	file.Write("\nkeys\n{\n");
 	file.Write(KeyBind::writeBinds());
 	file.Write("}\n");
+
+	// Write nodebuilder paths
+	file.Write("\n");
+	NodeBuilders::saveBuilderPaths(file);
 
 	// Close configuration file
 	file.Write("\n// End Configuration File\n\n");

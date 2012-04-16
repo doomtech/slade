@@ -40,6 +40,7 @@
 #include "SToolBar.h"
 #include "WadArchive.h"
 #include "SFileDialog.h"
+#include "NodeBuilders.h"
 #include <wx/aui/aui.h>
 
 
@@ -53,6 +54,8 @@ CVAR(Int, mew_height, 768, CVAR_SAVE);
 CVAR(Int, mew_left, -1, CVAR_SAVE);
 CVAR(Int, mew_top, -1, CVAR_SAVE);
 CVAR(Bool, mew_maximized, true, CVAR_SAVE);
+CVAR(String, nodebuilder_id, "zdbsp", CVAR_SAVE);
+CVAR(String, nodebuilder_options, "", CVAR_SAVE);
 
 
 /*******************************************************************
@@ -256,61 +259,110 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	return ok;
 }
 
+bool nb_warned = false;
 bool MapEditorWindow::saveMap() {
 	// Get map data entries
 	vector<ArchiveEntry*> map_data;
-	if (theGameConfiguration->getMapFormat() == MAP_DOOM)
+	if (mdesc_current.format == MAP_DOOM)
 		editor.getMap().writeDoomMap(map_data);
+	else if (mdesc_current.format == MAP_HEXEN)
+		editor.getMap().writeHexenMap(map_data);
 	else // TODO: other formats
 		return false;
 
 	// Add map data to temporary wad
-	WadArchive wad;
-	wad.addNewEntry("MAP01");
+	Archive* wad = new WadArchive();
+	wad->addNewEntry("MAP01");
 	for (unsigned a = 0; a < map_data.size(); a++)
-		wad.addEntry(map_data[a]);
+		wad->addEntry(map_data[a]);
 	if (theGameConfiguration->getMapFormat() == MAP_UDMF)
-		wad.addNewEntry("ENDMAP");
+		wad->addNewEntry("ENDMAP");
+
+	// Check for map archive
+	Archive* tempwad = NULL;
+	Archive::mapdesc_t map = mdesc_current;
+	if (mdesc_current.archive && mdesc_current.head) {
+		tempwad = new WadArchive();
+		tempwad->open(mdesc_current.head);
+		vector<Archive::mapdesc_t> amaps = tempwad->detectMaps();
+		if (amaps.size() > 0)
+			map = amaps[0];
+		else
+			return false;
+	}
 	
-	// TODO: node build
+	// --- Build nodes ---
 
-	// Go through current map entries
-	ArchiveEntry* entry = mdesc_current.head;
-	while (entry && entry != mdesc_current.end->nextEntry()) {
+	// Save wad to disk
+	string filename = appPath("sladetemp.wad", DIR_TEMP);
+	wad->save(filename);
+
+	// Get current nodebuilder
+	NodeBuilders::builder_t& builder = NodeBuilders::getBuilder(nodebuilder_id);
+	string command = builder.command;
+
+	// Check for undefined path
+	if (!wxFileExists(builder.path) && !nb_warned) {
+		// Open nodebuilder preferences
+		PreferencesDialog pd(this);
+		pd.showPage("Node Builders");
+		if (pd.ShowModal() == wxID_OK)
+			pd.applyPreferences();
+		theMainWindow->getArchiveManagerPanel()->refreshAllTabs();
+
+		// Get new builder if one was selected
+		builder = NodeBuilders::getBuilder(nodebuilder_id);
+		string command = builder.command;
+
+		// Check again
+		if (!wxFileExists(builder.path)) {
+			wxMessageBox("No valid Node Builder is currently configured, nodes will not be built!", "Warning", wxICON_WARNING);
+			nb_warned = true;
+		}
+	}
+
+	// Build command line
+	command.Replace("$f", S_FMT("\"%s\"", CHR(filename)));
+	command.Replace("$o", CHR(wxString(nodebuilder_options)));
+
+	// Run nodebuilder
+	if (wxFileExists(builder.path)) {
+		wxArrayString out;
+		wxExecute(S_FMT("\"%s\" %s", CHR(builder.path), CHR(command)), out, wxEXEC_HIDE_CONSOLE);
+		Raise();
+
+		// Re-load wad
+		wad->close();
+		wad->open(filename);
+	}
+	
+
+	// Delete current map entries
+	ArchiveEntry* entry = map.end;
+	Archive* archive = map.head->getParent();
+	while (entry && entry != map.head) {
+		ArchiveEntry* prev = entry->prevEntry();
 		entry->unlock();
+		archive->removeEntry(entry);
+		entry = prev;
+	}
 
-		// VERTEXES
-		if (entry->getName() == "VERTEXES") {
-			ArchiveEntry* data = map_data[SLADEMap::VERTEXES];
-			entry->importMemChunk(data->getMCData(false));
-		}
-
-		// LINEDEFS
-		else if (entry->getName() == "LINEDEFS") {
-			ArchiveEntry* data = map_data[SLADEMap::LINEDEFS];
-			entry->importMemChunk(data->getMCData(false));
-		}
-
-		// SIDEDEFS
-		else if (entry->getName() == "SIDEDEFS") {
-			ArchiveEntry* data = map_data[SLADEMap::SIDEDEFS];
-			entry->importMemChunk(data->getMCData(false));
-		}
-
-		// SECTORS
-		else if (entry->getName() == "SECTORS") {
-			ArchiveEntry* data = map_data[SLADEMap::SECTORS];
-			entry->importMemChunk(data->getMCData(false));
-		}
-
-		// THINGS
-		else if (entry->getName() == "THINGS") {
-			ArchiveEntry* data = map_data[SLADEMap::THINGS];
-			entry->importMemChunk(data->getMCData(false));
-		}
-
+	// Add new map entries
+	for (unsigned a = 1; a < wad->numEntries(); a++) {
+		entry = archive->addEntry(wad->getEntry(a), archive->entryIndex(map.head) + a, NULL, true);
 		entry->lock();
-		entry = entry->nextEntry();
+	}
+
+	// Clean up
+	delete wad;
+	wxRemoveFile(filename);
+	if (tempwad) {
+		tempwad->save();
+		delete tempwad;
+	}
+	else {
+		// Update map description
+		mdesc_current.end = entry;
 	}
 
 	return true;

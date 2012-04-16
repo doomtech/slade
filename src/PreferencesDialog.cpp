@@ -47,6 +47,7 @@
 #include "AdvancedPrefsPanel.h"
 #include "ArchiveManager.h"
 #include "TextEditorPrefsPanel.h"
+#include "NodesPrefsPanel.h"
 #include "Icons.h"
 #include <wx/gbsizer.h>
 
@@ -85,6 +86,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	panel_maped = new MapEditorPrefsPanel(tree_prefs);
 	panel_map_display = new MapDisplayPrefsPanel(tree_prefs);
 	panel_advanced = new AdvancedPrefsPanel(tree_prefs);
+	panel_nodebuilders = new NodesPrefsPanel(tree_prefs);
 
 	// Setup preferences TreeBook
 	tree_prefs->AddPage(panel_general, "General", true);
@@ -101,8 +103,9 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	tree_prefs->AddSubPage(panel_script_acs, "ACS");
 	tree_prefs->AddPage(panel_maped, "Map Editor");
 	tree_prefs->AddSubPage(panel_map_display, "Display");
+	tree_prefs->AddSubPage(panel_nodebuilders, "Node Builders");
 	tree_prefs->AddPage(panel_advanced, "Advanced");
-	
+
 	// Expand all tree nodes (so it gets sized properly)
 	for (unsigned page = 0; page < tree_prefs->GetPageCount(); page++)
 		tree_prefs->ExpandNode(page);
@@ -163,6 +166,19 @@ wxPanel* PreferencesDialog::setupBaseResourceArchivesPanel() {
 	return panel;
 }
 
+/* PreferencesDialog::showPage
+ * Shows the preferences page matching [name]
+ *******************************************************************/
+void PreferencesDialog::showPage(string name) {
+	// Go through all pages
+	for (unsigned a = 0; a < tree_prefs->GetPageCount(); a++) {
+		if (S_CMPNOCASE(tree_prefs->GetPageText(a), name)) {
+			tree_prefs->SetSelection(a);
+			return;
+		}
+	}
+}
+
 /* PreferencesDialog::applyPreferences
  * Applies preference values from all preference panels
  *******************************************************************/
@@ -180,6 +196,7 @@ void PreferencesDialog::applyPreferences() {
 	panel_colours->applyPreferences();
 	panel_maped->applyPreferences();
 	panel_map_display->applyPreferences();
+	panel_nodebuilders->applyPreferences();
 }
 
 

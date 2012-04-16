@@ -825,6 +825,12 @@
     <ClCompile Include="src\SLADEMap.cpp">
       <Filter>Map Editor\SLADEMap</Filter>
     </ClCompile>
+    <ClCompile Include="src\NodeBuilders.cpp">
+      <Filter>Map Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NodesPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1541,6 +1547,12 @@
     </ClInclude>
     <ClInclude Include="src\SectorBuilder.h">
       <Filter>Map Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NodeBuilders.h">
+      <Filter>Map Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NodesPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

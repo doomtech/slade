@@ -19,6 +19,7 @@ class ColourPrefsPanel;
 class MapEditorPrefsPanel;
 class MapDisplayPrefsPanel;
 class AdvancedPrefsPanel;
+class NodesPrefsPanel;
 
 class PreferencesDialog : public wxDialog {
 private:
@@ -37,6 +38,7 @@ private:
 	MapEditorPrefsPanel*	panel_maped;
 	MapDisplayPrefsPanel*	panel_map_display;
 	AdvancedPrefsPanel*		panel_advanced;
+	NodesPrefsPanel*		panel_nodebuilders;
 
 	// Base Resource Archive
 	BaseResourceArchivesPanel*	panel_bra;
@@ -49,6 +51,7 @@ public:
 	wxPanel*	setupEditingPrefsPanel();
 	wxPanel*	setupBaseResourceArchivesPanel();
 
+	void	showPage(string name);
 	void	applyPreferences();
 
 	// Events
