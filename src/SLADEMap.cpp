@@ -1290,11 +1290,6 @@ bool SLADEMap::readUDMFMap(Archive::mapdesc_t map) {
 
 
 void SLADEMap::clearMap() {
-	// Clear vertices
-	for (unsigned a = 0; a < vertices.size(); a++)
-		delete vertices[a];
-	vertices.clear();
-
 	// Clear sides
 	for (unsigned a = 0; a < sides.size(); a++)
 		delete sides[a];
@@ -1304,6 +1299,11 @@ void SLADEMap::clearMap() {
 	for (unsigned a = 0; a < lines.size(); a++)
 		delete lines[a];
 	lines.clear();
+
+	// Clear vertices
+	for (unsigned a = 0; a < vertices.size(); a++)
+		delete vertices[a];
+	vertices.clear();
 
 	// Clear sectors
 	for (unsigned a = 0; a < sectors.size(); a++)
