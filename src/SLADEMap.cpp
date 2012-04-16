@@ -2149,7 +2149,7 @@ MapVertex* SLADEMap::createVertex(double x, double y, double split_dist) {
 
 	// Check if this vertex splits any lines (if needed)
 	if (split_dist >= 0) {
-		int nlines = lines.size();
+		unsigned nlines = lines.size();
 		for (unsigned a = 0; a < nlines; a++) {
 			// Skip line if it shares the vertex
 			if (lines[a]->v1() == nv || lines[a]->v2() == nv)
@@ -2439,7 +2439,7 @@ void SLADEMap::thingSetAnglePoint(unsigned thing, fpoint2_t point) {
 
 void SLADEMap::splitLinesAt(MapVertex* vertex, double split_dist) {
 	// Check if this vertex splits any lines (if needed)
-	int nlines = lines.size();
+	unsigned nlines = lines.size();
 	for (unsigned a = 0; a < nlines; a++) {
 		// Skip line if it shares the vertex
 		if (lines[a]->v1() == vertex || lines[a]->v2() == vertex)

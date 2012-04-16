@@ -905,6 +905,14 @@
 				RelativePath=".\src\MapTextureManager.h"
 				>
 			</File>
+			<File
+				RelativePath=".\src\SectorBuilder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\SectorBuilder.h"
+				>
+			</File>
 			<Filter
 				Name="UI Elements"
 				>
@@ -1384,6 +1392,22 @@
 						</File>
 						<File
 							RelativePath=".\dist\res\config\games\include\sectors\zdoom_sectors.cfg"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Defaults"
+						>
+						<File
+							RelativePath=".\dist\res\config\games\include\defaults\doom_defaults.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\defaults\heretic_defaults.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\defaults\hexen_defaults.cfg"
 							>
 						</File>
 					</Filter>
