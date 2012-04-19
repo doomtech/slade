@@ -992,6 +992,20 @@ void MapEditor::splitLine(double x, double y, double min_dist) {
 	map.splitLine(lindex, vindex);
 }
 
+void MapEditor::flipLines(bool sides) {
+	// Get selected/hilighted line(s)
+	vector<MapLine*> lines;
+	getSelectedLines(lines);
+
+	// Go through list
+	for (unsigned a = 0; a < lines.size(); a++)
+		lines[a]->flip(sides);
+
+	// Update display
+	canvas->forceRefreshRenderer();
+	updateDisplay();
+}
+
 void MapEditor::changeSectorHeight(int amount, bool floor, bool ceiling) {
 	// Do nothing if not in sectors mode
 	if (edit_mode != MODE_SECTORS)

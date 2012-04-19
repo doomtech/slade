@@ -1432,6 +1432,14 @@ void MapCanvas::onKeyBindPress(string name) {
 		}
 	}
 
+	// Flip line
+	else if (name == "me2d_line_flip" && mouse_state == MSTATE_NORMAL)
+		editor->flipLines();
+
+	// Flip line (no sides)
+	else if (name == "me2d_line_flip_nosides" && mouse_state == MSTATE_NORMAL)
+		editor->flipLines(false);
+
 	// Begin line drawing
 	else if (name == "me2d_begin_linedraw" && mouse_state == MSTATE_NORMAL) {
 		if (mouse_state == MSTATE_NORMAL)

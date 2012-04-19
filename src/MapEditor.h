@@ -31,7 +31,7 @@ private:
 	vector<int>	move_items;
 	int			move_item_closest;
 
-	// Objecct properties
+	// Object properties
 	MapThing*	copy_thing;
 	MapSector*	copy_sector;
 
@@ -122,6 +122,7 @@ public:
 	void	copyProperties();
 	void	pasteProperties();
 	void	splitLine(double x, double y, double min_dist = 64);
+	void	flipLines(bool sides = true);
 	void	changeSectorHeight(int amount, bool floor = true, bool ceiling = true);
 	void	changeSectorLight(int amount);
 	void	changeThingType(int newtype);
