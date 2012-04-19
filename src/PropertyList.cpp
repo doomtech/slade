@@ -127,3 +127,31 @@ string PropertyList::toString() {
 
 	return ret;
 }
+
+/* PropertyList::allProperties
+ * Adds all existing properties to [list]
+ *******************************************************************/
+void PropertyList::allProperties(vector<Property>& list) {
+	// Get iterator to first property
+	PropertyHashMap::iterator i = properties.begin();
+
+	// Add all properties to the list
+	while (i != properties.end()) {
+		list.push_back(i->second);
+		i++;
+	}
+}
+
+/* PropertyList::allPropertyNames
+ * Adds all existing property names to [list]
+ *******************************************************************/
+void PropertyList::allPropertyNames(vector<string>& list) {
+	// Get iterator to first property
+	PropertyHashMap::iterator i = properties.begin();
+
+	// Add all properties to the list
+	while (i != properties.end()) {
+		list.push_back(i->first);
+		i++;
+	}
+}

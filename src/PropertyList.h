@@ -24,6 +24,8 @@ public:
 	bool	removeProperty(string key);
 	void	copyTo(PropertyList& list);
 	void	addFlag(string key);
+	void	allProperties(vector<Property>& list);
+	void	allPropertyNames(vector<string>& list);
 
 	string	toString();
 };

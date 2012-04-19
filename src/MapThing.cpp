@@ -58,3 +58,18 @@ void MapThing::setFloatProperty(string key, double value) {
 	else
 		MapObject::setFloatProperty(key, value);
 }
+
+void MapThing::copy(MapObject* c) {
+	// Don't copy a non-thing
+	if (c->getObjType() != MOBJ_THING)
+		return;
+
+	// Basic variables
+	MapThing* thing = (MapThing*)c;
+	this->x = thing->x;
+	this->y = thing->y;
+	this->type = thing->type;
+
+	// Other properties
+	MapObject::copy(c);
+}

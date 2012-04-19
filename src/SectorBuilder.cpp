@@ -478,7 +478,7 @@ void SectorBuilder::createSector(MapSector* sector, MapSector* sector_copy) {
 		if (!sector_copy)
 			sector_copy = findCopySector();		// Find potential sector to copy if none specified
 		if (sector_copy)
-			sector->copyPropsFrom(sector_copy);
+			sector->copy(sector_copy);
 	}
 
 	// Set sides to new sector

@@ -49,7 +49,7 @@ public:
 	MapSector(string f_tex, string c_tex, SLADEMap* parent = NULL);
 	~MapSector();
 
-	void	copyPropsFrom(MapSector* copy);
+	void	copy(MapObject* copy);
 
 	string		floorTexture() { return f_tex; }
 	string		ceilingTexture() { return c_tex; }

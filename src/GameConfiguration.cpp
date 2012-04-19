@@ -54,6 +54,10 @@ void GameConfiguration::setDefaults() {
 	any_map_name = false;
 	mix_tex_flats = false;
 	tx_textures = false;
+	defaults_line.clear();
+	defaults_side.clear();
+	defaults_sector.clear();
+	defaults_thing.clear();
 }
 
 string GameConfiguration::readConfigName(MemChunk& mc) {
@@ -652,6 +656,49 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 			if (block) readUDMFProperties(block, udmf_thing_props);
 		}
 
+		// Defaults section
+		else if (S_CMPNOCASE(node->getName(), "defaults")) {
+			// Go through defaults blocks
+			for (unsigned b = 0; b < node->nChildren(); b++) {
+				ParseTreeNode* block = (ParseTreeNode*)node->getChild(b);
+
+				// Linedef defaults
+				if (S_CMPNOCASE(block->getName(), "linedef")) {
+					for (unsigned c = 0; c < block->nChildren(); c++) {
+						ParseTreeNode* def = (ParseTreeNode*)block->getChild(c);
+						defaults_line[def->getName()] = def->getValue();
+					}
+				}
+
+				// Sidedef defaults
+				else if (S_CMPNOCASE(block->getName(), "sidedef")) {
+					for (unsigned c = 0; c < block->nChildren(); c++) {
+						ParseTreeNode* def = (ParseTreeNode*)block->getChild(c);
+						defaults_side[def->getName()] = def->getValue();
+					}
+				}
+
+				// Sector defaults
+				else if (S_CMPNOCASE(block->getName(), "sector")) {
+					for (unsigned c = 0; c < block->nChildren(); c++) {
+						ParseTreeNode* def = (ParseTreeNode*)block->getChild(c);
+						defaults_sector[def->getName()] = def->getValue();
+					}
+				}
+
+				// Thing defaults
+				else if (S_CMPNOCASE(block->getName(), "thing")) {
+					for (unsigned c = 0; c < block->nChildren(); c++) {
+						ParseTreeNode* def = (ParseTreeNode*)block->getChild(c);
+						defaults_thing[def->getName()] = def->getValue();
+					}
+				}
+
+				else
+					wxLogMessage("Unknown defaults block \"%s\"", CHR(block->getName()));
+			}
+		}
+
 		// Unknown/unexpected section
 		else
 			wxLogMessage("Warning: Unexpected game configuration section \"%s\", skipping", CHR(node->getName()));
@@ -1179,6 +1226,108 @@ string GameConfiguration::sectorTypeName(int type) {
 		name += S_FMT(" + %s", CHR(gen_flags[a]));
 
 	return name;
+}
+
+string GameConfiguration::getDefaultString(int type, string property) {
+	switch (type) {
+	case MOBJ_LINE:
+		return defaults_line[property].getStringValue(); break;
+	case MOBJ_SIDE:
+		return defaults_side[property].getStringValue(); break;
+	case MOBJ_SECTOR:
+		return defaults_sector[property].getStringValue(); break;
+	case MOBJ_THING:
+		return defaults_thing[property].getStringValue(); break;
+	default:
+		return "";
+	}
+}
+
+int GameConfiguration::getDefaultInt(int type, string property) {
+	switch (type) {
+	case MOBJ_LINE:
+		return defaults_line[property].getIntValue(); break;
+	case MOBJ_SIDE:
+		return defaults_side[property].getIntValue(); break;
+	case MOBJ_SECTOR:
+		return defaults_sector[property].getIntValue(); break;
+	case MOBJ_THING:
+		return defaults_thing[property].getIntValue(); break;
+	default:
+		return 0;
+	}
+}
+
+double GameConfiguration::getDefaultFloat(int type, string property) {
+	switch (type) {
+	case MOBJ_LINE:
+		return defaults_line[property].getFloatValue(); break;
+	case MOBJ_SIDE:
+		return defaults_side[property].getFloatValue(); break;
+	case MOBJ_SECTOR:
+		return defaults_sector[property].getFloatValue(); break;
+	case MOBJ_THING:
+		return defaults_thing[property].getFloatValue(); break;
+	default:
+		return 0;
+	}
+}
+
+bool GameConfiguration::getDefaultBool(int type, string property) {
+	switch (type) {
+	case MOBJ_LINE:
+		return defaults_line[property].getBoolValue(); break;
+	case MOBJ_SIDE:
+		return defaults_side[property].getBoolValue(); break;
+	case MOBJ_SECTOR:
+		return defaults_sector[property].getBoolValue(); break;
+	case MOBJ_THING:
+		return defaults_thing[property].getBoolValue(); break;
+	default:
+		return false;
+	}
+}
+
+void GameConfiguration::applyDefaults(MapObject* object) {
+	// Get all defaults for the object type
+	vector<string> prop_names;
+	vector<Property> prop_vals;
+
+	// Line defaults
+	if (object->getObjType() == MOBJ_LINE) {
+		defaults_line.allProperties(prop_vals);
+		defaults_line.allPropertyNames(prop_names);
+	}
+
+	// Side defaults
+	else if (object->getObjType() == MOBJ_SIDE) {
+		defaults_side.allProperties(prop_vals);
+		defaults_side.allPropertyNames(prop_names);
+	}
+
+	// Sector defaults
+	else if (object->getObjType() == MOBJ_SECTOR) {
+		defaults_sector.allProperties(prop_vals);
+		defaults_sector.allPropertyNames(prop_names);
+	}
+
+	// Thing defaults
+	else if (object->getObjType() == MOBJ_THING) {
+		defaults_thing.allProperties(prop_vals);
+		defaults_thing.allPropertyNames(prop_names);
+	}
+
+	// Apply defaults to object
+	for (unsigned a = 0; a < prop_names.size(); a++) {
+		if (prop_vals[a].getType() == PROP_BOOL)
+			object->setBoolProperty(prop_names[a], prop_vals[a].getBoolValue());
+		else if (prop_vals[a].getType() == PROP_INT)
+			object->setIntProperty(prop_names[a], prop_vals[a].getIntValue());
+		else if (prop_vals[a].getType() == PROP_FLOAT)
+			object->setFloatProperty(prop_names[a], prop_vals[a].getFloatValue());
+		else if (prop_vals[a].getType() == PROP_STRING)
+			object->setStringProperty(prop_names[a], prop_vals[a].getStringValue());
+	}
 }
 
 

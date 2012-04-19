@@ -21,13 +21,18 @@ MapSector::MapSector(string f_tex, string c_tex, SLADEMap* parent) : MapObject(M
 MapSector::~MapSector() {
 }
 
-void MapSector::copyPropsFrom(MapSector* sector) {
+void MapSector::copy(MapObject* s) {
+	// Don't copy a non-sector
+	if (s->getObjType() != MOBJ_SECTOR)
+		return;
+
 	// Basic variables
+	MapSector* sector = (MapSector*)s;
 	this->f_tex = sector->f_tex;
 	this->c_tex = sector->c_tex;
 
-	// Copy all properties
-	sector->properties.copyTo(properties);
+	// Other properties
+	MapObject::copy(s);
 }
 
 string MapSector::stringProperty(string key) {

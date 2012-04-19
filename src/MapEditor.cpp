@@ -23,13 +23,13 @@ MapEditor::MapEditor() {
 	hilight_locked = false;
 	sector_mode = SECTOR_BOTH;
 	grid_snap = true;
-	copy_thing = new MapThing(NULL);
-	copy_sector = new MapSector(NULL);
+	copy_thing = NULL;
+	copy_sector = NULL;
 }
 
 MapEditor::~MapEditor() {
-	delete copy_thing;
-	delete copy_sector;
+	if (copy_thing) delete copy_thing;
+	if (copy_sector) delete copy_sector;
 }
 
 double MapEditor::gridSize() {
@@ -874,41 +874,102 @@ void MapEditor::endMove() {
 }
 
 void MapEditor::copyProperties() {
+	// Do nothing if no selection or hilight
+	if (selection.size() == 0 && hilight_item < 0)
+		return;
+
 	// Sectors mode
 	if (edit_mode == MODE_SECTORS) {
+		// Create copy sector if needed
+		if (!copy_sector)
+			copy_sector = new MapSector(NULL);
+
 		// Copy selection/hilight properties
 		if (selection.size() > 0)
-			copy_sector->copyPropsFrom(map.getSector(selection[0]));
+			copy_sector->copy(map.getSector(selection[0]));
 		else if (hilight_item >= 0)
-			copy_sector->copyPropsFrom(map.getSector(hilight_item));
-		else
-			return;
+			copy_sector->copy(map.getSector(hilight_item));
 
 		// Editor message
 		addEditorMessage("Copied sector properties");
 	}
+
+	// Things mode
+	else if (edit_mode == MODE_THINGS) {
+		// Create copy thing if needed
+		if (!copy_thing)
+			copy_thing = new MapThing(NULL);
+
+		// Copy selection/hilight properties
+		if (selection.size() > 0)
+			copy_thing->copy(map.getThing(selection[0]));
+		else if (hilight_item >= 0)
+			copy_thing->copy(map.getThing(hilight_item));
+		else
+			return;
+
+		// Editor message
+		addEditorMessage("Copied thing properties");
+	}
 }
 
 void MapEditor::pasteProperties() {
+	// Do nothing if no selection or hilight
+	if (selection.size() == 0 && hilight_item < 0)
+		return;
+
 	// Sectors mode
 	if (edit_mode == MODE_SECTORS) {
 		// Do nothing if no properties have been copied
-		if (copy_sector->ceilingTexture().IsEmpty())
+		if (!copy_sector)
 			return;
 
 		// Paste properties to selection/hilight
 		if (selection.size() > 0) {
 			for (unsigned a = 0; a < selection.size(); a++)
-				map.getSector(selection[a])->copyPropsFrom(copy_sector);
+				map.getSector(selection[a])->copy(copy_sector);
 		}
 		else if (hilight_item >= 0)
-			map.getSector(hilight_item)->copyPropsFrom(copy_sector);
-		else
-			return;
+			map.getSector(hilight_item)->copy(copy_sector);
 
 		// Editor message
 		addEditorMessage("Pasted sector properties");
 	}
+
+	// Things mode
+	if (edit_mode == MODE_THINGS) {
+		// Do nothing if no properties have been copied
+		if (!copy_thing)
+			return;
+
+		// Paste properties to selection/hilight
+		if (selection.size() > 0) {
+			for (unsigned a = 0; a < selection.size(); a++) {
+				// Paste properties (but keep position)
+				MapThing* thing = map.getThing(selection[a]);
+				double x = thing->xPos();
+				double y = thing->yPos();
+				thing->copy(copy_thing);
+				thing->setFloatProperty("x", x);
+				thing->setFloatProperty("y", y);
+			}
+		}
+		else if (hilight_item >= 0) {
+			// Paste properties (but keep position)
+			MapThing* thing = map.getThing(hilight_item);
+			double x = thing->xPos();
+			double y = thing->yPos();
+			thing->copy(copy_thing);
+			thing->setFloatProperty("x", x);
+			thing->setFloatProperty("y", y);
+		}
+
+		// Editor message
+		addEditorMessage("Pasted thing properties");
+	}
+
+	// Update display
+	updateDisplay();
 }
 
 void MapEditor::splitLine(double x, double y, double min_dist) {
@@ -1132,6 +1193,18 @@ void MapEditor::createThing(double x, double y) {
 	// Create thing
 	MapThing* thing = map.createThing(x, y);
 
+	// Setup properties
+	if (copy_thing) {
+		// Copy properties from the last copied thing (except position)
+		double x = thing->xPos();
+		double y = thing->yPos();
+		thing->copy(copy_thing);
+		thing->setFloatProperty("x", x);
+		thing->setFloatProperty("y", y);
+	}
+	else
+		theGameConfiguration->applyDefaults(thing);	// No thing properties to copy, get defaults from game configuration
+
 	// Editor message
 	if (thing)
 		addEditorMessage(S_FMT("Created thing at (%d, %d)", (int)thing->xPos(), (int)thing->yPos()));
@@ -1162,15 +1235,11 @@ void MapEditor::createSector(double x, double y) {
 	if (ok)
 		builder.createSector(NULL, sector_copy);
 
-	// Set some temporary sector defaults if needed
+	// Set some sector defaults from game configuration if needed
 	if (!sector_copy && ok) {
 		MapSector* n_sector = map.getSector(map.nSectors()-1);
-		if (n_sector->ceilingTexture().IsEmpty()) {
-			n_sector->setStringProperty("texturefloor", "MFLR8_1");
-			n_sector->setStringProperty("textureceiling", "MFLR8_1");
-			n_sector->setIntProperty("heightceiling", 128);
-			n_sector->setIntProperty("lightlevel", 160);
-		}
+		if (n_sector->ceilingTexture().IsEmpty())
+			theGameConfiguration->applyDefaults(n_sector);
 	}
 
 	// Editor message
@@ -1490,15 +1559,12 @@ void MapEditor::endLineDraw(bool apply) {
 
 			// Copy from adjacent sector if any
 			if (sector_copy) {
-				sector->copyPropsFrom(sector_copy);
+				sector->copy(sector_copy);
 				continue;
 			}
 
-			// Otherwise, set some temporary sector defaults
-			sector->setStringProperty("texturefloor", "MFLR8_1");
-			sector->setStringProperty("textureceiling", "MFLR8_1");
-			sector->setIntProperty("heightceiling", 128);
-			sector->setIntProperty("lightlevel", 160);
+			// Otherwise, use defaults from game configuration
+			theGameConfiguration->applyDefaults(sector);
 		}
 
 		// Update line textures
@@ -1516,6 +1582,10 @@ void MapEditor::endLineDraw(bool apply) {
 				string tex = map.getAdjacentLineTexture(line->v1());
 				if (tex == "-")
 					tex = map.getAdjacentLineTexture(line->v2());
+
+				// If no adjacent texture, get default from game configuration
+				if (tex == "-")
+					tex = theGameConfiguration->getDefaultString(MOBJ_SIDE, "texturemiddle");
 
 				// Set texture
 				side->setStringProperty("texturemiddle", tex);

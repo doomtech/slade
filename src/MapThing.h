@@ -61,6 +61,8 @@ public:
 	double	floatProperty(string key);
 	void	setIntProperty(string key, int value);
 	void	setFloatProperty(string key, double value);
+
+	void	copy(MapObject* c);
 };
 
 #endif //__MAPTHING_H__

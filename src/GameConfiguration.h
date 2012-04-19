@@ -5,6 +5,7 @@
 #include "ActionSpecial.h"
 #include "ThingType.h"
 #include "UDMFProperty.h"
+#include "PropertyList.h"
 
 #ifndef __ARCHIVE_H__
 // Define map types
@@ -107,6 +108,12 @@ private:
 	UDMFPropMap	udmf_sector_props;
 	UDMFPropMap	udmf_thing_props;
 
+	// Defaults
+	PropertyList	defaults_line;
+	PropertyList	defaults_side;
+	PropertyList	defaults_sector;
+	PropertyList	defaults_thing;
+
 	// Singleton instance
 	static GameConfiguration*	instance;
 
@@ -189,6 +196,13 @@ public:
 
 	// Sector types
 	string	sectorTypeName(int type);
+
+	// Defaults
+	string	getDefaultString(int type, string property);
+	int		getDefaultInt(int type, string property);
+	double	getDefaultFloat(int type, string property);
+	bool	getDefaultBool(int type, string property);
+	void	applyDefaults(MapObject* object);
 
 	// Testing
 	void	dumpActionSpecials();
