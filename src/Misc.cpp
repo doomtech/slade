@@ -301,7 +301,7 @@ string Misc::fileNameToLumpName(string file) {
 		return lump;
 	} else {
 		// ZDoom
-		if (file[4] == '^') file[4] = '\\';
+		if (file.Len() > 5 && file[4] == '^') file[4] = '\\';
 	}
 	return file;
 }

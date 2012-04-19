@@ -1587,12 +1587,204 @@ bool SLADEMap::writeHexenMap(vector<ArchiveEntry*>& map_entries) {
 	writeDoomSectors(entry);
 	map_entries.push_back(entry);
 
+	// TODO: write BEHAVIOR and SCRIPTS
+
+	return true;
+}
+
+bool SLADEMap::writeDoom64Vertexes(ArchiveEntry * entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Init entry data
+	entry->clearData();
+	entry->resize(vertices.size() * 8, false);
+	entry->seek(0, 0);
+
+	// Write vertex data
+	int32_t x, y;	// Those are actually fixed_t, so shift by FRACBIT (16)
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		x = vertices[a]->xPos()*65536;
+		y = vertices[a]->yPos()*65536;
+		entry->write(&x, 4);
+		entry->write(&y, 4);
+	}
+
+	return true;
+}
+
+bool SLADEMap::writeDoom64Sidedefs(ArchiveEntry * entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Init entry data
+	entry->clearData();
+	entry->resize(sides.size() * sizeof(doom64side_t), false);
+	entry->seek(0, 0);
+
+	// Write side data
+	doom64side_t side;
+	for (unsigned a = 0; a < sides.size(); a++) {
+		memset(&side, 0, sizeof(doom64side_t));
+
+		// Offsets
+		side.x_offset = sides[a]->intProperty("offsetx");
+		side.y_offset = sides[a]->intProperty("offsety");
+
+		// Sector
+		side.sector = -1;
+		if (sides[a]->sector) side.sector = sides[a]->sector->getIndex();
+		
+		// Textures
+		side.tex_middle	= theResourceManager->getTextureHash(sides[a]->stringProperty("texturemiddle"));
+		side.tex_upper	= theResourceManager->getTextureHash(sides[a]->stringProperty("texturetop"));
+		side.tex_lower	= theResourceManager->getTextureHash(sides[a]->stringProperty("texturebottom"));
+
+		entry->write(&side, sizeof(doom64side_t));
+	}
+
+	return true;
+}
+
+bool SLADEMap::writeDoom64Linedefs(ArchiveEntry * entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Init entry data
+	entry->clearData();
+	entry->resize(lines.size() * sizeof(doom64line_t), false);
+	entry->seek(0, 0);
+
+	// Write line data
+	doom64line_t line;
+	for (unsigned a = 0; a < lines.size(); a++) {
+		// Vertices
+		line.vertex1 = lines[a]->v1Index();
+		line.vertex2 = lines[a]->v2Index();
+
+		// Properties
+		line.flags = lines[a]->intProperty("flags");
+		line.type = lines[a]->intProperty("special");
+		line.sector_tag = lines[a]->intProperty("arg0");
+
+		// Sides
+		line.side1 = -1;
+		line.side2 = -1;
+		if (lines[a]->side1) line.side1 = lines[a]->side1->getIndex();
+		if (lines[a]->side2) line.side2 = lines[a]->side2->getIndex();
+
+		entry->write(&line, sizeof(doom64line_t));
+	}
+
+	return true;
+}
+
+bool SLADEMap::writeDoom64Sectors(ArchiveEntry * entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Init entry data
+	entry->clearData();
+	entry->resize(sectors.size() * sizeof(doom64sector_t), false);
+	entry->seek(0, 0);
+
+	// Write sector data
+	doom64sector_t sector;
+	for (unsigned a = 0; a < sectors.size(); a++) {
+		memset(&sector, 0, sizeof(doom64sector_t));
+
+		// Height
+		sector.f_height = sectors[a]->intProperty("heightfloor");
+		sector.c_height = sectors[a]->intProperty("heightceiling");
+
+		// Textures
+		sector.f_tex = theResourceManager->getTextureHash(sectors[a]->stringProperty("texturefloor"));
+		sector.c_tex = theResourceManager->getTextureHash(sectors[a]->stringProperty("textureceiling"));
+
+		// Colors
+		sector.color[0] = sectors[a]->intProperty("color_things");
+		sector.color[1] = sectors[a]->intProperty("color_floor");
+		sector.color[2] = sectors[a]->intProperty("color_ceiling");
+		sector.color[3] = sectors[a]->intProperty("color_upper");
+		sector.color[4] = sectors[a]->intProperty("color_lower");
+
+		// Properties
+		sector.special = sectors[a]->intProperty("special");
+		sector.flags = sectors[a]->intProperty("flags");
+		sector.tag = sectors[a]->intProperty("id");
+
+		entry->write(&sector, sizeof(doom64sector_t));
+	}
+
+	return true;
+}
+
+bool SLADEMap::writeDoom64Things(ArchiveEntry * entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Init entry data
+	entry->clearData();
+	entry->resize(things.size() * sizeof(doom64thing_t), false);
+	entry->seek(0, 0);
+
+	// Write thing data
+	doom64thing_t thing;
+	for (unsigned a = 0; a < things.size(); a++) {
+		// Position
+		thing.x = things[a]->xPos();
+		thing.y = things[a]->yPos();
+		thing.z = things[a]->intProperty("height");
+
+		// Properties
+		thing.angle = things[a]->intProperty("angle");
+		thing.type = things[a]->type;
+		thing.flags = things[a]->intProperty("flags");
+		thing.tid = things[a]->intProperty("id");
+
+		entry->write(&thing, sizeof(doom64thing_t));
+	}
+
 	return true;
 }
 
 bool SLADEMap::writeDoom64Map(vector<ArchiveEntry*>& map_entries) {
-	return false;
-}
+	// Init entry list
+	map_entries.clear();
+
+	// Write THINGS
+	ArchiveEntry* entry = new ArchiveEntry("THINGS");
+	writeDoom64Things(entry);
+	map_entries.push_back(entry);
+
+	// Write LINEDEFS
+	entry = new ArchiveEntry("LINEDEFS");
+	writeDoom64Linedefs(entry);
+	map_entries.push_back(entry);
+
+	// Write SIDEDEFS
+	entry = new ArchiveEntry("SIDEDEFS");
+	writeDoom64Sidedefs(entry);
+	map_entries.push_back(entry);
+
+	// Write VERTEXES
+	entry = new ArchiveEntry("VERTEXES");
+	writeDoom64Vertexes(entry);
+	map_entries.push_back(entry);
+
+	// Write SECTORS
+	entry = new ArchiveEntry("SECTORS");
+	writeDoom64Sectors(entry);
+	map_entries.push_back(entry);
+
+	// TODO: Write LIGHTS and MACROS
+
+	return true;}
 
 bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 	// Check entry was given

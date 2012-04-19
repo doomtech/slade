@@ -202,6 +202,22 @@ void ResourceManager::removeArchive(Archive* archive) {
 	announce("resources_updated");
 }
 
+/* ResourceManager::getTextureHash
+ * Returns the Doom64 hash of a given texture name, computed using 
+ * the same hash algorithm as Doom64 EX itself
+ *******************************************************************/
+uint16_t ResourceManager::getTextureHash(string name) {
+	char str[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	for (size_t c = 0; c < name.length() && c < 8; c++)
+		str[c] = name[c];
+
+	uint32_t hash = 1315423911;
+	for(uint32_t i = 0; i < 8 && str[i] != '\0'; ++i)
+		hash ^= ((hash << 5) + toupper((int)str[i]) + (hash >> 2));
+	hash %= 65536;
+	return (uint16_t)hash;
+}
+
 /* ResourceManager::addEntry
  * Adds an entry to be managed
  *******************************************************************/
@@ -235,19 +251,8 @@ void ResourceManager::addEntry(ArchiveEntry* entry) {
 		if (entry->isInNamespace("textures") || entry->isInNamespace("hires")) {
 			satextures[name].add(entry);
 
-			// Compute Doom64 EX hash value, using the same hash algorithm as
-			// Doom64 EX itself
-			char str[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-			for (size_t c = 0; c < name.length() && c < 8; c++)
-				str[c] = name[c];
-
-			uint32_t hash = 1315423911;
-			for(uint32_t i = 0; i < 8 && str[i] != '\0'; ++i)
-				hash ^= ((hash << 5) + toupper((int)str[i]) + (hash >> 2));
-			hash %= 65536;
-
 			// Add name to hash table
-			ResourceManager::Doom64HashTable[hash] = name;
+			ResourceManager::Doom64HashTable[getTextureHash(name)] = name;
 
 		}
 	}

@@ -78,6 +78,12 @@ private:
 	bool	readDoom64Sectors(ArchiveEntry* entry);
 	bool	readDoom64Things(ArchiveEntry* entry);
 
+	bool	writeDoom64Vertexes(ArchiveEntry* entry);
+	bool	writeDoom64Sidedefs(ArchiveEntry* entry);
+	bool	writeDoom64Linedefs(ArchiveEntry* entry);
+	bool	writeDoom64Sectors(ArchiveEntry* entry);
+	bool	writeDoom64Things(ArchiveEntry* entry);
+
 	// UDMF
 	bool	addVertex(ParseTreeNode* def);
 	bool	addSide(ParseTreeNode* def);

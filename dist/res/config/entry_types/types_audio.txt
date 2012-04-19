@@ -203,7 +203,7 @@ entry_types
 	{
 		name = "Sound (SPC)";
 		format = snd_spc;
-		match_ext = "spc";
+		export_ext = "spc";
 		icon = "e_sound";
 		category = "Audio";
 		//editor = audio;

@@ -347,6 +347,11 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 				// Hexen
 				if (theGameConfiguration->getMapFormat() == MAP_HEXEN)
 					end = wad->addNewEntry("BEHAVIOR");
+				// Doom 64
+				else if (theGameConfiguration->getMapFormat() == MAP_DOOM64) {
+					wad->addNewEntry("LIGHTS");
+					end = wad->addNewEntry("MACROS");
+				}
 			}
 
 			// Add new map entry to the maps dir

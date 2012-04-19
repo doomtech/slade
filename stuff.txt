@@ -22,7 +22,7 @@ TODO List ---------------------------------------------------------------
 - 3d mode
 - Editing:
 	- Line properties update on line draw
-	- UDMF/Doom64 Map saving
+	- Proper UDMF/Hexen/Doom64 Map saving (BEHAVIOR, SCRIPTS, DIALOGUE, LIGHTS, MACROS, etc.)
 	- Generalised sector and line specials
 	- Rotate/scale objects
 - Better UDMF property handling

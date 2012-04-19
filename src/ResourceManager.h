@@ -103,6 +103,7 @@ public:
 	ArchiveEntry*	getTextureEntry(string texture, string nspace = "textures", Archive* priority = NULL);
 	CTexture*		getTexture(string texture, Archive* priority = NULL, Archive* ignore = NULL);
 	string			getTextureName(uint16_t hash) { return Doom64HashTable[hash]; }
+	uint16_t		getTextureHash(string name);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };

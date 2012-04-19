@@ -329,6 +329,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\NodesPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\NodesPrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\PNGPrefsPanel.cpp"
 					>
 				</File>
@@ -906,6 +914,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\NodeBuilders.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\NodeBuilders.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\SectorBuilder.cpp"
 				>
 			</File>
@@ -1399,6 +1415,10 @@
 						Name="Defaults"
 						>
 						<File
+							RelativePath=".\dist\res\config\games\include\defaults\doom64_defaults.cfg"
+							>
+						</File>
+						<File
 							RelativePath=".\dist\res\config\games\include\defaults\doom_defaults.cfg"
 							>
 						</File>
@@ -1408,6 +1428,10 @@
 						</File>
 						<File
 							RelativePath=".\dist\res\config\games\include\defaults\hexen_defaults.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\defaults\strife_defaults.cfg"
 							>
 						</File>
 					</Filter>

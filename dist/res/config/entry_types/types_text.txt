@@ -150,7 +150,7 @@ entry_types
 	mapinfo : text
 	{
 		name = "Mapinfo";
-		match_name = "mapinfo", "zmapinfo";
+		match_name = "mapinfo";
 	}
 
 	zmapinfo : text
@@ -158,6 +158,13 @@ entry_types
 		name = "Mapinfo (ZDoom)";
 		match_name = "zmapinfo";
 		text_language = "z_mapinfo";
+	}
+	
+	menudef : text
+	{
+		name = "Menu Definition";
+		match_name = "menudef";
+		text_language = "z_menudef";
 	}
 
 	modeldefs : text
