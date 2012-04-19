@@ -176,6 +176,7 @@ public:
 	bool	lineFlagSet(unsigned flag_index, MapLine* line);
 	string	lineFlagsString(MapLine* line);
 	void	setLineFlag(unsigned flag_index, MapLine* line, bool set = true);
+	void	setLineBasicFlag(string flag, MapLine* line, bool set = true);
 
 	// Line action (SPAC) triggers
 	string			spacTriggerString(MapLine* line);

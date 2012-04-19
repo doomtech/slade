@@ -1160,7 +1160,7 @@ void MapEditor::createSector(double x, double y) {
 
 	// Create sector from builder result
 	if (ok)
-		builder.createSector(sector_copy);
+		builder.createSector(NULL, sector_copy);
 
 	// Set some temporary sector defaults if needed
 	if (!sector_copy && ok) {
@@ -1351,6 +1351,16 @@ struct me_ls_t {
 void MapEditor::endLineDraw(bool apply) {
 	// Check if we want to 'apply' the line draw (ie. create the lines)
 	if (apply && draw_points.size() > 1) {
+		// Add extra points if any lines overlap existing vertices
+		for (unsigned a = 0; a < draw_points.size() - 1; a++) {
+			MapVertex* v = map.lineCrossVertex(draw_points[a].x, draw_points[a].y, draw_points[a+1].x, draw_points[a+1].y);
+			while (v) {
+				draw_points.insert(draw_points.begin()+a+1, fpoint2_t(v->xPos(), v->yPos()));
+				a++;
+				v = map.lineCrossVertex(draw_points[a].x, draw_points[a].y, draw_points[a+1].x, draw_points[a+1].y);
+			}
+		}
+
 		// Create vertices
 		for (unsigned a = 0; a < draw_points.size(); a++)
 			map.createVertex(draw_points[a].x, draw_points[a].y, 1);
@@ -1391,6 +1401,7 @@ void MapEditor::endLineDraw(bool apply) {
 		SectorBuilder builder;
 		int runs = 0;
 		unsigned ns_start = map.nSectors();
+		unsigned nsd_start = map.nSides();
 		vector<MapSector*> sectors_reused;
 		for (unsigned a = 0; a < edges.size(); a++) {
 			// Skip if edge is ignored
@@ -1418,13 +1429,12 @@ void MapEditor::endLineDraw(bool apply) {
 				continue;
 
 			// Check if we traced over an existing sector (or part of one)
-			MapSector* sector_existing = builder.findExistingSector();
-			bool create = true;
-			if (sector_existing) {
+			MapSector* sector = builder.findExistingSector();
+			if (sector) {
 				// Check if it's already been (re)used
 				bool reused = false;
 				for (unsigned s = 0; s < sectors_reused.size(); s++) {
-					if (sectors_reused[s] == sector_existing) {
+					if (sectors_reused[s] == sector) {
 						reused = true;
 						break;
 					}
@@ -1432,22 +1442,18 @@ void MapEditor::endLineDraw(bool apply) {
 
 				// If we can reuse the sector, do so
 				if (!reused) {
-					sectors_reused.push_back(sector_existing);
-					create = false;
-
-					for (unsigned e = 0; e < builder.nEdges(); e++)
-						map.setLineSector(builder.getEdgeLine(e)->getIndex(), sector_existing->getIndex(), builder.edgeIsFront(e));
+					sectors_reused.push_back(sector);
+					sector = NULL;
 				}
 			}
 			
-			// Create sector if needed
-			if (create)
-				builder.createSector();
+			// Create sector
+			builder.createSector(sector);
 		}
 
 		//wxLogMessage("Ran sector builder %d times", runs);
 
-		// Check if any of the created lines should be flipped
+		// Check if any new lines need to be flipped
 		for (unsigned a = nl_start; a < map.nLines(); a++) {
 			MapLine* line = map.getLine(a);
 			if (line->backSector() && !line->frontSector())
@@ -1493,6 +1499,27 @@ void MapEditor::endLineDraw(bool apply) {
 			sector->setStringProperty("textureceiling", "MFLR8_1");
 			sector->setIntProperty("heightceiling", 128);
 			sector->setIntProperty("lightlevel", 160);
+		}
+
+		// Update line textures
+		for (unsigned a = nsd_start; a < map.nSides(); a++) {
+			MapSide* side = map.getSide(a);
+
+			// Clear any unneeded textures
+			MapLine* line = side->getParentLine();
+			map.clearLineUnneededTextures(line->getIndex());
+
+			// Set middle texture if needed
+			if (side == line->s1() && !line->s2() && side->stringProperty("texturemiddle") == "-") {
+				wxLogMessage("midtex");
+				// Find adjacent texture (any)
+				string tex = map.getAdjacentLineTexture(line->v1());
+				if (tex == "-")
+					tex = map.getAdjacentLineTexture(line->v2());
+
+				// Set texture
+				side->setStringProperty("texturemiddle", tex);
+			}
 		}
 	}
 

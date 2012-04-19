@@ -29,6 +29,14 @@ bool SectorBuilder::edgeIsFront(unsigned index) {
 	return sector_edges[index].front;
 }
 
+bool SectorBuilder::edgeSideCreated(unsigned index) {
+	// Check index
+	if (index >= sector_edges.size())
+		return false;
+
+	return sector_edges[index].side_created;
+}
+
 SectorBuilder::edge_t SectorBuilder::nextEdge(SectorBuilder::edge_t edge) {
 	// Get relevant vertices
 	MapVertex* vertex = edge.line->v2();		// Vertex to be tested
@@ -93,7 +101,7 @@ bool SectorBuilder::traceOutline(MapLine* line, bool front) {
 	
 	// Begin tracing
 	vertex_right = edge.line->v1();
-	while (true) {
+	for (unsigned a = 0; a < 10000; a++) {
 		// Update edge sum (for clockwise detection)
 		if (edge.front)
 			edge_sum += (edge.line->x1()*edge.line->y2() - edge.line->x2()*edge.line->y1());
@@ -463,17 +471,19 @@ bool SectorBuilder::traceSector(SLADEMap* map, MapLine* line, bool front) {
 	return true;
 }
 
-void SectorBuilder::createSector(MapSector* sector_copy) {
-	// Create the sector
-	MapSector* sector = map->createSector();
-	if (!sector_copy)
-		sector_copy = findCopySector();		// Find potential sector to copy if none specified
-	if (sector_copy)
-		sector->copyPropsFrom(sector_copy);
+void SectorBuilder::createSector(MapSector* sector, MapSector* sector_copy) {
+	// Create the sector if needed
+	if (!sector) {
+		sector = map->createSector();
+		if (!sector_copy)
+			sector_copy = findCopySector();		// Find potential sector to copy if none specified
+		if (sector_copy)
+			sector->copyPropsFrom(sector_copy);
+	}
 
 	// Set sides to new sector
 	for (unsigned a = 0; a < sector_edges.size(); a++)
-		map->setLineSector(sector_edges[a].line->getIndex(), sector->getIndex(), sector_edges[a].front);
+		sector_edges[a].side_created = map->setLineSector(sector_edges[a].line->getIndex(), sector->getIndex(), sector_edges[a].front);
 }
 
 void SectorBuilder::drawResult() {

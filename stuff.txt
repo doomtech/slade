@@ -21,11 +21,14 @@ TODO List ---------------------------------------------------------------
 	- Will probably have to implement some kind of resize for this (perhaps FreeImage can do it nicely?)
 - 3d mode
 - Editing:
-	- Map saving
+	- Line properties update on line draw
+	- UDMF/Doom64 Map saving
 	- Generalised sector and line specials
 	- Rotate/scale objects
 - Better UDMF property handling
+- (Possibly) better line/thing flag handling
 - 'Tag edit' mode
+- Default values handling
 
 
 --- Minor Problems/Annoyances ---
@@ -98,10 +101,8 @@ TODO List ---------------------------------------------------------------
 Unimplemented Feature Requests ------------------------------------------
 
 --- General / User Interface ---
-- Ability to toggle toolbars, access all toolbar functions from menus
 - Fully customisable toolbars
 - Sorting by column (I.E. Name or Type)
-- Map browser
 
 --- Archive / Entry Management ---
 - mass export to format (XWE)
@@ -176,7 +177,7 @@ Ideas / Possible Features -----------------------------------------------
 - EntryPanels able to handle multiple entries for special purposes
 	- GfxEntryPanel: shows all selected images in a browser kind of thing
 	- AudioEntryPanel: loads all selected entries as a playlist
-
+- Full DECORATE editor (would go nicely with the project system above)
 
 
 

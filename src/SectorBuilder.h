@@ -13,10 +13,12 @@ private:
 	struct edge_t {
 		MapLine*	line;
 		bool		front;
+		bool		side_created;
 
 		edge_t(MapLine* line = NULL, bool front = true) {
 			this->line = line;
 			this->front = front;
+			side_created = false;
 		}
 	};
 
@@ -39,6 +41,7 @@ public:
 	unsigned	nEdges() { return sector_edges.size(); }
 	MapLine*	getEdgeLine(unsigned index);
 	bool		edgeIsFront(unsigned index);
+	bool		edgeSideCreated(unsigned index);
 
 	edge_t		nextEdge(edge_t edge);
 	bool		traceOutline(MapLine* line, bool front = true);
@@ -51,7 +54,7 @@ public:
 	MapSector*	findExistingSector();
 
 	bool	traceSector(SLADEMap* map, MapLine* line, bool front = true);
-	void	createSector(MapSector* sector_copy = NULL);
+	void	createSector(MapSector* sector = NULL, MapSector* sector_copy = NULL);
 
 	// Testing
 	void	drawResult();

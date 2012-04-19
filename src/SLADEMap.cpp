@@ -1703,6 +1703,10 @@ bool SLADEMap::removeSide(unsigned index) {
 	if (l->side2 == sides[index])
 		l->side2 = NULL;
 
+	// Set appropriate line flags
+	theGameConfiguration->setLineBasicFlag("blocking", l, true);
+	theGameConfiguration->setLineBasicFlag("twosided", l, false);
+
 	// Remove the side
 	delete sides[index];
 	sides[index] = sides.back();
@@ -2002,6 +2006,43 @@ vector<fpoint2_t> SLADEMap::cutLines(double x1, double y1, double x2, double y2)
 	return intersect_points;
 }
 
+MapVertex* SLADEMap::lineCrossVertex(double x1, double y1, double x2, double y2) {
+	// Create bbox for line
+	bbox_t bbox;
+	bbox.extend(x1, y1);
+	bbox.extend(x2, y2);
+
+	// Go through vertices
+	MapVertex* cv = NULL;
+	double min_dist = 999999;
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		MapVertex* vertex = vertices[a];
+
+		// Skip if outside line bbox
+		if (!bbox.point_within(vertex->x, vertex->y))
+			continue;
+
+		// Skip if it's at an end of the line
+		if (vertex->x == x1 && vertex->y == y1)
+			continue;
+		if (vertex->x == x2 && vertex->y == y2)
+			continue;
+
+		// Check if on line
+		if (MathStuff::distanceToLineFast(vertex->x, vertex->y, x1, y1, x2, y2) == 0) {
+			// Check distance between line start and vertex
+			double dist = MathStuff::distance(x1, y1, vertex->x, vertex->y);
+			if (dist < min_dist) {
+				cv = vertex;
+				min_dist = dist;
+			}
+		}
+	}
+
+	// Return closest overlapping vertex to line start
+	return cv;
+}
+
 bool SLADEMap::lineInSector(MapLine* line, MapSector* sector) {
 	if (line->side1 && line->side1->sector == sector ||
 		line->side2 && line->side2->sector == sector)
@@ -2052,6 +2093,46 @@ bool SLADEMap::getVerticesOfSector(unsigned index, vector<MapVertex*>& list) {
 	}
 
 	return true;
+}
+
+int SLADEMap::lineNeedsTexture(unsigned index) {
+	// Check index
+	if (index >= lines.size())
+		return 0;
+
+	// Check line is valid
+	MapLine* line = lines[index];
+	if (!line->side1)
+		return 0;
+
+	// If line is 1-sided, it only needs front middle
+	if (!line->side2)
+		return TEX_FRONT_MIDDLE;
+
+	// Get sector heights
+	int floor_front = line->frontSector()->intProperty("heightfloor");
+	int ceiling_front = line->frontSector()->intProperty("heightceiling");
+	int floor_back = line->backSector()->intProperty("heightfloor");
+	int ceiling_back = line->backSector()->intProperty("heightceiling");
+
+	// Front lower
+	int tex = 0;
+	if (floor_front < floor_back)
+		tex |= TEX_FRONT_LOWER;
+
+	// Back lower
+	else if (floor_front > floor_back)
+		tex |= TEX_BACK_LOWER;
+
+	// Front upper
+	if (ceiling_front > ceiling_back)
+		tex |= TEX_FRONT_UPPER;
+
+	// Back upper
+	else if (ceiling_front < ceiling_back)
+		tex |= TEX_BACK_UPPER;
+
+	return tex;
 }
 
 void SLADEMap::getSectorsByTag(int tag, vector<MapSector*>& list) {
@@ -2127,6 +2208,62 @@ rgba_t SLADEMap::getSectorColour(MapSector* sector, int where) {
 		int light = sector->intProperty("lightlevel");
 		return rgba_t(light, light, light, 255);
 	}
+}
+
+string SLADEMap::getAdjacentLineTexture(MapVertex* vertex, int tex_part) {
+	// Go through adjacent lines
+	string tex = "-";
+	for (unsigned a = 0; a < vertex->nConnectedLines(); a++) {
+		MapLine* l = vertex->connectedLine(a);
+
+		if (l->side1) {
+			// Front middle
+			if (tex_part & TEX_FRONT_MIDDLE) {
+				tex = l->stringProperty("side1.texturemiddle");
+				if (tex != "-")
+					return tex;
+			}
+
+			// Front upper
+			if (tex_part & TEX_FRONT_UPPER) {
+				tex = l->stringProperty("side1.texturetop");
+				if (tex != "-")
+					return tex;
+			}
+
+			// Front lower
+			if (tex_part & TEX_FRONT_LOWER) {
+				tex = l->stringProperty("side1.texturebottom");
+				if (tex != "-")
+					return tex;
+			}
+		}
+
+		if (l->side2) {
+			// Back middle
+			if (tex_part & TEX_BACK_MIDDLE) {
+				tex = l->stringProperty("side2.texturemiddle");
+				if (tex != "-")
+					return tex;
+			}
+
+			// Back upper
+			if (tex_part & TEX_BACK_UPPER) {
+				tex = l->stringProperty("side2.texturetop");
+				if (tex != "-")
+					return tex;
+			}
+
+			// Back lower
+			if (tex_part & TEX_BACK_LOWER) {
+				tex = l->stringProperty("side2.texturebottom");
+				if (tex != "-")
+					return tex;
+			}
+		}
+	}
+
+	return tex;
 }
 
 MapVertex* SLADEMap::createVertex(double x, double y, double split_dist) {
@@ -2249,6 +2386,26 @@ MapSector* SLADEMap::createSector() {
 	sectors.push_back(ns);
 
 	return ns;
+}
+
+MapSide* SLADEMap::createSide(MapSector* sector) {
+	// Check sector
+	if (!sector)
+		return NULL;
+
+	// Create side
+	MapSide* side = new MapSide(sector, this);
+
+	// Setup initial values
+	side->index = sides.size();
+	side->setStringProperty("texturemiddle", "-");
+	side->setStringProperty("texturetop", "-");
+	side->setStringProperty("texturebottom", "-");
+
+	// Add to sides
+	sides.push_back(side);
+
+	return side;
 }
 
 void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
@@ -2388,6 +2545,12 @@ void SLADEMap::splitLine(unsigned line, unsigned vertex) {
 	nl->index = lines.size();
 	lines.push_back(nl);
 
+	// Update x-offsets
+	int xoff1 = l->intProperty("side1.offsetx");
+	int xoff2 = l->intProperty("side2.offsetx");
+	nl->setIntProperty("side1.offsetx", xoff1 + l->getLength());
+	l->setIntProperty("side2.offsetx", xoff2 + nl->getLength());
+
 	geometry_updated = theApp->runTimer();
 }
 
@@ -2452,10 +2615,10 @@ void SLADEMap::splitLinesAt(MapVertex* vertex, double split_dist) {
 	}
 }
 
-void SLADEMap::setLineSector(unsigned line, unsigned sector, bool front) {
+bool SLADEMap::setLineSector(unsigned line, unsigned sector, bool front) {
 	// Check indices
 	if (line >= lines.size() || sector >= sectors.size())
-		return;
+		return false;
 
 	// Get the MapSide to set
 	MapSide* side = NULL;
@@ -2466,19 +2629,54 @@ void SLADEMap::setLineSector(unsigned line, unsigned sector, bool front) {
 
 	// Create side if needed
 	if (!side) {
-		side = new MapSide(sectors[sector], this);
-		side->index = sides.size();
-		side->parent = lines[line];
-		sides.push_back(side);
+		side = createSide(sectors[sector]);
 
+		// Add to line
+		side->parent = lines[line];
 		if (front)
 			lines[line]->side1 = side;
 		else
 			lines[line]->side2 = side;
+
+		// Set appropriate line flags
+		bool twosided = (lines[line]->side1 && lines[line]->side2);
+		theGameConfiguration->setLineBasicFlag("blocking", lines[line], !twosided);
+		theGameConfiguration->setLineBasicFlag("twosided", lines[line], twosided);
+
+		return true;
 	}
 	else {
 		// Set the side's sector
 		side->setSector(sectors[sector]);
+
+		return false;
+	}
+}
+
+void SLADEMap::clearLineUnneededTextures(unsigned index) {
+	// Check index
+	if (index >= lines.size())
+		return;
+
+	// Check line needed textures
+	int tex = lineNeedsTexture(index);
+
+	// Clear any unneeded textures
+	if (lines[index]->side1) {
+		if ((tex & TEX_FRONT_MIDDLE) == 0)
+			lines[index]->setStringProperty("side1.texturemiddle", "-");
+		if ((tex & TEX_FRONT_UPPER) == 0)
+			lines[index]->setStringProperty("side1.texturetop", "-");
+		if ((tex & TEX_FRONT_LOWER) == 0)
+			lines[index]->setStringProperty("side1.texturebottom", "-");
+	}
+	if (lines[index]->side2) {
+		if ((tex & TEX_BACK_MIDDLE) == 0)
+			lines[index]->setStringProperty("side2.texturemiddle", "-");
+		if ((tex & TEX_BACK_UPPER) == 0)
+			lines[index]->setStringProperty("side2.texturetop", "-");
+		if ((tex & TEX_BACK_LOWER) == 0)
+			lines[index]->setStringProperty("side2.texturebottom", "-");
 	}
 }
 

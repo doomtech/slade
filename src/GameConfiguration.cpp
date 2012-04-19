@@ -938,6 +938,40 @@ void GameConfiguration::setLineFlag(unsigned index, MapLine* line, bool set) {
 	line->setIntProperty("flags", flags);
 }
 
+void GameConfiguration::setLineBasicFlag(string flag, MapLine* line, bool set) {
+	// If UDMF, just set the bool value
+	if (map_format == MAP_UDMF) {
+		line->setBoolProperty(flag, set);
+		return;
+	}
+
+	// Get current flags
+	int flags = line->intProperty("flags");
+	int fval = 0;
+
+	// Impassible
+	if (flag == "blocking")
+		fval = 1;
+
+	// Two Sided
+	else if (flag == "twosided")
+		fval = 4;
+
+	// Upper unpegged
+	else if (flag == "dontpegtop")
+		fval = 8;
+
+	// Lower unpegged
+	else if (flag == "dontpegbottom")
+		fval = 16;
+
+	// Set/unset flag
+	if (set)
+		line->setIntProperty("flags", flags|fval);
+	else
+		line->setIntProperty("flags", flags & ~fval);
+}
+
 string GameConfiguration::spacTriggerString(MapLine* line) {
 	if (!line)
 		return "";

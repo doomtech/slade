@@ -10,6 +10,16 @@
 #include "Archive.h"
 #include "PropertyList.h"
 
+// Line texture ids
+enum {
+	TEX_FRONT_MIDDLE	= 0x01,
+	TEX_FRONT_UPPER		= 0x02,
+	TEX_FRONT_LOWER		= 0x04,
+	TEX_BACK_MIDDLE		= 0x08,
+	TEX_BACK_UPPER		= 0x10,
+	TEX_BACK_LOWER		= 0x20,
+};
+
 class ParseTreeNode;
 class SLADEMap {
 friend class MapEditor;
@@ -147,11 +157,13 @@ public:
 	bbox_t				getMapBBox();
 	MapVertex*			vertexAt(double x, double y);
 	vector<fpoint2_t>	cutLines(double x1, double y1, double x2, double y2);
+	MapVertex*			lineCrossVertex(double x1, double y1, double x2, double y2);
 
 	bool	lineInSector(MapLine* line, MapSector* sector);
 	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);
 	bool	getLinesOfSector(MapSector* sector, vector<MapLine*>& list);
 	bool	getVerticesOfSector(unsigned index, vector<MapVertex*>& list);
+	int		lineNeedsTexture(unsigned index);
 
 	// Tags/Ids
 	void	getSectorsByTag(int tag, vector<MapSector*>& list);
@@ -159,8 +171,9 @@ public:
 	void	getLinesById(int id, vector<MapLine*>& list);
 	void	getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list);
 
-	// Extra
+	// Info
 	rgba_t	getSectorColour(MapSector* sector, int where = 0);
+	string	getAdjacentLineTexture(MapVertex* vertex, int tex_part = 255);
 
 	// Creation
 	MapVertex*	createVertex(double x, double y, double split_dist = -1);
@@ -168,6 +181,7 @@ public:
 	MapLine*	createLine(MapVertex* vertex1, MapVertex* vertex2);
 	MapThing*	createThing(double x, double y);
 	MapSector*	createSector();
+	MapSide*	createSide(MapSector* sector);
 
 	// Editing
 	void		moveVertex(unsigned vertex, double nx, double ny);
@@ -177,7 +191,8 @@ public:
 	void		moveThing(unsigned thing, double nx, double ny);
 	void		thingSetAnglePoint(unsigned thing, fpoint2_t point);
 	void		splitLinesAt(MapVertex* vertex, double split_dist = 0);
-	void		setLineSector(unsigned line, unsigned sector, bool front = true);
+	bool		setLineSector(unsigned line, unsigned sector, bool front = true);
+	void		clearLineUnneededTextures(unsigned index);
 
 	// Checks
 	int		removeDetachedVertices();
