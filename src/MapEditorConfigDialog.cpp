@@ -62,8 +62,8 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 		framesizer->Add(list_maps, 1, wxEXPAND|wxALL, 4);
 
 		// New map button
-		//btn_new_map = new wxButton(this, -1, "New Map");
-		//framesizer->Add(btn_new_map, 0, wxLEFT|wxRIGHT|wxBOTTOM, 4);
+		btn_new_map = new wxButton(this, -1, "New Map");
+		framesizer->Add(btn_new_map, 0, wxLEFT|wxRIGHT|wxBOTTOM, 4);
 	}
 	else {
 		list_maps = NULL;
@@ -134,7 +134,7 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	if (show_maplist) {
 		list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &MapEditorConfigDialog::onMapActivated, this);
 		list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MapEditorConfigDialog::onMapSelected, this);
-		//btn_new_map->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnNewMap, this);
+		btn_new_map->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnNewMap, this);
 	}
 	btn_open_resource->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnOpenResource, this);
 	btn_recent->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnRecent, this);
@@ -253,15 +253,28 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 
 	// Create map name combo box
 	wxComboBox* cbo_mapname  = new wxComboBox(&dlg, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, flags);
+	cbo_mapname->SetMaxLength(8);
 	sizer->Add(cbo_mapname, 1, wxEXPAND|wxALL, 4);
 
 	// Add possible map names to the combo box
-	for (unsigned a = 0; a < theGameConfiguration->nMapNames(); a++)
-		cbo_mapname->Append(theGameConfiguration->mapName(a));
+	for (unsigned a = 0; a < theGameConfiguration->nMapNames(); a++) {
+		// Check if map already exists
+		string mapname = theGameConfiguration->mapName(a);
+		bool exists = false;
+		for (unsigned m = 0; m < maps.size(); m++) {
+			if (S_CMPNOCASE(maps[m].name, mapname)) {
+				exists = true;
+				break;
+			}
+		}
+
+		if (!exists)
+			cbo_mapname->Append(mapname);
+	}
 
 	// Set inital map name selection
 	if (theGameConfiguration->nMapNames() > 0)
-		cbo_mapname->SetValue(theGameConfiguration->mapName(0));
+		cbo_mapname->SetSelection(0);
 
 	// Add dialog buttons
 	sizer->Add(dlg.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
@@ -280,6 +293,74 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 				wxMessageBox("Map " + mapname + " already exists", "Error");
 				return;
 			}
+		}
+
+		// Check archive type
+		if (archive->getType() == ARCHIVE_WAD) {
+			// Create new (empty) map at the end of the wad
+			ArchiveEntry* head = archive->addNewEntry(mapname);
+			ArchiveEntry* end = NULL;
+
+			if (theGameConfiguration->getMapFormat() == MAP_UDMF) {
+				// UDMF
+				archive->addNewEntry("TEXTMAP");
+				end = archive->addNewEntry("ENDMAP");
+			}
+			else {
+				// Doom(64) / Hexen
+				archive->addNewEntry("THINGS");
+				archive->addNewEntry("LINEDEFS");
+				archive->addNewEntry("SIDEDEFS");
+				archive->addNewEntry("VERTEXES");
+				end = archive->addNewEntry("SECTORS");
+
+				// Hexen
+				if (theGameConfiguration->getMapFormat() == MAP_HEXEN)
+					end = archive->addNewEntry("BEHAVIOR");
+			}
+
+			// Refresh map list
+			populateMapList();
+			list_maps->selectItem(list_maps->GetItemCount()-1);
+		}
+		else if (archive->getType() == ARCHIVE_ZIP) {
+			// Create new wad archive for the map
+			Archive* wad = new WadArchive();
+
+			// Create new (empty) map at the end of the wad
+			ArchiveEntry* head = wad->addNewEntry(mapname);
+			ArchiveEntry* end = NULL;
+
+			if (theGameConfiguration->getMapFormat() == MAP_UDMF) {
+				// UDMF
+				wad->addNewEntry("TEXTMAP");
+				end = wad->addNewEntry("ENDMAP");
+			}
+			else {
+				// Doom(64) / Hexen
+				wad->addNewEntry("THINGS");
+				wad->addNewEntry("LINEDEFS");
+				wad->addNewEntry("SIDEDEFS");
+				wad->addNewEntry("VERTEXES");
+				end = wad->addNewEntry("SECTORS");
+
+				// Hexen
+				if (theGameConfiguration->getMapFormat() == MAP_HEXEN)
+					end = wad->addNewEntry("BEHAVIOR");
+			}
+
+			// Add new map entry to the maps dir
+			ArchiveEntry* mapentry = archive->addNewEntry(mapname+".wad", 0xFFFFFFFF, archive->getDir("maps"));
+			MemChunk mc;
+			wad->write(mc);
+			mapentry->importMemChunk(mc);
+
+			// Clean up
+			delete wad;
+
+			// Refresh map list
+			populateMapList();
+			list_maps->selectItem(list_maps->GetItemCount()-1);
 		}
 	}
 }

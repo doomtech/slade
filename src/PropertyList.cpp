@@ -116,6 +116,12 @@ string PropertyList::toString(bool condensed) {
 
 	// Go through all properties
 	while (i != properties.end()) {
+		// Skip if no value
+		if (!i->second.hasValue()) {
+			i++;
+			continue;
+		}
+
 		// Add "key = value;\n" to the return string
 		string key = i->first;
 		string val = i->second;
@@ -127,6 +133,8 @@ string PropertyList::toString(bool condensed) {
 			ret += key + "=" + val + ";\n";
 		else
 			ret += key + " = " + val + ";\n";
+
+		wxLogMessage("key %s type %s value %s", CHR(key), CHR(i->second.typeString()), CHR(val));
 
 		// Next property
 		i++;

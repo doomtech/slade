@@ -537,10 +537,14 @@ void MapObjectPropsPanel::setupTypeUDMF(int objtype) {
 		tabs_sections->SetPageText(0, "Thing");
 
 	// Go through all possible properties for this type
+	bool args = false;
 	vector<udmfp_t> props = theGameConfiguration->allUDMFProperties(objtype);
 	sort(props.begin(), props.end());
-	for (unsigned a = 0; a < props.size(); a++)
+	for (unsigned a = 0; a < props.size(); a++) {
 		addUDMFProperty(props[a].property, objtype);
+		if (props[a].property->getProperty() == "arg0")
+			args = true;
+	}
 
 	// Add side properties if line type
 	if (objtype == MOBJ_LINE) {
@@ -566,18 +570,20 @@ void MapObjectPropsPanel::setupTypeUDMF(int objtype) {
 	// Set all bool properties to use checkboxes
 	pg_properties->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
 
-	// Link arg properties to type/special properties
-	for (unsigned a = 0; a < properties.size(); a++) {
-		// Action special
-		if (properties[a]->getType() == MOPGProperty::TYPE_ASPECIAL) {
-			for (unsigned arg = 0; arg < 5; arg++)
-				((MOPGActionSpecialProperty*)properties[a])->addArgProperty(pg_properties->GetProperty(S_FMT("arg%d", arg)), arg);
-		}
+	// Link arg properties to type/special properties (if args exist)
+	if (args) {
+		for (unsigned a = 0; a < properties.size(); a++) {
+			// Action special
+			if (properties[a]->getType() == MOPGProperty::TYPE_ASPECIAL) {
+				for (unsigned arg = 0; arg < 5; arg++)
+					((MOPGActionSpecialProperty*)properties[a])->addArgProperty(pg_properties->GetProperty(S_FMT("arg%d", arg)), arg);
+			}
 
-		// Thing type
-		else if (properties[a]->getType() == MOPGProperty::TYPE_TTYPE) {
-			for (unsigned arg = 0; arg < 5; arg++)
-				((MOPGThingTypeProperty*)properties[a])->addArgProperty(pg_properties->GetProperty(S_FMT("arg%d", arg)), arg);
+			// Thing type
+			else if (properties[a]->getType() == MOPGProperty::TYPE_TTYPE) {
+				for (unsigned arg = 0; arg < 5; arg++)
+					((MOPGThingTypeProperty*)properties[a])->addArgProperty(pg_properties->GetProperty(S_FMT("arg%d", arg)), arg);
+			}
 		}
 	}
 

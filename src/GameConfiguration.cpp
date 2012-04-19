@@ -1175,21 +1175,21 @@ void GameConfiguration::cleanObjectUDMFProps(MapObject* object) {
 		}
 
 		// Remove the property from the object if it is the default value
-		Property& def = i->second.property->getDefaultValue();
-		if (def.getType() == PROP_BOOL) {
-			if (def.getBoolValue() == object->boolProperty(i->first))
+		//Property& def = i->second.property->getDefaultValue();
+		if (i->second.property->getDefaultValue().getType() == PROP_BOOL) {
+			if (i->second.property->getDefaultValue().getBoolValue() == object->boolProperty(i->first))
 				object->props().removeProperty(i->first);
 		}
-		else if (def.getType() == PROP_INT) {
-			if (def.getIntValue() == object->intProperty(i->first))
+		else if (i->second.property->getDefaultValue().getType() == PROP_INT) {
+			if (i->second.property->getDefaultValue().getIntValue() == object->intProperty(i->first))
 				object->props().removeProperty(i->first);
 		}
-		else if (def.getType() == PROP_FLOAT) {
-			if (def.getFloatValue() == object->floatProperty(i->first))
+		else if (i->second.property->getDefaultValue().getType() == PROP_FLOAT) {
+			if (i->second.property->getDefaultValue().getFloatValue() == object->floatProperty(i->first))
 				object->props().removeProperty(i->first);
 		}
-		else if (def.getType() == PROP_STRING) {
-			if (def.getStringValue() == object->stringProperty(i->first))
+		else if (i->second.property->getDefaultValue().getType() == PROP_STRING) {
+			if (i->second.property->getDefaultValue().getStringValue() == object->stringProperty(i->first))
 				object->props().removeProperty(i->first);
 		}
 

@@ -1051,11 +1051,13 @@ bool SLADEMap::addSide(ParseTreeNode* def) {
 	MapSide* ns = new MapSide(sectors[sector], this);
 
 	// Set some reasonable defaults
+	/*
 	ns->prop("texturetop").setValue(string("-"));
 	ns->prop("texturemiddle").setValue(string("-"));
 	ns->prop("texturebottom").setValue(string("-"));
 	ns->prop("offsetx") = 0;
 	ns->prop("offsety") = 0;
+	*/
 
 	// Add extra side info
 	ParseTreeNode* prop = NULL;
@@ -1104,12 +1106,14 @@ bool SLADEMap::addLine(ParseTreeNode* def) {
 	MapLine* nl = new MapLine(vertices[v1], vertices[v2], sides[s1], side2, this);
 
 	// Set some reasonable defaults
+	/*
 	nl->prop("special") = 0;
 	nl->prop("arg0") = 0;
 	nl->prop("arg1") = 0;
 	nl->prop("arg2") = 0;
 	nl->prop("arg3") = 0;
 	nl->prop("arg4") = 0;
+	*/
 
 	// Add extra line info
 	ParseTreeNode* prop = NULL;
@@ -1172,6 +1176,7 @@ bool SLADEMap::addThing(ParseTreeNode* def) {
 	MapThing* nt = new MapThing(prop_x->getFloatValue(), prop_y->getFloatValue(), prop_type->getIntValue(), this);
 
 	// Set some reasonable defaults
+	/*
 	nt->prop("height") = 0;
 	nt->prop("angle") = 0;
 	nt->prop("id") = 0;
@@ -1181,6 +1186,7 @@ bool SLADEMap::addThing(ParseTreeNode* def) {
 	nt->prop("arg2") = 0;
 	nt->prop("arg3") = 0;
 	nt->prop("arg4") = 0;
+	*/
 
 	// Add extra thing info
 	ParseTreeNode* prop = NULL;
@@ -1606,6 +1612,9 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 		// Basic properties
 		tempfile.Write(S_FMT("x=%1.3f;\ny=%1.3f;\ntype=%d;\n", things[a]->x, things[a]->y, things[a]->type));
 
+		// Remove internal 'flags' property if it exists
+		things[a]->props().removeProperty("flags");
+
 		// Other properties
 		if (!things[a]->properties.isEmpty()) {
 			theGameConfiguration->cleanObjectUDMFProps(things[a]);
@@ -1623,6 +1632,9 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 		tempfile.Write(S_FMT("v1=%d;\nv2=%d;\nsidefront=%d;\n", lines[a]->v1Index(), lines[a]->v2Index(), lines[a]->s1Index()));
 		if (lines[a]->s2())
 			tempfile.Write(S_FMT("sideback=%d;\n", lines[a]->s2Index()));
+
+		// Remove internal 'flags' property if it exists
+		lines[a]->props().removeProperty("flags");
 
 		// Other properties
 		if (!lines[a]->properties.isEmpty()) {

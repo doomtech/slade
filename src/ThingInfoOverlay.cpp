@@ -55,16 +55,17 @@ void ThingInfoOverlay::update(MapThing* thing) {
 		dir = "Southeast";
 	info.push_back(S_FMT("Direction: %s", CHR(dir)));
 
-	// Special and Args (if in hexen/udmf format)
-	if (theGameConfiguration->getMapFormat() == MAP_HEXEN || theGameConfiguration->getMapFormat() == MAP_UDMF) {
+	// Special and Args (if in hexen format or udmf with thing args)
+	if (theGameConfiguration->getMapFormat() == MAP_HEXEN ||
+		(theGameConfiguration->getMapFormat() == MAP_UDMF && theGameConfiguration->getUDMFProperty("arg0", MOBJ_THING))) {
 		int as_id = thing->prop("special").getIntValue();
 		info.push_back(S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id))));
 		int args[5];
-		args[0] = thing->prop("arg0");
-		args[1] = thing->prop("arg1");
-		args[2] = thing->prop("arg2");
-		args[3] = thing->prop("arg3");
-		args[4] = thing->prop("arg4");
+		args[0] = thing->intProperty("arg0");
+		args[1] = thing->intProperty("arg1");
+		args[2] = thing->intProperty("arg2");
+		args[3] = thing->intProperty("arg3");
+		args[4] = thing->intProperty("arg4");
 		string argstr = tt->getArgsString(args);
 		if (!argstr.IsEmpty())
 			info.push_back(S_FMT("%s", CHR(argstr)));
@@ -73,7 +74,8 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	}
 
 	// Flags
-	info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->prop("flags")))));
+	if (theGameConfiguration->getMapFormat() != MAP_UDMF)
+		info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->prop("flags")))));
 
 	// TID (if in doom64/hexen/udmf format)
 	if (theGameConfiguration->getMapFormat() != MAP_DOOM) {

@@ -1736,6 +1736,12 @@
     <None Include="dist\res\config\games\include\defaults\hexen_defaults.cfg">
       <Filter>Map Editor\GameConfiguration\Configurations\Defaults</Filter>
     </None>
+    <None Include="dist\res\config\games\include\defaults\doom64_defaults.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Defaults</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\defaults\strife_defaults.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Defaults</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SLADE.rc" />

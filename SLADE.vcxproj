@@ -594,9 +594,11 @@
     <None Include="dist\res\config\games\heretic_zd_hexen.cfg" />
     <None Include="dist\res\config\games\heretic_zd_udmf.cfg" />
     <None Include="dist\res\config\games\hexen.cfg" />
+    <None Include="dist\res\config\games\include\defaults\doom64_defaults.cfg" />
     <None Include="dist\res\config\games\include\defaults\doom_defaults.cfg" />
     <None Include="dist\res\config\games\include\defaults\heretic_defaults.cfg" />
     <None Include="dist\res\config\games\include\defaults\hexen_defaults.cfg" />
+    <None Include="dist\res\config\games\include\defaults\strife_defaults.cfg" />
     <None Include="dist\res\config\games\include\flags\boom_flags.cfg" />
     <None Include="dist\res\config\games\include\flags\doom64_flags.cfg" />
     <None Include="dist\res\config\games\include\flags\doom_flags.cfg" />
