@@ -363,6 +363,8 @@ Archive::Archive(uint8_t type) {
 Archive::~Archive() {
 	if (dir_root)
 		delete dir_root;
+	if (parent)
+		parent->unlock();
 }
 
 /* Archive::getFilename

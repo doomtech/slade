@@ -1143,6 +1143,60 @@ vector<udmfp_t> GameConfiguration::allUDMFProperties(int type) {
 	return ret;
 }
 
+void GameConfiguration::cleanObjectUDMFProps(MapObject* object) {
+	// Get UDMF properties list for type
+	UDMFPropMap* map = NULL;
+	int type = object->getObjType();
+	if (type == MOBJ_VERTEX)
+		map = &udmf_vertex_props;
+	else if (type == MOBJ_LINE)
+		map = &udmf_linedef_props;
+	else if (type == MOBJ_SIDE)
+		map = &udmf_sidedef_props;
+	else if (type == MOBJ_SECTOR)
+		map = &udmf_sector_props;
+	else if (type == MOBJ_THING)
+		map = &udmf_thing_props;
+	else
+		return;
+
+	// Go through properties
+	UDMFPropMap::iterator i = map->begin();
+	while (i != map->end()) {
+		if (!i->second.property) {
+			i++;
+			continue;
+		}
+
+		// Check if the object even has this property
+		if (!object->hasProp(i->first)) {
+			i++;
+			continue;
+		}
+
+		// Remove the property from the object if it is the default value
+		Property& def = i->second.property->getDefaultValue();
+		if (def.getType() == PROP_BOOL) {
+			if (def.getBoolValue() == object->boolProperty(i->first))
+				object->props().removeProperty(i->first);
+		}
+		else if (def.getType() == PROP_INT) {
+			if (def.getIntValue() == object->intProperty(i->first))
+				object->props().removeProperty(i->first);
+		}
+		else if (def.getType() == PROP_FLOAT) {
+			if (def.getFloatValue() == object->floatProperty(i->first))
+				object->props().removeProperty(i->first);
+		}
+		else if (def.getType() == PROP_STRING) {
+			if (def.getStringValue() == object->stringProperty(i->first))
+				object->props().removeProperty(i->first);
+		}
+
+		i++;
+	}
+}
+
 string GameConfiguration::sectorTypeName(int type) {
 	// Check for zero type
 	if (type == 0)

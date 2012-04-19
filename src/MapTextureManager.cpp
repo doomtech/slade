@@ -272,7 +272,7 @@ void MapTextureManager::refreshResources() {
 	flats.clear();
 	sprites.clear();
 	thePaletteChooser->setGlobalFromArchive(archive);
-	wxLogMessage("texture manager cleared");
+	//wxLogMessage("texture manager cleared");
 }
 
 void MapTextureManager::setArchive(Archive* archive) {

@@ -225,6 +225,22 @@ void MapEditorWindow::setupLayout() {
 	Layout();
 }
 
+void MapEditorWindow::lockMapEntries(bool lock) {
+	// Don't bother if no map is open
+	if (!mdesc_current.head)
+		return;
+
+	// Just lock/unlock the 'head' entry if it's a pk3 map
+	if (mdesc_current.archive) {
+		if (lock)
+			mdesc_current.head->lock();
+		else
+			mdesc_current.head->unlock();
+
+		return;
+	}
+}
+
 bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	// Get map parent archive
 	Archive* archive = map.head->getParent();
@@ -240,13 +256,10 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 
 	// Show window if opened ok
 	if (ok) {
-		// Lock map entries
 		mdesc_current = map;
-		ArchiveEntry* entry = map.head;
-		while (entry && entry != map.end->nextEntry()) {
-			entry->lock();
-			entry = entry->nextEntry();
-		}
+
+		// Lock map entries
+		lockMapEntries();
 
 		this->Show(true);
 		map_canvas->viewFitToMap();
@@ -260,46 +273,26 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 }
 
 bool nb_warned = false;
-bool MapEditorWindow::saveMap() {
-	// Get map data entries
-	vector<ArchiveEntry*> map_data;
-	if (mdesc_current.format == MAP_DOOM)
-		editor.getMap().writeDoomMap(map_data);
-	else if (mdesc_current.format == MAP_HEXEN)
-		editor.getMap().writeHexenMap(map_data);
-	else // TODO: other formats
-		return false;
-
-	// Add map data to temporary wad
-	Archive* wad = new WadArchive();
-	wad->addNewEntry("MAP01");
-	for (unsigned a = 0; a < map_data.size(); a++)
-		wad->addEntry(map_data[a]);
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF)
-		wad->addNewEntry("ENDMAP");
-
-	// Check for map archive
-	Archive* tempwad = NULL;
-	Archive::mapdesc_t map = mdesc_current;
-	if (mdesc_current.archive && mdesc_current.head) {
-		tempwad = new WadArchive();
-		tempwad->open(mdesc_current.head);
-		vector<Archive::mapdesc_t> amaps = tempwad->detectMaps();
-		if (amaps.size() > 0)
-			map = amaps[0];
-		else
-			return false;
-	}
-	
-	// --- Build nodes ---
+void MapEditorWindow::buildNodes(Archive* wad) {
+	NodeBuilders::builder_t builder;
+	string command;
+	string options;
 
 	// Save wad to disk
 	string filename = appPath("sladetemp.wad", DIR_TEMP);
 	wad->save(filename);
 
 	// Get current nodebuilder
-	NodeBuilders::builder_t& builder = NodeBuilders::getBuilder(nodebuilder_id);
-	string command = builder.command;
+	builder = NodeBuilders::getBuilder(nodebuilder_id);
+	command = builder.command;
+	options = nodebuilder_options;
+
+	// Switch to ZDBSP if UDMF
+	if (mdesc_current.format == MAP_UDMF && nodebuilder_id != "zdbsp") {
+		wxMessageBox("Nodebuilder switched to ZDBSP for UDMF format", "Save Map", wxICON_INFORMATION);
+		builder = NodeBuilders::getBuilder("zdbsp");
+		command = builder.command;
+	}
 
 	// Check for undefined path
 	if (!wxFileExists(builder.path) && !nb_warned) {
@@ -323,39 +316,83 @@ bool MapEditorWindow::saveMap() {
 
 	// Build command line
 	command.Replace("$f", S_FMT("\"%s\"", CHR(filename)));
-	command.Replace("$o", CHR(wxString(nodebuilder_options)));
+	command.Replace("$o", CHR(wxString(options)));
 
 	// Run nodebuilder
 	if (wxFileExists(builder.path)) {
 		wxArrayString out;
+		wxLogMessage("execute \"%s\"", CHR(command));
 		wxExecute(S_FMT("\"%s\" %s", CHR(builder.path), CHR(command)), out, wxEXEC_HIDE_CONSOLE);
 		Raise();
+		wxLogMessage("Nodebuilder output:");
+		for (unsigned a = 0; a < out.size(); a++)
+			wxLogMessage(out[a]);
 
 		// Re-load wad
 		wad->close();
 		wad->open(filename);
 	}
+	else if (nb_warned)
+		wxLogMessage("Nodebuilder path not set up, no nodes were built");
+}
+
+bool MapEditorWindow::saveMap() {
+	// Get map data entries
+	vector<ArchiveEntry*> map_data;
+	if (mdesc_current.format == MAP_DOOM)
+		editor.getMap().writeDoomMap(map_data);
+	else if (mdesc_current.format == MAP_HEXEN)
+		editor.getMap().writeHexenMap(map_data);
+	else if (mdesc_current.format == MAP_UDMF) {
+		ArchiveEntry* udmf = new ArchiveEntry("TEXTMAP");
+		editor.getMap().writeUDMFMap(udmf);
+		map_data.push_back(udmf);
+	}
+	else // TODO: doom64
+		return false;
+
+	// Add map data to temporary wad
+	Archive* wad = new WadArchive();
+	wad->addNewEntry("MAP01");
+	for (unsigned a = 0; a < map_data.size(); a++)
+		wad->addEntry(map_data[a]);
+	if (theGameConfiguration->getMapFormat() == MAP_UDMF)
+		wad->addNewEntry("ENDMAP");
+
+	// Check for map archive
+	Archive* tempwad = NULL;
+	Archive::mapdesc_t map = mdesc_current;
+	if (mdesc_current.archive && mdesc_current.head) {
+		tempwad = new WadArchive();
+		tempwad->open(mdesc_current.head);
+		vector<Archive::mapdesc_t> amaps = tempwad->detectMaps();
+		if (amaps.size() > 0)
+			map = amaps[0];
+		else
+			return false;
+	}
 	
+	// Build nodes
+	buildNodes(wad);
+
+	// Unlock current map entries
+	lockMapEntries(false);
 
 	// Delete current map entries
 	ArchiveEntry* entry = map.end;
 	Archive* archive = map.head->getParent();
 	while (entry && entry != map.head) {
 		ArchiveEntry* prev = entry->prevEntry();
-		entry->unlock();
 		archive->removeEntry(entry);
 		entry = prev;
 	}
 
 	// Add new map entries
-	for (unsigned a = 1; a < wad->numEntries(); a++) {
+	for (unsigned a = 1; a < wad->numEntries(); a++)
 		entry = archive->addEntry(wad->getEntry(a), archive->entryIndex(map.head) + a, NULL, true);
-		entry->lock();
-	}
 
 	// Clean up
 	delete wad;
-	wxRemoveFile(filename);
 	if (tempwad) {
 		tempwad->save();
 		delete tempwad;
@@ -364,6 +401,9 @@ bool MapEditorWindow::saveMap() {
 		// Update map description
 		mdesc_current.end = entry;
 	}
+
+	// Lock current map entries
+	lockMapEntries();
 
 	return true;
 }
@@ -374,21 +414,13 @@ bool MapEditorWindow::saveMapAs() {
 	if (!SFileDialog::saveFile(info, "Save Map As", "Wad Archives (*.wad)|*.wad", this))
 		return false;
 
-	// Unlock current map entries
-	ArchiveEntry* entry = mdesc_current.head;
-	while (entry && entry != mdesc_current.end->nextEntry()) {
-		entry->unlock();
-		entry = entry->nextEntry();
-	}
-	mdesc_current.head = NULL;
-
 	// Create new, empty wad
 	WadArchive wad;
 	ArchiveEntry* head = wad.addNewEntry(mdesc_current.name);
 	ArchiveEntry* end = NULL;
 	if (theGameConfiguration->getMapFormat() == MAP_UDMF) {
-		// TODO: UDMF
-		return false;
+		wad.addNewEntry("TEXTMAP");
+		end = wad.addNewEntry("ENDMAP");
 	}
 	else {
 		wad.addNewEntry("THINGS");
@@ -421,12 +453,10 @@ void MapEditorWindow::closeMap() {
 	// Close map in editor
 	editor.clearMap();
 
-	// Unlock map entries
-	ArchiveEntry* entry = mdesc_current.head;
-	while (entry && entry != mdesc_current.end->nextEntry()) {
-		entry->unlock();
-		entry = entry->nextEntry();
-	}
+	// Unlock current map entries
+	lockMapEntries(false);
+
+	// Clear map info
 	mdesc_current.head = NULL;
 }
 

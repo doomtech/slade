@@ -1067,6 +1067,7 @@ bool SLADEMap::addSide(ParseTreeNode* def) {
 			continue;
 
 		ns->prop(prop->getName()) = prop->getValue();
+		//wxLogMessage("Property %s type %s (%s)", CHR(prop->getName()), CHR(prop->getValue().typeString()), CHR(prop->getValue().getStringValue()));
 	}
 
 	// Add side to map
@@ -1588,7 +1589,105 @@ bool SLADEMap::writeDoom64Map(vector<ArchiveEntry*>& map_entries) {
 }
 
 bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
-	return false;
+	// Check entry was given
+	if (!textmap)
+		return false;
+
+	// Open temp text file
+	wxFile tempfile(appPath("sladetemp.txt", DIR_TEMP), wxFile::write);
+
+	// Write map namespace
+	tempfile.Write(S_FMT("namespace=\"%s\";\n", CHR(udmf_namespace)));
+
+	// Write things
+	for (unsigned a = 0; a < things.size(); a++) {
+		tempfile.Write(S_FMT("thing//#%d\n{\n", a));
+
+		// Basic properties
+		tempfile.Write(S_FMT("x=%1.3f;\ny=%1.3f;\ntype=%d;\n", things[a]->x, things[a]->y, things[a]->type));
+
+		// Other properties
+		if (!things[a]->properties.isEmpty()) {
+			theGameConfiguration->cleanObjectUDMFProps(things[a]);
+			tempfile.Write(things[a]->properties.toString(true));
+		}
+
+		tempfile.Write("}\n\n");
+	}
+
+	// Write lines
+	for (unsigned a = 0; a < lines.size(); a++) {
+		tempfile.Write(S_FMT("linedef//#%d\n{\n", a));
+
+		// Basic properties
+		tempfile.Write(S_FMT("v1=%d;\nv2=%d;\nsidefront=%d;\n", lines[a]->v1Index(), lines[a]->v2Index(), lines[a]->s1Index()));
+		if (lines[a]->s2())
+			tempfile.Write(S_FMT("sideback=%d;\n", lines[a]->s2Index()));
+
+		// Other properties
+		if (!lines[a]->properties.isEmpty()) {
+			theGameConfiguration->cleanObjectUDMFProps(lines[a]);
+			tempfile.Write(lines[a]->properties.toString(true));
+		}
+
+		tempfile.Write("}\n\n");
+	}
+
+	// Write sides
+	for (unsigned a = 0; a < sides.size(); a++) {
+		tempfile.Write(S_FMT("sidedef//#%d\n{\n", a));
+
+		// Basic properties
+		tempfile.Write(S_FMT("sector=%d;\n", sides[a]->sector->getIndex()));
+
+		// Other properties
+		if (!sides[a]->properties.isEmpty()) {
+			theGameConfiguration->cleanObjectUDMFProps(sides[a]);
+			tempfile.Write(sides[a]->properties.toString(true));
+		}
+
+		tempfile.Write("}\n\n");
+	}
+
+	// Write vertices
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		tempfile.Write(S_FMT("vertex//#%d\n{\n", a));
+
+		// Basic properties
+		tempfile.Write(S_FMT("x=%1.3f;\ny=%1.3f;\n", vertices[a]->x, vertices[a]->y));
+
+		// Other properties
+		if (!vertices[a]->properties.isEmpty()) {
+			theGameConfiguration->cleanObjectUDMFProps(vertices[a]);
+			tempfile.Write(vertices[a]->properties.toString(true));
+		}
+
+		tempfile.Write("}\n\n");
+	}
+
+	// Write sectors
+	for (unsigned a = 0; a < sectors.size(); a++) {
+		tempfile.Write(S_FMT("sector//#%d\n{\n", a));
+
+		// Basic properties
+		tempfile.Write(S_FMT("texturefloor=\"%s\";\ntextureceiling=\"%s\";\n", CHR(sectors[a]->f_tex), CHR(sectors[a]->c_tex)));
+
+		// Other properties
+		if (!sectors[a]->properties.isEmpty()) {
+			theGameConfiguration->cleanObjectUDMFProps(sectors[a]);
+			tempfile.Write(sectors[a]->properties.toString(true));
+		}
+
+		tempfile.Write("}\n\n");
+	}
+
+	// Close file
+	tempfile.Close();
+
+	// Load file to entry
+	textmap->importFile(appPath("sladetemp.txt", DIR_TEMP));
+
+	return true;
 }
 
 

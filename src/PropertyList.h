@@ -26,8 +26,9 @@ public:
 	void	addFlag(string key);
 	void	allProperties(vector<Property>& list);
 	void	allPropertyNames(vector<string>& list);
+	bool	isEmpty() { return properties.size() == 0; }
 
-	string	toString();
+	string	toString(bool condensed = false);
 };
 
 #endif//__PROPERTY_LIST_H__

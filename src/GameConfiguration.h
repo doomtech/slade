@@ -193,6 +193,7 @@ public:
 	// UDMF properties
 	UDMFProperty*	getUDMFProperty(string name, int type);
 	vector<udmfp_t>	allUDMFProperties(int type);
+	void			cleanObjectUDMFProps(MapObject* object);
 
 	// Sector types
 	string	sectorTypeName(int type);

@@ -333,6 +333,7 @@ bool MapPreviewCanvas::openMap(Archive::mapdesc_t map) {
 
 	// Clean up
 	if (map_archive) {
+		temp_archive->close();
 		delete temp_archive;
 		temp_archive = NULL;
 	}

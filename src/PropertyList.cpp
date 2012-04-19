@@ -107,7 +107,7 @@ void PropertyList::addFlag(string key) {
 /* PropertyList::toString
  * Returns a string representation of the property list
  *******************************************************************/
-string PropertyList::toString() {
+string PropertyList::toString(bool condensed) {
 	// Init return string
 	string ret = wxEmptyString;
 
@@ -119,7 +119,14 @@ string PropertyList::toString() {
 		// Add "key = value;\n" to the return string
 		string key = i->first;
 		string val = i->second;
-		ret += key + " = " + val + ";\n";
+
+		if (i->second.getType() == PROP_STRING)
+			val = "\"" + val + "\"";
+
+		if (condensed)
+			ret += key + "=" + val + ";\n";
+		else
+			ret += key + " = " + val + ";\n";
 
 		// Next property
 		i++;

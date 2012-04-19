@@ -28,6 +28,9 @@ private:
 	// Singleton instance
 	static MapEditorWindow*		instance;
 
+	void	buildNodes(Archive* wad);
+	void	lockMapEntries(bool lock = true);
+
 public:
 	MapEditorWindow();
 	~MapEditorWindow();

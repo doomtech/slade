@@ -246,9 +246,9 @@ string Property::getStringValue(bool warn_wrong_type) {
 		return S_FMT("%d", value.Integer);
 	else if (type == PROP_BOOL) {
 		if (value.Boolean)
-			return "1";
+			return "true";
 		else
-			return "0";
+			return "false";
 	}
 	else if (type == PROP_FLOAT)
 		return S_FMT("%f", value.Floating);
