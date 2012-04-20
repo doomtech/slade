@@ -12,7 +12,7 @@
 #include "MapObjectPropsPanel.h"
 #include "SectorBuilder.h"
 
-double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
+double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
 MapEditor::MapEditor() {
 	// Init variables
@@ -681,8 +681,8 @@ void MapEditor::showItem(int index) {
 
 void MapEditor::incrementGrid() {
 	gridsize++;
-	if (gridsize > 18)
-		gridsize = 18;
+	if (gridsize > 20)
+		gridsize = 20;
 
 	addEditorMessage(S_FMT("Grid Size: %dx%d", (int)gridSize(), (int)gridSize()));
 }
