@@ -41,6 +41,7 @@
 #include "WadArchive.h"
 #include "SFileDialog.h"
 #include "NodeBuilders.h"
+#include "ShapeDrawPanel.h"
 #include <wx/aui/aui.h>
 
 
@@ -48,7 +49,6 @@
  * VARIABLES
  *******************************************************************/
 MapEditorWindow* MapEditorWindow::instance = NULL;
-string map_window_layout = "";
 CVAR(Int, mew_width, 1024, CVAR_SAVE);
 CVAR(Int, mew_height, 768, CVAR_SAVE);
 CVAR(Int, mew_left, -1, CVAR_SAVE);
@@ -96,6 +96,61 @@ MapEditorWindow::MapEditorWindow()
 MapEditorWindow::~MapEditorWindow() {
 }
 
+/* MapEditorWindow::loadLayout
+ * Loads the previously saved layout file for the window
+ *******************************************************************/
+void MapEditorWindow::loadLayout() {
+	// Open layout file
+	Tokenizer tz;
+	if (!tz.openFile(appPath("mapwindow.layout", DIR_USER)))
+		return;
+
+	// Parse layout
+	wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+	while (true) {
+		// Read component+layout pair
+		string component = tz.getToken();
+		string layout = tz.getToken();
+
+		// Load layout to component
+		if (!component.IsEmpty() && !layout.IsEmpty())
+			m_mgr->LoadPaneInfo(layout, m_mgr->GetPane(component));
+
+		// Check if we're done
+		if (tz.peekToken().IsEmpty())
+			break;
+	}
+}
+
+/* MapEditorWindow::saveLayout
+ * Saves the current window layout to a file
+ *******************************************************************/
+void MapEditorWindow::saveLayout() {
+	// Open layout file
+	wxFile file(appPath("mapwindow.layout", DIR_USER), wxFile::write);
+
+	// Write component layout
+	wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+
+	// Console pane
+	file.Write("\"console\" ");
+	string pinf = m_mgr->SavePaneInfo(m_mgr->GetPane("console"));
+	file.Write(S_FMT("\"%s\"\n", CHR(pinf)));
+
+	// Item info pane
+	file.Write("\"item_props\" ");
+	pinf = m_mgr->SavePaneInfo(m_mgr->GetPane("item_props"));
+	file.Write(S_FMT("\"%s\"\n", CHR(pinf)));
+
+	// Shape drawing pane
+	file.Write("\"shape_draw\" ");
+	pinf = m_mgr->SavePaneInfo(m_mgr->GetPane("shape_draw"));
+	file.Write(S_FMT("\"%s\"\n", CHR(pinf)));
+
+	// Close file
+	file.Close();
+}
+
 /* MapEditorWindow::setupLayout
  * Sets up the basic map editor window layout
  *******************************************************************/
@@ -137,8 +192,9 @@ void MapEditorWindow::setupLayout() {
 
 	// View menu
 	wxMenu* menu_view = new wxMenu("");
-	theApp->getAction("mapw_showconsole")->addToMenu(menu_view);
 	theApp->getAction("mapw_showproperties")->addToMenu(menu_view);
+	theApp->getAction("mapw_showconsole")->addToMenu(menu_view);
+	theApp->getAction("mapw_showdrawoptions")->addToMenu(menu_view);
 	menu->Append(menu_view, "View");
 
 	SetMenuBar(menu);
@@ -214,12 +270,24 @@ void MapEditorWindow::setupLayout() {
 	m_mgr->AddPane(panel_obj_props, p_inf);
 
 
-	// Load previously saved perspective string
-	// Doesn't play nice for whatever reason (god I hate wxAUI, it's terrible)
-	//long vers = 0;
-	//map_window_layout.Left(3).ToLong(&vers);
-	//if (vers == MEW_LAYOUT_VERS)
-	//	m_mgr->LoadPerspective(map_window_layout.Right(map_window_layout.Length() - 3));
+	// --- Shape Draw Options Panel ---
+	ShapeDrawPanel* panel_shapedraw = new ShapeDrawPanel(this);
+
+	// Setup panel info & add panel
+	wxSize msize = panel_shapedraw->GetMinSize();
+	p_inf.Float();
+	p_inf.BestSize(msize.x, msize.y);
+	p_inf.FloatingSize(msize.x, msize.y);
+	p_inf.FloatingPosition(140, 140);
+	p_inf.MinSize(msize.x, msize.y);
+	p_inf.Show(false);
+	p_inf.Caption("Shape Drawing");
+	p_inf.Name("shape_draw");
+	m_mgr->AddPane(panel_shapedraw, p_inf);
+
+
+	// Load previously saved window layout
+	loadLayout();
 
 	m_mgr->Update();
 	Layout();
@@ -552,6 +620,19 @@ bool MapEditorWindow::handleAction(string id) {
 		return true;
 	}
 
+	// View->Shape Draw Options
+	else if (id == "mapw_showdrawoptions") {
+		wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+		wxAuiPaneInfo& p_inf = m_mgr->GetPane("shape_draw");
+
+		// Toggle window and focus
+		p_inf.Show(!p_inf.IsShown());
+		map_canvas->SetFocus();
+
+		m_mgr->Update();
+		return true;
+	}
+
 	return false;
 }
 
@@ -560,9 +641,7 @@ bool MapEditorWindow::handleAction(string id) {
  *******************************************************************/
 void MapEditorWindow::onClose(wxCloseEvent& e) {
 	// Save current layout
-	mew_maximized = IsMaximized();
-	wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
-	map_window_layout = m_mgr->SavePerspective();
+	saveLayout();
 
 	this->Show(false);
 	closeMap();

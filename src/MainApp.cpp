@@ -79,13 +79,6 @@ CVAR(String, dir_last, "", CVAR_SAVE)
 
 
 /*******************************************************************
- * EXTERNAL VARIABLES
- *******************************************************************/
-extern string main_window_layout;
-extern string map_window_layout;
-
-
-/*******************************************************************
  * CLASSES
  *******************************************************************/
 
@@ -496,6 +489,7 @@ void MainApp::initActions() {
 	new SAction("mapw_mode_things", "Things Mode", "t_things", "Change to things editing mode", "", SAction::RADIO, -1, group_mode);
 	new SAction("mapw_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
 	new SAction("mapw_showproperties", "&Item Properties", "t_properties", "Toggle the Item Properties window", "Ctrl+1");
+	new SAction("mapw_showdrawoptions", "&Shape Draw Options", "t_settings", "Toggle the Shape Drawing Options window", "Ctrl+3");
 	int group_flat_type = SAction::newGroup();
 	new SAction("mapw_flat_none", "Wireframe", "t_flat_w", "Don't show flats (wireframe)", "", SAction::RADIO, -1, group_flat_type);
 	new SAction("mapw_flat_untextured", "Untextured", "t_flat_u", "Show untextured flats", "", SAction::RADIO, -1, group_flat_type);
@@ -716,16 +710,6 @@ void MainApp::readConfigFile() {
 			}
 		}
 
-		// Read saved main window AUI layout
-		if (!token.Cmp("main_window_layout")) {
-			main_window_layout = tz.getToken();
-		}
-
-		// Read saved map window AUI layout
-		if (!token.Cmp("map_window_layout")) {
-			map_window_layout = tz.getToken();
-		}
-
 		// Read base resource archive paths
 		if (!token.Cmp("base_resource_paths")) {
 			// Skip {
@@ -795,14 +779,6 @@ void MainApp::saveConfigFile() {
 
 	// Write cvars
 	save_cvars(file);
-
-	// Write main window AUI layout
-	string layout = S_FMT("%3d%s", MW_LAYOUT_VERS, main_window_layout.c_str());
-	file.Write(S_FMT("main_window_layout \"%s\"\n", CHR(layout)));
-
-	// Write map window AUI layout
-	layout = S_FMT("%3d%s", MEW_LAYOUT_VERS, map_window_layout.c_str());
-	file.Write(S_FMT("map_window_layout \"%s\"\n", CHR(layout)));
 
 	// Write base resource archive paths
 	file.Write("\nbase_resource_paths\n{\n");

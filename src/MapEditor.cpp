@@ -14,6 +14,11 @@
 
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
+EXTERN_CVAR(Int, shapedraw_sides)
+EXTERN_CVAR(Int, shapedraw_shape)
+EXTERN_CVAR(Bool, shapedraw_centered)
+EXTERN_CVAR(Bool, shapedraw_lockratio)
+
 MapEditor::MapEditor() {
 	// Init variables
 	edit_mode = MODE_LINES;
@@ -1420,8 +1425,102 @@ void MapEditor::removeLineDrawPoint() {
 	draw_points.pop_back();
 }
 
-unsigned MapEditor::numEditorMessages() {
-	return editor_messages.size();
+void MapEditor::setShapeDrawOrigin(fpoint2_t point, bool nearest) {
+	// Snap to nearest vertex if necessary
+	if (nearest) {
+		int vertex = map.nearestVertex(point.x, point.y);
+		if (vertex >= 0) {
+			point.x = map.getVertex(vertex)->xPos();
+			point.y = map.getVertex(vertex)->yPos();
+		}
+	}
+
+	// Otherwise, snap to grid if necessary
+	else if (grid_snap) {
+		point.x = snapToGrid(point.x);
+		point.y = snapToGrid(point.y);
+	}
+
+	draw_origin = point;
+}
+
+void MapEditor::updateShapeDraw(fpoint2_t point) {
+	// Clear line draw points
+	draw_points.clear();
+
+	// Snap edge to grid if needed
+	if (grid_snap) {
+		point.x = snapToGrid(point.x);
+		point.y = snapToGrid(point.y);
+	}
+
+	// Lock width:height at 1:1 if needed
+	fpoint2_t origin = draw_origin;
+	double width = abs(point.x - origin.x);
+	double height = abs(point.y - origin.y);
+	if (shapedraw_lockratio) {
+		if (width < height) {
+			if (origin.x < point.x)
+				point.x = origin.x + height;
+			else
+				point.x = origin.x - height;
+		}
+
+		if (height < width) {
+			if (origin.y < point.y)
+				point.y = origin.y + width;
+			else
+				point.y = origin.y - width;
+		}
+	}
+
+	// Center on origin if needed
+	if (shapedraw_centered) {
+		origin.x -= (point.x - origin.x);
+		origin.y -= (point.y - origin.y);
+	}
+
+	// Get box from tl->br
+	fpoint2_t tl(min(origin.x, point.x), min(origin.y, point.y));
+	fpoint2_t br(max(origin.x, point.x), max(origin.y, point.y));
+	width = br.x - tl.x;
+	height = br.y - tl.y;
+
+	// Rectangle
+	if (shapedraw_shape == 0) {
+		draw_points.push_back(fpoint2_t(tl.x, tl.y));
+		draw_points.push_back(fpoint2_t(br.x, tl.y));
+		draw_points.push_back(fpoint2_t(br.x, br.y));
+		draw_points.push_back(fpoint2_t(tl.x, br.y));
+		draw_points.push_back(fpoint2_t(tl.x, tl.y));
+	}
+
+	// Ellipse
+	else if (shapedraw_shape == 1) {
+		// Get midpoint
+		fpoint2_t mid;
+		mid.x = tl.x + ((br.x - tl.x) * 0.5);
+		mid.y = tl.y + ((br.y - tl.y) * 0.5);
+
+		// Get x/y radius
+		width *= 0.5;
+		height *= 0.5;
+
+		// Add ellipse points
+		double rot = 0;
+		fpoint2_t start;
+		for (int a = 0; a < shapedraw_sides; a++) {
+			fpoint2_t p(mid.x + sin(rot) * width, mid.y - cos(rot) * height);
+			draw_points.push_back(p);
+			rot -= (3.1415926535897932384626433832795 * 2) / (double)shapedraw_sides;
+
+			if (a == 0)
+				start = p;
+		}
+
+		// Close ellipse
+		draw_points.push_back(start);
+	}
 }
 
 struct me_ls_t {
@@ -1637,6 +1736,10 @@ void MapEditor::addEditorMessage(string message) {
 	msg.message = message;
 	msg.act_time = theApp->runTimer();
 	editor_messages.push_back(msg);
+}
+
+unsigned MapEditor::numEditorMessages() {
+	return editor_messages.size();
 }
 
 string MapEditor::getModeString() {

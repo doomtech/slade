@@ -524,6 +524,11 @@ void MapCanvas::drawLineDrawLines() {	// Best function name ever
 			end.x = editor->getMap().getVertex(vertex)->xPos();
 			end.y = editor->getMap().getVertex(vertex)->yPos();
 		}
+		else if (editor->gridSnap()) {
+			// No nearest vertex, snap to grid if needed
+			end.x = editor->snapToGrid(end.x);
+			end.y = editor->snapToGrid(end.y);
+		}
 	}
 	else if (editor->gridSnap()) {
 		// Otherwise, snap to grid if needed
@@ -538,7 +543,8 @@ void MapCanvas::drawLineDrawLines() {	// Best function name ever
 		fpoint2_t point = editor->lineDrawPoint(a);
 		glVertex2d(point.x, point.y);
 	}
-	glVertex2d(end.x, end.y);
+	if (draw_state == DSTATE_LINE)
+		glVertex2d(end.x, end.y);
 	glEnd();
 
 	// Draw points
@@ -549,7 +555,8 @@ void MapCanvas::drawLineDrawLines() {	// Best function name ever
 		fpoint2_t point = editor->lineDrawPoint(a);
 		glVertex2d(point.x, point.y);
 	}
-	glVertex2d(end.x, end.y);
+	if (draw_state == DSTATE_LINE || draw_state == DSTATE_SHAPE_ORIGIN)
+		glVertex2d(end.x, end.y);
 	glEnd();
 }
 
@@ -1442,8 +1449,14 @@ void MapCanvas::onKeyBindPress(string name) {
 
 	// Begin line drawing
 	else if (name == "me2d_begin_linedraw" && mouse_state == MSTATE_NORMAL) {
-		if (mouse_state == MSTATE_NORMAL)
-			mouse_state = MSTATE_LINE_DRAW;
+		draw_state = DSTATE_LINE;
+		mouse_state = MSTATE_LINE_DRAW;
+	}
+
+	// Begin shape drawing
+	else if (name == "me2d_begin_shapedraw" && mouse_state == MSTATE_NORMAL) {
+		draw_state = DSTATE_SHAPE_ORIGIN;
+		mouse_state = MSTATE_LINE_DRAW;
 	}
 
 	// Create object
@@ -1727,9 +1740,26 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 			if (e.GetModifiers() & wxMOD_SHIFT)
 				nearest_vertex = true;
 
-			if (editor->addLineDrawPoint(mouse_downpos_m, nearest_vertex)) {
-				// If line drawing finished, revert to normal state
-				mouse_state = MSTATE_NORMAL;
+			// Line drawing
+			if (draw_state == DSTATE_LINE) {
+				if (editor->addLineDrawPoint(mouse_downpos_m, nearest_vertex)) {
+					// If line drawing finished, revert to normal state
+					mouse_state = MSTATE_NORMAL;
+				}
+			}
+			
+			// Shape drawing
+			else {
+				if (draw_state == DSTATE_SHAPE_ORIGIN) {
+					// Set shape origin
+					editor->setShapeDrawOrigin(mouse_downpos_m, nearest_vertex);
+					draw_state = DSTATE_SHAPE_EDGE;
+				}
+				else {
+					// Finish shape draw
+					editor->endLineDraw(true);
+					mouse_state = MSTATE_NORMAL;
+				}
 			}
 		}
 		else if (mouse_state == MSTATE_NORMAL) {
@@ -1744,8 +1774,17 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 	// Right button
 	else if (e.RightDown()) {
 		// Remove line draw point if in line drawing state
-		if (mouse_state == MSTATE_LINE_DRAW)
-			editor->removeLineDrawPoint();
+		if (mouse_state == MSTATE_LINE_DRAW) {
+			// Line drawing
+			if (draw_state == DSTATE_LINE)
+				editor->removeLineDrawPoint();
+
+			// Shape drawing
+			else if (draw_state == DSTATE_SHAPE_EDGE) {
+				editor->endLineDraw(false);
+				draw_state = DSTATE_SHAPE_ORIGIN;
+			}
+		}
 
 		// Normal state
 		else if (mouse_state == MSTATE_NORMAL) {
@@ -1860,6 +1899,10 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	// Check if we are in thing quick angle state
 	if (mouse_state == MSTATE_THING_ANGLE)
 		editor->thingQuickAngle(mouse_pos_m);
+
+	// Update shape drawing if needed
+	if (mouse_state == MSTATE_LINE_DRAW && draw_state == DSTATE_SHAPE_EDGE)
+		editor->updateShapeDraw(mouse_pos_m);
 
 	e.Skip();
 }

@@ -37,6 +37,7 @@ private:
 
 	// Drawing
 	vector<fpoint2_t>	draw_points;
+	fpoint2_t			draw_origin;
 
 	// Editor messages
 	struct editor_msg_t {
@@ -140,6 +141,8 @@ public:
 	fpoint2_t	lineDrawPoint(unsigned index);
 	bool		addLineDrawPoint(fpoint2_t point, bool nearest = false);
 	void		removeLineDrawPoint();
+	void		setShapeDrawOrigin(fpoint2_t point, bool nearest = false);
+	void		updateShapeDraw(fpoint2_t point);
 	void		endLineDraw(bool apply = true);
 
 	// Editor messages

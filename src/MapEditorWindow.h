@@ -8,12 +8,6 @@
 #include "MainApp.h"
 #include "STopWindow.h"
 
-// The below is needed because, if I add a toolbar or dockable window to the main window,
-// then a previously saved perspective is loaded from slade3.cfg, the new item won't show
-// up at all. So when saving the perspective, add this number to the start of the string,
-// and check against it when loading. In other words, wxAUI is silly.
-#define MEW_LAYOUT_VERS 001
-
 class MapObject;
 class MapObjectPropsPanel;
 class SToolBar;
@@ -45,6 +39,10 @@ public:
 
 	MapEditor&			mapEditor() { return editor; }
 	MapTextureManager&	textureManager() { return tex_man; }
+
+	// Layout save/load
+	void	loadLayout();
+	void	saveLayout();
 
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);

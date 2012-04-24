@@ -103,6 +103,56 @@ MainWindow::MainWindow()
 MainWindow::~MainWindow() {
 }
 
+/* MainWindow::loadLayout
+ * Loads the previously saved layout file for the window
+ *******************************************************************/
+void MainWindow::loadLayout() {
+	// Open layout file
+	Tokenizer tz;
+	if (!tz.openFile(appPath("mainwindow.layout", DIR_USER)))
+		return;
+
+	// Parse layout
+	wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+	while (true) {
+		// Read component+layout pair
+		string component = tz.getToken();
+		string layout = tz.getToken();
+
+		// Load layout to component
+		if (!component.IsEmpty() && !layout.IsEmpty())
+			m_mgr->LoadPaneInfo(layout, m_mgr->GetPane(component));
+
+		// Check if we're done
+		if (tz.peekToken().IsEmpty())
+			break;
+	}
+}
+
+/* MainWindow::saveLayout
+ * Saves the current window layout to a file
+ *******************************************************************/
+void MainWindow::saveLayout() {
+	// Open layout file
+	wxFile file(appPath("mainwindow.layout", DIR_USER), wxFile::write);
+
+	// Write component layout
+	wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+
+	// Console pane
+	file.Write("\"console\" ");
+	string pinf = m_mgr->SavePaneInfo(m_mgr->GetPane("console"));
+	file.Write(S_FMT("\"%s\"\n", CHR(pinf)));
+
+	// Archive Manager pane
+	file.Write("\"archive_manager\" ");
+	pinf = m_mgr->SavePaneInfo(m_mgr->GetPane("archive_manager"));
+	file.Write(S_FMT("\"%s\"\n", CHR(pinf)));
+
+	// Close file
+	file.Close();
+}
+
 /* MainWindow::setupLayout
  * Sets up the wxWidgets window layout
  *******************************************************************/
@@ -275,10 +325,7 @@ void MainWindow::setupLayout() {
 
 
 	// Load previously saved perspective string
-	long vers = 0;
-	main_window_layout.Left(3).ToLong(&vers);
-	if (vers == MW_LAYOUT_VERS)
-		m_mgr->LoadPerspective(main_window_layout.Right(main_window_layout.Length() - 3));
+	loadLayout();
 
 	// Finalize
 	m_mgr->Update();
@@ -376,7 +423,8 @@ bool MainWindow::exitProgram() {
 		return false;
 
 	// Save current layout
-	main_window_layout = m_mgr->SavePerspective();
+	//main_window_layout = m_mgr->SavePerspective();
+	saveLayout();
 	mw_maximized = IsMaximized();
 
 	// Save selected palette

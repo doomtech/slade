@@ -31,12 +31,16 @@ private:
 
 	// Mouse stuff
 	enum {
-		MSTATE_NORMAL,
+		MSTATE_NORMAL = 0,
 		MSTATE_SELECTION,
 		MSTATE_PANNING,
 		MSTATE_MOVE,
 		MSTATE_THING_ANGLE,
 		MSTATE_LINE_DRAW,
+
+		DSTATE_LINE = 0,
+		DSTATE_SHAPE_ORIGIN,
+		DSTATE_SHAPE_EDGE,
 	};
 	point2_t	mouse_pos;			// 'Raw' mouse position
 	point2_t	mouse_downpos;
@@ -46,6 +50,7 @@ private:
 	bool		zooming_cursor;
 	bool		mouse_selbegin;
 	bool		mouse_movebegin;
+	int			draw_state;
 
 	// Info overlays
 	int					last_hilight;
