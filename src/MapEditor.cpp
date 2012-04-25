@@ -69,6 +69,7 @@ void MapEditor::setEditMode(int mode) {
 	case MODE_LINES:	addEditorMessage("Lines mode"); break;
 	case MODE_SECTORS:	addEditorMessage("Sectors mode (Normal)"); break;
 	case MODE_THINGS:	addEditorMessage("Things mode"); break;
+	case MODE_3D:		addEditorMessage("3d mode"); break;
 	default: break;
 	};
 }

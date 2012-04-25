@@ -315,6 +315,11 @@ void KeyBind::initBinds() {
 	addBind("paste", keypress_t("V", KPM_CTRL), "Paste");
 	addBind("select_all", keypress_t("A", KPM_CTRL), "Select All");
 
+	// Map Editor (map*)
+	addBind("map_edit_accept", keypress_t("return"), "Accept edit");
+	addBind("map_edit_cancel", keypress_t("escape"), "Cancel edit");
+	addBind("map_toggle_3d", keypress_t("Q"), "Toggle 3d mode");
+
 	// Map Editor 2D (me2d*)
 	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection");
 	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan view");
@@ -341,8 +346,6 @@ void KeyBind::initBinds() {
 	addBind("me2d_flat_type", keypress_t("F", KPM_CTRL), "Cycle flat type");
 	addBind("me2d_split_line", keypress_t("S", KPM_CTRL|KPM_SHIFT), "Split nearest line");
 	addBind("me2d_lock_hilight", keypress_t("H", KPM_CTRL), "Lock/unlock hilight");
-	addBind("me2d_edit_accept", keypress_t("return"), "Accept edit");
-	addBind("me2d_edit_cancel", keypress_t("escape"), "Cancel edit");
 	addBind("me2d_begin_linedraw", keypress_t("space"), "Begin line drawing");
 	addBind("me2d_begin_shapedraw", keypress_t("space", KPM_SHIFT), "Begin shape drawing");
 	addBind("me2d_create_object", keypress_t("insert"), "Create object");
@@ -379,6 +382,14 @@ void KeyBind::initBinds() {
 	addBind("me2d_thing_quick_angle", keypress_t("D"), "Quick angle edit");
 
 	// Map Editor 3D (me3d*)
+	addBind("me3d_camera_forward", keypress_t("W"), "Camera forward");
+	addBind("me3d_camera_back", keypress_t("S"), "Camera backward");
+	addBind("me3d_camera_left", keypress_t("A"), "Camera strafe left");
+	addBind("me3d_camera_right", keypress_t("D"), "Camera strafe right");
+	addBind("me3d_camera_up", keypress_t("up"), "Camera move up");
+	addBind("me3d_camera_down", keypress_t("down"), "Camera move down");
+	addBind("me3d_camera_turn_left", keypress_t("left"), "Camera turn left");
+	addBind("me3d_camera_turn_right", keypress_t("right"), "Camera turn right");
 
 	// Entry List (el*)
 	addBind("el_new", keypress_t("N", KPM_CTRL), "New Entry");

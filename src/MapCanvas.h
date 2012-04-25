@@ -18,6 +18,7 @@ class MapSide;
 class ThingType;
 class GLTexture;
 class MapRenderer2D;
+class MapRenderer3D;
 class MapCanvas : public OGLCanvas, public KeyBindHandler, public SActionHandler {
 private:
 	MapEditor*				editor;
@@ -27,6 +28,7 @@ private:
 	int						fr_idle;
 	sf::Clock				sfclock;
 	MapRenderer2D*			renderer_2d;
+	MapRenderer3D*			renderer_3d;
 	int						modifiers_current;
 
 	// Mouse stuff
@@ -107,8 +109,16 @@ public:
 	void	drawSelectionNumbers();
 	void	drawThingQuickAngleLines();
 	void	drawLineDrawLines();
+	void	drawMap2d();
 	void	draw();
+
+	// Frame updates
+	bool	update2d(double mult);
+	bool	update3d(double mult);
 	void	update(long frametime);
+
+	// Mouse
+	void	mouseToCenter();
 
 	void	itemSelected(int index, bool selected = true);
 	void	itemsSelected(vector<int>& items, bool selected = true);
@@ -123,6 +133,8 @@ public:
 
 	// Keybind handling
 	void	onKeyBindPress(string name);
+	void	keyBinds2d(string name);
+	void	keyBinds3d(string name);
 	void	onKeyBindRelease(string name);
 
 	// SAction handler
@@ -139,7 +151,7 @@ public:
 	void	onMouseLeave(wxMouseEvent& e);
 	void	onMouseEnter(wxMouseEvent& e);
 	void	onIdle(wxIdleEvent& e);
-	void	onTimer(wxTimerEvent& e);
+	void	onRTimer(wxTimerEvent& e);
 };
 
 #endif //__MAPCANVAS_H__

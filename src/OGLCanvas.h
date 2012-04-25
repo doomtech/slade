@@ -27,7 +27,7 @@ protected:
 	long		last_time;
 
 public:
-	OGLCanvas(wxWindow* parent, int id);
+	OGLCanvas(wxWindow* parent, int id, bool handle_timer = true);
 	~OGLCanvas();
 
 	Palette8bit*	getPalette() { return &palette; }

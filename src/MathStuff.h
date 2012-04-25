@@ -20,6 +20,7 @@ namespace MathStuff {
 	double		distanceRayLine(fpoint2_t ray_origin, fpoint2_t ray_dir, double x1, double y1, double x2, double y2);
 	double		angle2DRad(fpoint2_t p1, fpoint2_t p2, fpoint2_t p3);
 	fpoint2_t	rotatePoint(fpoint2_t origin, fpoint2_t point, double angle);
+	fpoint3_t	rotateVector3D(fpoint3_t vector, fpoint3_t axis, double angle);
 }
 
 #endif//__MATHSTUFF_H__

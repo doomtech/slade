@@ -304,6 +304,31 @@ fpoint2_t MathStuff::rotatePoint(fpoint2_t origin, fpoint2_t point, double angle
 	return fpoint2_t(x + origin.x, y + origin.y);
 }
 
+fpoint3_t MathStuff::rotateVector3D(fpoint3_t vector, fpoint3_t axis, double angle) {
+	fpoint3_t rvec;
+
+	// Calculate the sine and cosine of the angle once
+	float crot = (float)cos(angle);
+	float srot = (float)sin(angle);
+
+	// Rotate x
+	rvec.x  = (crot + (1 - crot) * axis.x * axis.x)				* vector.x;
+	rvec.x += ((1 - crot) * axis.x * axis.y - axis.z * srot)	* vector.y;
+	rvec.x += ((1 - crot) * axis.x * axis.z + axis.y * srot)	* vector.z;
+
+	// Rotate y
+	rvec.y  = ((1 - crot) * axis.x * axis.y + axis.z * srot)	* vector.x;
+	rvec.y += (crot + (1 - crot) * axis.y * axis.y)				* vector.y;
+	rvec.y += ((1 - crot) * axis.y * axis.z - axis.x * srot)	* vector.z;
+
+	// Rotate z
+	rvec.z  = ((1 - crot) * axis.x * axis.z - axis.y * srot)	* vector.x;
+	rvec.z += ((1 - crot) * axis.y * axis.z + axis.x * srot)	* vector.y;
+	rvec.z += (crot + (1 - crot) * axis.z * axis.z)				* vector.z;
+
+	return rvec;
+}
+
 
 
 CONSOLE_COMMAND(angle2d, 6) {

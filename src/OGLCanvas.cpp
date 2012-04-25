@@ -53,11 +53,13 @@
 /* OGLCanvas::OGLCanvas
  * OGLCanvas class constructor, SFML implementation
  *******************************************************************/
-OGLCanvas::OGLCanvas(wxWindow* parent, int id)
+OGLCanvas::OGLCanvas(wxWindow* parent, int id, bool handle_timer)
 : wxControl(parent, id, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS), timer(this) {
 	init_done = false;
 	last_time = theApp->runTimer();
-	timer.Start(100);
+
+	if (handle_timer)
+		timer.Start(100);
 
 	// Code taken from SFML wxWidgets integration example
 	sf::WindowHandle handle;
@@ -85,7 +87,8 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id)
 	Bind(wxEVT_PAINT, &OGLCanvas::onPaint, this);
 	Bind(wxEVT_ERASE_BACKGROUND, &OGLCanvas::onEraseBackground, this);
 	//Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
-	Bind(wxEVT_TIMER, &OGLCanvas::onTimer, this);
+	if (handle_timer)
+		Bind(wxEVT_TIMER, &OGLCanvas::onTimer, this);
 }
 #else
 /* OGLCanvas::OGLCanvas
