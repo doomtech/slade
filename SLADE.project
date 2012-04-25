@@ -221,6 +221,8 @@
       <File Name="src/MapTextureBrowser.h"/>
       <File Name="src/ThingTypeBrowser.cpp"/>
       <File Name="src/ThingTypeBrowser.h"/>
+      <File Name="src/ShapeDrawPanel.cpp"/>
+      <File Name="src/ShapeDrawPanel.h"/>
     </VirtualDirectory>
     <File Name="src/MapEditorWindow.h"/>
     <File Name="src/MapEditorWindow.cpp"/>
@@ -245,6 +247,8 @@
     <File Name="src/SectorBuilder.h"/>
     <File Name="src/NodeBuilders.cpp"/>
     <File Name="src/NodeBuilders.h"/>
+    <File Name="src/MapRenderer3D.cpp"/>
+    <File Name="src/MapRenderer3D.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
     <VirtualDirectory Name="Archive">
@@ -569,6 +573,8 @@
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
       
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -607,6 +613,8 @@
       <General OutputFile="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" IntermediateDirectory="./Debug" Command="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
+      
       
       
       
@@ -667,6 +675,8 @@
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
       
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -706,6 +716,8 @@
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
+      
       
       ]]>
       </Environment>

@@ -94,7 +94,7 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id, bool handle_timer)
 /* OGLCanvas::OGLCanvas
  * OGLCanvas class constructor, wxGLCanvas implementation
  *******************************************************************/
-OGLCanvas::OGLCanvas(wxWindow* parent, int id)
+OGLCanvas::OGLCanvas(wxWindow* parent, int id, bool handle_timer)
 : wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS), timer(this) {
 	init_done = false;
 	last_time = theApp->runTimer();
@@ -103,7 +103,7 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id)
 	Bind(wxEVT_PAINT, &OGLCanvas::onPaint, this);
 	Bind(wxEVT_ERASE_BACKGROUND, &OGLCanvas::onEraseBackground, this);
 	//Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
-	Bind(wxEVT_TIMER, &OGLCanvas::onTimer, this);
+	//Bind(wxEVT_TIMER, &OGLCanvas::onTimer, this);
 }
 #endif
 
