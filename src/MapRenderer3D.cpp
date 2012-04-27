@@ -166,8 +166,7 @@ void MapRenderer3D::renderMap() {
 	glFogf(GL_FOG_END, 3000.0f);
 
 	// Quick distance vis check
-	if (render_max_dist > 0)
-		quickVisDiscard();
+	quickVisDiscard();
 	
 	// Render walls
 	renderWalls();
@@ -696,10 +695,6 @@ void MapRenderer3D::renderWalls() {
 }
 
 void MapRenderer3D::quickVisDiscard() {
-	// Do nothing if no max distance
-	if (render_max_dist <= 0)
-		return;
-
 	// Check if vis arrays need to be rebuilt
 	if (dist_lines.size() != map->nLines()) {
 		dist_lines.clear();
@@ -711,6 +706,10 @@ void MapRenderer3D::quickVisDiscard() {
 		for (unsigned a = 0; a < map->nSectors(); a++)
 			dist_sectors.push_back(0);
 	}
+
+	// Do nothing if no max distance
+	if (render_max_dist <= 0)
+		return;
 
 	// Go through all sectors
 	double x = cam_position.x;
@@ -754,8 +753,10 @@ void MapRenderer3D::quickVisDiscard() {
 }
 
 float MapRenderer3D::calcDistFade(double distance) {
-	float faderange = render_max_dist * 0.2f;
+	if (render_max_dist <= 0)
+		return 1.0f;
 
+	float faderange = render_max_dist * 0.2f;
 	if (distance > render_max_dist - faderange)
 		return 1.0f - ((distance - (render_max_dist - faderange)) / faderange);
 	else
