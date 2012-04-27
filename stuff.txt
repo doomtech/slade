@@ -106,6 +106,7 @@ Unimplemented Feature Requests ------------------------------------------
 
 --- Archive / Entry Management ---
 - mass export to format (XWE)
+- sorting lumps in archive (not just their display)
 
 --- Entry Editing ---
 - SBARINFO viewer/editor
@@ -139,6 +140,7 @@ Ideas / Possible Features -----------------------------------------------
 - 'Animation viewer' (select a bunch of sprites to test an animation or whatever)
 - Hex editor
 - Font editor
+- Better UI for palette editing tools (something like the color remap maybe?)
 - *Project system:
 	- Hide/abstract underlying archive/entry stuff
 	- Will need to specify a 'game' for the project to enable/disable certain features:
@@ -178,7 +180,7 @@ Ideas / Possible Features -----------------------------------------------
 	- GfxEntryPanel: shows all selected images in a browser kind of thing
 	- AudioEntryPanel: loads all selected entries as a playlist
 - Full DECORATE editor (would go nicely with the project system above)
-
+- DeHackEd editor (could be an outgrowth of the DECORATE editor since it'd require actor/state management)
 
 
 Other / Notes -----------------------------------------------------------

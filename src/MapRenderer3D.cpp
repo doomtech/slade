@@ -733,8 +733,14 @@ void MapRenderer3D::renderThings() {
 
 		// Get thing sprite
 		tex = theMapEditor->textureManager().getSprite(tt->getSprite(), tt->getTranslation(), tt->getPalette());
-		if (!tex)
+		if (!tex) {
+			// Sprite not found, try an icon
+			tex = theMapEditor->textureManager().getEditorImage(S_FMT("thing/%s", CHR(tt->getIcon())));
+		}
+		if (!tex) {
+			// Icon not found either, use unknown icon
 			tex = theMapEditor->textureManager().getEditorImage("thing/unknown");
+		}
 
 		// Bind texture if needed
 		if (tex != tex_last) {
@@ -749,16 +755,17 @@ void MapRenderer3D::renderThings() {
 		float x2 = thing->xPos() + cam_strafe.x * halfwidth;
 		float y2 = thing->yPos() + cam_strafe.y * halfwidth;
 
-		// Get thing z position
 		MapSector* sector =  map->getSector(thing_sectors[a]);
 		float height = 0;
-		if (sector)
+		if (sector) {
+			// Get thing z position
 			height = sector->intProperty("heightfloor");
-		if (tt->isHanging())
-			height = sector->intProperty("heightceiling") - tex->getHeight();
+			if (tt->isHanging())
+				height = sector->intProperty("heightceiling") - tex->getHeight();
 
-		// Set colour from sector
-		setLight(map->getSectorColour(sector, 0, true), sector->intProperty("lightlevel"), calcDistFade(dist, mdist));
+			// Set colour from sector
+			setLight(map->getSectorColour(sector, 0, true), sector->intProperty("lightlevel"), calcDistFade(dist, mdist));
+		}
 
 		// Draw thing
 		glBegin(GL_QUADS);
