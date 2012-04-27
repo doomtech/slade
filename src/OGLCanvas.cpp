@@ -99,7 +99,7 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id, bool handle_timer)
  * OGLCanvas class constructor, wxGLCanvas implementation
  *******************************************************************/
 OGLCanvas::OGLCanvas(wxWindow* parent, int id, bool handle_timer)
-: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS), timer(this) {
+: wxGLCanvas(parent, id, OpenGL::getWxGLAttribs(), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS), timer(this) {
 	init_done = false;
 	last_time = theApp->runTimer();
 

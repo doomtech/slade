@@ -35,6 +35,8 @@ GLTexture* MapTextureManager::getTexture(string name) {
 		filter = GLTexture::LINEAR;
 	else if (map_tex_filter == 2)
 		filter = GLTexture::LINEAR_MIPMAP;
+	else if (map_tex_filter == 3)
+		filter = GLTexture::NEAREST_MIPMAP;
 
 	// If the texture is loaded
 	if (mtex.texture) {
@@ -105,6 +107,8 @@ GLTexture* MapTextureManager::getFlat(string name) {
 		filter = GLTexture::LINEAR;
 	else if (map_tex_filter == 2)
 		filter = GLTexture::LINEAR_MIPMAP;
+	else if (map_tex_filter == 3)
+		filter = GLTexture::NEAREST_MIPMAP;
 
 	// If the texture is loaded
 	if (mtex.texture) {
@@ -176,6 +180,8 @@ GLTexture* MapTextureManager::getSprite(string name, string translation, string 
 		filter = GLTexture::LINEAR;
 	else if (map_tex_filter == 2)
 		filter = GLTexture::LINEAR;
+	else if (map_tex_filter == 3)
+		filter = GLTexture::NEAREST_MIPMAP;
 
 	// If the texture is loaded
 	if (mtex.texture) {

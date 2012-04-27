@@ -116,23 +116,6 @@ void MapRenderer3D::setupView(int width, int height) {
 	gluLookAt(cam_position.x, cam_position.y, cam_position.z,
 				cam_position.x+cam_dir3d.x, cam_position.y+cam_dir3d.y, cam_position.z+cam_dir3d.z,
 				up.x, up.y, up.z);
-
-	// Setup GL stuff
-	glEnable(GL_DEPTH_TEST);
-	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_ALPHA_TEST);
-	glDepthMask(GL_TRUE);
-	glAlphaFunc(GL_GREATER, 0.8f);
-
-	// Setup fog
-	GLfloat fogColor[4]= {0.0f, 0.0f, 0.0f, 0.6f};
-	glFogi(GL_FOG_MODE, GL_LINEAR);
-	glFogfv(GL_FOG_COLOR, fogColor);
-	glFogf(GL_FOG_DENSITY, 2.0f);
-	//glHint(GL_FOG_HINT, GL_NICEST);
-	glFogf(GL_FOG_START, 0.0f);
-	glFogf(GL_FOG_END, 3000.0f);
 }
 
 void MapRenderer3D::setLight(rgba_t& colour, uint8_t light) {
@@ -159,6 +142,34 @@ void MapRenderer3D::setLight(rgba_t& colour, uint8_t light) {
 	glColor4f(colour.fr()*mult, colour.fg()*mult, colour.fb()*mult, colour.fa());
 }
 
+void MapRenderer3D::renderMap() {
+	// Setup GL stuff
+	glEnable(GL_DEPTH_TEST);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_ALPHA_TEST);
+	glDepthMask(GL_TRUE);
+	glAlphaFunc(GL_GREATER, 0.8f);
+
+	// Setup fog
+	GLfloat fogColor[4]= {0.0f, 0.0f, 0.0f, 0.6f};
+	glFogi(GL_FOG_MODE, GL_LINEAR);
+	glFogfv(GL_FOG_COLOR, fogColor);
+	glFogf(GL_FOG_DENSITY, 2.0f);
+	//glHint(GL_FOG_HINT, GL_NICEST);
+	glFogf(GL_FOG_START, 0.0f);
+	glFogf(GL_FOG_END, 3000.0f);
+	
+	// Render walls
+	renderWalls();
+	
+	// Render flats
+	renderFlats();
+	
+	// Cleanup gl state
+	glDisable(GL_ALPHA_TEST);
+}
+
 void MapRenderer3D::renderFlats() {
 	// Check for map
 	if (!map)
@@ -171,6 +182,7 @@ void MapRenderer3D::renderFlats() {
 
 	// Render floors
 	glCullFace(GL_FRONT);
+	rgba_t col;
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		MapSector* sector = map->getSector(a);
 
@@ -191,7 +203,8 @@ void MapRenderer3D::renderFlats() {
 		// Render flat
 		glPushMatrix();
 		glTranslated(0, 0, sector->intProperty("heightfloor"));
-		setLight(map->getSectorColour(sector, 1, true), sector->intProperty("lightlevel"));
+		col = map->getSectorColour(sector, 1, true);
+		setLight(col, sector->intProperty("lightlevel"));
 		sector->getPolygon()->render();
 		glPopMatrix();
 	}
@@ -218,7 +231,8 @@ void MapRenderer3D::renderFlats() {
 		// Render flat
 		glPushMatrix();
 		glTranslated(0, 0, sector->intProperty("heightceiling"));
-		setLight(map->getSectorColour(sector, 2, true), sector->intProperty("lightlevel"));
+		col = map->getSectorColour(sector, 1, true);
+		setLight(col, sector->intProperty("lightlevel"));
 		sector->getPolygon()->render();
 		glPopMatrix();
 	}

@@ -14,6 +14,7 @@ namespace OpenGL {
 	unsigned		maxTextureSize();
 	bool			isInitialised();
 	bool			accuracyTweak();
+	int*			getWxGLAttribs();
 }
 
 #endif//__OPENGL_H__

@@ -778,8 +778,7 @@ void MapCanvas::draw() {
 	// Draw 3d map if in 3d mode
 	if (editor->editMode() == MapEditor::MODE_3D) {
 		renderer_3d->setupView(GetSize().x, GetSize().y);
-		renderer_3d->renderFlats();
-		renderer_3d->renderWalls();
+		renderer_3d->renderMap();
 	}
 
 	// Otherwise, draw 2d map

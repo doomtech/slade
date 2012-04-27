@@ -68,6 +68,7 @@ public:
 	// -- Rendering --
 	void	setupView(int width, int height);
 	void	setLight(rgba_t& colour, uint8_t light);
+	void	renderMap();
 
 	// Flats
 	void	renderFlats();
