@@ -164,6 +164,7 @@ public:
 	MapVertex*			vertexAt(double x, double y);
 	vector<fpoint2_t>	cutLines(double x1, double y1, double x2, double y2);
 	MapVertex*			lineCrossVertex(double x1, double y1, double x2, double y2);
+	double				distanceToSector(double x, double y, unsigned index, double maxdist = -1);
 
 	bool	lineInSector(MapLine* line, MapSector* sector);
 	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);

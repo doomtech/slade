@@ -2346,6 +2346,43 @@ MapVertex* SLADEMap::lineCrossVertex(double x1, double y1, double x2, double y2)
 	return cv;
 }
 
+double SLADEMap::distanceToSector(double x, double y, unsigned index, double maxdist) {
+	// Check index
+	if (index >= sectors.size())
+		return -1;
+
+	if (maxdist < 0)
+		maxdist = 9999999;
+
+	// Check bounding box first
+	MapSector* sector = sectors[index];
+	bbox_t bbox = sector->boundingBox();
+	double min_dist = 9999999;
+	double dist = MathStuff::distanceToLine(x, y, bbox.min.x, bbox.min.y, bbox.min.x, bbox.max.y);
+	if (dist < min_dist) min_dist = dist;
+	dist = MathStuff::distanceToLine(x, y, bbox.min.x, bbox.max.y, bbox.max.x, bbox.max.y);
+	if (dist < min_dist) min_dist = dist;
+	dist = MathStuff::distanceToLine(x, y, bbox.max.x, bbox.max.y, bbox.max.x, bbox.min.y);
+	if (dist < min_dist) min_dist = dist;
+	dist = MathStuff::distanceToLine(x, y, bbox.max.x, bbox.min.y, bbox.min.x, bbox.min.y);
+	if (dist < min_dist) min_dist = dist;
+
+	if (min_dist > maxdist && !bbox.point_within(x, y))
+		return -1;
+
+	// Check lines of sector
+	vector<MapLine*> list;
+	getLinesOfSector(sector, list);
+	for (unsigned a = 0; a < list.size(); a++) {
+		MapLine* line = list[a];
+		dist = MathStuff::distanceToLine(x, y, line->x1(), line->y1(), line->x2(), line->y2());
+		if (dist < min_dist)
+			min_dist = dist;
+	}
+
+	return min_dist;
+}
+
 bool SLADEMap::lineInSector(MapLine* line, MapSector* sector) {
 	if (line->side1 && line->side1->sector == sector ||
 		line->side2 && line->side2->sector == sector)

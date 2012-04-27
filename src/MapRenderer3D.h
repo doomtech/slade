@@ -11,6 +11,11 @@ private:
 	bool		fullbright;
 	bool		fog;
 
+	// Visibility
+	//int				max_dist;
+	vector<double>	dist_sectors;
+	vector<double>	dist_lines;
+
 	// Camera
 	fpoint3_t	cam_position;
 	fpoint2_t	cam_direction;
@@ -67,7 +72,7 @@ public:
 
 	// -- Rendering --
 	void	setupView(int width, int height);
-	void	setLight(rgba_t& colour, uint8_t light);
+	void	setLight(rgba_t& colour, uint8_t light, float alpha = 1.0f);
 	void	renderMap();
 
 	// Flats
@@ -77,8 +82,12 @@ public:
 	void	setupQuad(quad_3d_t* quad, double x1, double y1, double x2, double y2, double top, double bottom);
 	void	setupQuadTexCoords(quad_3d_t* quad, int length, double left, double top, bool pegbottom = false, double sx = 1, double sy = 1);
 	void	updateLine(unsigned index);
-	void	renderQuad(quad_3d_t* quad);
+	void	renderQuad(quad_3d_t* quad, float alpha = 1.0f);
 	void	renderWalls();
+
+	// Visibility checking
+	void	quickVisDiscard();
+	float	calcDistFade(double distance);
 };
 
 #endif//__MAP_RENDERER_3D_H__
