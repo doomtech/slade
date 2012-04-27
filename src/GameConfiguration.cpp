@@ -954,19 +954,19 @@ bool GameConfiguration::lineBasicFlagSet(string flag, MapLine* line) {
 
 	// Impassible
 	if (flag == "blocking")
-		return flags & 1;
+		return !!(flags & 1);
 
 	// Two Sided
 	else if (flag == "twosided")
-		return flags & 4;
+		return !!(flags & 4);
 
 	// Upper unpegged
 	else if (flag == "dontpegtop")
-		return flags & 8;
+		return !!(flags & 8);
 
 	// Lower unpegged
 	else if (flag == "dontpegbottom")
-		return flags & 16;
+		return !!(flags & 16);
 
 	// Unknown
 	return false;
