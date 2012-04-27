@@ -906,6 +906,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\MapRenderer3D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapRenderer3D.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\MapTextureManager.cpp"
 				>
 			</File>
@@ -962,6 +970,14 @@
 				</File>
 				<File
 					RelativePath=".\src\MCAnimations.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ShapeDrawPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ShapeDrawPanel.h"
 					>
 				</File>
 				<File
@@ -1221,6 +1237,10 @@
 					</File>
 					<File
 						RelativePath=".\dist\res\config\games\hexen.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\nodebuilders.cfg"
 						>
 					</File>
 					<File

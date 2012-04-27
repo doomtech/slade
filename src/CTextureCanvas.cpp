@@ -570,7 +570,7 @@ void CTextureCanvas::drawOffsetLines() {
 	else if (view_type == 2) {
 		glPushMatrix();
 		glEnable(GL_LINE_SMOOTH);
-		Drawing::drawHud(true, true, false);
+		Drawing::drawHud();
 		glDisable(GL_LINE_SMOOTH);
 		glPopMatrix();
 	}

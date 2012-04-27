@@ -44,7 +44,7 @@ namespace Drawing {
 	fpoint2_t textExtents(string text, int font = FONT_NORMAL);
 
 	// Specific
-	void drawHud(bool statusbar, bool center, bool wide);
+	void drawHud();
 
 	// Implementation-specific
 #ifdef USE_SFML_RENDERWINDOW

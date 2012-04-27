@@ -52,6 +52,11 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+CVAR(Bool, hud_statusbar, 1, CVAR_SAVE)
+CVAR(Bool, hud_center, 1, CVAR_SAVE)
+CVAR(Bool, hud_wide, 0, CVAR_SAVE)
+CVAR(Bool, hud_bob, 0, CVAR_SAVE)
+
 namespace Drawing {
 #ifdef USE_SFML_RENDERWINDOW
 	sf::Font			font_normal;
@@ -587,11 +592,11 @@ fpoint2_t Drawing::textExtents(string text, int font) {
 /* Drawing::drawHud
  * Draws doom hud offset guide lines, from the center
  *******************************************************************/
-void Drawing::drawHud(bool statusbar, bool center, bool wide) {
+void Drawing::drawHud() {
 	// Determine some variables
 	int hw = 160;
 	int hh = 100;
-	if (wide) hw = 176;
+	if (hud_wide) hw = 177;
 
 	// Draw 320x200 screen outline
 	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
@@ -601,19 +606,25 @@ void Drawing::drawHud(bool statusbar, bool center, bool wide) {
 	// Draw statusbar line if needed
 	glLineWidth(1.0f);
 	glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-	if (statusbar)
+	if (hud_statusbar)
 		drawLine(-hw, 68, hw, 68);
 
 	// Draw center lines if needed
-	if (center) {
+	if (hud_center) {
 		drawLine(-hw, 0, hw, 0);
 		drawLine(0, -hh, 0, hh);
 	}
 
 	// Draw normal screen edge guides if widescreen
-	if (wide) {
+	if (hud_wide) {
 		drawLine(-160, -100, -160, 100);
 		drawLine(160, -100, 160, 100);
+	}
+
+	// Draw weapon bobbing guides
+	if (hud_bob) {
+		glLineWidth(0.8f);
+		drawRect(-hw - 16, -hh - 16, hw + 16, hh + 16);
 	}
 }
 

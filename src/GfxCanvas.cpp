@@ -147,7 +147,7 @@ void GfxCanvas::drawOffsetLines() {
 		glPushMatrix();
 		glEnable(GL_LINE_SMOOTH);
 		glScaled(scale, scale, 1);
-		Drawing::drawHud(true, true, false);
+		Drawing::drawHud();
 		glDisable(GL_LINE_SMOOTH);
 		glPopMatrix();
 	}

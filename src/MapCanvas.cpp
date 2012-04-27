@@ -28,8 +28,8 @@
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
-#include <SFML/Window.hpp>
 #include "Main.h"
+#include <SFML/Window.hpp>
 #include "WxStuff.h"
 #include "MapCanvas.h"
 #include "MapEditor.h"
@@ -47,7 +47,6 @@
 #include "MapObjectPropsPanel.h"
 #include "SectorTextureOverlay.h"
 #include "LineTextureOverlay.h"
-
 #include "SectorBuilder.h"
 
 
@@ -1159,7 +1158,9 @@ void MapCanvas::update(long frametime) {
 
 void MapCanvas::mouseToCenter() {
 	wxRect rect = GetScreenRect();
+#if SFML_VERSION_MAJOR >= 2
 	sf::Mouse::setPosition(sf::Vector2i(rect.x + rect.width*0.5, rect.y + rect.height*0.5));
+#endif
 }
 
 void MapCanvas::itemSelected(int index, bool selected) {
@@ -2105,7 +2106,7 @@ void MapCanvas::onIdle(wxIdleEvent& e) {
 	Refresh();
 }
 
-void MapCanvas::onTimer(wxTimerEvent& e) {
+void MapCanvas::onRTimer(wxTimerEvent& e) {
 	// Get time since last redraw
 	long frametime = (sfclock.GetElapsedTime() * 1000) - last_time;
 
