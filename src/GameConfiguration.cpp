@@ -944,6 +944,34 @@ bool GameConfiguration::lineFlagSet(unsigned index, MapLine* line) {
 		return false;
 }
 
+bool GameConfiguration::lineBasicFlagSet(string flag, MapLine* line) {
+	// If UDMF, just get the bool value
+	if (map_format == MAP_UDMF)
+		return line->boolProperty(flag);
+
+	// Get current flags
+	int flags = line->intProperty("flags");
+
+	// Impassible
+	if (flag == "blocking")
+		return flags & 1;
+
+	// Two Sided
+	else if (flag == "twosided")
+		return flags & 4;
+
+	// Upper unpegged
+	else if (flag == "dontpegtop")
+		return flags & 8;
+
+	// Lower unpegged
+	else if (flag == "dontpegbottom")
+		return flags & 16;
+
+	// Unknown
+	return false;
+}
+
 string GameConfiguration::lineFlagsString(MapLine* line) {
 	if (!line)
 		return "";

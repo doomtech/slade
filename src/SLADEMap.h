@@ -178,7 +178,7 @@ public:
 	void	getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list);
 
 	// Info
-	rgba_t	getSectorColour(MapSector* sector, int where = 0);
+	rgba_t	getSectorColour(MapSector* sector, int where = 0, bool fullbright = false);
 	string	getAdjacentLineTexture(MapVertex* vertex, int tex_part = 255);
 
 	// Creation

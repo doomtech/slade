@@ -577,6 +577,9 @@ void MapCanvas::drawMap2d() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+
 	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
 	if (OpenGL::accuracyTweak())
 		glTranslatef(0.375f, 0.375f, 0);
@@ -776,6 +779,7 @@ void MapCanvas::draw() {
 	if (editor->editMode() == MapEditor::MODE_3D) {
 		renderer_3d->setupView(GetSize().x, GetSize().y);
 		renderer_3d->renderFlats();
+		renderer_3d->renderWalls();
 	}
 
 	// Otherwise, draw 2d map
@@ -820,7 +824,7 @@ void MapCanvas::draw() {
 	else if (editor->editMode() == MapEditor::MODE_THINGS)
 		info_thing.draw(GetSize().y, GetSize().x, anim_info_fade);
 
-	// test
+	// Draw current fullscreen overlay
 	if (overlay_current)
 		overlay_current->draw(GetSize().x, GetSize().y, anim_overlay_fade);
 
@@ -1039,37 +1043,37 @@ bool MapCanvas::update3d(double mult) {
 
 	// Camera forward
 	if (KeyBind::isPressed("me3d_camera_forward")) {
-		renderer_3d->cameraMove(mult*10);
+		renderer_3d->cameraMove(mult*4);
 		moving = true;
 	}
 
 	// Camera backward
 	if (KeyBind::isPressed("me3d_camera_back")) {
-		renderer_3d->cameraMove(-mult*10);
+		renderer_3d->cameraMove(-mult*4);
 		moving = true;
 	}
 
 	// Camera left (strafe)
 	if (KeyBind::isPressed("me3d_camera_left")) {
-		renderer_3d->cameraStrafe(-mult*10);
+		renderer_3d->cameraStrafe(-mult*4);
 		moving = true;
 	}
 
 	// Camera right (strafe)
 	if (KeyBind::isPressed("me3d_camera_right")) {
-		renderer_3d->cameraStrafe(mult*10);
+		renderer_3d->cameraStrafe(mult*4);
 		moving = true;
 	}
 
 	// Camera up
 	if (KeyBind::isPressed("me3d_camera_up")) {
-		renderer_3d->cameraMoveUp(mult*10);
+		renderer_3d->cameraMoveUp(mult*4);
 		moving = true;
 	}
 
 	// Camera down
 	if (KeyBind::isPressed("me3d_camera_down")) {
-		renderer_3d->cameraMoveUp(-mult*10);
+		renderer_3d->cameraMoveUp(-mult*4);
 		moving = true;
 	}
 
@@ -1304,8 +1308,10 @@ void MapCanvas::changeEditMode(int mode) {
 	}
 	else if (mode == MapEditor::MODE_THINGS)
 		theApp->toggleAction("mapw_mode_things");
-	else if (mode == MapEditor::MODE_3D)
+	else if (mode == MapEditor::MODE_3D) {
 		mouseToCenter();
+		renderer_3d->refresh();
+	}
 	theMapEditor->refreshToolBar();
 
 	// Refresh
@@ -1619,6 +1625,25 @@ void MapCanvas::keyBinds2d(string name) {
 }
 
 void MapCanvas::keyBinds3d(string name) {
+	// Toggle fog
+	if (name == "me3d_toggle_fog") {
+		bool fog = renderer_3d->fogEnabled();
+		renderer_3d->enableFog(!fog);
+		if (fog)
+			editor->addEditorMessage("Fog disabled");
+		else
+			editor->addEditorMessage("Fog enabled");
+	}
+
+	// Toggle fullbright
+	else if (name == "me3d_toggle_fullbright") {
+		bool fb = renderer_3d->fullbrightEnabled();
+		renderer_3d->enableFullbright(!fb);
+		if (fb)
+			editor->addEditorMessage("Fullbright disabled");
+		else
+			editor->addEditorMessage("Fullbright enabled");
+	}
 }
 
 void MapCanvas::onKeyBindRelease(string name) {

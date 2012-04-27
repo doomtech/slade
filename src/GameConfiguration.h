@@ -181,6 +181,7 @@ public:
 	int		nLineFlags() { return flags_line.size(); }
 	string	lineFlag(unsigned flag_index);
 	bool	lineFlagSet(unsigned flag_index, MapLine* line);
+	bool	lineBasicFlagSet(string flag, MapLine* line);
 	string	lineFlagsString(MapLine* line);
 	void	setLineFlag(unsigned flag_index, MapLine* line, bool set = true);
 	void	setLineBasicFlag(string flag, MapLine* line, bool set = true);

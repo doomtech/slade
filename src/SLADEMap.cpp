@@ -2474,7 +2474,7 @@ void SLADEMap::getLinesById(int id, vector<MapLine*>& list) {
 	}
 }
 
-rgba_t SLADEMap::getSectorColour(MapSector* sector, int where) {
+rgba_t SLADEMap::getSectorColour(MapSector* sector, int where, bool fullbright) {
 	// Check for UDMF+ZDoom namespace
 	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
 		// Get sector light colour
@@ -2483,6 +2483,8 @@ rgba_t SLADEMap::getSectorColour(MapSector* sector, int where) {
 
 		// Get sector light level
 		int light = sector->intProperty("lightlevel");
+		if (fullbright)
+			light = 255;
 
 		// Get specific light level
 		if (where == 1) {
@@ -2502,14 +2504,24 @@ rgba_t SLADEMap::getSectorColour(MapSector* sector, int where) {
 				light += cl;
 		}
 
+		// Clamp light level
+		if (light > 255)
+			light = 255;
+		if (light < 0)
+			light = 0;
+
 		// Calculate and return the colour
 		float lightmult = (float)light / 255.0f;
 		return rgba_t(wxcol.Blue() * lightmult, wxcol.Green() * lightmult, wxcol.Red() * lightmult, 255);
 	}
 	else {
 		// Other format, simply return the light level
-		int light = sector->intProperty("lightlevel");
-		return rgba_t(light, light, light, 255);
+		if (fullbright)
+			return rgba_t(255, 255, 255, 255);
+		else {
+			int light = sector->intProperty("lightlevel");
+			return rgba_t(light, light, light, 255);
+		}
 	}
 }
 

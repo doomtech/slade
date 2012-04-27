@@ -77,10 +77,14 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id, bool handle_timer)
 	handle = GetHandle();
 #endif
 
+	// Context settings
+	sf::ContextSettings settings;
+	settings.depthBits = 32;
+
 #if SFML_VERSION_MAJOR < 2
-	sf::RenderWindow::Create(handle);
+	sf::RenderWindow::Create(handle, settings);
 #else
-	sf::RenderWindow::create(handle);
+	sf::RenderWindow::create(handle, settings);
 #endif
 
 	// Bind events
