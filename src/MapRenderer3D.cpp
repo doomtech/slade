@@ -7,6 +7,7 @@
 #include "MapEditorWindow.h"
 
 CVAR(Float, render_max_dist, -1, CVAR_SAVE)
+CVAR(Float, render_max_thing_dist, 3000, CVAR_SAVE)
 
 MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	// Init variables
@@ -44,6 +45,7 @@ void MapRenderer3D::refresh() {
 	lines.clear();
 	dist_lines.clear();
 	dist_sectors.clear();
+	thing_sectors.clear();
 }
 
 void MapRenderer3D::cameraMove(double distance) {
@@ -173,6 +175,9 @@ void MapRenderer3D::renderMap() {
 	
 	// Render flats
 	renderFlats();
+
+	// Render things
+	renderThings();
 	
 	// Cleanup gl state
 	glDisable(GL_ALPHA_TEST);
@@ -222,7 +227,7 @@ void MapRenderer3D::renderFlats() {
 		glPushMatrix();
 		glTranslated(0, 0, sector->intProperty("heightfloor"));
 		col = map->getSectorColour(sector, 1, true);
-		setLight(col, sector->intProperty("lightlevel"), calcDistFade(dist_sectors[a]));
+		setLight(col, sector->intProperty("lightlevel"), calcDistFade(dist_sectors[a], render_max_dist));
 		sector->getPolygon()->render();
 		glPopMatrix();
 	}
@@ -254,7 +259,7 @@ void MapRenderer3D::renderFlats() {
 		glPushMatrix();
 		glTranslated(0, 0, sector->intProperty("heightceiling"));
 		col = map->getSectorColour(sector, 1, true);
-		setLight(col, sector->intProperty("lightlevel"), calcDistFade(dist_sectors[a]));
+		setLight(col, sector->intProperty("lightlevel"), calcDistFade(dist_sectors[a], render_max_dist));
 		sector->getPolygon()->render();
 		glPopMatrix();
 	}
@@ -661,7 +666,7 @@ void MapRenderer3D::renderWalls() {
 		}
 
 		// Check for distance fade
-		distfade = calcDistFade(dist_lines[a]);
+		distfade = calcDistFade(dist_lines[a], render_max_dist);
 
 		// Update line if needed
 		if (!lines[a].calculated)
@@ -692,6 +697,77 @@ void MapRenderer3D::renderWalls() {
 	}
 
 	glDisable(GL_TEXTURE_2D);
+}
+
+void MapRenderer3D::renderThings() {
+	// Create thing sector array if empty or the wrong size
+	if (thing_sectors.size() == 0 || thing_sectors.size() != map->nThings()) {
+		thing_sectors.clear();
+		for (unsigned a = 0; a < map->nThings(); a++)
+			thing_sectors.push_back(-1);
+	}
+
+	// Init textures
+	glEnable(GL_TEXTURE_2D);
+	GLTexture* tex_last = NULL;
+	GLTexture* tex = NULL;
+
+	// Go through things
+	double dist;
+	double mdist = render_max_thing_dist;
+	if (mdist <= 0) mdist = render_max_dist;
+	for (unsigned a = 0; a < map->nThings(); a++) {
+		MapThing* thing = map->getThing(a);
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+
+		// Check thing distance if needed
+		if (mdist > 0) {
+			dist = MathStuff::distance(cam_position.x, cam_position.y, thing->xPos(), thing->yPos());
+			if (dist > mdist)
+				continue;
+		}
+
+		// Determine thing sector if needed
+		if (thing_sectors[a] < 0)
+			thing_sectors[a] = map->inSector(thing->xPos(), thing->yPos());
+
+		// Get thing sprite
+		tex = theMapEditor->textureManager().getSprite(tt->getSprite(), tt->getTranslation(), tt->getPalette());
+		if (!tex)
+			tex = theMapEditor->textureManager().getEditorImage("thing/unknown");
+
+		// Bind texture if needed
+		if (tex != tex_last) {
+			tex->bind();
+			tex_last = tex;
+		}
+
+		// Determine coordinates
+		double halfwidth = tex->getWidth() * 0.5;
+		float x1 = thing->xPos() - cam_strafe.x * halfwidth;
+		float y1 = thing->yPos() - cam_strafe.y * halfwidth;
+		float x2 = thing->xPos() + cam_strafe.x * halfwidth;
+		float y2 = thing->yPos() + cam_strafe.y * halfwidth;
+
+		// Get thing z position
+		MapSector* sector =  map->getSector(thing_sectors[a]);
+		float height = 0;
+		if (sector)
+			height = sector->intProperty("heightfloor");
+		if (tt->isHanging())
+			height = sector->intProperty("heightceiling") - tex->getHeight();
+
+		// Set colour from sector
+		setLight(map->getSectorColour(sector, 0, true), sector->intProperty("lightlevel"), calcDistFade(dist, mdist));
+
+		// Draw thing
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex3f(x1, y1, height + tex->getHeight());
+		glTexCoord2f(0.0f, 1.0f);	glVertex3f(x1, y1, height);
+		glTexCoord2f(1.0f, 1.0f);	glVertex3f(x2, y2, height);
+		glTexCoord2f(1.0f, 0.0f);	glVertex3f(x2, y2, height + tex->getHeight());
+		glEnd();
+	}
 }
 
 void MapRenderer3D::quickVisDiscard() {
@@ -752,13 +828,13 @@ void MapRenderer3D::quickVisDiscard() {
 	}
 }
 
-float MapRenderer3D::calcDistFade(double distance) {
-	if (render_max_dist <= 0)
+float MapRenderer3D::calcDistFade(double distance, double max) {
+	if (max <= 0)
 		return 1.0f;
 
-	float faderange = render_max_dist * 0.2f;
-	if (distance > render_max_dist - faderange)
-		return 1.0f - ((distance - (render_max_dist - faderange)) / faderange);
+	float faderange = max * 0.2f;
+	if (distance > max - faderange)
+		return 1.0f - ((distance - (max - faderange)) / faderange);
 	else
 		return 1.0f;
 }

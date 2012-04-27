@@ -33,6 +33,7 @@ public:
 	rgba_t	getColour() { return colour; }
 	int		getRadius() { return radius; }
 	bool	isAngled() { return angled; }
+	bool	isHanging() { return hanging; }
 	bool	shrinkOnZoom() { return shrink; }
 	string	getSprite() { return sprite; }
 	string	getIcon() { return icon; }

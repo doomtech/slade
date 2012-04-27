@@ -2204,9 +2204,40 @@ vector<int> SLADEMap::nearestThingMulti(double x, double y) {
 }
 
 int SLADEMap::inSector(double x, double y) {
-	// Find nearest line
-	int nline = nearestLine(x, y, 999999);
+	// Check point with sector bboxes
+	bool* stest = new bool[sides.size()];
+	memset(stest, 0, sides.size());
+	for (unsigned a = 0; a < sectors.size(); a++) {
+		if (sectors[a]->boundingBox().point_within(x, y)) {
+			for (unsigned s = 0; s < sectors[a]->connected_sides.size(); s++)
+				stest[sectors[a]->connected_sides[s]->getIndex()] = true;
+		}
+	}
+
+	// Go through sides
+	double min_dist = 999999;
+	int nline = -1;
+	for (unsigned a = 0; a < sides.size(); a++) {
+		// Ignore if not marked
+		if (!stest[a])
+			continue;
+
+		// Get distance to parent line
+		int line = sides[a]->parent->index;
+		double dist = fastDistanceToLine(x, y, line, 999999);
+		if (dist < min_dist) {
+			min_dist = dist;
+			nline = line;
+		}
+	}
+	delete[] stest;
+
+	// Return if no nearest line found
 	if (nline < 0) return -1;
+
+	// Find nearest line
+	//int nline = nearestLine(x, y, 999999);
+	//if (nline < 0) return -1;
 
 	// Check what side of the line the point is on
 	MapLine* line = lines[nline];

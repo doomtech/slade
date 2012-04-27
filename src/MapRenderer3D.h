@@ -12,9 +12,9 @@ private:
 	bool		fog;
 
 	// Visibility
-	//int				max_dist;
 	vector<double>	dist_sectors;
 	vector<double>	dist_lines;
+	vector<int>		thing_sectors;
 
 	// Camera
 	fpoint3_t	cam_position;
@@ -85,9 +85,12 @@ public:
 	void	renderQuad(quad_3d_t* quad, float alpha = 1.0f);
 	void	renderWalls();
 
+	// Things
+	void	renderThings();
+
 	// Visibility checking
 	void	quickVisDiscard();
-	float	calcDistFade(double distance);
+	float	calcDistFade(double distance, double max = -1);
 };
 
 #endif//__MAP_RENDERER_3D_H__
