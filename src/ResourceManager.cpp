@@ -238,6 +238,16 @@ void ResourceManager::addEntry(ArchiveEntry* entry) {
 
 	// Check for various image entries, so only accept images
 	if (type->getEditor() == "gfx") {
+		// Reject graphics that are not in a valid namespace:
+			// Patches in wads can be in the global namespace as well, and
+			// ZDoom textures can use sprites and graphics as patches
+		if (!entry->isInNamespace("global")		&& !entry->isInNamespace("patches")		&&
+			!entry->isInNamespace("sprites")	&& !entry->isInNamespace("graphics")	&&
+			// Stand-alone textures can also be found in the hires namespace
+			!entry->isInNamespace("hires")		&& !entry->isInNamespace("textures")	&&
+			// Flats are kinda boring in comparison
+			!entry->isInNamespace("flats"))
+			return;
 
 		// Check for patch entry
 		if (type->extraProps().propertyExists("patch") || entry->isInNamespace("patches"))
