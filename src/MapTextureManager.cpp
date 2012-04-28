@@ -228,6 +228,34 @@ GLTexture* MapTextureManager::getSprite(string name, string translation, string 
 	return NULL;
 }
 
+/* MapTextureManager::getVerticalOffset
+ * Detects offset hacks such as that used by the wall torch thing in
+ * Heretic (type 50). If the Y offset is noticeably larger than the
+ * sprite height, that means the thing is supposed to be rendered
+ * above its real position.
+ *******************************************************************/
+int MapTextureManager::getVerticalOffset(string name) {
+	// Don't bother looking for nameless sprites
+	if (name.IsEmpty())
+		return NULL;
+
+	// Get sprite matching name
+	ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "sprites", archive);
+	if (!entry) entry = theResourceManager->getPatchEntry(name, "", archive);
+	if (entry) {
+		SImage image;
+		Misc::loadImageFromEntry(&image, entry);
+		int h = image.getHeight();
+		int o = image.offset().y;
+		if (o > h)
+			return o - h;
+		else
+			return 0;
+	}
+
+	return 0;
+}
+
 void importEditorImages(MapTexHashMap& map, ArchiveTreeNode* dir, string path) {
 	SImage image;
 

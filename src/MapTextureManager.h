@@ -36,6 +36,7 @@ public:
 	GLTexture*	getFlat(string name);
 	GLTexture*	getSprite(string name, string translation = "", string palette = "");
 	GLTexture*	getEditorImage(string name);
+	int			getVerticalOffset(string name);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
