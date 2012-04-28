@@ -63,6 +63,7 @@ CVAR(Bool, scroll_smooth, true, CVAR_SAVE)
 CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
 CVAR(Bool, selection_clear_click, false, CVAR_SAVE)
 CVAR(Bool, map_showfps, false, CVAR_SAVE)
+CVAR(Bool, camera_3d_gravity, true, CVAR_SAVE)
 
 // for testing
 PolygonSplitter splitter;
@@ -74,6 +75,7 @@ SectorBuilder sbuilder;
  *******************************************************************/
 EXTERN_CVAR(Int, vertex_size)
 EXTERN_CVAR(Bool, vertex_round)
+EXTERN_CVAR(Float, render_max_dist)
 
 
 /* MapCanvas::MapCanvas
@@ -362,6 +364,19 @@ void MapCanvas::viewShowObject() {
 
 void MapCanvas::viewMatchSpot(double mx, double my, double sx, double sy) {
 	setView(view_xoff_inter + mx - translateX(sx, true), view_yoff_inter + my - translateY(sy, true));
+}
+
+void MapCanvas::set3dCameraThing(MapThing* thing) {
+	// Determine position
+	fpoint3_t pos(thing->xPos(), thing->yPos(), 40);
+	int sector = editor->getMap().inSector(pos.x, pos.y);
+	if (sector >= 0)
+		pos.z += editor->getMap().getSector(sector)->intProperty("heightfloor");
+
+	// Determine direction
+	fpoint2_t dir(0, 1);
+
+	renderer_3d->cameraSet(pos, dir);
 }
 
 void MapCanvas::drawGrid() {
@@ -840,6 +855,9 @@ void MapCanvas::draw() {
 		Drawing::drawText(S_FMT("FPS: %d", afps));
 	}
 
+	// test
+	Drawing::drawText(S_FMT("Render distance: %1.2f", (double)render_max_dist), 0, 100);
+
 	// Editor messages
 	drawEditorMessages();
 
@@ -1086,6 +1104,10 @@ bool MapCanvas::update3d(double mult) {
 		renderer_3d->cameraTurn(mult);
 		moving = true;
 	}
+
+	// Apply gravity to camera if needed
+	if (camera_3d_gravity)
+		renderer_3d->cameraApplyGravity(mult);
 
 	return moving;
 }
@@ -1645,6 +1667,15 @@ void MapCanvas::keyBinds3d(string name) {
 			editor->addEditorMessage("Fullbright disabled");
 		else
 			editor->addEditorMessage("Fullbright enabled");
+	}
+
+	// Toggle gravity
+	else if (name == "me3d_toggle_gravity") {
+		camera_3d_gravity = !camera_3d_gravity;
+		if (!camera_3d_gravity)
+			editor->addEditorMessage("Gravity disabled");
+		else
+			editor->addEditorMessage("Gravity enabled");
 	}
 }
 

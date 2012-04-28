@@ -9,13 +9,16 @@
 CVAR(Float, render_max_dist, -1, CVAR_SAVE)
 CVAR(Float, render_max_thing_dist, 3000, CVAR_SAVE)
 CVAR(Int, render_thing_icon_size, 16, CVAR_SAVE)
+CVAR(Bool, render_fog_quality, true, CVAR_SAVE)
+CVAR(Bool, render_max_dist_adaptive, true, CVAR_SAVE)
+CVAR(Int, render_adaptive_ms, 15, CVAR_SAVE)
 
 MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	// Init variables
 	this->map = map;
 	this->fog = true;
 	this->fullbright = false;
-	//this->max_dist = render_max_dist;
+	this->gravity = 0.5;
 
 	// Init other
 	init();
@@ -104,6 +107,43 @@ void MapRenderer3D::cameraUpdateVectors() {
 	cam_dir3d = cam_dir3d.normalize();
 }
 
+void MapRenderer3D::cameraSet(fpoint3_t position, fpoint2_t direction) {
+	// Set camera position/direction
+	cam_position = position;
+	cam_direction = direction;
+	cam_pitch = 0;
+
+	// Update camera vectors
+	cameraUpdateVectors();
+}
+
+void MapRenderer3D::cameraApplyGravity(double mult) {
+	// Get current sector
+	int sector = map->inSector(cam_position.x, cam_position.y);
+	if (sector < 0)
+		return;
+
+	// Get target height
+	int fheight = map->getSector(sector)->intProperty("heightfloor") + 40;
+	int cheight = map->getSector(sector)->intProperty("heightceiling");
+	if (fheight > cheight - 4)
+		fheight = cheight - 4;
+
+	if (cam_position.z > fheight) {
+		double diff = cam_position.z - fheight;
+		cam_position.z -= (diff*0.3*mult);
+		if (cam_position.z < fheight)
+			cam_position.z = fheight;
+	}
+
+	else if (cam_position.z < fheight) {
+		double diff = fheight - cam_position.z;
+		cam_position.z += (diff*0.5*mult);
+		if (cam_position.z > fheight)
+			cam_position.z = fheight;
+	}
+}
+
 void MapRenderer3D::setupView(int width, int height) {
 	// Setup projection
 	glMatrixMode(GL_PROJECTION);
@@ -164,11 +204,15 @@ void MapRenderer3D::renderMap() {
 	glFogi(GL_FOG_MODE, GL_LINEAR);
 	glFogfv(GL_FOG_COLOR, fogColor);
 	glFogf(GL_FOG_DENSITY, 2.0f);
-	//glHint(GL_FOG_HINT, GL_NICEST);
 	glFogf(GL_FOG_START, 0.0f);
 	glFogf(GL_FOG_END, 3000.0f);
+	if (render_fog_quality)
+		glHint(GL_FOG_HINT, GL_NICEST);
+	else
+		glHint(GL_FOG_HINT, GL_FASTEST);
 
 	// Quick distance vis check
+	sf::Clock clock;
 	quickVisDiscard();
 	
 	// Render walls
@@ -179,9 +223,27 @@ void MapRenderer3D::renderMap() {
 
 	// Render things
 	renderThings();
+
+	// Check elapsed time
+	if (render_max_dist_adaptive) {
+		long ms = clock.getElapsedTime().asMilliseconds();
+		if (ms > render_adaptive_ms) {
+			render_max_dist = render_max_dist - 100;
+			if (render_max_dist < 1000)
+				render_max_dist = 1000;
+		}
+		else if (ms < render_adaptive_ms-5) {
+			render_max_dist = render_max_dist + 100;
+			if (render_max_dist > 20000)
+				render_max_dist = 20000;
+		}
+	}
 	
 	// Cleanup gl state
 	glDisable(GL_ALPHA_TEST);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_FOG);
 }
 
 void MapRenderer3D::renderFlats() {
@@ -760,7 +822,7 @@ void MapRenderer3D::renderThings() {
 	// Go through things
 	double dist, halfwidth, theight;
 	double mdist = render_max_thing_dist;
-	if (mdist <= 0) mdist = render_max_dist;
+	if (mdist <= 0 || mdist > render_max_dist) mdist = render_max_dist;
 	rgba_t col;
 	float x1, y1, x2, y2;
 	for (unsigned a = 0; a < map->nThings(); a++) {

@@ -139,7 +139,7 @@ void Polygon2D::updateTextureCoords(double scale_x, double scale_y, double offse
 unsigned Polygon2D::vboDataSize() {
 	unsigned total = 0;
 	for (unsigned a = 0; a < subpolys.size(); a++)
-		total += subpolys[a]->n_vertices * 36;
+		total += subpolys[a]->n_vertices * 20;
 	return total;
 }
 
@@ -149,12 +149,12 @@ unsigned Polygon2D::writeToVBO(unsigned offset, unsigned index) {
 	unsigned i = index;
 	for (unsigned a = 0; a < subpolys.size(); a++) {
 		// Write subpoly data to VBO at the correct offset
-		glBufferSubData(GL_ARRAY_BUFFER, ofs, subpolys[a]->n_vertices*36, subpolys[a]->vertices);
+		glBufferSubData(GL_ARRAY_BUFFER, ofs, subpolys[a]->n_vertices*20, subpolys[a]->vertices);
 
 		// Update the subpoly vbo offset
 		subpolys[a]->vbo_offset = ofs;
 		subpolys[a]->vbo_index = i;
-		ofs += subpolys[a]->n_vertices*36;
+		ofs += subpolys[a]->n_vertices*20;
 		i += subpolys[a]->n_vertices;
 	}
 
@@ -168,7 +168,7 @@ unsigned Polygon2D::writeToVBO(unsigned offset, unsigned index) {
 void Polygon2D::updateVBOData() {
 	// Go through subpolys
 	for (unsigned a = 0; a < subpolys.size(); a++)
-		glBufferSubData(GL_ARRAY_BUFFER, subpolys[a]->vbo_offset, subpolys[a]->n_vertices*36, subpolys[a]->vertices);
+		glBufferSubData(GL_ARRAY_BUFFER, subpolys[a]->vbo_offset, subpolys[a]->n_vertices*20, subpolys[a]->vertices);
 
 	// Update variables
 	vbo_update = 0;
@@ -208,6 +208,14 @@ void Polygon2D::renderVBO(bool colour) {
 }
 
 void Polygon2D::renderWireframeVBO(bool colour) {
+}
+
+void Polygon2D::setupVBOPointers() {
+	glVertexPointer(3, GL_FLOAT, 20, 0);
+	glTexCoordPointer(2, GL_FLOAT, 20, ((char*)NULL + 12));
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
 }
 
 

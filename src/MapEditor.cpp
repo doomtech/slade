@@ -91,7 +91,32 @@ void MapEditor::setSectorEditMode(int mode) {
 
 bool MapEditor::openMap(Archive::mapdesc_t map) {
 	wxLogMessage("Opening map %s", CHR(map.name));
-	return this->map.readMap(map);
+	if (!this->map.readMap(map))
+		return false;
+
+	// Find camera thing
+	if (canvas) {
+		MapThing* cam = NULL;
+		MapThing* pstart = NULL;
+		for (unsigned a = 0; a < this->map.nThings(); a++) {
+			MapThing* thing = this->map.getThing(a);
+			if (thing->getType() == 32000)
+				cam = thing;
+			if (thing->getType() == 1)
+				pstart = thing;
+
+			if (cam)
+				break;
+		}
+
+		// Set canvas 3d camera
+		if (cam)
+			canvas->set3dCameraThing(cam);
+		else if (pstart)
+			canvas->set3dCameraThing(pstart);
+	}
+
+	return true;
 }
 
 void MapEditor::clearMap() {

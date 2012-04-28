@@ -25,6 +25,7 @@ private:
 	double		cam_angle;
 	fpoint3_t	cam_dir3d;
 	fpoint3_t	cam_strafe;
+	double		gravity;
 
 	// Structs
 	enum {
@@ -93,6 +94,8 @@ public:
 	void	cameraStrafe(double distance);
 	void	cameraPitch(double amount);
 	void	cameraUpdateVectors();
+	void	cameraSet(fpoint3_t position, fpoint2_t direction);
+	void	cameraApplyGravity(double mult);
 
 	// -- Rendering --
 	void	setupView(int width, int height);

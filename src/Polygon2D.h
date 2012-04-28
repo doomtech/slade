@@ -5,17 +5,17 @@
 struct gl_vertex_t {
 	float x, y, z;
 	float tx, ty;
-	float r, g, b, a;
+	//float r, g, b, a;
 	gl_vertex_t(float x = 0.0f, float y = 0.0f, float z = 0.0f) {
 		this->x = x;
 		this->y = y;
 		this->z = z;
 		this->tx = 0.0f;
 		this->ty = 0.0f;
-		this->r = 1.0f;
-		this->g = 1.0f;
-		this->b = 1.0f;
-		this->a = 1.0f;
+		//this->r = 1.0f;
+		//this->g = 1.0f;
+		//this->b = 1.0f;
+		//this->a = 1.0f;
 	}
 };
 
@@ -73,6 +73,8 @@ public:
 	void	renderWireframe();
 	void	renderVBO(bool colour = true);
 	void	renderWireframeVBO(bool colour = true);
+
+	static void	setupVBOPointers();
 };
 
 

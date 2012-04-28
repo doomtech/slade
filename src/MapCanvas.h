@@ -19,6 +19,7 @@ class ThingType;
 class GLTexture;
 class MapRenderer2D;
 class MapRenderer3D;
+class MapThing;
 class MapCanvas : public OGLCanvas, public KeyBindHandler, public SActionHandler {
 private:
 	MapEditor*				editor;
@@ -102,6 +103,7 @@ public:
 	void	viewFitToMap(bool snap = false);
 	void	viewShowObject();
 	void	viewMatchSpot(double mx, double my, double sx, double sy);
+	void	set3dCameraThing(MapThing* thing);
 
 	// Drawing
 	void	drawGrid();

@@ -392,6 +392,7 @@ void KeyBind::initBinds() {
 	addBind("me3d_camera_turn_right", keypress_t("right"), "Camera turn right");
 	addBind("me3d_toggle_fog", keypress_t("F"), "Toggle fog");
 	addBind("me3d_toggle_fullbright", keypress_t("B"), "Toggle full brightness");
+	addBind("me3d_toggle_gravity", keypress_t("G"), "Toggle camera gravity");
 
 	// Entry List (el*)
 	addBind("el_new", keypress_t("N", KPM_CTRL), "New Entry");

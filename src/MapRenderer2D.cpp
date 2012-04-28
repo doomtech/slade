@@ -1279,11 +1279,7 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_flats);
 
 	// Setup VBO pointers
-	glVertexPointer(3, GL_FLOAT, 36, 0);
-	glTexCoordPointer(2, GL_FLOAT, 36, ((char*)NULL + 12));
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
+	Polygon2D::setupVBOPointers();
 
 	// Go through sectors
 	GLTexture* tex_last = NULL;
