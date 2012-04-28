@@ -1,7 +1,7 @@
 find_package(wxWidgets COMPONENTS std aui gl stc richtext propgrid media REQUIRED)
 include(${wxWidgets_USE_FILE})
 
-set(SFML_FIND_COMPONENTS system audio)
+set(SFML_FIND_COMPONENTS system audio window)
 
 find_package (PkgConfig REQUIRED)
 pkg_check_modules (GTK2 REQUIRED gtk+-2.0)
