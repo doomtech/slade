@@ -393,6 +393,7 @@ void KeyBind::initBinds() {
 	addBind("me3d_toggle_fog", keypress_t("F"), "Toggle fog");
 	addBind("me3d_toggle_fullbright", keypress_t("B"), "Toggle full brightness");
 	addBind("me3d_toggle_gravity", keypress_t("G"), "Toggle camera gravity");
+	addBind("me3d_release_mouse", keypress_t("tab"), "Release mouse cursor");
 
 	// Entry List (el*)
 	addBind("el_new", keypress_t("N", KPM_CTRL), "New Entry");

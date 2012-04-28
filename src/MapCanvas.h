@@ -54,6 +54,7 @@ private:
 	bool		mouse_selbegin;
 	bool		mouse_movebegin;
 	int			draw_state;
+	bool		mouse_locked;
 
 	// Info overlays
 	int					last_hilight;
@@ -121,6 +122,7 @@ public:
 
 	// Mouse
 	void	mouseToCenter();
+	void	lockMouse(bool lock);
 
 	void	itemSelected(int index, bool selected = true);
 	void	itemsSelected(vector<int>& items, bool selected = true);
@@ -154,6 +156,7 @@ public:
 	void	onMouseEnter(wxMouseEvent& e);
 	void	onIdle(wxIdleEvent& e);
 	void	onRTimer(wxTimerEvent& e);
+	void	onFocus(wxFocusEvent& e);
 };
 
 #endif //__MAPCANVAS_H__

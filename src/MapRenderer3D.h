@@ -13,6 +13,7 @@ private:
 	bool		udmf_zdoom;
 	bool		fullbright;
 	bool		fog;
+	string		skytex;
 
 	// Visibility
 	vector<double>	dist_sectors;
@@ -34,6 +35,10 @@ private:
 		
 		// Thing flags
 		ICON		= 0x02,
+
+		// Quad flags
+		TRANS		= 0x02,
+		SKY			= 0x04,
 	};
 	struct gl_vertex_t {
 		float x, y, z;
@@ -44,10 +49,12 @@ private:
 		rgba_t		colour;
 		uint8_t		light;
 		GLTexture*	texture;
+		uint8_t		flags;
 
 		quad_3d_t() {
 			colour.set(255, 255, 255, 255, 0);
 			texture = NULL;
+			flags = 0;
 		}
 	};
 	struct line_3d_t {
@@ -106,6 +113,7 @@ public:
 	void	setupView(int width, int height);
 	void	setLight(rgba_t& colour, uint8_t light, float alpha = 1.0f);
 	void	renderMap();
+	void	renderSky();
 
 	// Flats
 	void	updateSectorVBO(unsigned index);

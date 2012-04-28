@@ -22,6 +22,7 @@ MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	this->vbo_ceilings = 0;
 	this->vbo_floors = 0;
 	this->vbo_walls = 0;
+	this->skytex = "SKY1";
 
 	// Init other
 	init();
@@ -225,6 +226,9 @@ void MapRenderer3D::renderMap() {
 	sf::Clock clock;
 	quickVisDiscard();
 	
+	// Render sky
+	renderSky();
+
 	// Render walls
 	renderWalls();
 	
@@ -258,6 +262,53 @@ void MapRenderer3D::renderMap() {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_FOG);
+}
+
+void MapRenderer3D::renderSky() {
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_FOG);
+	glDisable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+	glEnable(GL_TEXTURE_2D);
+
+	// Get sky texture
+	GLTexture* sky = theMapEditor->textureManager().getTexture(skytex);
+	if (sky) {
+		sky->bind();
+
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y - 64.0f, cam_position.z + 64.0f);
+		glTexCoord2f(1.0f, 0.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y - 64.0f, cam_position.z + 64.0f);
+		glTexCoord2f(1.0f, 2.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y - 64.0f, cam_position.z - 64.0f);
+		glTexCoord2f(0.0f, 2.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y - 64.0f, cam_position.z - 64.0f);
+		glEnd();
+
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y + 64.0f, cam_position.z + 64.0f);
+		glTexCoord2f(1.0f, 0.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y + 64.0f, cam_position.z + 64.0f);
+		glTexCoord2f(1.0f, 2.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y + 64.0f, cam_position.z - 64.0f);
+		glTexCoord2f(0.0f, 2.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y + 64.0f, cam_position.z - 64.0f);
+		glEnd();
+
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y - 64.0f, cam_position.z + 64.0f);
+		glTexCoord2f(1.0f, 0.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y + 64.0f, cam_position.z + 64.0f);
+		glTexCoord2f(1.0f, 2.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y + 64.0f, cam_position.z - 64.0f);
+		glTexCoord2f(0.0f, 2.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y - 64.0f, cam_position.z - 64.0f);
+		glEnd();
+
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y + 64.0f, cam_position.z + 64.0f);
+		glTexCoord2f(1.0f, 0.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y - 64.0f, cam_position.z + 64.0f);
+		glTexCoord2f(1.0f, 2.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y - 64.0f, cam_position.z - 64.0f);
+		glTexCoord2f(0.0f, 2.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y + 64.0f, cam_position.z - 64.0f);
+		glEnd();
+	}
+
+	glDepthMask(GL_TRUE);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void MapRenderer3D::updateSectorVBO(unsigned index) {
@@ -349,6 +400,7 @@ void MapRenderer3D::renderFlats() {
 	// Render floors
 	glCullFace(GL_FRONT);
 	rgba_t col;
+	uint8_t alpha = 255;
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		MapSector* sector = map->getSector(a);
 
@@ -361,6 +413,12 @@ void MapRenderer3D::renderFlats() {
 			if (dist_sectors[a] > render_max_dist && !sector->boundingBox().point_within(cam_position.x, cam_position.y))
 				continue;
 		}
+
+		// Check for sky
+		if (sector->floorTexture() == "F_SKY1")
+			alpha = 0;
+		else
+			alpha = 255;
 
 		// Get texture
 		tex = theMapEditor->textureManager().getFlat(sector->floorTexture());
@@ -380,6 +438,7 @@ void MapRenderer3D::renderFlats() {
 		glPushMatrix();
 		glTranslated(0, 0, sector->intProperty("heightfloor"));
 		col = map->getSectorColour(sector, 1, true);
+		col.a = alpha;
 		setLight(col, sector->intProperty("lightlevel"), calcDistFade(dist_sectors[a], render_max_dist));
 		sector->getPolygon()->render();
 		glPopMatrix();
@@ -393,6 +452,12 @@ void MapRenderer3D::renderFlats() {
 		// Check distance if needed
 		if (render_max_dist > 0 && dist_sectors[a] > render_max_dist)
 			continue;
+
+		// Check for sky
+		if (sector->ceilingTexture() == "F_SKY1")
+			alpha = 0;
+		else
+			alpha = 255;
 
 		// Get texture
 		tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
@@ -412,6 +477,7 @@ void MapRenderer3D::renderFlats() {
 		glPushMatrix();
 		glTranslated(0, 0, sector->intProperty("heightceiling"));
 		col = map->getSectorColour(sector, 1, true);
+		col.a = alpha;
 		setLight(col, sector->intProperty("lightlevel"), calcDistFade(dist_sectors[a], render_max_dist));
 		sector->getPolygon()->render();
 		glPopMatrix();
@@ -448,6 +514,7 @@ void MapRenderer3D::renderFlatsVBO() {
 
 	// Render floors
 	glCullFace(GL_FRONT);
+	uint8_t alpha = 255;
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		MapSector* sector = map->getSector(a);
 
@@ -465,6 +532,12 @@ void MapRenderer3D::renderFlatsVBO() {
 		if (sector->getPolygon()->vboUpdate() > 0)
 			updateSectorVBO(a);
 
+		// Check for sky
+		if (sector->floorTexture() == "F_SKY1")
+			alpha = 0;
+		else
+			alpha = 255;
+
 		// Get texture
 		tex = theMapEditor->textureManager().getFlat(sector->floorTexture());
 
@@ -481,6 +554,7 @@ void MapRenderer3D::renderFlatsVBO() {
 
 		// Render flat
 		col = map->getSectorColour(sector, 1, true);
+		col.a = alpha;
 		setLight(col, sector->intProperty("lightlevel"), calcDistFade(dist_sectors[a], render_max_dist));
 		sector->getPolygon()->renderVBO(false);
 	}
@@ -495,6 +569,12 @@ void MapRenderer3D::renderFlatsVBO() {
 		// Check distance if needed
 		if (render_max_dist > 0 && dist_sectors[a] > render_max_dist)
 			continue;
+
+		// Check for sky
+		if (sector->ceilingTexture() == "F_SKY1")
+			alpha = 0;
+		else
+			alpha = 255;
 
 		// Get texture
 		tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
@@ -512,6 +592,7 @@ void MapRenderer3D::renderFlatsVBO() {
 
 		// Render flat
 		col = map->getSectorColour(sector, 1, true);
+		col.a = alpha;
 		setLight(col, sector->intProperty("lightlevel"), calcDistFade(dist_sectors[a], render_max_dist));
 		sector->getPolygon()->renderVBO(false);
 	}
@@ -645,6 +726,16 @@ void MapRenderer3D::updateLine(unsigned index) {
 	int lowceil = min(ceiling1, ceiling2);
 	int highfloor = max(floor1, floor2);
 
+	// Check for sky ceiling/floor on both sides
+	/*
+	bool skyfloor = false;
+	bool skyceil = false;
+	if (line->frontSector()->floorTexture() == "F_SKY1" && line->backSector()->floorTexture() == "F_SKY1")
+		skyfloor = true;
+	if (line->frontSector()->ceilingTexture() == "F_SKY1" && line->backSector()->ceilingTexture() == "F_SKY1")
+		skyceil = true;
+		*/
+
 	// Front lower
 	if (floor2 > floor1) {
 		quad_3d_t quad;
@@ -677,6 +768,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.light = light1;
 		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturebottom"));
 		setupQuadTexCoords(&quad, length, xoff, yoff, false, sx, sy);
+		if (line->backSector()->floorTexture() == "F_SKY1") quad.flags |= SKY;
 
 		// Add quad
 		lines[index].quads.push_back(quad);
@@ -757,6 +849,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.light = light1;
 		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturetop"));
 		setupQuadTexCoords(&quad, length, xoff, yoff, !upeg, sx, sy);
+		if (line->backSector()->ceilingTexture() == "F_SKY1") quad.flags |= SKY;
 
 		// Add quad
 		lines[index].quads.push_back(quad);
@@ -794,6 +887,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.light = light2;
 		quad.texture = theMapEditor->textureManager().getTexture(line->s2()->stringProperty("texturebottom"));
 		setupQuadTexCoords(&quad, length, xoff, yoff, false, sx, sy);
+		if (line->frontSector()->floorTexture() == "F_SKY1") quad.flags |= SKY;
 
 		// Add quad
 		lines[index].quads.push_back(quad);
@@ -874,6 +968,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.light = light2;
 		quad.texture = theMapEditor->textureManager().getTexture(line->s2()->stringProperty("texturetop"));
 		setupQuadTexCoords(&quad, length, xoff, yoff, !upeg, sx, sy);
+		if (line->frontSector()->ceilingTexture() == "F_SKY1") quad.flags |= SKY;
 
 		// Add quad
 		lines[index].quads.push_back(quad);
@@ -886,6 +981,10 @@ void MapRenderer3D::updateLine(unsigned index) {
 
 void MapRenderer3D::renderQuad(MapRenderer3D::quad_3d_t* quad, float alpha) {
 	// Setup colour/light
+	if (quad->flags & SKY) {
+		alpha = 0;
+		glDisable(GL_ALPHA_TEST);
+	}
 	setLight(quad->colour, quad->light, alpha);
 
 	// Draw quad
@@ -895,6 +994,9 @@ void MapRenderer3D::renderQuad(MapRenderer3D::quad_3d_t* quad, float alpha) {
 	glTexCoord2f(quad->points[2].tx, quad->points[2].ty);	glVertex3f(quad->points[2].x, quad->points[2].y, quad->points[2].z);
 	glTexCoord2f(quad->points[3].tx, quad->points[3].ty);	glVertex3f(quad->points[3].x, quad->points[3].y, quad->points[3].z);
 	glEnd();
+
+	if (quad->flags & SKY)
+		glEnable(GL_ALPHA_TEST);
 }
 
 void MapRenderer3D::renderWalls() {

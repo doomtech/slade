@@ -112,6 +112,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	mouse_selbegin = false;
 	mouse_movebegin = false;
 	overlay_current = NULL;
+	mouse_locked = false;
 	
 #ifdef USE_SFML_RENDERWINDOW
 #if SFML_VERSION_MAJOR < 2
@@ -142,6 +143,8 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	Bind(wxEVT_LEAVE_WINDOW, &MapCanvas::onMouseLeave, this);
 	Bind(wxEVT_ENTER_WINDOW, &MapCanvas::onMouseEnter, this);
 	Bind(wxEVT_TIMER, &MapCanvas::onRTimer, this);
+	Bind(wxEVT_SET_FOCUS, &MapCanvas::onFocus, this);
+	Bind(wxEVT_KILL_FOCUS, &MapCanvas::onFocus, this);
 #ifdef USE_SFML_RENDERWINDOW
 	Bind(wxEVT_IDLE, &MapCanvas::onIdle, this);
 #endif
@@ -856,7 +859,7 @@ void MapCanvas::draw() {
 	}
 
 	// test
-	Drawing::drawText(S_FMT("Render distance: %1.2f", (double)render_max_dist), 0, 100);
+	//Drawing::drawText(S_FMT("Render distance: %1.2f", (double)render_max_dist), 0, 100);
 
 	// Editor messages
 	drawEditorMessages();
@@ -1187,6 +1190,40 @@ void MapCanvas::mouseToCenter() {
 #endif
 }
 
+void MapCanvas::lockMouse(bool lock) {
+	mouse_locked = lock;
+	if (lock) {
+		// Center mouse
+		mouseToCenter();
+
+		// Hide cursor
+		wxImage img(32, 32, true);
+		img.SetMask(true);
+		img.SetMaskColour(0, 0, 0);
+		SetCursor(wxCursor(img));
+
+#ifdef USE_SFML_RENDERWINDOW
+#if SFML_VERSION_MAJOR < 2
+		ShowMouseCursor(false);
+#else
+		setMouseCursorVisible(false);
+#endif
+#endif
+	}
+	else {
+		// Show cursor
+		SetCursor(wxNullCursor);
+
+#ifdef USE_SFML_RENDERWINDOW
+#if SFML_VERSION_MAJOR < 2
+		ShowMouseCursor(false);
+#else
+		setMouseCursorVisible(false);
+#endif
+#endif
+	}
+}
+
 void MapCanvas::itemSelected(int index, bool selected) {
 	// Things mode
 	if (editor->editMode() == MapEditor::MODE_THINGS) {
@@ -1304,6 +1341,9 @@ void MapCanvas::changeEditMode(int mode) {
 	int mode_prev = editor->editMode();
 	editor->setEditMode(mode);
 
+	// Unlock mouse
+	lockMouse(false);
+
 	// Update toolbar
 	if (mode != mode_prev) theMapEditor->removeAllCustomToolBars();
 	if (mode == MapEditor::MODE_VERTICES)
@@ -1333,7 +1373,7 @@ void MapCanvas::changeEditMode(int mode) {
 	else if (mode == MapEditor::MODE_THINGS)
 		theApp->toggleAction("mapw_mode_things");
 	else if (mode == MapEditor::MODE_3D) {
-		mouseToCenter();
+		lockMouse(true);
 		renderer_3d->refresh();
 	}
 	theMapEditor->refreshToolBar();
@@ -1677,6 +1717,10 @@ void MapCanvas::keyBinds3d(string name) {
 		else
 			editor->addEditorMessage("Gravity enabled");
 	}
+
+	// Release mouse cursor
+	else if (name == "me3d_release_mouse")
+		lockMouse(false);
 }
 
 void MapCanvas::onKeyBindRelease(string name) {
@@ -1910,6 +1954,12 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 
 	// Left button
 	if (e.LeftDown()) {
+		// If the mouse is unlocked and we're in 3d mode, lock the mouse
+		if (!mouse_locked && editor->editMode() == MapEditor::MODE_3D) {
+			mouseToCenter();
+			lockMouse(true);
+		}
+
 		// Line drawing state, add line draw point
 		if (mouse_state == MSTATE_LINE_DRAW) {
 			// Snap point to nearest vertex if shift is held down
@@ -2054,7 +2104,7 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	}
 
 	// Check for 3d mode
-	if (editor->editMode() == MapEditor::MODE_3D) {
+	if (editor->editMode() == MapEditor::MODE_3D && mouse_locked) {
 		// Get relative mouse movement
 		int xrel = e.GetX() - (GetSize().x * 0.5);
 		int yrel = e.GetY() - (GetSize().y * 0.5);
@@ -2175,3 +2225,12 @@ void MapCanvas::onRTimer(wxTimerEvent& e) {
 	Refresh();
 }
 #endif
+
+void MapCanvas::onFocus(wxFocusEvent& e) {
+	if (e.GetEventType() == wxEVT_SET_FOCUS) {
+		if (editor->editMode() == MapEditor::MODE_3D)
+			lockMouse(true);
+	}
+	else if (e.GetEventType() == wxEVT_KILL_FOCUS)
+		lockMouse(false);
+}
