@@ -19,6 +19,9 @@ MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	this->fog = true;
 	this->fullbright = false;
 	this->gravity = 0.5;
+	this->vbo_ceilings = 0;
+	this->vbo_floors = 0;
+	this->vbo_walls = 0;
 
 	// Init other
 	init();
@@ -50,6 +53,13 @@ void MapRenderer3D::refresh() {
 	things.clear();
 	dist_lines.clear();
 	dist_sectors.clear();
+
+	// Clear VBOs
+	if (vbo_floors != 0) {
+		glDeleteBuffers(1, &vbo_floors);
+		glDeleteBuffers(1, &vbo_ceilings);
+		vbo_floors = vbo_ceilings = 0;
+	}
 }
 
 void MapRenderer3D::cameraMove(double distance) {
@@ -246,6 +256,78 @@ void MapRenderer3D::renderMap() {
 	glDisable(GL_FOG);
 }
 
+void MapRenderer3D::updateSectorVBO(unsigned index) {
+	// Check index
+	if (index >= map->nSectors())
+		return;
+
+	// --- Update texture coordinates ---
+	MapSector* sector = map->getSector(index);
+	Polygon2D* poly = sector->getPolygon();
+
+	// Floor
+	GLTexture* tex = theMapEditor->textureManager().getTexture(sector->floorTexture());
+	if (tex) {
+		// Set polygon texture
+		poly->setTexture(tex);
+		
+		// Get scaling/offset info
+		double ox = 0;
+		double oy = 0;
+		double sx = 1;
+		double sy = 1;
+		double rot = 0;
+		
+		// Check for UDMF + ZDoom extensions
+		if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+			ox = sector->floatProperty("xpanningfloor");
+			oy = sector->floatProperty("ypanningfloor");
+			sx = sector->floatProperty("xscalefloor");
+			sy = sector->floatProperty("yscalefloor");
+			rot = sector->floatProperty("rotationfloor");
+		}
+
+		poly->updateTextureCoords(sx, sy, ox, oy, rot);
+	}
+
+	// Update polygon VBO data
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_floors);
+	poly->setZ(sector->intProperty("heightfloor"));
+	poly->updateVBOData();
+
+	// Ceiling
+	tex = theMapEditor->textureManager().getTexture(sector->ceilingTexture());
+	if (tex) {
+		// Set polygon texture
+		poly->setTexture(tex);
+		
+		// Get scaling/offset info
+		double ox = 0;
+		double oy = 0;
+		double sx = 1;
+		double sy = 1;
+		double rot = 0;
+		
+		// Check for UDMF + ZDoom extensions
+		if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+			ox = sector->floatProperty("xpanningceiling");
+			oy = sector->floatProperty("ypanningceiling");
+			sx = sector->floatProperty("xscaleceiling");
+			sy = sector->floatProperty("yscaleceiling");
+			rot = sector->floatProperty("rotationceiling");
+		}
+
+		poly->updateTextureCoords(sx, sy, ox, oy, rot);
+	}
+
+	// Update polygon VBO data
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_ceilings);
+	poly->setZ(sector->intProperty("heightceiling"));
+	poly->updateVBOData();
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void MapRenderer3D::renderFlats() {
 	// Check for map
 	if (!map)
@@ -255,6 +337,10 @@ void MapRenderer3D::renderFlats() {
 	glEnable(GL_TEXTURE_2D);
 	GLTexture* tex = NULL;
 	GLTexture* tex_last = NULL;
+
+	// Use VBOs if supported
+	if (GLEW_ARB_vertex_buffer_object)
+		return renderFlatsVBO();
 
 	// Render floors
 	glCullFace(GL_FRONT);
@@ -328,6 +414,110 @@ void MapRenderer3D::renderFlats() {
 	}
 
 	glDisable(GL_TEXTURE_2D);
+}
+
+void MapRenderer3D::renderFlatsVBO() {
+	// First, check if any polygon vertex data has changed (in this case we need to refresh the entire vbo)
+	bool vbo_updated = false;
+	for (unsigned a = 0; a < map->nSectors(); a++) {
+		Polygon2D* poly = map->getSector(a)->getPolygon();
+		if (poly && poly->vboUpdate() > 1) {
+			//wxLogMessage("Updating sector %d polygon vbo data", a);
+			updateFlatsVBO();
+			vbo_updated = true;
+		}
+	}
+
+	// Create VBO if necessary
+	if (!vbo_updated && vbo_floors == 0) {
+		updateFlatsVBO();
+		vbo_updated = true;
+	}
+
+	// Setup opengl state
+	glEnable(GL_TEXTURE_2D);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_floors);
+	Polygon2D::setupVBOPointers();
+	GLTexture* tex_last = NULL;
+	GLTexture* tex = NULL;
+	rgba_t col;
+
+	// Render floors
+	glCullFace(GL_FRONT);
+	for (unsigned a = 0; a < map->nSectors(); a++) {
+		MapSector* sector = map->getSector(a);
+
+		// Check distance if needed
+		if (render_max_dist > 0) {
+			if (dist_sectors[a] > render_max_dist)
+				continue;
+			// Double-check distance
+			dist_sectors[a] = map->distanceToSector(cam_position.x, cam_position.y, a, render_max_dist);
+			if (dist_sectors[a] > render_max_dist && !sector->boundingBox().point_within(cam_position.x, cam_position.y))
+				continue;
+		}
+
+		// Update sector VBO data if needed
+		if (sector->getPolygon()->vboUpdate() > 0)
+			updateSectorVBO(a);
+
+		// Get texture
+		tex = theMapEditor->textureManager().getFlat(sector->floorTexture());
+
+		// Bind the texture if needed
+		if (tex) {
+			if (!tex_last)
+				glEnable(GL_TEXTURE_2D);
+			if (tex != tex_last)
+				tex->bind();
+		}
+		else if (!tex_last)
+			glDisable(GL_TEXTURE_2D);
+		tex_last = tex;
+
+		// Render flat
+		col = map->getSectorColour(sector, 1, true);
+		setLight(col, sector->intProperty("lightlevel"), calcDistFade(dist_sectors[a], render_max_dist));
+		sector->getPolygon()->renderVBO(false);
+	}
+
+	// Render ceilings
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_ceilings);
+	Polygon2D::setupVBOPointers();
+	glCullFace(GL_BACK);
+	for (unsigned a = 0; a < map->nSectors(); a++) {
+		MapSector* sector = map->getSector(a);
+
+		// Check distance if needed
+		if (render_max_dist > 0 && dist_sectors[a] > render_max_dist)
+			continue;
+
+		// Get texture
+		tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
+
+		// Bind the texture if needed
+		if (tex) {
+			if (!tex_last)
+				glEnable(GL_TEXTURE_2D);
+			if (tex != tex_last)
+				tex->bind();
+		}
+		else if (!tex_last)
+			glDisable(GL_TEXTURE_2D);
+		tex_last = tex;
+
+		// Render flat
+		col = map->getSectorColour(sector, 1, true);
+		setLight(col, sector->intProperty("lightlevel"), calcDistFade(dist_sectors[a], render_max_dist));
+		sector->getPolygon()->renderVBO(false);
+	}
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	// Clean up opengl state
+	glDisable(GL_TEXTURE_2D);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void MapRenderer3D::setupQuad(MapRenderer3D::quad_3d_t* quad, double x1, double y1, double x2, double y2, double top, double bottom) {
@@ -878,6 +1068,71 @@ void MapRenderer3D::renderThings() {
 		glTexCoord2f(1.0f, 0.0f);	glVertex3f(x2, y2, things[a].z + theight);
 		glEnd();
 	}
+}
+
+void MapRenderer3D::updateFlatsVBO() {
+	// Create VBOs if needed
+	if (vbo_floors == 0) {
+		glGenBuffers(1, &vbo_floors);
+		glGenBuffers(1, &vbo_ceilings);
+	}
+
+	// Get total size needed
+	unsigned totalsize = 0;
+	for (unsigned a = 0; a < map->nSectors(); a++) {
+		Polygon2D* poly = map->getSector(a)->getPolygon();
+		totalsize += poly->vboDataSize();
+	}
+
+	// --- Floors ---
+
+	// Allocate buffer data
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_floors);
+	glBufferData(GL_ARRAY_BUFFER, totalsize, NULL, GL_STATIC_DRAW);
+
+	// Write polygon data to VBO
+	unsigned offset = 0;
+	unsigned index = 0;
+	int height = 0;
+	for (unsigned a = 0; a < map->nSectors(); a++) {
+		// Set polygon z height
+		Polygon2D* poly = map->getSector(a)->getPolygon();
+		height = map->getSector(a)->intProperty("heightfloor");
+		poly->setZ(height);
+
+		// Write to VBO
+		offset = poly->writeToVBO(offset, index);
+		index += poly->totalVertices();
+	}
+
+	// --- Ceilings ---
+
+	// Allocate buffer data
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_ceilings);
+	glBufferData(GL_ARRAY_BUFFER, totalsize, NULL, GL_STATIC_DRAW);
+
+	// Write polygon data to VBO
+	offset = 0;
+	index = 0;
+	for (unsigned a = 0; a < map->nSectors(); a++) {
+		// Set polygon z height
+		Polygon2D* poly = map->getSector(a)->getPolygon();
+		height = map->getSector(a)->intProperty("heightceiling");
+		poly->setZ(height);
+
+		// Write to VBO
+		offset = poly->writeToVBO(offset, index);
+		index += poly->totalVertices();
+
+		// Reset polygon z
+		poly->setZ(0.0f);
+	}
+
+	// Clean up
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void MapRenderer3D::updateWallsVBO() {
 }
 
 void MapRenderer3D::quickVisDiscard() {

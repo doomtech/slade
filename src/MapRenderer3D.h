@@ -75,6 +75,11 @@ private:
 	vector<line_3d_t>	lines;
 	vector<thing_3d_t>	things;
 
+	// VBOs
+	GLuint	vbo_floors;
+	GLuint	vbo_ceilings;
+	GLuint	vbo_walls;
+
 public:
 	MapRenderer3D(SLADEMap* map = NULL);
 	~MapRenderer3D();
@@ -103,7 +108,9 @@ public:
 	void	renderMap();
 
 	// Flats
+	void	updateSectorVBO(unsigned index);
 	void	renderFlats();
+	void	renderFlatsVBO();
 
 	// Walls
 	void	setupQuad(quad_3d_t* quad, double x1, double y1, double x2, double y2, double top, double bottom);
@@ -115,6 +122,10 @@ public:
 	// Things
 	void	updateThing(unsigned index, MapThing* thing);
 	void	renderThings();
+
+	// VBO stuff
+	void	updateFlatsVBO();
+	void	updateWallsVBO();
 
 	// Visibility checking
 	void	quickVisDiscard();

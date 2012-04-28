@@ -24,6 +24,19 @@ void Polygon2D::setColour(float r, float g, float b, float a) {
 	colour[3] = a;
 }
 
+void Polygon2D::setZ(float z) {
+	// Go through all sub-polys
+	for (unsigned a = 0; a < subpolys.size(); a++) {
+		// Set all vertex z values
+		for (unsigned v = 0; v < subpolys[a]->n_vertices; v++)
+			subpolys[a]->vertices[v].z = z;
+	}
+}
+
+void Polygon2D::setZ(plane_t plane) {
+	// TODO
+}
+
 void Polygon2D::addSubPoly() {
 	subpolys.push_back(new gl_polygon_t());
 	vbo_update = 2;
