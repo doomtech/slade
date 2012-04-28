@@ -8,6 +8,7 @@
 
 CVAR(Float, render_max_dist, -1, CVAR_SAVE)
 CVAR(Float, render_max_thing_dist, 3000, CVAR_SAVE)
+CVAR(Int, render_thing_icon_size, 16, CVAR_SAVE)
 
 MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	// Init variables
@@ -43,9 +44,9 @@ bool MapRenderer3D::init() {
 void MapRenderer3D::refresh() {
 	// Clear any existing map data
 	lines.clear();
+	things.clear();
 	dist_lines.clear();
 	dist_sectors.clear();
-	thing_sectors.clear();
 }
 
 void MapRenderer3D::cameraMove(double distance) {
@@ -317,11 +318,12 @@ void MapRenderer3D::updateLine(unsigned index) {
 
 	// Clear current line data
 	lines[index].quads.clear();
+	lines[index].flags = 0;
 
 	// Skip invalid line
 	MapLine* line = map->getLine(index);
 	if (!line->s1()) {
-		lines[index].calculated = true;
+		lines[index].flags |= CALCULATED;
 		return;
 	}
 
@@ -371,7 +373,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 
 		// Add middle quad and finish
 		lines[index].quads.push_back(quad);
-		lines[index].calculated = true;
+		lines[index].flags |= CALCULATED;
 		return;
 	}
 
@@ -623,7 +625,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 
 
 	// Finished
-	lines[index].calculated = true;
+	lines[index].flags |= CALCULATED;
 }
 
 void MapRenderer3D::renderQuad(MapRenderer3D::quad_3d_t* quad, float alpha) {
@@ -669,7 +671,7 @@ void MapRenderer3D::renderWalls() {
 		distfade = calcDistFade(dist_lines[a], render_max_dist);
 
 		// Update line if needed
-		if (!lines[a].calculated)
+		if ((lines[a].flags & CALCULATED) == 0)
 			updateLine(a);
 
 		// Draw each quad on the line
@@ -699,12 +701,55 @@ void MapRenderer3D::renderWalls() {
 	glDisable(GL_TEXTURE_2D);
 }
 
+void MapRenderer3D::updateThing(unsigned index, MapThing* thing) {
+	// Check index
+	if (index >= things.size() || !thing)
+		return;
+
+	// Setup thing info
+	things[index].type = theGameConfiguration->thingType(thing->getType());
+	things[index].sector = map->getSector(map->inSector(thing->xPos(), thing->yPos()));
+
+	// Get sprite texture
+	uint32_t theight = render_thing_icon_size;
+	things[index].sprite = theMapEditor->textureManager().getSprite(things[index].type->getSprite(), things[index].type->getTranslation(), things[index].type->getPalette());
+	if (!things[index].sprite) {
+		// Sprite not found, try an icon
+		things[index].sprite = theMapEditor->textureManager().getEditorImage(S_FMT("thing/%s", CHR(things[index].type->getIcon())));
+		things[index].flags |= ICON;
+	}
+	else theight = things[index].sprite->getHeight();
+	if (!things[index].sprite) {
+		// Icon not found either, use unknown icon
+		things[index].sprite = theMapEditor->textureManager().getEditorImage("thing/unknown");
+	}
+
+	// Determine z position
+	if (things[index].sector) {
+		// Get sector floor (or ceiling) height
+		int sheight = things[index].sector->prop("heightfloor").getIntValue();
+		if (things[index].type->isHanging()) {
+			sheight = things[index].sector->prop("heightceiling").getIntValue();
+			sheight -= theight;
+		}
+
+		// Set height
+		things[index].z = sheight;
+		if (things[index].type->shrinkOnZoom())
+			things[index].z -= render_thing_icon_size*0.5;
+		if (things[index].z < sheight)
+			things[index].z = sheight;
+		things[index].z += thing->prop("height").getFloatValue();
+	}
+
+	things[index].flags |= CALCULATED;
+}
+
 void MapRenderer3D::renderThings() {
-	// Create thing sector array if empty or the wrong size
-	if (thing_sectors.size() == 0 || thing_sectors.size() != map->nThings()) {
-		thing_sectors.clear();
+	// Create things array if empty
+	if (things.size() == 0) {
 		for (unsigned a = 0; a < map->nThings(); a++)
-			thing_sectors.push_back(-1);
+			things.push_back(thing_3d_t());
 	}
 
 	// Init textures
@@ -713,12 +758,13 @@ void MapRenderer3D::renderThings() {
 	GLTexture* tex = NULL;
 
 	// Go through things
-	double dist;
+	double dist, halfwidth, theight;
 	double mdist = render_max_thing_dist;
 	if (mdist <= 0) mdist = render_max_dist;
+	rgba_t col;
+	float x1, y1, x2, y2;
 	for (unsigned a = 0; a < map->nThings(); a++) {
 		MapThing* thing = map->getThing(a);
-		ThingType* tt = theGameConfiguration->thingType(thing->getType());
 
 		// Check thing distance if needed
 		if (mdist > 0) {
@@ -727,20 +773,12 @@ void MapRenderer3D::renderThings() {
 				continue;
 		}
 
-		// Determine thing sector if needed
-		if (thing_sectors[a] < 0)
-			thing_sectors[a] = map->inSector(thing->xPos(), thing->yPos());
+		// Update thing if needed
+		if ((things[a].flags & CALCULATED) == 0)
+			updateThing(a, thing);
 
 		// Get thing sprite
-		tex = theMapEditor->textureManager().getSprite(tt->getSprite(), tt->getTranslation(), tt->getPalette());
-		if (!tex) {
-			// Sprite not found, try an icon
-			tex = theMapEditor->textureManager().getEditorImage(S_FMT("thing/%s", CHR(tt->getIcon())));
-		}
-		if (!tex) {
-			// Icon not found either, use unknown icon
-			tex = theMapEditor->textureManager().getEditorImage("thing/unknown");
-		}
+		tex = things[a].sprite;
 
 		// Bind texture if needed
 		if (tex != tex_last) {
@@ -749,30 +787,33 @@ void MapRenderer3D::renderThings() {
 		}
 
 		// Determine coordinates
-		double halfwidth = tex->getWidth() * 0.5;
-		float x1 = thing->xPos() - cam_strafe.x * halfwidth;
-		float y1 = thing->yPos() - cam_strafe.y * halfwidth;
-		float x2 = thing->xPos() + cam_strafe.x * halfwidth;
-		float y2 = thing->yPos() + cam_strafe.y * halfwidth;
+		halfwidth = tex->getWidth() * 0.5;
+		theight = tex->getHeight();
+		if (things[a].flags & ICON) {
+			halfwidth = render_thing_icon_size*0.5;
+			theight = render_thing_icon_size;
+		}
+		x1 = thing->xPos() - cam_strafe.x * halfwidth;
+		y1 = thing->yPos() - cam_strafe.y * halfwidth;
+		x2 = thing->xPos() + cam_strafe.x * halfwidth;
+		y2 = thing->yPos() + cam_strafe.y * halfwidth;
 
-		MapSector* sector =  map->getSector(thing_sectors[a]);
-		float height = 0;
-		if (sector) {
-			// Get thing z position
-			height = sector->intProperty("heightfloor");
-			if (tt->isHanging())
-				height = sector->intProperty("heightceiling") - tex->getHeight();
-
-			// Set colour from sector
-			setLight(map->getSectorColour(sector, 0, true), sector->intProperty("lightlevel"), calcDistFade(dist, mdist));
+		// Set colour/brightness from sector
+		if (things[a].type->isFullbright()) {
+			col.set(255, 255, 255, 255);
+			setLight(col, 255, calcDistFade(dist, mdist));
+		}
+		else if (things[a].sector) {
+			col = map->getSectorColour(things[a].sector, 0, true);
+			setLight(col, things[a].sector->intProperty("lightlevel"), calcDistFade(dist, mdist));
 		}
 
 		// Draw thing
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex3f(x1, y1, height + tex->getHeight());
-		glTexCoord2f(0.0f, 1.0f);	glVertex3f(x1, y1, height);
-		glTexCoord2f(1.0f, 1.0f);	glVertex3f(x2, y2, height);
-		glTexCoord2f(1.0f, 0.0f);	glVertex3f(x2, y2, height + tex->getHeight());
+		glTexCoord2f(0.0f, 0.0f);	glVertex3f(x1, y1, things[a].z + theight);
+		glTexCoord2f(0.0f, 1.0f);	glVertex3f(x1, y1, things[a].z);
+		glTexCoord2f(1.0f, 1.0f);	glVertex3f(x2, y2, things[a].z);
+		glTexCoord2f(1.0f, 0.0f);	glVertex3f(x2, y2, things[a].z + theight);
 		glEnd();
 	}
 }

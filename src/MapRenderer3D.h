@@ -4,6 +4,9 @@
 
 class SLADEMap;
 class GLTexture;
+class ThingType;
+class MapThing;
+class MapSector;
 class MapRenderer3D {
 private:
 	SLADEMap*	map;
@@ -14,7 +17,6 @@ private:
 	// Visibility
 	vector<double>	dist_sectors;
 	vector<double>	dist_lines;
-	vector<int>		thing_sectors;
 
 	// Camera
 	fpoint3_t	cam_position;
@@ -25,6 +27,13 @@ private:
 	fpoint3_t	cam_strafe;
 
 	// Structs
+	enum {
+		// Common flags
+		CALCULATED	= 0x01,
+		
+		// Thing flags
+		ICON		= 0x02,
+	};
 	struct gl_vertex_t {
 		float x, y, z;
 		float tx, ty;
@@ -41,14 +50,29 @@ private:
 		}
 	};
 	struct line_3d_t {
-		bool				calculated;
+		uint8_t				flags;
 		vector<quad_3d_t>	quads;
 
-		line_3d_t() { calculated = false; }
+		line_3d_t() { flags = 0; }
+	};
+	struct thing_3d_t {
+		uint8_t		flags;
+		ThingType*	type;
+		MapSector*	sector;
+		float		z;
+		GLTexture*	sprite;
+
+		thing_3d_t() {
+			flags = 0;
+			type = NULL;
+			sector = NULL;
+			z = 0;
+		}
 	};
 
 	// Map Structures
 	vector<line_3d_t>	lines;
+	vector<thing_3d_t>	things;
 
 public:
 	MapRenderer3D(SLADEMap* map = NULL);
@@ -86,6 +110,7 @@ public:
 	void	renderWalls();
 
 	// Things
+	void	updateThing(unsigned index, MapThing* thing);
 	void	renderThings();
 
 	// Visibility checking

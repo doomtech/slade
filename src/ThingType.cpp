@@ -12,6 +12,7 @@ ThingType::ThingType(string name) {
 	this->colour = rgba_t(170, 170, 180, 255, 0);
 	this->radius = 20;
 	this->height = 16;
+	this->fullbright = false;
 
 	// Init args
 	args[0].name = "Arg1";
@@ -33,6 +34,7 @@ void ThingType::copy(ThingType* copy) {
 	this->height = copy->height;
 	this->angled = copy->angled;
 	this->hanging = copy->hanging;
+	this->fullbright = copy->fullbright;
 	this->shrink = copy->shrink;
 	this->sprite = copy->sprite;
 	this->icon = copy->icon;
@@ -80,6 +82,7 @@ void ThingType::reset() {
 	this->colour = COL_WHITE;
 	this->radius = 20;
 	this->height = 16;
+	this->fullbright = false;
 
 	// Reset args
 	for (unsigned a = 0; a < 5; a++) {
@@ -146,6 +149,10 @@ void ThingType::parse(ParseTreeNode* node) {
 		else if (S_CMPNOCASE(name, "shrink"))
 			this->shrink = child->getBoolValue();
 
+		// Fullbright
+		else if (S_CMPNOCASE(name, "fullbright"))
+			this->fullbright = child->getBoolValue();
+
 		// Translation
 		else if (S_CMPNOCASE(name, "translation"))
 		{
@@ -209,6 +216,7 @@ string ThingType::stringDesc() {
 	if (!sprite.IsEmpty()) ret += S_FMT(", sprite \"%s\"", CHR(sprite));
 	if (!angled) ret += ", angle hidden";
 	if (hanging) ret += ", hanging";
+	if (fullbright) ret += ", fullbright";
 
 	return ret;
 }
