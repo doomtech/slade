@@ -42,6 +42,7 @@ private:
 	uint8_t			type;			// 0=patch, 1=graphic
 	bool			flip_x;
 	bool			flip_y;
+	bool			use_offsets;
 	int16_t			rotation;
 	Translation		translation;
 	rgba_t			colour;
@@ -58,6 +59,7 @@ public:
 
 	bool			flipX() { return flip_x; }
 	bool			flipY() { return flip_y; }
+	bool			useOffsets() { return use_offsets; }
 	int16_t			getRotation() { return rotation; }
 	rgba_t			getColour() { return colour; }
 	float			getAlpha() { return alpha; }
@@ -67,6 +69,7 @@ public:
 
 	void	flipX(bool flip) { flip_x = flip; }
 	void	flipY(bool flip) { flip_y = flip; }
+	void	useOffsets(bool use) { use_offsets = use; }
 	void	setRotation(int16_t rot) { rotation = rot; }
 	void	setColour(uint8_t r, uint8_t g, uint8_t b, uint8_t a) { colour.set(r, g, b, a); }
 	void	setAlpha(float a) { alpha = a; }

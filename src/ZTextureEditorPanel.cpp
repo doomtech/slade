@@ -263,25 +263,29 @@ wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
 	gb_sizer->Add(new wxStaticText(panel, -1, "Y Position:"), wxGBPosition(1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 	gb_sizer->Add(spin_patch_top, wxGBPosition(1, 1), wxDefaultSpan, wxEXPAND);
 
+	// Use Offsets
+	cb_useofs = new wxCheckBox(panel, -1, "Use Source Gfx Offsets");
+	gb_sizer->Add(cb_useofs, wxGBPosition(2, 0), wxGBSpan(1, 2), wxALIGN_CENTER_VERTICAL);
+
 	// Flip X
 	cb_flipx = new wxCheckBox(panel, -1, "Flip X");
-	gb_sizer->Add(cb_flipx, wxGBPosition(2, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(cb_flipx, wxGBPosition(3, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 
 	// Flip Y
 	cb_flipy = new wxCheckBox(panel, -1, "Flip Y");
-	gb_sizer->Add(cb_flipy, wxGBPosition(2, 1), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(cb_flipy, wxGBPosition(3, 1), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 
 	// Rotation
 	string rotval[] = { "0", "90", "180", "270" };
 	choice_rotation = new wxChoice(panel, -1, wxDefaultPosition, wxDefaultSize, 4, rotval);
 	choice_rotation->SetSelection(0);
-	gb_sizer->Add(new wxStaticText(panel, -1, "Rotation:"), wxGBPosition(3, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
-	gb_sizer->Add(choice_rotation, wxGBPosition(3, 1), wxDefaultSpan, wxEXPAND);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Rotation:"), wxGBPosition(4, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(choice_rotation, wxGBPosition(4, 1), wxDefaultSpan, wxEXPAND);
 
 	// Alpha
 	spin_alpha = new wxSpinCtrlDouble(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, 1, 1, 0.1);
-	gb_sizer->Add(new wxStaticText(panel, -1, "Alpha:"), wxGBPosition(4, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
-	gb_sizer->Add(spin_alpha, wxGBPosition(4, 1), wxDefaultSpan, wxEXPAND);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Alpha:"), wxGBPosition(5, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(spin_alpha, wxGBPosition(5, 1), wxDefaultSpan, wxEXPAND);
 
 	// Alpha Style
 	string styles[] = { "Copy", "Translucent", "Add", "Subtract", "ReverseSubtract", "Modulate", "CopyAlpha" };
@@ -342,6 +346,7 @@ wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
 	// Bind events
 	cb_flipx->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onPatchFlipXChanged, this);
 	cb_flipy->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onPatchFlipYChanged, this);
+	cb_useofs->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onPatchUseOfsChanged, this);
 	choice_rotation->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ZTextureEditorPanel::onPatchRotationChanged, this);
 	spin_alpha->Bind(wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, &ZTextureEditorPanel::onPatchAlphaChanged, this);
 	choice_style->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ZTextureEditorPanel::onPatchAlphaStyleChanged, this);
@@ -372,6 +377,7 @@ void ZTextureEditorPanel::updatePatchControls() {
 		spin_patch_top->Enable(false);
 		cb_flipx->Enable(false);
 		cb_flipy->Enable(false);
+		cb_useofs->Enable(false);
 		choice_rotation->Enable(false);
 		spin_alpha->Enable(false);
 		choice_style->Enable(false);
@@ -390,6 +396,7 @@ void ZTextureEditorPanel::updatePatchControls() {
 		spin_patch_top->Enable(true);
 		cb_flipx->Enable(true);
 		cb_flipy->Enable(true);
+		cb_useofs->Enable(true);
 		choice_rotation->Enable(true);
 		spin_alpha->Enable(true);
 		choice_style->Enable(true);
@@ -414,6 +421,7 @@ void ZTextureEditorPanel::updatePatchControls() {
 			spin_patch_top->SetValue(patch->yOffset());
 			cb_flipx->SetValue(patch->flipX());
 			cb_flipy->SetValue(patch->flipY());
+			cb_useofs->SetValue(patch->useOffsets());
 			spin_alpha->SetValue(patch->getAlpha());
 			choice_style->SetStringSelection(patch->getStyle());
 			cp_blend_col->SetColour(WXCOL(patch->getColour()));
@@ -678,6 +686,27 @@ void ZTextureEditorPanel::onPatchFlipYChanged(wxCommandEvent& e) {
 		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
 		if (patch)
 			patch->flipY(cb_flipy->GetValue());
+	}
+
+	// Update UI
+	tex_canvas->redraw(true);
+
+	tex_modified = true;
+}
+
+/* ZTextureEditorPanel::onPatchUseOfsChanged
+ * Called when the 'FUse Offsets' checkbox is (un)checked
+ *******************************************************************/
+void ZTextureEditorPanel::onPatchUseOfsChanged(wxCommandEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch)
+			patch->useOffsets(cb_useofs->GetValue());
 	}
 
 	// Update UI

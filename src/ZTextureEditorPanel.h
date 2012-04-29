@@ -21,6 +21,7 @@ private:
 	// Patch properties
 	wxCheckBox*			cb_flipx;
 	wxCheckBox*			cb_flipy;
+	wxCheckBox*			cb_useofs;
 	wxChoice*			choice_rotation;
 	wxSpinCtrlDouble*	spin_alpha;
 	wxChoice*			choice_style;
@@ -66,6 +67,7 @@ public:
 	void	onTexNullTextureChanged(wxCommandEvent& e);
 	void	onPatchFlipXChanged(wxCommandEvent& e);
 	void	onPatchFlipYChanged(wxCommandEvent& e);
+	void	onPatchUseOfsChanged(wxCommandEvent& e);
 	void	onPatchRotationChanged(wxCommandEvent& e);
 	void	onPatchAlphaChanged(wxSpinDoubleEvent& e);
 	void	onPatchAlphaStyleChanged(wxCommandEvent& e);

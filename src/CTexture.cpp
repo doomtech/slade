@@ -145,6 +145,7 @@ ArchiveEntry* CTPatch::getPatchEntry(Archive* parent) {
 CTPatchEx::CTPatchEx() {
 	flip_x = false;
 	flip_y = false;
+	use_offsets = false;
 	rotation = 0;
 	alpha = 1.0f;
 	style = "Copy";
@@ -159,6 +160,7 @@ CTPatchEx::CTPatchEx(string name, int16_t offset_x, int16_t offset_y, uint8_t ty
 : CTPatch(name, offset_x, offset_y) {
 	flip_x = false;
 	flip_y = false;
+	use_offsets = false;
 	rotation = 0;
 	alpha = 1.0f;
 	style = "Copy";
@@ -173,6 +175,7 @@ CTPatchEx::CTPatchEx(CTPatch* copy) {
 	if (copy) {
 		flip_x = false;
 		flip_y = false;
+		use_offsets = false;
 		rotation = 0;
 		alpha = 1.0f;
 		style = "Copy";
@@ -191,6 +194,7 @@ CTPatchEx::CTPatchEx(CTPatchEx* copy) {
 	if (copy) {
 		flip_x = copy->flip_x;
 		flip_y = copy->flip_y;
+		use_offsets = copy->useOffsets();
 		rotation = copy->rotation;
 		alpha = copy->alpha;
 		style = copy->style;
@@ -260,6 +264,10 @@ bool CTPatchEx::parse(Tokenizer& tz, uint8_t type) {
 			// FlipY
 			if (S_CMPNOCASE(property, "FlipY"))
 				flip_y = true;
+
+			// UseOffsets
+			if (S_CMPNOCASE(property, "UseOffsets"))
+				use_offsets = true;
 
 			// Rotate
 			if (S_CMPNOCASE(property, "Rotate"))
@@ -359,6 +367,8 @@ string CTPatchEx::asText() {
 		text += "\t\tFlipX\n";
 	if (flip_y)
 		text += "\t\tFlipY\n";
+	if (use_offsets)
+		text += "\t\UseOffsets\n";
 	if (rotation != 0)
 		text += S_FMT("\t\tRotate %d\n", rotation);
 	if (blendtype == 1 && !translation.isEmpty()) {
@@ -846,6 +856,14 @@ bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal, bool fo
 			if (!loadPatchImage(a, p_img, parent, pal))
 				continue;
 
+			// Handle offsets
+			int ofs_x = patch->xOffset();
+			int ofs_y = patch->yOffset();
+			if (patch->useOffsets()) {
+				ofs_x -= p_img.offset().x;
+				ofs_y -= p_img.offset().y;
+			}
+
 			// Apply translation before anything in case we're forcing rgba (can't translate rgba images)
 			if (patch->getBlendType() == 1)
 				p_img.applyTranslation(&(patch->getTranslation()), pal);
@@ -895,7 +913,7 @@ bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal, bool fo
 
 
 			// Add patch to texture image
-			image.drawImage(p_img, patch->xOffset(), patch->yOffset(), dp, pal, pal);
+			image.drawImage(p_img, ofs_x, ofs_y, dp, pal, pal);
 		}
 	}
 	else {
