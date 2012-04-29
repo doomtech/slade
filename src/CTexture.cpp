@@ -368,7 +368,7 @@ string CTPatchEx::asText() {
 	if (flip_y)
 		text += "\t\tFlipY\n";
 	if (use_offsets)
-		text += "\t\UseOffsets\n";
+		text += "\t\tUseOffsets\n";
 	if (rotation != 0)
 		text += S_FMT("\t\tRotate %d\n", rotation);
 	if (blendtype == 1 && !translation.isEmpty()) {

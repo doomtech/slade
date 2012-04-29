@@ -237,7 +237,7 @@ GLTexture* MapTextureManager::getSprite(string name, string translation, string 
 int MapTextureManager::getVerticalOffset(string name) {
 	// Don't bother looking for nameless sprites
 	if (name.IsEmpty())
-		return NULL;
+		return 0;
 
 	// Get sprite matching name
 	ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "sprites", archive);
