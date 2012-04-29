@@ -125,7 +125,7 @@ public:
 	void	setupView(int width, int height);
 	void	setLight(rgba_t& colour, uint8_t light, float alpha = 1.0f);
 	void	renderMap();
-	void	renderSkySlice(float top, float bottom, float atop, float abottom, float size);
+	void	renderSkySlice(float top, float bottom, float atop, float abottom, float size, float tx = 0.125f, float ty = 2.0f);
 	void	renderSky();
 
 	// Flats

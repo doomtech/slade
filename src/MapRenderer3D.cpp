@@ -382,11 +382,10 @@ void MapRenderer3D::renderMap() {
 	glDisable(GL_FOG);
 }
 
-void MapRenderer3D::renderSkySlice(float top, float bottom, float atop, float abottom, float size) {
+void MapRenderer3D::renderSkySlice(float top, float bottom, float atop, float abottom, float size, float tx, float ty) {
 	float tc_x = 0.0f;
-	float tc_w = 0.125f;
-	float tc_y1 = -top + 1.0f;
-	float tc_y2 = -bottom + 1.0f;
+	float tc_y1 = (-top + 1.0f) * (ty * 0.5f);
+	float tc_y2 = (-bottom + 1.0f) * (ty * 0.5f);
 
 	glBegin(GL_QUADS);
 
@@ -394,27 +393,27 @@ void MapRenderer3D::renderSkySlice(float top, float bottom, float atop, float ab
 	for (unsigned a = 0; a < 31; a++) {
 		// Top
 		glColor4f(1.0f, 1.0f, 1.0f, atop);
-		glTexCoord2f(tc_x+tc_w, tc_y1);	glVertex3f(cam_position.x + (sky_circle[a+1].x * size), cam_position.y - (sky_circle[a+1].y * size), cam_position.z + (top * size));
+		glTexCoord2f(tc_x+tx, tc_y1);	glVertex3f(cam_position.x + (sky_circle[a+1].x * size), cam_position.y - (sky_circle[a+1].y * size), cam_position.z + (top * size));
 		glTexCoord2f(tc_x, tc_y1);		glVertex3f(cam_position.x + (sky_circle[a].x * size), cam_position.y - (sky_circle[a].y * size), cam_position.z + (top * size));
 
 		// Bottom
 		glColor4f(1.0f, 1.0f, 1.0f, abottom);
 		glTexCoord2f(tc_x, tc_y2);		glVertex3f(cam_position.x + (sky_circle[a].x * size), cam_position.y - (sky_circle[a].y * size), cam_position.z + (bottom * size));
-		glTexCoord2f(tc_x+tc_w, tc_y2);	glVertex3f(cam_position.x + (sky_circle[a+1].x * size), cam_position.y - (sky_circle[a+1].y * size), cam_position.z + (bottom * size));
+		glTexCoord2f(tc_x+tx, tc_y2);	glVertex3f(cam_position.x + (sky_circle[a+1].x * size), cam_position.y - (sky_circle[a+1].y * size), cam_position.z + (bottom * size));
 
-		tc_x += tc_w;
+		tc_x += tx;
 	}
 
 	// Link last point -> first
 	// Top
 	glColor4f(1.0f, 1.0f, 1.0f, atop);
-	glTexCoord2f(tc_x+tc_w, tc_y1);	glVertex3f(cam_position.x + (sky_circle[0].x * size), cam_position.y - (sky_circle[0].y * size), cam_position.z + (top * size));
+	glTexCoord2f(tc_x+tx, tc_y1);	glVertex3f(cam_position.x + (sky_circle[0].x * size), cam_position.y - (sky_circle[0].y * size), cam_position.z + (top * size));
 	glTexCoord2f(tc_x, tc_y1);		glVertex3f(cam_position.x + (sky_circle[31].x * size), cam_position.y - (sky_circle[31].y * size), cam_position.z + (top * size));
 
 	// Bottom
 	glColor4f(1.0f, 1.0f, 1.0f, abottom);
 	glTexCoord2f(tc_x, tc_y2);		glVertex3f(cam_position.x + (sky_circle[31].x * size), cam_position.y - (sky_circle[31].y * size), cam_position.z + (bottom * size));
-	glTexCoord2f(tc_x+tc_w, tc_y2);	glVertex3f(cam_position.x + (sky_circle[0].x * size), cam_position.y - (sky_circle[0].y * size), cam_position.z + (bottom * size));
+	glTexCoord2f(tc_x+tx, tc_y2);	glVertex3f(cam_position.x + (sky_circle[0].x * size), cam_position.y - (sky_circle[0].y * size), cam_position.z + (bottom * size));
 
 	glEnd();
 }
@@ -471,10 +470,18 @@ void MapRenderer3D::renderSky() {
 		// Render skybox sides
 		glDisable(GL_ALPHA_TEST);
 		glEnable(GL_TEXTURE_2D);
+
+		// Check for odd sky sizes
+		float tx = 0.125f;
+		float ty = 2.0f;
+		if (sky->getWidth() > 256)
+			tx = 0.125f / ((float)sky->getWidth() / 256.0f);
+		if (sky->getHeight() > 128)
+			ty = 1.0f;
 		
-		renderSkySlice(1.0f, 0.5f, 0.0f, 1.0f, size);	// Top
-		renderSkySlice(0.5f, -0.5f, 1.0f, 1.0f, size);	// Middle
-		renderSkySlice(-0.5f, -1.0f, 1.0f, 0.0f, size);	// Bottom
+		renderSkySlice(1.0f, 0.5f, 0.0f, 1.0f, size, tx, ty);	// Top
+		renderSkySlice(0.5f, -0.5f, 1.0f, 1.0f, size, tx, ty);	// Middle
+		renderSkySlice(-0.5f, -1.0f, 1.0f, 0.0f, size, tx, ty);	// Bottom
 	}
 
 	glPopMatrix();
@@ -1289,6 +1296,7 @@ void MapRenderer3D::renderThings() {
 	double mdist = render_max_thing_dist;
 	if (mdist <= 0 || mdist > render_max_dist) mdist = render_max_dist;
 	rgba_t col;
+	uint8_t light;
 	float x1, y1, x2, y2;
 	for (unsigned a = 0; a < map->nThings(); a++) {
 		MapThing* thing = map->getThing(a);
@@ -1325,15 +1333,24 @@ void MapRenderer3D::renderThings() {
 		x2 = thing->xPos() + cam_strafe.x * halfwidth;
 		y2 = thing->yPos() + cam_strafe.y * halfwidth;
 
-		// Set colour/brightness from sector
-		if (things[a].type->isFullbright()) {
+		// Set colour/brightness
+		light = 255;
+		if (things[a].type->isFullbright())
 			col.set(255, 255, 255, 255);
-			setLight(col, 255, calcDistFade(dist, mdist));
+		else {
+			// Get light level from sector
+			if (things[a].sector)
+				light = things[a].sector->intProperty("lightlevel");
+			
+			// Icon, use thing icon colour
+			if (things[a].flags & ICON)
+				col.set(things[a].type->getColour());
+
+			// Otherwise use sector colour
+			else if (things[a].sector)
+				col.set(map->getSectorColour(things[a].sector, 0, true));
 		}
-		else if (things[a].sector) {
-			col = map->getSectorColour(things[a].sector, 0, true);
-			setLight(col, things[a].sector->intProperty("lightlevel"), calcDistFade(dist, mdist));
-		}
+		setLight(col, light, calcDistFade(dist, mdist));
 
 		// Draw thing
 		glBegin(GL_QUADS);
