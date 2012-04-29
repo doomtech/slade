@@ -22,7 +22,10 @@ MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	this->vbo_ceilings = 0;
 	this->vbo_floors = 0;
 	this->vbo_walls = 0;
-	this->skytex = "SKY1";
+	this->skytex1 = "SKY1";
+
+	// Build skybox circle
+	buildSkyCircle();
 
 	// Init other
 	init();
@@ -61,6 +64,121 @@ void MapRenderer3D::refresh() {
 		glDeleteBuffers(1, &vbo_ceilings);
 		vbo_floors = vbo_ceilings = 0;
 	}
+
+	// Set sky texture
+	gc_mapinfo_t minf = theGameConfiguration->mapInfo(map->mapName());
+	skytex1 = minf.sky1;
+	skytex2 = minf.sky2;
+	skycol_top.a = 0;
+	//wxLogMessage("sky1: %s, sky2: %s", CHR(skytex1), CHR(skytex2));
+}
+
+void MapRenderer3D::buildSkyCircle() {
+	double rot = 0;
+	for (unsigned a = 0; a < 32; a++) {
+		sky_circle[a].set(sin(rot), -cos(rot));
+		rot -= (3.1415926535897932384626433832795 * 2) / 32.0;
+	}
+
+	/*
+	// Generate circular coordinates (as quads)
+	double rot = 0;
+	double srot, crot;
+	float tc_x = 0.0f;
+	float fade_size = 0.8f;
+	float half_fade_size = fade_size * 0.5f;
+	for (int a = 0; a < 32; a++) {
+		srot = sin(rot);
+		crot = cos(rot);
+		int c = a*4;
+
+		// Left of quad
+		sky_circle_top[c].x = srot;
+		sky_circle_top[c].y = crot;
+		sky_circle_top[c].tx = tc_x;
+		sky_circle_mid[c].x = srot;
+		sky_circle_mid[c].y = crot;
+		sky_circle_mid[c].tx = tc_x;
+		sky_circle_bottom[c].x = srot;
+		sky_circle_bottom[c].y = crot;
+		sky_circle_bottom[c].tx = tc_x;
+		sky_circle_top[c+1].x = srot;
+		sky_circle_top[c+1].y = crot;
+		sky_circle_top[c+1].tx = tc_x;
+		sky_circle_mid[c+1].x = srot;
+		sky_circle_mid[c+1].y = crot;
+		sky_circle_mid[c+1].tx = tc_x;
+		sky_circle_bottom[c+1].x = srot;
+		sky_circle_bottom[c+1].y = crot;
+		sky_circle_bottom[c+1].tx = tc_x;
+
+		// Rotate to next point on circle
+		rot -= (3.1415926535897932384626433832795 * 2) / 32.0;
+		srot = sin(rot);
+		crot = cos(rot);
+		tc_x += 0.125f;
+
+		// Right of quad
+		sky_circle_top[c+2].x = srot;
+		sky_circle_top[c+2].y = crot;
+		sky_circle_top[c+2].tx = tc_x;
+		sky_circle_mid[c+2].x = srot;
+		sky_circle_mid[c+2].y = crot;
+		sky_circle_mid[c+2].tx = tc_x;
+		sky_circle_bottom[c+2].x = srot;
+		sky_circle_bottom[c+2].y = crot;
+		sky_circle_bottom[c+2].tx = tc_x;
+		sky_circle_top[c+3].x = srot;
+		sky_circle_top[c+3].y = crot;
+		sky_circle_top[c+3].tx = tc_x;
+		sky_circle_mid[c+3].x = srot;
+		sky_circle_mid[c+3].y = crot;
+		sky_circle_mid[c+3].tx = tc_x;
+		sky_circle_bottom[c+3].x = srot;
+		sky_circle_bottom[c+3].y = crot;
+		sky_circle_bottom[c+3].tx = tc_x;
+
+		// Top of quad
+		sky_circle_top[c].z = 1.0f;
+		sky_circle_top[c].alpha = 0.0f;
+		sky_circle_top[c].ty = 0.0f;
+		sky_circle_top[c+3].z = 1.0f;
+		sky_circle_top[c+3].alpha = 0.0f;
+		sky_circle_top[c+3].ty = 0.0f;
+		sky_circle_mid[c].z = 1.0f-fade_size;
+		sky_circle_mid[c].alpha = 1.0f;
+		sky_circle_mid[c].ty = fade_size;
+		sky_circle_mid[c+3].z = 1.0f-fade_size;
+		sky_circle_mid[c+3].alpha = 1.0f;
+		sky_circle_mid[c+3].ty = fade_size;
+		sky_circle_bottom[c].z = -1.0f+fade_size;
+		sky_circle_bottom[c].alpha = 1.0f;
+		sky_circle_bottom[c].ty = 2.0f-fade_size;
+		sky_circle_bottom[c+3].z = -1.0f+fade_size;
+		sky_circle_bottom[c+3].alpha = 1.0f;
+		sky_circle_bottom[c+3].ty = 2.0f-fade_size;
+
+		// Bottom of quad
+		sky_circle_top[c+1].z = 0.0f;//1.0f-fade_size;
+		sky_circle_top[c+1].alpha = 1.0f;
+		sky_circle_top[c+1].ty = fade_size;
+		sky_circle_top[c+2].z = 0.0f;//1.0f-fade_size;
+		sky_circle_top[c+2].alpha = 1.0f;
+		sky_circle_top[c+2].ty = fade_size;
+		sky_circle_mid[c+1].z = -1.0f+fade_size;
+		sky_circle_mid[c+1].alpha = 1.0f;
+		sky_circle_mid[c+1].ty = 2.0f-fade_size;
+		sky_circle_mid[c+2].z = -1.0f+fade_size;
+		sky_circle_mid[c+2].alpha = 1.0f;
+		sky_circle_mid[c+2].ty = 2.0f-fade_size;
+		sky_circle_bottom[c+1].z = -1.0f;
+		sky_circle_bottom[c+1].alpha = 0.0f;
+		sky_circle_bottom[c+1].ty = 2.0f;
+		sky_circle_bottom[c+2].z = -1.0f;
+		sky_circle_bottom[c+2].alpha = 0.0f;
+		sky_circle_bottom[c+2].ty = 2.0f;
+	}
+	*/
 }
 
 void MapRenderer3D::cameraMove(double distance) {
@@ -208,7 +326,7 @@ void MapRenderer3D::renderMap() {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_ALPHA_TEST);
 	glDepthMask(GL_TRUE);
-	glAlphaFunc(GL_GREATER, 0.2f);
+	glAlphaFunc(GL_GREATER, 0.8f);
 
 	// Setup fog
 	GLfloat fogColor[4]= {0.0f, 0.0f, 0.0f, 0.6f};
@@ -264,51 +382,106 @@ void MapRenderer3D::renderMap() {
 	glDisable(GL_FOG);
 }
 
+void MapRenderer3D::renderSkySlice(float top, float bottom, float atop, float abottom, float size) {
+	float tc_x = 0.0f;
+	float tc_w = 0.125f;
+	float tc_y1 = -top + 1.0f;
+	float tc_y2 = -bottom + 1.0f;
+
+	glBegin(GL_QUADS);
+
+	// Go through circular points
+	for (unsigned a = 0; a < 31; a++) {
+		// Top
+		glColor4f(1.0f, 1.0f, 1.0f, atop);
+		glTexCoord2f(tc_x+tc_w, tc_y1);	glVertex3f(cam_position.x + (sky_circle[a+1].x * size), cam_position.y - (sky_circle[a+1].y * size), cam_position.z + (top * size));
+		glTexCoord2f(tc_x, tc_y1);		glVertex3f(cam_position.x + (sky_circle[a].x * size), cam_position.y - (sky_circle[a].y * size), cam_position.z + (top * size));
+
+		// Bottom
+		glColor4f(1.0f, 1.0f, 1.0f, abottom);
+		glTexCoord2f(tc_x, tc_y2);		glVertex3f(cam_position.x + (sky_circle[a].x * size), cam_position.y - (sky_circle[a].y * size), cam_position.z + (bottom * size));
+		glTexCoord2f(tc_x+tc_w, tc_y2);	glVertex3f(cam_position.x + (sky_circle[a+1].x * size), cam_position.y - (sky_circle[a+1].y * size), cam_position.z + (bottom * size));
+
+		tc_x += tc_w;
+	}
+
+	// Link last point -> first
+	// Top
+	glColor4f(1.0f, 1.0f, 1.0f, atop);
+	glTexCoord2f(tc_x+tc_w, tc_y1);	glVertex3f(cam_position.x + (sky_circle[0].x * size), cam_position.y - (sky_circle[0].y * size), cam_position.z + (top * size));
+	glTexCoord2f(tc_x, tc_y1);		glVertex3f(cam_position.x + (sky_circle[31].x * size), cam_position.y - (sky_circle[31].y * size), cam_position.z + (top * size));
+
+	// Bottom
+	glColor4f(1.0f, 1.0f, 1.0f, abottom);
+	glTexCoord2f(tc_x, tc_y2);		glVertex3f(cam_position.x + (sky_circle[31].x * size), cam_position.y - (sky_circle[31].y * size), cam_position.z + (bottom * size));
+	glTexCoord2f(tc_x+tc_w, tc_y2);	glVertex3f(cam_position.x + (sky_circle[0].x * size), cam_position.y - (sky_circle[0].y * size), cam_position.z + (bottom * size));
+
+	glEnd();
+}
+
 void MapRenderer3D::renderSky() {
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	COL_WHITE.set_gl();
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_FOG);
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
 	glEnable(GL_TEXTURE_2D);
+	GLTexture* sky = NULL;
+
+	// Center skybox a bit below the camera view
+	glPushMatrix();
+	glTranslatef(0.0f, 0.0f, -10.0f);
 
 	// Get sky texture
-	GLTexture* sky = theMapEditor->textureManager().getTexture(skytex);
+	if (!skytex2.IsEmpty())
+		sky = theMapEditor->textureManager().getTexture(skytex2);
+	else
+		sky = theMapEditor->textureManager().getTexture(skytex1);
 	if (sky) {
+		// Bind texture
 		sky->bind();
 
+		// Get average colour if needed
+		if (skycol_top.a == 0) {
+			int theight = sky->getHeight() * 0.4;
+			skycol_top = sky->averageColour(rect_t(0, 0, sky->getWidth(), theight));
+			skycol_bottom = sky->averageColour(rect_t(0, sky->getHeight() - theight, sky->getWidth(), sky->getHeight()));
+		}
+
+		// Render top cap
+		float size = 64.0f;
+		glDisable(GL_TEXTURE_2D);
+		skycol_top.set_gl(false);
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y - 64.0f, cam_position.z + 64.0f);
-		glTexCoord2f(1.0f, 0.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y - 64.0f, cam_position.z + 64.0f);
-		glTexCoord2f(1.0f, 2.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y - 64.0f, cam_position.z - 64.0f);
-		glTexCoord2f(0.0f, 2.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y - 64.0f, cam_position.z - 64.0f);
+		glVertex3f(cam_position.x-(size*10), cam_position.y-(size*10), cam_position.z+size);
+		glVertex3f(cam_position.x-(size*10), cam_position.y+(size*10), cam_position.z+size);
+		glVertex3f(cam_position.x+(size*10), cam_position.y+(size*10), cam_position.z+size);
+		glVertex3f(cam_position.x+(size*10), cam_position.y-(size*10), cam_position.z+size);
 		glEnd();
 
+		// Render bottom cap
+		skycol_bottom.set_gl(false);
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y + 64.0f, cam_position.z + 64.0f);
-		glTexCoord2f(1.0f, 0.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y + 64.0f, cam_position.z + 64.0f);
-		glTexCoord2f(1.0f, 2.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y + 64.0f, cam_position.z - 64.0f);
-		glTexCoord2f(0.0f, 2.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y + 64.0f, cam_position.z - 64.0f);
+		glVertex3f(cam_position.x-(size*10), cam_position.y-(size*10), cam_position.z-size);
+		glVertex3f(cam_position.x-(size*10), cam_position.y+(size*10), cam_position.z-size);
+		glVertex3f(cam_position.x+(size*10), cam_position.y+(size*10), cam_position.z-size);
+		glVertex3f(cam_position.x+(size*10), cam_position.y-(size*10), cam_position.z-size);
 		glEnd();
 
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y - 64.0f, cam_position.z + 64.0f);
-		glTexCoord2f(1.0f, 0.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y + 64.0f, cam_position.z + 64.0f);
-		glTexCoord2f(1.0f, 2.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y + 64.0f, cam_position.z - 64.0f);
-		glTexCoord2f(0.0f, 2.0f);	glVertex3f(cam_position.x + 64.0f, cam_position.y - 64.0f, cam_position.z - 64.0f);
-		glEnd();
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y + 64.0f, cam_position.z + 64.0f);
-		glTexCoord2f(1.0f, 0.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y - 64.0f, cam_position.z + 64.0f);
-		glTexCoord2f(1.0f, 2.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y - 64.0f, cam_position.z - 64.0f);
-		glTexCoord2f(0.0f, 2.0f);	glVertex3f(cam_position.x - 64.0f, cam_position.y + 64.0f, cam_position.z - 64.0f);
-		glEnd();
+		// Render skybox sides
+		glDisable(GL_ALPHA_TEST);
+		glEnable(GL_TEXTURE_2D);
+		
+		renderSkySlice(1.0f, 0.5f, 0.0f, 1.0f, size);	// Top
+		renderSkySlice(0.5f, -0.5f, 1.0f, 1.0f, size);	// Middle
+		renderSkySlice(-0.5f, -1.0f, 1.0f, 0.0f, size);	// Bottom
 	}
 
+	glPopMatrix();
 	glDepthMask(GL_TRUE);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_ALPHA_TEST);
 }
 
 void MapRenderer3D::updateSectorVBO(unsigned index) {
@@ -401,6 +574,7 @@ void MapRenderer3D::renderFlats() {
 	glCullFace(GL_FRONT);
 	rgba_t col;
 	uint8_t alpha = 255;
+	string skyflat = theGameConfiguration->skyFlat();
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		MapSector* sector = map->getSector(a);
 
@@ -415,7 +589,7 @@ void MapRenderer3D::renderFlats() {
 		}
 
 		// Check for sky
-		if (sector->floorTexture() == "F_SKY1")
+		if (sector->floorTexture() == skyflat)
 			alpha = 0;
 		else
 			alpha = 255;
@@ -454,7 +628,7 @@ void MapRenderer3D::renderFlats() {
 			continue;
 
 		// Check for sky
-		if (sector->ceilingTexture() == "F_SKY1")
+		if (sector->ceilingTexture() == skyflat)
 			alpha = 0;
 		else
 			alpha = 255;
@@ -515,6 +689,7 @@ void MapRenderer3D::renderFlatsVBO() {
 	// Render floors
 	glCullFace(GL_FRONT);
 	uint8_t alpha = 255;
+	string skyflat = theGameConfiguration->skyFlat();
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		MapSector* sector = map->getSector(a);
 
@@ -533,7 +708,7 @@ void MapRenderer3D::renderFlatsVBO() {
 			updateSectorVBO(a);
 
 		// Check for sky
-		if (sector->floorTexture() == "F_SKY1")
+		if (sector->floorTexture() == skyflat)
 			alpha = 0;
 		else
 			alpha = 255;
@@ -571,7 +746,7 @@ void MapRenderer3D::renderFlatsVBO() {
 			continue;
 
 		// Check for sky
-		if (sector->ceilingTexture() == "F_SKY1")
+		if (sector->ceilingTexture() == skyflat)
 			alpha = 0;
 		else
 			alpha = 255;
@@ -725,16 +900,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 	int yoff2 = line->s2()->intProperty("offsety");
 	int lowceil = min(ceiling1, ceiling2);
 	int highfloor = max(floor1, floor2);
-
-	// Check for sky ceiling/floor on both sides
-	/*
-	bool skyfloor = false;
-	bool skyceil = false;
-	if (line->frontSector()->floorTexture() == "F_SKY1" && line->backSector()->floorTexture() == "F_SKY1")
-		skyfloor = true;
-	if (line->frontSector()->ceilingTexture() == "F_SKY1" && line->backSector()->ceilingTexture() == "F_SKY1")
-		skyceil = true;
-		*/
+	string sky_flat = theGameConfiguration->skyFlat();
 
 	// Front lower
 	if (floor2 > floor1) {
@@ -768,7 +934,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.light = light1;
 		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturebottom"));
 		setupQuadTexCoords(&quad, length, xoff, yoff, false, sx, sy);
-		if (line->backSector()->floorTexture() == "F_SKY1") quad.flags |= SKY;
+		if (line->backSector()->floorTexture() == sky_flat) quad.flags |= SKY;
 
 		// Add quad
 		lines[index].quads.push_back(quad);
@@ -849,7 +1015,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.light = light1;
 		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturetop"));
 		setupQuadTexCoords(&quad, length, xoff, yoff, !upeg, sx, sy);
-		if (line->backSector()->ceilingTexture() == "F_SKY1") quad.flags |= SKY;
+		if (line->backSector()->ceilingTexture() == sky_flat) quad.flags |= SKY;
 
 		// Add quad
 		lines[index].quads.push_back(quad);
@@ -887,7 +1053,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.light = light2;
 		quad.texture = theMapEditor->textureManager().getTexture(line->s2()->stringProperty("texturebottom"));
 		setupQuadTexCoords(&quad, length, xoff, yoff, false, sx, sy);
-		if (line->frontSector()->floorTexture() == "F_SKY1") quad.flags |= SKY;
+		if (line->frontSector()->floorTexture() == sky_flat) quad.flags |= SKY;
 
 		// Add quad
 		lines[index].quads.push_back(quad);
@@ -968,7 +1134,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.light = light2;
 		quad.texture = theMapEditor->textureManager().getTexture(line->s2()->stringProperty("texturetop"));
 		setupQuadTexCoords(&quad, length, xoff, yoff, !upeg, sx, sy);
-		if (line->frontSector()->ceilingTexture() == "F_SKY1") quad.flags |= SKY;
+		if (line->frontSector()->ceilingTexture() == sky_flat) quad.flags |= SKY;
 
 		// Add quad
 		lines[index].quads.push_back(quad);

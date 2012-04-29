@@ -273,6 +273,9 @@ bool SLADEMap::readMap(Archive::mapdesc_t map) {
 	if (tempwad)
 		delete tempwad;
 
+	// Set map name
+	name = map.name;
+
 	return ok;
 }
 

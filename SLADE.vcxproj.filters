@@ -148,6 +148,9 @@
     <Filter Include="Map Editor\GameConfiguration\Configurations\Defaults">
       <UniqueIdentifier>{df9a03e9-4e78-4c2b-82c5-23cb25885488}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Map Editor\GameConfiguration\Configurations\Maps">
+      <UniqueIdentifier>{2ab62fca-ce61-4260-8a0b-98bf2d9784c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -1753,6 +1756,18 @@
     </None>
     <None Include="dist\res\config\games\include\defaults\strife_defaults.cfg">
       <Filter>Map Editor\GameConfiguration\Configurations\Defaults</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\maps\doom1_maps.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Maps</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\maps\doom2_maps.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Maps</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\maps\heretic_maps.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Maps</Filter>
+    </None>
+    <None Include="dist\res\config\games\doom2_prboom+.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

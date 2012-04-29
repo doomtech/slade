@@ -536,6 +536,55 @@ bool GLTexture::draw2dTiled(uint32_t width, uint32_t height) {
 	return true;
 }
 
+/* GLTexture::averageColour
+ * Returns the average colour of the texture
+ *******************************************************************/
+rgba_t GLTexture::averageColour(rect_t area) {
+	// Check texture is loaded
+	if (!loaded)
+		return COL_BLACK;
+
+	// Empty area rect means full texture
+	if (area.tl.x == area.br.x && area.tl.y == area.br.y)
+		area.set(0, 0, width, height);
+
+	// Clamp area to texture
+	if (area.tl.x < 0)		area.tl.x = 0;
+	if (area.tl.y < 0)		area.tl.y = 0;
+	if (area.br.x > width)	area.br.x = width;
+	if (area.br.y > height)	area.br.y = height;
+
+	// Get texture pixels
+	uint8_t* pixels = new uint8_t[width*height*4];
+	glBindTexture(GL_TEXTURE_2D, tex[0].id);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+	// Add colour values
+	unsigned red = 0;
+	unsigned green = 0;
+	unsigned blue = 0;
+	unsigned npix = 0;
+	// Go through area
+	for (unsigned y = area.tl.y; y < area.br.y; y++) {
+		for (unsigned x = area.tl.x; x < area.br.x; x++) {
+			// Add pixel
+			unsigned c = (y * width * 4) + (x * 4);
+			red += pixels[c++];
+			green += pixels[c++];
+			blue += pixels[c++];
+
+			npix++;
+		}
+	}
+
+	// Clean up
+	delete[] pixels;
+
+	// Return average colour
+	wxLogMessage("r %d g %d b %d - npix %d", red, green, blue, npix);
+	return rgba_t(red/npix, green/npix, blue/npix, 255);
+}
+
 
 /*******************************************************************
  * GLTEXTURE STATIC FUNCTIONS

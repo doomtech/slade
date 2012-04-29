@@ -58,6 +58,8 @@ void GameConfiguration::setDefaults() {
 	defaults_side.clear();
 	defaults_sector.clear();
 	defaults_thing.clear();
+	maps.clear();
+	sky_flat = "F_SKY1";
 }
 
 string GameConfiguration::readConfigName(MemChunk& mc) {
@@ -146,6 +148,26 @@ void GameConfiguration::init() {
 	// Sort game configurations list by title
 	std::sort(game_configs.begin(), game_configs.end());
 	lastDefaultConfig = game_configs.size();
+}
+
+string GameConfiguration::mapName(unsigned index) {
+	// Check index
+	if (index > maps.size())
+		return "";
+
+	return maps[index].mapname;
+}
+
+gc_mapinfo_t GameConfiguration::mapInfo(string name) {
+	for (unsigned a = 0; a < maps.size(); a++) {
+		if (maps[a].mapname == name)
+			return maps[a];
+	}
+
+	if (maps.size() > 0)
+		return maps[0];
+	else
+		return gc_mapinfo_t();
 }
 
 string GameConfiguration::configTitle(unsigned index) {
@@ -428,7 +450,6 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	name = "Invalid Configuration";
 	action_specials.clear();
 	thing_types.clear();
-	map_names.clear();
 	flags_thing.clear();
 	flags_line.clear();
 	udmf_vertex_props.clear();
@@ -458,10 +479,12 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 			this->name = node->getStringValue();
 
 		// Valid map names
+		/*
 		else if (S_CMPNOCASE(node->getName(), "map_names")) {
 			for (unsigned n = 0; n < node->nValues(); n++)
 				map_names.push_back(node->getStringValue(n));
 		}
+		*/
 
 		// Allow any map name
 		else if (S_CMPNOCASE(node->getName(), "map_name_any"))
@@ -502,6 +525,10 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 		// TX_/'textures' namespace enabled
 		else if (S_CMPNOCASE(node->getName(), "tx_textures"))
 			tx_textures = node->getBoolValue();
+
+		// Sky flat
+		else if (S_CMPNOCASE(node->getName(), "sky_flat"))
+			sky_flat = node->getStringValue();
 	}
 
 	// Go through all other config sections
@@ -696,6 +723,37 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 
 				else
 					wxLogMessage("Unknown defaults block \"%s\"", CHR(block->getName()));
+			}
+		}
+
+		// Maps section
+		else if (S_CMPNOCASE(node->getName(), "maps")) {
+			// Go through map blocks
+			for (unsigned b = 0; b < node->nChildren(); b++) {
+				ParseTreeNode* block = (ParseTreeNode*)node->getChild(b);
+
+				// Map definition
+				if (S_CMPNOCASE(block->getType(), "map")) {
+					gc_mapinfo_t map;
+					map.mapname = block->getName();
+
+					// Go through map properties
+					for (unsigned c = 0; c < block->nChildren(); c++) {
+						ParseTreeNode* prop = (ParseTreeNode*)block->getChild(c);
+
+						// Sky texture
+						if (S_CMPNOCASE(prop->getName(), "sky")) {
+							// Primary sky texture
+							map.sky1 = prop->getStringValue();
+
+							// Secondary sky texture
+							if (prop->nValues() > 1)
+								map.sky2 = prop->getStringValue(1);
+						}
+					}
+
+					maps.push_back(map);
+				}
 			}
 		}
 
@@ -1435,8 +1493,8 @@ void GameConfiguration::dumpThingTypes() {
 
 void GameConfiguration::dumpValidMapNames() {
 	wxLogMessage("Valid Map Names:");
-	for (unsigned a = 0; a < map_names.size(); a++)
-		wxLogMessage(map_names[a]);
+	for (unsigned a = 0; a < maps.size(); a++)
+		wxLogMessage(maps[a].mapname);
 }
 
 void GameConfiguration::dumpUDMFProperties() {

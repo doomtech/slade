@@ -32,6 +32,7 @@ private:
 	string				udmf_namespace;
 	PropertyList		udmf_props;
 	bool				position_frac;
+	string				name;
 
 	// The last time the map geometry was updated
 	long	geometry_updated;
@@ -104,6 +105,7 @@ public:
 		SECTORS
 	};
 
+	string		mapName() { return name; }
 	MapVertex*	getVertex(unsigned index);
 	MapSide*	getSide(unsigned index);
 	MapLine*	getLine(unsigned index);

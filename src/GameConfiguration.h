@@ -47,6 +47,12 @@ struct udmfp_t {
 	bool operator> (const udmfp_t& right) const { return (index > right.index); }
 };
 
+struct gc_mapinfo_t {
+	string	mapname;
+	string	sky1;
+	string	sky2;
+};
+
 WX_DECLARE_HASH_MAP(int, as_t, wxIntegerHash, wxIntegerEqual, ASpecialMap);
 WX_DECLARE_HASH_MAP(int, tt_t, wxIntegerHash, wxIntegerEqual, ThingTypeMap);
 WX_DECLARE_STRING_HASH_MAP(udmfp_t, UDMFPropMap);
@@ -67,10 +73,10 @@ private:
 	ActionSpecial	as_unknown;
 	ThingTypeMap	thing_types;
 	ThingType		ttype_unknown;
-	vector<string>	map_names;
 	bool			any_map_name;
 	bool			mix_tex_flats;
 	bool			tx_textures;
+	string			sky_flat;
 
 	struct gconf_t {
 		string	title;
@@ -100,6 +106,9 @@ private:
 		sectype_t(int type, string name) { this->type = type; this->name = name; }
 	};
 	vector<sectype_t>	sector_types;
+
+	// Map info
+	vector<gc_mapinfo_t>	maps;
 
 	// UDMF properties
 	UDMFPropMap	udmf_vertex_props;
@@ -137,14 +146,16 @@ public:
 	bool	mixTexFlats() { return mix_tex_flats; }
 	bool	txTextures() { return tx_textures; }
 	string	udmfNamespace() { return udmf_namespace; }
+	string	skyFlat() { return sky_flat; }
 
 	string			readConfigName(MemChunk& mc);
 	void			init();
 	unsigned		nConfigs() { return game_configs.size(); }
 	string			configTitle(unsigned index);
 	string			configName(unsigned index);
-	unsigned		nMapNames() { return map_names.size(); }
-	string			mapName(unsigned index) { return map_names[index]; }
+	unsigned		nMapNames() { return maps.size(); }
+	string			mapName(unsigned index);
+	gc_mapinfo_t	mapInfo(string mapname);
 
 	// Config #include handling
 	void	buildConfig(string filename, string& out);

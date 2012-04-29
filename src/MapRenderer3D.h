@@ -13,7 +13,6 @@ private:
 	bool		udmf_zdoom;
 	bool		fullbright;
 	bool		fog;
-	string		skytex;
 
 	// Visibility
 	vector<double>	dist_sectors;
@@ -87,6 +86,18 @@ private:
 	GLuint	vbo_ceilings;
 	GLuint	vbo_walls;
 
+	// Sky
+	struct gl_vertex_ex_t {
+		float x, y, z;
+		float tx, ty;
+		float alpha;
+	};
+	string		skytex1;
+	string		skytex2;
+	rgba_t		skycol_top;
+	rgba_t		skycol_bottom;
+	fpoint2_t	sky_circle[32];
+
 public:
 	MapRenderer3D(SLADEMap* map = NULL);
 	~MapRenderer3D();
@@ -98,6 +109,7 @@ public:
 
 	bool	init();
 	void	refresh();
+	void	buildSkyCircle();
 
 	// Camera
 	void	cameraMove(double distance);
@@ -113,6 +125,7 @@ public:
 	void	setupView(int width, int height);
 	void	setLight(rgba_t& colour, uint8_t light, float alpha = 1.0f);
 	void	renderMap();
+	void	renderSkySlice(float top, float bottom, float atop, float abottom, float size);
 	void	renderSky();
 
 	// Flats
