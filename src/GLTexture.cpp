@@ -581,7 +581,6 @@ rgba_t GLTexture::averageColour(rect_t area) {
 	delete[] pixels;
 
 	// Return average colour
-	wxLogMessage("r %d g %d b %d - npix %d", red, green, blue, npix);
 	return rgba_t(red/npix, green/npix, blue/npix, 255);
 }
 

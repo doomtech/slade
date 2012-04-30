@@ -13,6 +13,7 @@ private:
 	bool		udmf_zdoom;
 	bool		fullbright;
 	bool		fog;
+	int			last_light;
 
 	// Visibility
 	vector<double>	dist_sectors;
@@ -38,6 +39,7 @@ private:
 		// Quad flags
 		TRANS		= 0x02,
 		SKY			= 0x04,
+		MIDTEX		= 0x08,
 	};
 	struct gl_vertex_t {
 		float x, y, z;
@@ -49,6 +51,7 @@ private:
 		uint8_t		light;
 		GLTexture*	texture;
 		uint8_t		flags;
+		float		alpha;
 
 		quad_3d_t() {
 			colour.set(255, 255, 255, 255, 0);
@@ -59,8 +62,9 @@ private:
 	struct line_3d_t {
 		uint8_t				flags;
 		vector<quad_3d_t>	quads;
+		long				updated_time;
 
-		line_3d_t() { flags = 0; }
+		line_3d_t() { flags = 0; updated_time = 0; }
 	};
 	struct thing_3d_t {
 		uint8_t		flags;
@@ -68,18 +72,21 @@ private:
 		MapSector*	sector;
 		float		z;
 		GLTexture*	sprite;
+		long		updated_time;
 
 		thing_3d_t() {
 			flags = 0;
 			type = NULL;
 			sector = NULL;
 			z = 0;
+			updated_time = 0;
 		}
 	};
 
 	// Map Structures
 	vector<line_3d_t>	lines;
 	vector<thing_3d_t>	things;
+	quad_3d_t**			quads;
 
 	// VBOs
 	GLuint	vbo_floors;

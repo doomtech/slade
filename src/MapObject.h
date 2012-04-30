@@ -25,6 +25,7 @@ protected:
 	SLADEMap*		parent_map;
 	PropertyList	properties;
 	bool			filtered;
+	long			modified_time;
 
 public:
 	MapObject(int type = MOBJ_UNKNOWN, SLADEMap* parent = NULL);
@@ -34,6 +35,7 @@ public:
 	unsigned	getIndex();
 	SLADEMap*	getParentMap() { return parent_map; }
 	bool		isFiltered() { return filtered; }
+	long		modifiedTime() { return modified_time; }
 
 	PropertyList&	props()				{ return properties; }
 	Property&		prop(string key)	{ return properties[key]; }
@@ -44,10 +46,10 @@ public:
 	virtual int		intProperty(string key);
 	virtual double	floatProperty(string key);
 	virtual string	stringProperty(string key);
-	virtual void	setBoolProperty(string key, bool value) { properties[key] = value; }
-	virtual void	setIntProperty(string key, int value) { properties[key] = value; }
-	virtual void	setFloatProperty(string key, double value) { properties[key] = value; }
-	virtual void	setStringProperty(string key, string value) { properties[key] = value; }
+	virtual void	setBoolProperty(string key, bool value);
+	virtual void	setIntProperty(string key, int value);
+	virtual void	setFloatProperty(string key, double value);
+	virtual void	setStringProperty(string key, string value);
 
 	virtual fpoint2_t	midPoint() { return fpoint2_t(0,0); }
 	virtual fpoint2_t	textPoint() { return fpoint2_t(0,0); }

@@ -13,6 +13,9 @@ CVAR(Bool, render_fog_quality, true, CVAR_SAVE)
 CVAR(Bool, render_max_dist_adaptive, true, CVAR_SAVE)
 CVAR(Int, render_adaptive_ms, 15, CVAR_SAVE)
 
+// test
+CVAR(Bool, render_sort, true, CVAR_SAVE)
+
 MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	// Init variables
 	this->map = map;
@@ -23,6 +26,8 @@ MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	this->vbo_floors = 0;
 	this->vbo_walls = 0;
 	this->skytex1 = "SKY1";
+	this->quads = NULL;
+	this->last_light = 255;
 
 	// Build skybox circle
 	buildSkyCircle();
@@ -32,6 +37,8 @@ MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 }
 
 MapRenderer3D::~MapRenderer3D() {
+	if (quads)
+		delete quads;
 }
 
 bool MapRenderer3D::init() {
@@ -53,10 +60,12 @@ bool MapRenderer3D::init() {
 
 void MapRenderer3D::refresh() {
 	// Clear any existing map data
-	lines.clear();
-	things.clear();
 	dist_lines.clear();
 	dist_sectors.clear();
+	if (quads) {
+		delete quads;
+		quads = NULL;
+	}
 
 	// Clear VBOs
 	if (vbo_floors != 0) {
@@ -79,106 +88,6 @@ void MapRenderer3D::buildSkyCircle() {
 		sky_circle[a].set(sin(rot), -cos(rot));
 		rot -= (3.1415926535897932384626433832795 * 2) / 32.0;
 	}
-
-	/*
-	// Generate circular coordinates (as quads)
-	double rot = 0;
-	double srot, crot;
-	float tc_x = 0.0f;
-	float fade_size = 0.8f;
-	float half_fade_size = fade_size * 0.5f;
-	for (int a = 0; a < 32; a++) {
-		srot = sin(rot);
-		crot = cos(rot);
-		int c = a*4;
-
-		// Left of quad
-		sky_circle_top[c].x = srot;
-		sky_circle_top[c].y = crot;
-		sky_circle_top[c].tx = tc_x;
-		sky_circle_mid[c].x = srot;
-		sky_circle_mid[c].y = crot;
-		sky_circle_mid[c].tx = tc_x;
-		sky_circle_bottom[c].x = srot;
-		sky_circle_bottom[c].y = crot;
-		sky_circle_bottom[c].tx = tc_x;
-		sky_circle_top[c+1].x = srot;
-		sky_circle_top[c+1].y = crot;
-		sky_circle_top[c+1].tx = tc_x;
-		sky_circle_mid[c+1].x = srot;
-		sky_circle_mid[c+1].y = crot;
-		sky_circle_mid[c+1].tx = tc_x;
-		sky_circle_bottom[c+1].x = srot;
-		sky_circle_bottom[c+1].y = crot;
-		sky_circle_bottom[c+1].tx = tc_x;
-
-		// Rotate to next point on circle
-		rot -= (3.1415926535897932384626433832795 * 2) / 32.0;
-		srot = sin(rot);
-		crot = cos(rot);
-		tc_x += 0.125f;
-
-		// Right of quad
-		sky_circle_top[c+2].x = srot;
-		sky_circle_top[c+2].y = crot;
-		sky_circle_top[c+2].tx = tc_x;
-		sky_circle_mid[c+2].x = srot;
-		sky_circle_mid[c+2].y = crot;
-		sky_circle_mid[c+2].tx = tc_x;
-		sky_circle_bottom[c+2].x = srot;
-		sky_circle_bottom[c+2].y = crot;
-		sky_circle_bottom[c+2].tx = tc_x;
-		sky_circle_top[c+3].x = srot;
-		sky_circle_top[c+3].y = crot;
-		sky_circle_top[c+3].tx = tc_x;
-		sky_circle_mid[c+3].x = srot;
-		sky_circle_mid[c+3].y = crot;
-		sky_circle_mid[c+3].tx = tc_x;
-		sky_circle_bottom[c+3].x = srot;
-		sky_circle_bottom[c+3].y = crot;
-		sky_circle_bottom[c+3].tx = tc_x;
-
-		// Top of quad
-		sky_circle_top[c].z = 1.0f;
-		sky_circle_top[c].alpha = 0.0f;
-		sky_circle_top[c].ty = 0.0f;
-		sky_circle_top[c+3].z = 1.0f;
-		sky_circle_top[c+3].alpha = 0.0f;
-		sky_circle_top[c+3].ty = 0.0f;
-		sky_circle_mid[c].z = 1.0f-fade_size;
-		sky_circle_mid[c].alpha = 1.0f;
-		sky_circle_mid[c].ty = fade_size;
-		sky_circle_mid[c+3].z = 1.0f-fade_size;
-		sky_circle_mid[c+3].alpha = 1.0f;
-		sky_circle_mid[c+3].ty = fade_size;
-		sky_circle_bottom[c].z = -1.0f+fade_size;
-		sky_circle_bottom[c].alpha = 1.0f;
-		sky_circle_bottom[c].ty = 2.0f-fade_size;
-		sky_circle_bottom[c+3].z = -1.0f+fade_size;
-		sky_circle_bottom[c+3].alpha = 1.0f;
-		sky_circle_bottom[c+3].ty = 2.0f-fade_size;
-
-		// Bottom of quad
-		sky_circle_top[c+1].z = 0.0f;//1.0f-fade_size;
-		sky_circle_top[c+1].alpha = 1.0f;
-		sky_circle_top[c+1].ty = fade_size;
-		sky_circle_top[c+2].z = 0.0f;//1.0f-fade_size;
-		sky_circle_top[c+2].alpha = 1.0f;
-		sky_circle_top[c+2].ty = fade_size;
-		sky_circle_mid[c+1].z = -1.0f+fade_size;
-		sky_circle_mid[c+1].alpha = 1.0f;
-		sky_circle_mid[c+1].ty = 2.0f-fade_size;
-		sky_circle_mid[c+2].z = -1.0f+fade_size;
-		sky_circle_mid[c+2].alpha = 1.0f;
-		sky_circle_mid[c+2].ty = 2.0f-fade_size;
-		sky_circle_bottom[c+1].z = -1.0f;
-		sky_circle_bottom[c+1].alpha = 0.0f;
-		sky_circle_bottom[c+1].ty = 2.0f;
-		sky_circle_bottom[c+2].z = -1.0f;
-		sky_circle_bottom[c+2].alpha = 0.0f;
-		sky_circle_bottom[c+2].ty = 2.0f;
-	}
-	*/
 }
 
 void MapRenderer3D::cameraMove(double distance) {
@@ -296,21 +205,22 @@ void MapRenderer3D::setupView(int width, int height) {
 }
 
 void MapRenderer3D::setLight(rgba_t& colour, uint8_t light, float alpha) {
-	// Fullbright
-	if (fullbright || light == 255) {
-		glDisable(GL_FOG);
-		colour.ampf(1.0f, 1.0f, 1.0f, alpha).set_gl(false);
-		return;
-	}
+	// Force 255 light in fullbright mode
+	if (fullbright)
+		light = 255;
 
-	// Set fog level
-	if (fog) {
-		glEnable(GL_FOG);
-		float lm = light/200.0f;
-		glFogf(GL_FOG_END, (lm * lm * 3000.0f));
+	// Setup fog
+	if (fog && light != last_light) {
+		if (light >= 240)
+			glDisable(GL_FOG);
+		else {
+			glEnable(GL_FOG);
+			float lm = light/170.0f;
+			glFogf(GL_FOG_END, (lm * lm * 3000.0f));
+		}
+
+		last_light = light;
 	}
-	else
-		glDisable(GL_FOG);
 
 	// If we have a non-coloured light, darken it a bit to
 	// closer resemble the software renderer light level
@@ -326,7 +236,7 @@ void MapRenderer3D::renderMap() {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_ALPHA_TEST);
 	glDepthMask(GL_TRUE);
-	glAlphaFunc(GL_GREATER, 0.8f);
+	glAlphaFunc(GL_GREATER, 0.0f);
 
 	// Setup fog
 	GLfloat fogColor[4]= {0.0f, 0.0f, 0.0f, 0.6f};
@@ -339,6 +249,7 @@ void MapRenderer3D::renderMap() {
 		glHint(GL_FOG_HINT, GL_NICEST);
 	else
 		glHint(GL_FOG_HINT, GL_FASTEST);
+	last_light = -1;
 
 	// Quick distance vis check
 	sf::Clock clock;
@@ -349,7 +260,7 @@ void MapRenderer3D::renderMap() {
 
 	// Render walls
 	renderWalls();
-	
+
 	// Render flats
 	renderFlats();
 
@@ -893,6 +804,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		// Add middle quad and finish
 		lines[index].quads.push_back(quad);
 		lines[index].flags |= CALCULATED;
+		lines[index].updated_time = theApp->runTimer();
 		return;
 	}
 
@@ -987,6 +899,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.colour = colour1;
 		quad.light = light1;
 		setupQuadTexCoords(&quad, length, xoff, yoff, false, sx, sy);
+		quad.flags |= MIDTEX;
 
 		// Add quad
 		lines[index].quads.push_back(quad);
@@ -1106,6 +1019,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.colour = colour2;
 		quad.light = light2;
 		setupQuadTexCoords(&quad, length, xoff, yoff, false, sx, sy);
+		quad.flags |= MIDTEX;
 
 		// Add quad
 		lines[index].quads.push_back(quad);
@@ -1150,14 +1064,19 @@ void MapRenderer3D::updateLine(unsigned index) {
 
 	// Finished
 	lines[index].flags |= CALCULATED;
+	lines[index].updated_time = theApp->runTimer();
 }
 
 void MapRenderer3D::renderQuad(MapRenderer3D::quad_3d_t* quad, float alpha) {
-	// Setup colour/light
+	// Setup special rendering options
 	if (quad->flags & SKY) {
 		alpha = 0;
 		glDisable(GL_ALPHA_TEST);
 	}
+	else if (quad->flags & MIDTEX)
+		glAlphaFunc(GL_GREATER, 0.9f*alpha);
+
+	// Setup colour/light
 	setLight(quad->colour, quad->light, alpha);
 
 	// Draw quad
@@ -1168,31 +1087,42 @@ void MapRenderer3D::renderQuad(MapRenderer3D::quad_3d_t* quad, float alpha) {
 	glTexCoord2f(quad->points[3].tx, quad->points[3].ty);	glVertex3f(quad->points[3].x, quad->points[3].y, quad->points[3].z);
 	glEnd();
 
+	// Reset settings
 	if (quad->flags & SKY)
 		glEnable(GL_ALPHA_TEST);
+	else if (quad->flags & MIDTEX)
+		glAlphaFunc(GL_GREATER, 0.0f);
 }
 
 void MapRenderer3D::renderWalls() {
 	// Create lines array if empty
-	if (lines.size() == 0) {
-		for (unsigned a = 0; a < map->nLines(); a++)
-			lines.push_back(MapRenderer3D::line_3d_t());
+	if (lines.size() != map->nLines()) {
+		lines.resize(map->nLines());
+		//for (unsigned a = 0; a < map->nLines(); a++)
+		//	lines.push_back(MapRenderer3D::line_3d_t());
 	}
+
+	// Create quads array if empty
+	if (!quads)
+		quads = (quad_3d_t**)malloc(sizeof(quad_3d_t*) * map->nLines() * 4);
 
 	// Init textures
 	glEnable(GL_TEXTURE_2D);
 	GLTexture* tex_last = NULL;
 
-	// Draw all lines
+	// Go through lines
 	MapLine* line;
 	double distfade;
+	unsigned nquads = 0;
+	unsigned updates = 0;
 	for (unsigned a = 0; a < lines.size(); a++) {
+		line = map->getLine(a);
+
 		// Check distance if needed
 		if (render_max_dist > 0) {
 			if (dist_lines[a] > render_max_dist)
 				continue;
 			// Double check distance
-			line = map->getLine(a);
 			dist_lines[a] = MathStuff::distanceToLine(cam_position.x, cam_position.y, line->x1(), line->y1(), line->x2(), line->y2());
 			if (dist_lines[a] > render_max_dist)
 				continue;
@@ -1202,10 +1132,15 @@ void MapRenderer3D::renderWalls() {
 		distfade = calcDistFade(dist_lines[a], render_max_dist);
 
 		// Update line if needed
-		if ((lines[a].flags & CALCULATED) == 0)
+		//if ((lines[a].flags & CALCULATED) == 0) {
+		if (lines[a].updated_time < line->modifiedTime()) {
 			updateLine(a);
+			//updates++;
+			//if (updates > 500)
+			//	break;
+		}
 
-		// Draw each quad on the line
+		// Determine quads to be drawn
 		quad_3d_t* quad;
 		for (unsigned q = 0; q < lines[a].quads.size(); q++) {
 			// Check we're on the right side of the quad
@@ -1213,19 +1148,67 @@ void MapRenderer3D::renderWalls() {
 			if (MathStuff::lineSide(cam_position.x, cam_position.y, quad->points[0].x, quad->points[0].y, quad->points[2].x, quad->points[2].y) < 0)
 				continue;
 
-			// Bind the texture if needed
-			if (quad->texture) {
-				if (!tex_last)
-					glEnable(GL_TEXTURE_2D);
-				if (lines[a].quads[q].texture != tex_last)
-					lines[a].quads[q].texture->bind();
+			if (!render_sort) {
+				// Bind the texture if needed
+				if (quad->texture) {
+					if (!tex_last)
+						glEnable(GL_TEXTURE_2D);
+					if (lines[a].quads[q].texture != tex_last)
+						lines[a].quads[q].texture->bind();
+				}
+				else if (tex_last)
+					glDisable(GL_TEXTURE_2D);
+				tex_last = quad->texture;
+
+				// Render quad
+				renderQuad(quad, distfade);
 			}
-			else if (tex_last)
-				glDisable(GL_TEXTURE_2D);
-			tex_last = quad->texture;
+			else {
+				quads[nquads] = quad;
+				quad->alpha = calcDistFade(dist_lines[a], render_max_dist);
+				nquads++;
+			}
+		}
+	}
+
+	if (render_sort) {
+		// Render all sky quads first
+		glDisable(GL_TEXTURE_2D);
+		for (unsigned a = 0; a < nquads; a++) {
+			// Ignore if not sky
+			if ((quads[a]->flags & SKY) == 0)
+				continue;
 
 			// Render quad
-			renderQuad(quad, distfade);
+			renderQuad(quads[a]);
+			quads[a] = quads[nquads-1];
+			nquads--;
+			a--;
+		}
+		glEnable(GL_TEXTURE_2D);
+
+		// Render all visible quads, ordered by texture
+		GLTexture* tex_current = NULL;
+		unsigned a = 0;
+		while (nquads > 0) {
+			tex_current = NULL;
+			a = 0;
+			while (a < nquads) {
+				// Check texture
+				if (!tex_current && quads[a]->texture) {
+					tex_current = quads[a]->texture;
+					quads[a]->texture->bind();
+				}
+				if (quads[a]->texture != tex_current) {
+					a++;
+					continue;
+				}
+
+				// Render quad
+				renderQuad(quads[a], quads[a]->alpha);
+				quads[a] = quads[nquads-1];
+				nquads--;
+			}
 		}
 	}
 
@@ -1277,13 +1260,15 @@ void MapRenderer3D::updateThing(unsigned index, MapThing* thing) {
 	things[index].z += theMapEditor->textureManager().getVerticalOffset(things[index].type->getSprite());
 
 	things[index].flags |= CALCULATED;
+	things[index].updated_time = theApp->runTimer();
 }
 
 void MapRenderer3D::renderThings() {
 	// Create things array if empty
-	if (things.size() == 0) {
-		for (unsigned a = 0; a < map->nThings(); a++)
-			things.push_back(thing_3d_t());
+	if (things.size() != map->nThings()) {
+		things.resize(map->nThings());
+		//for (unsigned a = 0; a < map->nThings(); a++)
+		//	things.push_back(thing_3d_t());
 	}
 
 	// Init textures
@@ -1298,6 +1283,7 @@ void MapRenderer3D::renderThings() {
 	rgba_t col;
 	uint8_t light;
 	float x1, y1, x2, y2;
+	unsigned update = 0;
 	for (unsigned a = 0; a < map->nThings(); a++) {
 		MapThing* thing = map->getThing(a);
 
@@ -1309,8 +1295,13 @@ void MapRenderer3D::renderThings() {
 		}
 
 		// Update thing if needed
-		if ((things[a].flags & CALCULATED) == 0)
+		//if ((things[a].flags & CALCULATED) == 0) {
+		if (things[a].updated_time < thing->modifiedTime()) {
 			updateThing(a, thing);
+			update++;
+			if (update > 500)
+				break;
+		}
 
 		// Get thing sprite
 		tex = things[a].sprite;

@@ -2949,6 +2949,8 @@ void SLADEMap::moveThing(unsigned thing, double nx, double ny) {
 	MapThing* t = things[thing];
 	t->x = nx;
 	t->y = ny;
+
+	t->modified_time = theApp->runTimer();
 }
 
 void SLADEMap::thingSetAnglePoint(unsigned thing, fpoint2_t point) {

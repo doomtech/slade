@@ -377,7 +377,7 @@ void MapCanvas::set3dCameraThing(MapThing* thing) {
 		pos.z += editor->getMap().getSector(sector)->intProperty("heightfloor");
 
 	// Determine direction
-	fpoint2_t dir(0, 1);
+	fpoint2_t dir = MathStuff::vectorAngle(MathStuff::degToRad(thing->intProperty("angle")));
 
 	renderer_3d->cameraSet(pos, dir);
 }

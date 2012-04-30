@@ -5,6 +5,7 @@
 #include "MapSide.h"
 #include "MapVertex.h"
 #include "GameConfiguration.h"
+#include "MainApp.h"
 
 MapSector::MapSector(SLADEMap* parent) : MapObject(MOBJ_SECTOR, parent) {
 	// Init variables
@@ -51,6 +52,9 @@ void MapSector::setStringProperty(string key, string value) {
 		c_tex = value;
 	else
 		MapObject::setStringProperty(key, value);
+
+	// Update modified time
+	modified_time = theApp->runTimer();
 }
 
 void MapSector::setFloatProperty(string key, double value) {
@@ -65,6 +69,9 @@ void MapSector::setFloatProperty(string key, double value) {
 	}
 
 	MapObject::setFloatProperty(key, value);
+
+	// Update modified time
+	modified_time = theApp->runTimer();
 }
 
 fpoint2_t MapSector::midPoint() {

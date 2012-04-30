@@ -3,6 +3,7 @@
 #include "MapObject.h"
 #include "SLADEMap.h"
 #include "GameConfiguration.h"
+#include "MainApp.h"
 
 MapObject::MapObject(int type, SLADEMap* parent) {
 	// Init variables
@@ -10,6 +11,7 @@ MapObject::MapObject(int type, SLADEMap* parent) {
 	this->parent_map = parent;
 	this->index = 0;
 	this->filtered = false;
+	this->modified_time = theApp->runTimer();
 }
 
 MapObject::~MapObject() {
@@ -34,6 +36,9 @@ void MapObject::copy(MapObject* c) {
 	c->properties.copyTo(properties);
 	this->parent_map = c->parent_map;
 	this->filtered = c->filtered;
+
+	// Update modified time
+	modified_time = theApp->runTimer();
 }
 
 bool MapObject::boolProperty(string key) {
@@ -94,4 +99,36 @@ string MapObject::stringProperty(string key) {
 		else
 			return "";
 	}
+}
+
+void MapObject::setBoolProperty(string key, bool value) {
+	// Set property
+	properties[key] = value;
+
+	// Update modified time
+	modified_time = theApp->runTimer();
+}
+
+void MapObject::setIntProperty(string key, int value) {
+	// Set property
+	properties[key] = value;
+
+	// Update modified time
+	modified_time = theApp->runTimer();
+}
+
+void MapObject::setFloatProperty(string key, double value) {
+	// Set property
+	properties[key] = value;
+
+	// Update modified time
+	modified_time = theApp->runTimer();
+}
+
+void MapObject::setStringProperty(string key, string value) {
+	// Set property
+	properties[key] = value;
+
+	// Update modified time
+	modified_time = theApp->runTimer();
 }

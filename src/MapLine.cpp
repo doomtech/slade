@@ -5,6 +5,7 @@
 #include "MapSide.h"
 #include "MathStuff.h"
 #include "SLADEMap.h"
+#include "MainApp.h"
 
 MapLine::MapLine(SLADEMap* parent) : MapObject(MOBJ_LINE, parent) {
 	// Init variables
@@ -268,6 +269,8 @@ void MapLine::resetInternals() {
 		s2->resetPolygon();
 		s2->resetBBox();
 	}
+
+	modified_time = theApp->runTimer();
 }
 
 void MapLine::flip(bool sides) {
@@ -283,5 +286,6 @@ void MapLine::flip(bool sides) {
 		side2 = s;
 	}
 
+	modified_time = theApp->runTimer();
 	resetInternals();
 }

@@ -21,6 +21,9 @@ namespace MathStuff {
 	double		angle2DRad(fpoint2_t p1, fpoint2_t p2, fpoint2_t p3);
 	fpoint2_t	rotatePoint(fpoint2_t origin, fpoint2_t point, double angle);
 	fpoint3_t	rotateVector3D(fpoint3_t vector, fpoint3_t axis, double angle);
+	double		degToRad(double angle);
+	double		radToDeg(double angle);
+	fpoint2_t	vectorAngle(double angle_rad);
 }
 
 #endif//__MATHSTUFF_H__

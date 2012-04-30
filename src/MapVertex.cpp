@@ -1,6 +1,7 @@
 
 #include "Main.h"
 #include "MapVertex.h"
+#include "MainApp.h"
 
 MapVertex::MapVertex(SLADEMap* parent) : MapObject(MOBJ_VERTEX, parent) {
 	// Init variables
@@ -42,6 +43,9 @@ void MapVertex::setIntProperty(string key, int value) {
 		y = value;
 	else
 		MapObject::setIntProperty(key, value);
+
+	// Update modified time
+	modified_time = theApp->runTimer();
 }
 
 void MapVertex::setFloatProperty(string key, double value) {
@@ -51,6 +55,9 @@ void MapVertex::setFloatProperty(string key, double value) {
 		y = value;
 	else
 		MapObject::setFloatProperty(key, value);
+
+	// Update modified time
+	modified_time = theApp->runTimer();
 }
 
 void MapVertex::connectLine(MapLine* line) {

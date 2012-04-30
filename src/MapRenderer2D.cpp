@@ -1285,6 +1285,7 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 	GLTexture* tex_last = NULL;
 	GLTexture* tex = NULL;
 	bool first = true;
+	unsigned update = 0;
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		MapSector* sector = map->getSector(a);
 
@@ -1336,8 +1337,12 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 		}
 
 		// Update polygon VBO data if needed
-		if (poly->vboUpdate() > 0)
+		if (poly->vboUpdate() > 0) {
 			poly->updateVBOData();
+			update++;
+			if (update > 200)
+				break;
+		}
 
 		// Bind the texture if needed
 		if (tex) {

@@ -4,6 +4,7 @@
 #include "MapSide.h"
 #include "MapSector.h"
 #include "SLADEMap.h"
+#include "MainApp.h"
 
 MapSide::MapSide(MapSector* sector, SLADEMap* parent) : MapObject(MOBJ_SIDE, parent) {
 	// Init variables
@@ -34,6 +35,9 @@ void MapSide::setSector(MapSector* sector) {
 	// Add side to new sector
 	this->sector = sector;
 	sector->connectSide(this);
+
+	// Update modified time
+	modified_time = theApp->runTimer();
 }
 
 int MapSide::intProperty(string key) {
@@ -52,4 +56,7 @@ void MapSide::setIntProperty(string key, int value) {
 		setSector(parent_map->getSector(value));
 	else
 		MapObject::setIntProperty(key, value);
+
+	// Update modified time
+	modified_time = theApp->runTimer();
 }

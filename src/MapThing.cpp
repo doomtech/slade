@@ -1,6 +1,7 @@
 
 #include "Main.h"
 #include "MapThing.h"
+#include "MainApp.h"
 
 MapThing::MapThing(SLADEMap* parent) : MapObject(MOBJ_THING, parent) {
 	// Init variables
@@ -48,6 +49,9 @@ void MapThing::setIntProperty(string key, int value) {
 		y = value;
 	else
 		MapObject::setIntProperty(key, value);
+
+	// Update modified time
+	modified_time = theApp->runTimer();
 }
 
 void MapThing::setFloatProperty(string key, double value) {
@@ -57,6 +61,9 @@ void MapThing::setFloatProperty(string key, double value) {
 		y = value;
 	else
 		MapObject::setFloatProperty(key, value);
+
+	// Update modified time
+	modified_time = theApp->runTimer();
 }
 
 void MapThing::copy(MapObject* c) {

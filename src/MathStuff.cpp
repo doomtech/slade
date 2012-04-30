@@ -37,6 +37,7 @@
  *******************************************************************/
 namespace MathStuff {
 	double rad2deg = 180 / PI;
+	double deg2rad = PI / 180;
 }
 
 
@@ -327,6 +328,18 @@ fpoint3_t MathStuff::rotateVector3D(fpoint3_t vector, fpoint3_t axis, double ang
 	rvec.z += (crot + (1 - crot) * axis.z * axis.z)				* vector.z;
 
 	return rvec;
+}
+
+double MathStuff::degToRad(double angle) {
+	return (angle * PI) / 180;
+}
+
+double MathStuff::radToDeg(double angle) {
+	return angle * rad2deg;
+}
+
+fpoint2_t MathStuff::vectorAngle(double angle_rad) {
+	return fpoint2_t(cos(-angle_rad), -sin(-angle_rad));
 }
 
 
