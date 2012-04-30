@@ -2,7 +2,9 @@
 #ifndef __INTERFACE_PREFS_PANEL_H__
 #define __INTERFACE_PREFS_PANEL_H__
 
-class InterfacePrefsPanel : public wxPanel {
+#include "PrefsPanelBase.h"
+
+class InterfacePrefsPanel : public PrefsPanelBase {
 private:
 	wxCheckBox*	cb_size_as_string;
 	wxCheckBox* cb_filter_dirs;

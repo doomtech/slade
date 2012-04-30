@@ -2,7 +2,9 @@
 #ifndef __ACS_PREFS_PANEL_H__
 #define __ACS_PREFS_PANEL_H__
 
-class ACSPrefsPanel : public wxPanel {
+#include "PrefsPanelBase.h"
+
+class ACSPrefsPanel : public PrefsPanelBase {
 private:
 	wxTextCtrl*	text_accpath;
 	wxButton*	btn_browse_accpath;

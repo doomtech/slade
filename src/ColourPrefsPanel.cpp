@@ -43,7 +43,7 @@
 /* ColourPrefsPanel::ColourPrefsPanel
  * ColourPrefsPanel class constructor
  *******************************************************************/
-ColourPrefsPanel::ColourPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+ColourPrefsPanel::ColourPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

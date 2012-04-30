@@ -2,7 +2,9 @@
 #ifndef __GENERAL_PREFS_PANEL_H__
 #define __GENERAL_PREFS_PANEL_H__
 
-class GeneralPrefsPanel : public wxPanel {
+#include "PrefsPanelBase.h"
+
+class GeneralPrefsPanel : public PrefsPanelBase {
 private:
 	wxCheckBox*	cb_gl_np2;
 	wxCheckBox*	cb_archive_load;

@@ -48,7 +48,7 @@ EXTERN_CVAR(Bool, temp_use_appdir)
 /* GeneralPrefsPanel::GeneralPrefsPanel
  * GeneralPrefsPanel class constructor
  *******************************************************************/
-GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

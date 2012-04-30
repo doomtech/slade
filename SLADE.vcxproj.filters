@@ -840,6 +840,9 @@
     <ClCompile Include="src\MapRenderer3D.cpp">
       <Filter>Map Editor</Filter>
     </ClCompile>
+    <ClCompile Include="src\InputPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1568,6 +1571,12 @@
     </ClInclude>
     <ClInclude Include="src\MapRenderer3D.h">
       <Filter>Map Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InputPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PrefsPanelBase.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

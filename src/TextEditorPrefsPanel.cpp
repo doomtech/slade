@@ -53,7 +53,7 @@ EXTERN_CVAR(Bool, txed_trim_whitespace)
 /* TextEditorPrefsPanel::TextEditorPrefsPanel
  * TextEditorPrefsPanel class constructor
  *******************************************************************/
-TextEditorPrefsPanel::TextEditorPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+TextEditorPrefsPanel::TextEditorPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create main sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

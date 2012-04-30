@@ -50,7 +50,7 @@ EXTERN_CVAR(Bool, list_font_monospace)
 /* InterfacePrefsPanel::InterfacePrefsPanel
  * InterfacePrefsPanel class constructor
  *******************************************************************/
-InterfacePrefsPanel::InterfacePrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+InterfacePrefsPanel::InterfacePrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

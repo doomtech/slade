@@ -6,7 +6,7 @@
 EXTERN_CVAR(Bool, scroll_smooth)
 EXTERN_CVAR(Bool, selection_clear_click)
 
-MapEditorPrefsPanel::MapEditorPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+MapEditorPrefsPanel::MapEditorPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

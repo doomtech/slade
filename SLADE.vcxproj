@@ -156,6 +156,7 @@
     <ClCompile Include="src\HexEditorPanel.cpp" />
     <ClCompile Include="src\HexEntryPanel.cpp" />
     <ClCompile Include="src\HogArchive.cpp" />
+    <ClCompile Include="src\InputPrefsPanel.cpp" />
     <ClCompile Include="src\InterfacePrefsPanel.cpp" />
     <ClCompile Include="src\KeyBind.cpp" />
     <ClCompile Include="src\LfdArchive.cpp" />
@@ -389,6 +390,7 @@
     <ClInclude Include="src\HexEntryPanel.h" />
     <ClInclude Include="src\HogArchive.h" />
     <ClInclude Include="src\ImageFormats.h" />
+    <ClInclude Include="src\InputPrefsPanel.h" />
     <ClInclude Include="src\InterfacePrefsPanel.h" />
     <ClInclude Include="src\KeyBind.h" />
     <ClInclude Include="src\LfdArchive.h" />
@@ -465,6 +467,7 @@
     <ClInclude Include="src\PNGPrefsPanel.h" />
     <ClInclude Include="src\Polygon2D.h" />
     <ClInclude Include="src\PreferencesDialog.h" />
+    <ClInclude Include="src\PrefsPanelBase.h" />
     <ClInclude Include="src\ResArchive.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RffArchive.h" />

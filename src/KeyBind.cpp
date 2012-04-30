@@ -43,6 +43,29 @@ void KeyBind::addKey(string key, bool alt, bool ctrl, bool shift) {
 	keys.back().key = key;
 }
 
+string KeyBind::keysAsString() {
+	string ret = "";
+
+	for (unsigned a = 0; a < keys.size(); a++) {
+		if (keys[a].ctrl) ret += "Ctrl+";
+		if (keys[a].alt) ret += "Alt+";
+		if (keys[a].shift) ret += "Shift+";
+
+		string keyname = keys[a].key;
+		keyname.Replace("_", " ");
+		keyname = keyname.Capitalize();
+		ret += keyname;
+
+		if (a < keys.size() - 1)
+			ret += ", ";
+	}
+
+	if (ret.IsEmpty())
+		return "None";
+	else
+		return ret;
+}
+
 
 /*******************************************************************
  * KEYBIND STATIC FUNCTIONS
@@ -85,7 +108,7 @@ bool KeyBind::isPressed(string name) {
 	return getBind(name).pressed;
 }
 
-bool KeyBind::addBind(string name, keypress_t key, string desc) {
+bool KeyBind::addBind(string name, keypress_t key, string desc, string group) {
 	// Find keybind
 	KeyBind* bind = NULL;
 	for (unsigned a = 0; a < keybinds.size(); a++) {
@@ -101,9 +124,11 @@ bool KeyBind::addBind(string name, keypress_t key, string desc) {
 		bind = &keybinds.back();
 	}
 
-	// Set keybind description
-	if (!desc.IsEmpty())
+	// Set keybind description/group
+	if (!desc.IsEmpty()) {
 		bind->description = desc;
+		bind->group = group;
+	}
 
 	// Check if the key is already bound to it
 	for (unsigned a = 0; a < bind->keys.size(); a++) {
@@ -300,6 +325,11 @@ keypress_t KeyBind::asKeyPress(int keycode, int modifiers) {
 						((modifiers & wxMOD_SHIFT) != 0));
 }
 
+void KeyBind::allKeyBinds(vector<KeyBind*>& list) {
+	for (unsigned a = 0; a < keybinds.size(); a++)
+		list.push_back(&keybinds[a]);
+}
+
 // The + key char is different between windows and unix/mac
 #ifdef __WXMSW__
 #define PLUSKEY "+"
@@ -310,127 +340,143 @@ keypress_t KeyBind::asKeyPress(int keycode, int modifiers) {
 
 void KeyBind::initBinds() {
 	// General
-	addBind("copy", keypress_t("C", KPM_CTRL), "Copy");
-	addBind("cut", keypress_t("X", KPM_CTRL), "Cut");
-	addBind("paste", keypress_t("V", KPM_CTRL), "Paste");
-	addBind("select_all", keypress_t("A", KPM_CTRL), "Select All");
+	string group = "General";
+	addBind("copy", keypress_t("C", KPM_CTRL), "Copy", group);
+	addBind("cut", keypress_t("X", KPM_CTRL), "Cut", group);
+	addBind("paste", keypress_t("V", KPM_CTRL), "Paste", group);
+	addBind("select_all", keypress_t("A", KPM_CTRL), "Select All", group);
 
 	// Map Editor (map*)
-	addBind("map_edit_accept", keypress_t("return"), "Accept edit");
-	addBind("map_edit_cancel", keypress_t("escape"), "Cancel edit");
-	addBind("map_toggle_3d", keypress_t("Q"), "Toggle 3d mode");
+	group = "Map Editor General";
+	addBind("map_edit_accept", keypress_t("return"), "Accept edit", group);
+	addBind("map_edit_cancel", keypress_t("escape"), "Cancel edit", group);
+	addBind("map_toggle_3d", keypress_t("Q"), "Toggle 3d mode", group);
 
 	// Map Editor 2D (me2d*)
-	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection");
-	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan view");
+	group = "Map Editor 2D Mode";
+	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection", group);
+	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan view", group);
 	addBind("me2d_pan_view", keypress_t("space", KPM_CTRL));
-	addBind("me2d_move", keypress_t("Z"), "Toggle item move mode");
-	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom in (towards mouse)");
-	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom out (towards mouse)");
-	addBind("me2d_zoom_in", keypress_t(PLUSKEY), "Zoom in (towards screen center)");
-	addBind("me2d_zoom_out", keypress_t("-"), "Zoom out (towards screen center)");
-	addBind("me2d_show_object", keypress_t(PLUSKEY, KPM_SHIFT), "Zoom in, show current object");
+	addBind("me2d_move", keypress_t("Z"), "Toggle item move mode", group);
+	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom in (towards mouse)", group);
+	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom out (towards mouse)", group);
+	addBind("me2d_zoom_in", keypress_t(PLUSKEY), "Zoom in (towards screen center)", group);
+	addBind("me2d_zoom_out", keypress_t("-"), "Zoom out (towards screen center)", group);
+	addBind("me2d_show_object", keypress_t(PLUSKEY, KPM_SHIFT), "Zoom in, show current object", group);
 	addBind("me2d_show_object", keypress_t("mwheelup", KPM_SHIFT));
-	addBind("me2d_show_all", keypress_t("-", KPM_SHIFT), "Zoom out, show full map");
+	addBind("me2d_show_all", keypress_t("-", KPM_SHIFT), "Zoom out, show full map", group);
 	addBind("me2d_show_all", keypress_t("mwheeldown", KPM_SHIFT));
-	addBind("me2d_left", keypress_t("left"), "Scroll left");
-	addBind("me2d_right", keypress_t("right"), "Scroll right");
-	addBind("me2d_up", keypress_t("up"), "Scroll up");
-	addBind("me2d_down", keypress_t("down"), "Scroll down");
-	addBind("me2d_grid_inc", keypress_t("["), "Increment grid level");
-	addBind("me2d_grid_dec", keypress_t("]"), "Decrement grid level");
-	addBind("me2d_mode_vertices", keypress_t("V"), "Vertices mode");
-	addBind("me2d_mode_lines", keypress_t("L"), "Lines mode");
-	addBind("me2d_mode_sectors", keypress_t("S"), "Sectors mode");
-	addBind("me2d_mode_things", keypress_t("T"), "Things mode");
-	addBind("me2d_flat_type", keypress_t("F", KPM_CTRL), "Cycle flat type");
-	addBind("me2d_split_line", keypress_t("S", KPM_CTRL|KPM_SHIFT), "Split nearest line");
-	addBind("me2d_lock_hilight", keypress_t("H", KPM_CTRL), "Lock/unlock hilight");
-	addBind("me2d_begin_linedraw", keypress_t("space"), "Begin line drawing");
-	addBind("me2d_begin_shapedraw", keypress_t("space", KPM_SHIFT), "Begin shape drawing");
-	addBind("me2d_create_object", keypress_t("insert"), "Create object");
-	addBind("me2d_delete_object", keypress_t("delete"), "Delete object");
-	addBind("me2d_copy_properties", keypress_t("C", KPM_CTRL|KPM_SHIFT), "Copy object properties");
-	addBind("me2d_paste_properties", keypress_t("V", KPM_CTRL|KPM_SHIFT), "Paste object properties");
+	addBind("me2d_left", keypress_t("left"), "Scroll left", group);
+	addBind("me2d_right", keypress_t("right"), "Scroll right", group);
+	addBind("me2d_up", keypress_t("up"), "Scroll up", group);
+	addBind("me2d_down", keypress_t("down"), "Scroll down", group);
+	addBind("me2d_grid_inc", keypress_t("["), "Increment grid level", group);
+	addBind("me2d_grid_dec", keypress_t("]"), "Decrement grid level", group);
+	addBind("me2d_mode_vertices", keypress_t("V"), "Vertices mode", group);
+	addBind("me2d_mode_lines", keypress_t("L"), "Lines mode", group);
+	addBind("me2d_mode_sectors", keypress_t("S"), "Sectors mode", group);
+	addBind("me2d_mode_things", keypress_t("T"), "Things mode", group);
+	addBind("me2d_flat_type", keypress_t("F", KPM_CTRL), "Cycle flat type", group);
+	addBind("me2d_split_line", keypress_t("S", KPM_CTRL|KPM_SHIFT), "Split nearest line", group);
+	addBind("me2d_lock_hilight", keypress_t("H", KPM_CTRL), "Lock/unlock hilight", group);
+	addBind("me2d_begin_linedraw", keypress_t("space"), "Begin line drawing", group);
+	addBind("me2d_begin_shapedraw", keypress_t("space", KPM_SHIFT), "Begin shape drawing", group);
+	addBind("me2d_create_object", keypress_t("insert"), "Create object", group);
+	addBind("me2d_delete_object", keypress_t("delete"), "Delete object", group);
+	addBind("me2d_copy_properties", keypress_t("C", KPM_CTRL|KPM_SHIFT), "Copy object properties", group);
+	addBind("me2d_paste_properties", keypress_t("V", KPM_CTRL|KPM_SHIFT), "Paste object properties", group);
 
 	// Map Editor 2D Lines mode (me2d_line*)
-	addBind("me2d_line_change_texture", keypress_t("T", KPM_CTRL), "Change texture(s)");
-	addBind("me2d_line_flip", keypress_t("F"), "Flip line(s)");
-	addBind("me2d_line_flip_nosides", keypress_t("F", KPM_SHIFT), "Flip line(s) but not sides");
+	group = "Map Editor 2D Lines Mode";
+	addBind("me2d_line_change_texture", keypress_t("T", KPM_CTRL), "Change texture(s)", group);
+	addBind("me2d_line_flip", keypress_t("F"), "Flip line(s)", group);
+	addBind("me2d_line_flip_nosides", keypress_t("F", KPM_SHIFT), "Flip line(s) but not sides", group);
 
 	// Map Editor 2D Sectors mode (me2d_sector*)
-	addBind("me2d_sector_light_up16", keypress_t("'"), "Light level up 16");
-	addBind("me2d_sector_light_up", keypress_t("'", KPM_SHIFT), "Light level up 1");
-	addBind("me2d_sector_light_down16", keypress_t(";"), "Light level down 16");
-	addBind("me2d_sector_light_down", keypress_t(";", KPM_SHIFT), "Light level down 1");
-	addBind("me2d_sector_floor_up8", keypress_t(".", KPM_CTRL), "Floor height up 8");
-	addBind("me2d_sector_floor_up", keypress_t(".", KPM_CTRL|KPM_SHIFT), "Floor height up 1");
-	addBind("me2d_sector_floor_down8", keypress_t(",", KPM_CTRL), "Floor height down 8");
-	addBind("me2d_sector_floor_down", keypress_t(",", KPM_CTRL|KPM_SHIFT), "Floor height down 1");
-	addBind("me2d_sector_ceil_up8", keypress_t(".", KPM_ALT), "Ceiling height up 8");
-	addBind("me2d_sector_ceil_up", keypress_t(".", KPM_ALT|KPM_SHIFT), "Ceiling height up 1");
-	addBind("me2d_sector_ceil_down8", keypress_t(",", KPM_ALT), "Ceiling height down 8");
-	addBind("me2d_sector_ceil_down", keypress_t(",", KPM_ALT|KPM_SHIFT), "Ceiling height down 1");
-	addBind("me2d_sector_height_up8", keypress_t("."), "Height up 8");
-	addBind("me2d_sector_height_up", keypress_t(".", KPM_SHIFT), "Height up 1");
-	addBind("me2d_sector_height_down8", keypress_t(","), "Height down 8");
-	addBind("me2d_sector_height_down", keypress_t(",", KPM_SHIFT), "Height down 1");
-	addBind("me2d_sector_change_texture", keypress_t("T", KPM_CTRL), "Change texture(s)");
+	group = "Map Editor 2D Sectors Mode";
+	addBind("me2d_sector_light_up16", keypress_t("'"), "Light level up 16", group);
+	addBind("me2d_sector_light_up", keypress_t("'", KPM_SHIFT), "Light level up 1", group);
+	addBind("me2d_sector_light_down16", keypress_t(";"), "Light level down 16", group);
+	addBind("me2d_sector_light_down", keypress_t(";", KPM_SHIFT), "Light level down 1", group);
+	addBind("me2d_sector_floor_up8", keypress_t(".", KPM_CTRL), "Floor height up 8", group);
+	addBind("me2d_sector_floor_up", keypress_t(".", KPM_CTRL|KPM_SHIFT), "Floor height up 1", group);
+	addBind("me2d_sector_floor_down8", keypress_t(",", KPM_CTRL), "Floor height down 8", group);
+	addBind("me2d_sector_floor_down", keypress_t(",", KPM_CTRL|KPM_SHIFT), "Floor height down 1", group);
+	addBind("me2d_sector_ceil_up8", keypress_t(".", KPM_ALT), "Ceiling height up 8", group);
+	addBind("me2d_sector_ceil_up", keypress_t(".", KPM_ALT|KPM_SHIFT), "Ceiling height up 1", group);
+	addBind("me2d_sector_ceil_down8", keypress_t(",", KPM_ALT), "Ceiling height down 8", group);
+	addBind("me2d_sector_ceil_down", keypress_t(",", KPM_ALT|KPM_SHIFT), "Ceiling height down 1", group);
+	addBind("me2d_sector_height_up8", keypress_t("."), "Height up 8", group);
+	addBind("me2d_sector_height_up", keypress_t(".", KPM_SHIFT), "Height up 1", group);
+	addBind("me2d_sector_height_down8", keypress_t(","), "Height down 8", group);
+	addBind("me2d_sector_height_down", keypress_t(",", KPM_SHIFT), "Height down 1", group);
+	addBind("me2d_sector_change_texture", keypress_t("T", KPM_CTRL), "Change texture(s)", group);
 
 	// Map Editor 2D Things mode (me2d_thing*)
-	addBind("me2d_thing_change_type", keypress_t("T", KPM_CTRL), "Change type");
-	addBind("me2d_thing_quick_angle", keypress_t("D"), "Quick angle edit");
+	group = "Map Editor 2D Things Mode";
+	addBind("me2d_thing_change_type", keypress_t("T", KPM_CTRL), "Change type", group);
+	addBind("me2d_thing_quick_angle", keypress_t("D"), "Quick angle edit", group);
 
 	// Map Editor 3D (me3d*)
-	addBind("me3d_camera_forward", keypress_t("W"), "Camera forward");
-	addBind("me3d_camera_back", keypress_t("S"), "Camera backward");
-	addBind("me3d_camera_left", keypress_t("A"), "Camera strafe left");
-	addBind("me3d_camera_right", keypress_t("D"), "Camera strafe right");
-	addBind("me3d_camera_up", keypress_t("up"), "Camera move up");
-	addBind("me3d_camera_down", keypress_t("down"), "Camera move down");
-	addBind("me3d_camera_turn_left", keypress_t("left"), "Camera turn left");
-	addBind("me3d_camera_turn_right", keypress_t("right"), "Camera turn right");
-	addBind("me3d_toggle_fog", keypress_t("F"), "Toggle fog");
-	addBind("me3d_toggle_fullbright", keypress_t("B"), "Toggle full brightness");
-	addBind("me3d_toggle_gravity", keypress_t("G"), "Toggle camera gravity");
-	addBind("me3d_release_mouse", keypress_t("tab"), "Release mouse cursor");
+	group = "Map Editor 3D Mode";
+	addBind("me3d_camera_forward", keypress_t("W"), "Camera forward", group);
+	addBind("me3d_camera_back", keypress_t("S"), "Camera backward", group);
+	addBind("me3d_camera_left", keypress_t("A"), "Camera strafe left", group);
+	addBind("me3d_camera_right", keypress_t("D"), "Camera strafe right", group);
+	addBind("me3d_camera_up", keypress_t("up"), "Camera move up", group);
+	addBind("me3d_camera_down", keypress_t("down"), "Camera move down", group);
+	addBind("me3d_camera_turn_left", keypress_t("left"), "Camera turn left", group);
+	addBind("me3d_camera_turn_right", keypress_t("right"), "Camera turn right", group);
+	addBind("me3d_toggle_fog", keypress_t("F"), "Toggle fog", group);
+	addBind("me3d_toggle_fullbright", keypress_t("B"), "Toggle full brightness", group);
+	addBind("me3d_toggle_gravity", keypress_t("G"), "Toggle camera gravity", group);
+	addBind("me3d_release_mouse", keypress_t("tab"), "Release mouse cursor", group);
 
 	// Entry List (el*)
-	addBind("el_new", keypress_t("N", KPM_CTRL), "New Entry");
-	addBind("el_delete", keypress_t("delete"), "Delete Entry");
-	addBind("el_move_up", keypress_t("U", KPM_CTRL), "Move Entry up");
-	addBind("el_move_down", keypress_t("D", KPM_CTRL), "Move Entry down");
-	addBind("el_rename", keypress_t("R", KPM_CTRL), "Rename Entry");
+	group = "Entry List";
+	addBind("el_new", keypress_t("N", KPM_CTRL), "New Entry", group);
+	addBind("el_delete", keypress_t("delete"), "Delete Entry", group);
+	addBind("el_move_up", keypress_t("U", KPM_CTRL), "Move Entry up", group);
+	addBind("el_move_down", keypress_t("D", KPM_CTRL), "Move Entry down", group);
+	addBind("el_rename", keypress_t("R", KPM_CTRL), "Rename Entry", group);
 	addBind("el_rename", keypress_t("f2"));
-	addBind("el_import", keypress_t("I", KPM_CTRL), "Import to Entry");
-	addBind("el_import_files", keypress_t("I", KPM_CTRL|KPM_SHIFT), "Import Files");
-	addBind("el_export", keypress_t("E", KPM_CTRL), "Export Entry");
-	addBind("el_up_dir", keypress_t("backspace"), "Up one directory");
+	addBind("el_import", keypress_t("I", KPM_CTRL), "Import to Entry", group);
+	addBind("el_import_files", keypress_t("I", KPM_CTRL|KPM_SHIFT), "Import Files", group);
+	addBind("el_export", keypress_t("E", KPM_CTRL), "Export Entry", group);
+	addBind("el_up_dir", keypress_t("backspace"), "Up one directory", group);
 
 	// Texture editor (txed*)
-	addBind("txed_patch_left", keypress_t("left", KPM_CTRL), "Move Patch left");
-	addBind("txed_patch_left8", keypress_t("left"), "Move Patch left 8");
-	addBind("txed_patch_up", keypress_t("up", KPM_CTRL), "Move Patch up");
-	addBind("txed_patch_up8", keypress_t("up"), "Move Patch up 8");
-	addBind("txed_patch_right", keypress_t("right", KPM_CTRL), "Move Patch right");
-	addBind("txed_patch_right8", keypress_t("right"), "Move Patch right 8");
-	addBind("txed_patch_down", keypress_t("down", KPM_CTRL), "Move Patch down");
-	addBind("txed_patch_down8", keypress_t("down"), "Move Patch down 8");
-	addBind("txed_patch_add", keypress_t("insert"), "Add Patch");
-	addBind("txed_patch_delete", keypress_t("delete"), "Delete Patch");
-	addBind("txed_patch_replace", keypress_t("f2"), "Replace Patch");
+	group = "Texture Editor";
+	addBind("txed_patch_left", keypress_t("left", KPM_CTRL), "Move Patch left", group);
+	addBind("txed_patch_left8", keypress_t("left"), "Move Patch left 8", group);
+	addBind("txed_patch_up", keypress_t("up", KPM_CTRL), "Move Patch up", group);
+	addBind("txed_patch_up8", keypress_t("up"), "Move Patch up 8", group);
+	addBind("txed_patch_right", keypress_t("right", KPM_CTRL), "Move Patch right", group);
+	addBind("txed_patch_right8", keypress_t("right"), "Move Patch right 8", group);
+	addBind("txed_patch_down", keypress_t("down", KPM_CTRL), "Move Patch down", group);
+	addBind("txed_patch_down8", keypress_t("down"), "Move Patch down 8", group);
+	addBind("txed_patch_add", keypress_t("insert"), "Add Patch", group);
+	addBind("txed_patch_delete", keypress_t("delete"), "Delete Patch", group);
+	addBind("txed_patch_replace", keypress_t("f2"), "Replace Patch", group);
 	addBind("txed_patch_replace", keypress_t("R", KPM_CTRL));
-	addBind("txed_patch_duplicate", keypress_t("D", KPM_CTRL), "Duplicate Patch");
-	addBind("txed_patch_forward", keypress_t("]"), "Bring Patch forward");
-	addBind("txed_patch_back", keypress_t("["), "Send Patch back");
-	addBind("txed_tex_up", keypress_t("up", KPM_CTRL), "Move Texture up");
+	addBind("txed_patch_duplicate", keypress_t("D", KPM_CTRL), "Duplicate Patch", group);
+	addBind("txed_patch_forward", keypress_t("]"), "Bring Patch forward", group);
+	addBind("txed_patch_back", keypress_t("["), "Send Patch back", group);
+	addBind("txed_tex_up", keypress_t("up", KPM_CTRL), "Move Texture up", group);
 	addBind("txed_tex_up", keypress_t("U", KPM_CTRL));
-	addBind("txed_tex_down", keypress_t("down", KPM_CTRL), "Move Texture down");
+	addBind("txed_tex_down", keypress_t("down", KPM_CTRL), "Move Texture down", group);
 	addBind("txed_tex_down", keypress_t("D", KPM_CTRL));
-	addBind("txed_tex_new", keypress_t("N", KPM_CTRL), "New Texture");
-	addBind("txed_tex_new_patch", keypress_t("N", KPM_CTRL|KPM_SHIFT), "New Texture from Patch");
-	addBind("txed_tex_new_file", keypress_t("N", KPM_CTRL|KPM_ALT), "New Texture from File");
-	addBind("txed_tex_delete", keypress_t("delete"), "Delete Texture");
+	addBind("txed_tex_new", keypress_t("N", KPM_CTRL), "New Texture", group);
+	addBind("txed_tex_new_patch", keypress_t("N", KPM_CTRL|KPM_SHIFT), "New Texture from Patch", group);
+	addBind("txed_tex_new_file", keypress_t("N", KPM_CTRL|KPM_ALT), "New Texture from File", group);
+	addBind("txed_tex_delete", keypress_t("delete"), "Delete Texture", group);
+
+
+	// Set above keys as defaults
+	for (unsigned a = 0; a < keybinds.size(); a++) {
+		for (unsigned k = 0; k < keybinds[a].keys.size(); k++)
+			keybinds[a].defaults.push_back(keybinds[a].keys[k]);
+	}
 }
 
 string KeyBind::writeBinds() {
@@ -444,6 +490,10 @@ string KeyBind::writeBinds() {
 		// Add keybind line
 		ret += "\t";
 		ret += kb.name;
+
+		// '.' indicates no binds
+		if (kb.keys.size() == 0)
+			ret += " .";
 
 		// Go through all bound keys
 		for (unsigned a = 0; a < kb.keys.size(); a++) {
@@ -485,6 +535,10 @@ bool KeyBind::readBinds(Tokenizer& tz) {
 		// Read keys
 		while (1) {
 			string keystr = tz.getToken();
+
+			// Finish if no keys are bound
+			if (keystr == ".")
+				break;
 
 			// Parse key string
 			string key, mods;

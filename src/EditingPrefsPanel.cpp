@@ -46,7 +46,7 @@ EXTERN_CVAR(Int, autosave_entry_changes)
 /* EditingPrefsPanel::EditingPrefsPanel
  * EditingPrefsPanel class constructor
  *******************************************************************/
-EditingPrefsPanel::EditingPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+EditingPrefsPanel::EditingPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

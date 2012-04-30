@@ -48,7 +48,7 @@ EXTERN_CVAR(String, nodebuilder_options)
 /* NodesPrefsPanel::NodesPrefsPanel
  * NodesPrefsPanel class constructor
  *******************************************************************/
-NodesPrefsPanel::NodesPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+NodesPrefsPanel::NodesPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

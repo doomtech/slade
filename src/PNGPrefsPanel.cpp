@@ -47,7 +47,7 @@ EXTERN_CVAR(String, path_deflopt)
 /* PNGPrefsPanel::PNGPrefsPanel
  * PNGPrefsPanel class constructor
  *******************************************************************/
-PNGPrefsPanel::PNGPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+PNGPrefsPanel::PNGPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

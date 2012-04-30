@@ -42,7 +42,7 @@
 /* TextStylePrefsPanel::TextStylePrefsPanel
  * TextStylePrefsPanel class constructor
  *******************************************************************/
-TextStylePrefsPanel::TextStylePrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+TextStylePrefsPanel::TextStylePrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Init variables
 	ss_current.copySet(StyleSet::currentSet());
 	ts_current = ss_current.getStyle("default");

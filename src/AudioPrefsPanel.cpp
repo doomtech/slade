@@ -49,7 +49,7 @@ EXTERN_CVAR(String, dir_last)
 /* AudioPrefsPanel::AudioPrefsPanel
  * AudioPrefsPanel class constructor
  *******************************************************************/
-AudioPrefsPanel::AudioPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+AudioPrefsPanel::AudioPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

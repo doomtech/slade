@@ -2,7 +2,9 @@
 #ifndef __PNG_PREFS_PANEL_H__
 #define __PNG_PREFS_PANEL_H__
 
-class PNGPrefsPanel : public wxPanel {
+#include "PrefsPanelBase.h"
+
+class PNGPrefsPanel : public PrefsPanelBase {
 private:
 	wxTextCtrl*	text_pngoutpath;
 	wxTextCtrl*	text_pngcrushpath;

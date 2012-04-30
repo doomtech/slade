@@ -25,7 +25,7 @@ EXTERN_CVAR(Bool, map_animate_tagged)
 EXTERN_CVAR(Bool, line_fade)
 EXTERN_CVAR(Bool, flat_fade)
 
-MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

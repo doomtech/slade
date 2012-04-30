@@ -2,7 +2,9 @@
 #ifndef __NODES_PREFS_PANEL_H__
 #define __NODES_PREFS_PANEL_H__
 
-class NodesPrefsPanel : public wxPanel {
+#include "PrefsPanelBase.h"
+
+class NodesPrefsPanel : public PrefsPanelBase {
 private:
 	wxChoice*		choice_nodebuilder;
 	wxButton*		btn_browse_path;

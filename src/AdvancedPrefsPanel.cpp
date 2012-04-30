@@ -41,7 +41,7 @@
 /* AdvancedPrefsPanel::AdvancedPrefsPanel
  * AdvancedPrefsPanel class constructor
  *******************************************************************/
-AdvancedPrefsPanel::AdvancedPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+AdvancedPrefsPanel::AdvancedPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

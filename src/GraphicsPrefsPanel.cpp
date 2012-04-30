@@ -51,7 +51,7 @@ EXTERN_CVAR(Int, browser_bg_type)
 /* GraphicsPrefsPanel::GraphicsPrefsPanel
  * GraphicsPrefsPanel class constructor
  *******************************************************************/
-GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);

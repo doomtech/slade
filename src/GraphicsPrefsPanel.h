@@ -1,9 +1,11 @@
 
 #ifndef __GFX_PREFS_PANEL_H__
 #define __GFX_PREFS_PANEL_H__
+
+#include "PrefsPanelBase.h"
 #include <wx/clrpicker.h>
 
-class GraphicsPrefsPanel : public wxPanel {
+class GraphicsPrefsPanel : public PrefsPanelBase {
 private:
 	wxColourPickerCtrl*	cp_colour1;
 	wxColourPickerCtrl*	cp_colour2;

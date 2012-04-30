@@ -2,43 +2,14 @@
 #ifndef __PREFERENCES_DIALOG_H__
 #define __PREFERENCES_DIALOG_H__
 
-#include "ColourPrefsPanel.h"
 #include <wx/treebook.h>
 
+class PrefsPanelBase;
 class BaseResourceArchivesPanel;
-class GeneralPrefsPanel;
-class InterfacePrefsPanel;
-class EditingPrefsPanel;
-class TextEditorPrefsPanel;
-class TextStylePrefsPanel;
-class ACSPrefsPanel;
-class GraphicsPrefsPanel;
-class PNGPrefsPanel;
-class AudioPrefsPanel;
-class ColourPrefsPanel;
-class MapEditorPrefsPanel;
-class MapDisplayPrefsPanel;
-class AdvancedPrefsPanel;
-class NodesPrefsPanel;
-
 class PreferencesDialog : public wxDialog {
 private:
-	wxTreebook*	tree_prefs;
-
-	GeneralPrefsPanel*		panel_general;
-	InterfacePrefsPanel*	panel_interface;
-	EditingPrefsPanel*		panel_editing;
-	TextEditorPrefsPanel*	panel_text_editor;
-	TextStylePrefsPanel*	panel_text_styles;
-	ACSPrefsPanel*			panel_script_acs;
-	GraphicsPrefsPanel*		panel_gfx_prefs;
-	PNGPrefsPanel*			panel_gfx_png;
-	AudioPrefsPanel*		panel_audio;
-	ColourPrefsPanel*		panel_colours;
-	MapEditorPrefsPanel*	panel_maped;
-	MapDisplayPrefsPanel*	panel_map_display;
-	AdvancedPrefsPanel*		panel_advanced;
-	NodesPrefsPanel*		panel_nodebuilders;
+	wxTreebook*				tree_prefs;
+	vector<PrefsPanelBase*>	prefs_pages;
 
 	// Base Resource Archive
 	BaseResourceArchivesPanel*	panel_bra;

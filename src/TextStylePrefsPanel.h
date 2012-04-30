@@ -2,11 +2,12 @@
 #ifndef __TEXT_STYLE_PREFS_PANEL_H__
 #define __TEXT_STYLE_PREFS_PANEL_H__
 
+#include "PrefsPanelBase.h"
 #include "TextStyle.h"
 #include <wx/clrpicker.h>
 #include <wx/fontpicker.h>
 
-class TextStylePrefsPanel : public wxPanel {
+class TextStylePrefsPanel : public PrefsPanelBase {
 private:
 	wxChoice*			choice_styleset;
 	wxButton*			btn_savestyleset;

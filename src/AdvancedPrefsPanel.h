@@ -2,9 +2,10 @@
 #ifndef __ADVANCED_PREFS_PANEL_H__
 #define __ADVANCED_PREFS_PANEL_H__
 
+#include "PrefsPanelBase.h"
 #include <wx/propgrid/propgrid.h>
 
-class AdvancedPrefsPanel : public wxPanel {
+class AdvancedPrefsPanel : public PrefsPanelBase {
 private:
 	wxPropertyGrid*	pg_cvars;
 

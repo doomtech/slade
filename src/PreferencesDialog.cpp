@@ -48,6 +48,7 @@
 #include "ArchiveManager.h"
 #include "TextEditorPrefsPanel.h"
 #include "NodesPrefsPanel.h"
+#include "InputPrefsPanel.h"
 #include "Icons.h"
 #include <wx/gbsizer.h>
 
@@ -72,39 +73,25 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	// Create preferences TreeBook
 	tree_prefs = new wxTreebook(this, -1, wxDefaultPosition, wxDefaultSize);
 
-	// Create separate preferences panels
-	panel_general = new GeneralPrefsPanel(tree_prefs);
-	panel_interface = new InterfacePrefsPanel(tree_prefs);
-	panel_editing = new EditingPrefsPanel(tree_prefs);
-	panel_text_editor = new TextEditorPrefsPanel(tree_prefs);
-	panel_text_styles = new TextStylePrefsPanel(tree_prefs);
-	panel_script_acs = new ACSPrefsPanel(tree_prefs);
-	panel_gfx_prefs = new GraphicsPrefsPanel(tree_prefs);
-	panel_gfx_png = new PNGPrefsPanel(tree_prefs);
-	panel_audio = new AudioPrefsPanel(tree_prefs);
-	panel_colours = new ColourPrefsPanel(tree_prefs);
-	panel_maped = new MapEditorPrefsPanel(tree_prefs);
-	panel_map_display = new MapDisplayPrefsPanel(tree_prefs);
-	panel_advanced = new AdvancedPrefsPanel(tree_prefs);
-	panel_nodebuilders = new NodesPrefsPanel(tree_prefs);
-
 	// Setup preferences TreeBook
-	tree_prefs->AddPage(panel_general, "General", true);
-	tree_prefs->AddPage(panel_interface, "Interface");
-	tree_prefs->AddSubPage(panel_colours, "Colours");
-	tree_prefs->AddPage(panel_editing, "Editing");
+	PrefsPanelBase* panel;
+	panel = new GeneralPrefsPanel(tree_prefs);		tree_prefs->AddPage(panel, "General", true); prefs_pages.push_back(panel);
+	panel = new InterfacePrefsPanel(tree_prefs);	tree_prefs->AddPage(panel, "Interface"); prefs_pages.push_back(panel);
+	panel = new ColourPrefsPanel(tree_prefs);		tree_prefs->AddSubPage(panel, "Colours"); prefs_pages.push_back(panel);
+	panel = new InputPrefsPanel(tree_prefs);		tree_prefs->AddPage(panel, "Input"); prefs_pages.push_back(panel);
+	panel = new EditingPrefsPanel(tree_prefs);		tree_prefs->AddPage(panel, "Editing"); prefs_pages.push_back(panel);
 	tree_prefs->AddSubPage(setupBaseResourceArchivesPanel(), "Base Resource Archive");
-	tree_prefs->AddPage(panel_text_editor, "Text Editor");
-	tree_prefs->AddSubPage(panel_text_styles, "Fonts & Colours");
-	tree_prefs->AddPage(panel_gfx_prefs, "Graphics");
-	tree_prefs->AddSubPage(panel_gfx_png, "PNG");
-	tree_prefs->AddPage(panel_audio, "Audio");
+	panel = new TextEditorPrefsPanel(tree_prefs);	tree_prefs->AddPage(panel, "Text Editor"); prefs_pages.push_back(panel);
+	panel = new TextStylePrefsPanel(tree_prefs);	tree_prefs->AddSubPage(panel, "Fonts & Colours"); prefs_pages.push_back(panel);
+	panel = new GraphicsPrefsPanel(tree_prefs);		tree_prefs->AddPage(panel, "Graphics"); prefs_pages.push_back(panel);
+	panel = new PNGPrefsPanel(tree_prefs);			tree_prefs->AddSubPage(panel, "PNG"); prefs_pages.push_back(panel);
+	panel = new AudioPrefsPanel(tree_prefs);		tree_prefs->AddPage(panel, "Audio"); prefs_pages.push_back(panel);
 	tree_prefs->AddPage(new wxPanel(tree_prefs, -1), "Scripting");
-	tree_prefs->AddSubPage(panel_script_acs, "ACS");
-	tree_prefs->AddPage(panel_maped, "Map Editor");
-	tree_prefs->AddSubPage(panel_map_display, "Display");
-	tree_prefs->AddSubPage(panel_nodebuilders, "Node Builders");
-	tree_prefs->AddPage(panel_advanced, "Advanced");
+	panel = new ACSPrefsPanel(tree_prefs);			tree_prefs->AddSubPage(panel, "ACS"); prefs_pages.push_back(panel);
+	panel = new MapEditorPrefsPanel(tree_prefs);	tree_prefs->AddPage(panel, "Map Editor"); prefs_pages.push_back(panel);
+	panel = new MapDisplayPrefsPanel(tree_prefs);	tree_prefs->AddSubPage(panel, "Display"); prefs_pages.push_back(panel);
+	panel = new NodesPrefsPanel(tree_prefs);		tree_prefs->AddSubPage(panel, "Node Builders"); prefs_pages.push_back(panel);
+	panel = new AdvancedPrefsPanel(tree_prefs);		tree_prefs->AddPage(panel, "Advanced"); prefs_pages.push_back(panel);
 
 	// Expand all tree nodes (so it gets sized properly)
 	for (unsigned page = 0; page < tree_prefs->GetPageCount(); page++)
@@ -183,20 +170,8 @@ void PreferencesDialog::showPage(string name) {
  * Applies preference values from all preference panels
  *******************************************************************/
 void PreferencesDialog::applyPreferences() {
-	panel_advanced->applyPreferences();
-	panel_general->applyPreferences();
-	panel_interface->applyPreferences();
-	panel_editing->applyPreferences();
-	panel_text_editor->applyPreferences();
-	panel_text_styles->applyPreferences();
-	panel_script_acs->applyPreferences();
-	panel_gfx_prefs->applyPreferences();
-	panel_gfx_png->applyPreferences();
-	panel_audio->applyPreferences();
-	panel_colours->applyPreferences();
-	panel_maped->applyPreferences();
-	panel_map_display->applyPreferences();
-	panel_nodebuilders->applyPreferences();
+	for (unsigned a = 0; a < prefs_pages.size(); a++)
+		prefs_pages[a]->applyPreferences();
 }
 
 

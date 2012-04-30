@@ -2,7 +2,9 @@
 #ifndef __MAP_EDITOR_PREFS_PANEL_H__
 #define __MAP_EDITOR_PREFS_PANEL_H__
 
-class MapEditorPrefsPanel : public wxPanel {
+#include "PrefsPanelBase.h"
+
+class MapEditorPrefsPanel : public PrefsPanelBase {
 private:
 	wxCheckBox*	cb_scroll_smooth;
 	wxCheckBox*	cb_selection_clear_click;

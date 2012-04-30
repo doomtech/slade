@@ -46,7 +46,7 @@ EXTERN_CVAR(String, path_acc)
 /* ACSPrefsPanel::ACSPrefsPanel
  * ACSPrefsPanel class constructor
  *******************************************************************/
-ACSPrefsPanel::ACSPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
+ACSPrefsPanel::ACSPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(psizer);
