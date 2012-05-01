@@ -871,6 +871,46 @@
 						RelativePath=".\src\TextStyle.h"
 						>
 					</File>
+					<Filter
+						Name="Languages"
+						>
+						<File
+							RelativePath=".\dist\res\config\languages\0_base.txt"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\languages\acs.txt"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\languages\decorate.txt"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\languages\edf.txt"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\languages\fragglescript.txt"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\languages\hexen.txt"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\languages\kssc.txt"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\languages\usdf.txt"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\languages\zdoom.txt"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="HexEditor"

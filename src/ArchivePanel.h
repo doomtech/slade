@@ -127,6 +127,7 @@ public:
 	virtual void	onEntryListActivated(wxListEvent& e);
 	void			onDEPEditAsText(wxCommandEvent& e);
 	void			onDEPViewAsHex(wxCommandEvent& e);
+	void			onMEPEditAsText(wxCommandEvent& e);
 	void			onTextFilterChanged(wxCommandEvent& e);
 	void			onChoiceCategoryChanged(wxCommandEvent& e);
 	void			onDirChanged(wxCommandEvent& e);

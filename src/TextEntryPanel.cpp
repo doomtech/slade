@@ -107,6 +107,11 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// --- Attempt to determine text language ---
 	TextLanguage* tl = NULL;
 
+	// Level markers use FraggleScript
+	if (entry->getType() == EntryType::mapMarkerType()) {
+		tl = TextLanguage::getLanguage("fragglescript");
+	}
+
 	// From entry language hint
 	if (entry->exProps().propertyExists("TextLanguage")) {
 		string lang_id = entry->exProp("TextLanguage");

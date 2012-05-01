@@ -48,6 +48,7 @@ class MapEntryPanel : public EntryPanel {
 private:
 	MapPreviewCanvas*	map_canvas;
 	wxButton*			btn_saveimg;
+	wxButton*			btn_script;
 
 public:
 	MapEntryPanel(wxWindow* parent);
@@ -58,6 +59,8 @@ public:
 	bool	createImage();
 
 	void	onBtnSaveImage(wxCommandEvent& e);
+	void	onBtnEditFraggleScript(wxCommandEvent& e);
+	wxButton*	getEditTextButton() { return btn_script; }
 };
 
 #endif//__MAP_ENTRY_PANEL_H__

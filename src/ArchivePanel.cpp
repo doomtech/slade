@@ -261,6 +261,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	btn_updir->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onBtnUpDir, this);
 	((DefaultEntryPanel*)default_area)->getEditTextButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPEditAsText, this);
 	((DefaultEntryPanel*)default_area)->getViewHexButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPViewAsHex, this);
+	((MapEntryPanel*)map_area)->getEditTextButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onMEPEditAsText, this);
 
 	// Do a quick check to see if we need the path display
 	if (archive->getRoot()->nChildren() == 0)
@@ -2329,6 +2330,18 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 		theMainWindow->openEntry(entry);
 
 	e.Skip();
+}
+
+/* ArchivePanel::onMEPEditAsText
+ * Called when the 'Edit Level Script' button is clicked on the map
+ * entry panel - opens the entry in the text editor panel
+ *******************************************************************/
+void ArchivePanel::onMEPEditAsText(wxCommandEvent& e) {
+	// Get entry to edit
+	ArchiveEntry* entry = map_area->getEntry();
+
+	// Open in text editor
+	openEntryAsText(entry);
 }
 
 /* ArchivePanel::onDEPEditAsText

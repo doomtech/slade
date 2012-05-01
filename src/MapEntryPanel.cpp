@@ -372,6 +372,10 @@ MapEntryPanel::MapEntryPanel(wxWindow* parent) : EntryPanel(parent, "map") {
 	btn_saveimg = new wxButton(this, -1, "Save Map Image");
 	sizer_top->Add(btn_saveimg, 0, wxEXPAND|wxRIGHT, 4);
 
+	// Add 'Edit Level Script' button
+	btn_script = new wxButton(this, -1, "Edit Level Script");
+	sizer_top->Add(btn_script, 0, wxEXPAND|wxRIGHT, 4);
+
 	// Bind events
 	btn_saveimg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEntryPanel::onBtnSaveImage, this);
 
