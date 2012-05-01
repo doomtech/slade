@@ -305,6 +305,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\InputPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\InputPrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\InterfacePrefsPanel.cpp"
 					>
 				</File>
@@ -1188,6 +1196,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\dist\res\config\games\doom2_eternity.cfg"
+						>
+					</File>
+					<File
 						RelativePath=".\dist\res\config\games\doom2_prboom+.cfg"
 						>
 					</File>
@@ -1240,11 +1252,23 @@
 						>
 					</File>
 					<File
+						RelativePath=".\dist\res\config\games\hexen_zd.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\hexen_zd_udmf.cfg"
+						>
+					</File>
+					<File
 						RelativePath=".\dist\res\config\nodebuilders.cfg"
 						>
 					</File>
 					<File
 						RelativePath=".\dist\res\config\games\strife.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\strife_zd_udmf.cfg"
 						>
 					</File>
 					<Filter
@@ -1267,11 +1291,19 @@
 							>
 						</File>
 						<File
+							RelativePath=".\dist\res\config\games\include\specials\eternity_specials.cfg"
+							>
+						</File>
+						<File
 							RelativePath=".\dist\res\config\games\include\specials\heretic_specials.cfg"
 							>
 						</File>
 						<File
 							RelativePath=".\dist\res\config\games\include\specials\hexen_specials.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\specials\mbf_specials.cfg"
 							>
 						</File>
 						<File
@@ -1304,6 +1336,10 @@
 						</File>
 						<File
 							RelativePath=".\dist\res\config\games\include\things\doom64_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\eternity_things.cfg"
 							>
 						</File>
 						<File
@@ -1452,6 +1488,34 @@
 						</File>
 						<File
 							RelativePath=".\dist\res\config\games\include\defaults\strife_defaults.cfg"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Maps"
+						>
+						<File
+							RelativePath=".\dist\res\config\games\include\maps\doom1_maps.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\maps\doom2_maps.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\maps\doom64_maps.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\maps\heretic_maps.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\maps\hexen_maps.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\maps\strife_maps.cfg"
 							>
 						</File>
 					</Filter>

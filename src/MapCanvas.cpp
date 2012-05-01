@@ -1823,6 +1823,7 @@ bool MapCanvas::handleAction(string id) {
 			renderer_2d->forceUpdate(fade_lines);
 			Refresh();
 		}
+		return true;
 	}
 
 	// --- Line context menu ---
@@ -1840,6 +1841,7 @@ bool MapCanvas::handleAction(string id) {
 			lto->openLines(selection);
 			overlay_current = lto;
 		}
+		return true;
 	}
 
 	// --- Thing context menu ---

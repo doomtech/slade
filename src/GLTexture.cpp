@@ -549,10 +549,10 @@ rgba_t GLTexture::averageColour(rect_t area) {
 		area.set(0, 0, width, height);
 
 	// Clamp area to texture
-	if (area.tl.x < 0)		area.tl.x = 0;
-	if (area.tl.y < 0)		area.tl.y = 0;
-	if (area.br.x > width)	area.br.x = width;
-	if (area.br.y > height)	area.br.y = height;
+	if (area.tl.x < 0)					area.tl.x = 0;
+	if (area.tl.y < 0)					area.tl.y = 0;
+	if ((unsigned)area.br.x > width)	area.br.x = width;
+	if ((unsigned)area.br.y > height)	area.br.y = height;
 
 	// Get texture pixels
 	uint8_t* pixels = new uint8_t[width*height*4];
@@ -565,8 +565,8 @@ rgba_t GLTexture::averageColour(rect_t area) {
 	unsigned blue = 0;
 	unsigned npix = 0;
 	// Go through area
-	for (unsigned y = area.tl.y; y < area.br.y; y++) {
-		for (unsigned x = area.tl.x; x < area.br.x; x++) {
+	for (int y = area.tl.y; y < area.br.y; y++) {
+		for (int x = area.tl.x; x < area.br.x; x++) {
 			// Add pixel
 			unsigned c = (y * width * 4) + (x * 4);
 			red += pixels[c++];

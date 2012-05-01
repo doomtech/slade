@@ -152,7 +152,7 @@ void InputPrefsPanel::initBindsList() {
 		wxTreeListItem item = list_binds->AppendItem(group, binds[a]->getDescription(), -1, -1, new BindListItemData(binds[a]->getKey(0), binds[a]));
 
 		// Add any extra key binds
-		for (unsigned b = 1; b < binds[a]->nKeys(); b++)
+		for (int b = 1; b < binds[a]->nKeys(); b++)
 			list_binds->AppendItem(item, "", -1, -1, new BindListItemData(binds[a]->getKey(b)));
 	}
 }
@@ -386,7 +386,7 @@ void InputPrefsPanel::onBtnDefaults(wxCommandEvent& e) {
 		bind->key = bind->bind->getDefault(0);
 
 	// Go through default keys for the bind
-	for (unsigned a = 1; a < bind->bind->nDefaults(); a++)
+	for (int a = 1; a < bind->bind->nDefaults(); a++)
 		wxTreeListItem n = list_binds->AppendItem(item, "", -1, -1, new BindListItemData(bind->bind->getDefault(a)));
 
 	// Refresh list
