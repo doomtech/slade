@@ -12,9 +12,8 @@ CVAR(Int, render_thing_icon_size, 16, CVAR_SAVE)
 CVAR(Bool, render_fog_quality, true, CVAR_SAVE)
 CVAR(Bool, render_max_dist_adaptive, true, CVAR_SAVE)
 CVAR(Int, render_adaptive_ms, 15, CVAR_SAVE)
+CVAR(Bool, render_3d_sky, true, CVAR_SAVE)
 
-// test
-CVAR(Bool, render_sort, true, CVAR_SAVE)
 
 MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	// Init variables
@@ -27,7 +26,12 @@ MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	this->vbo_walls = 0;
 	this->skytex1 = "SKY1";
 	this->quads = NULL;
+	this->flats = NULL;
 	this->last_light = 255;
+	this->tex_last = NULL;
+	this->n_quads = 0;
+	this->n_flats = 0;
+	this->flat_last = 0;
 
 	// Build skybox circle
 	buildSkyCircle();
@@ -39,6 +43,8 @@ MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 MapRenderer3D::~MapRenderer3D() {
 	if (quads)
 		delete quads;
+	if (flats)
+		delete flats;
 }
 
 bool MapRenderer3D::init() {
@@ -64,6 +70,10 @@ void MapRenderer3D::refresh() {
 	if (quads) {
 		delete quads;
 		quads = NULL;
+	}
+	if (flats) {
+		delete flats;
+		flats = NULL;
 	}
 
 	// Clear VBOs
@@ -257,7 +267,31 @@ void MapRenderer3D::renderMap() {
 		glHint(GL_FOG_HINT, GL_NICEST);
 	else
 		glHint(GL_FOG_HINT, GL_FASTEST);
+
+	// Init
 	last_light = -1;
+	tex_last = NULL;
+
+	// Init VBO stuff
+	if (OpenGL::vboSupport()) {
+		// Check if any polygon vertex data has changed (in this case we need to refresh the entire vbo)
+		bool vbo_updated = false;
+		for (unsigned a = 0; a < map->nSectors(); a++) {
+			Polygon2D* poly = map->getSector(a)->getPolygon();
+			if (poly && poly->vboUpdate() > 1) {
+				updateFlatsVBO();
+				vbo_updated = true;
+				break;
+			}
+		}
+
+		// Create VBO if necessary
+		if (!vbo_updated && vbo_floors == 0)
+			updateFlatsVBO();
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
 
 	// Create flat arrays if needed
 	if (floors.size() != map->nSectors()) {
@@ -276,9 +310,14 @@ void MapRenderer3D::renderMap() {
 	// Quick distance vis check
 	sf::Clock clock;
 	quickVisDiscard();
+
+	// Build lists of quads and flats to render
+	checkVisibleFlats();
+	checkVisibleQuads();
 	
 	// Render sky
-	renderSky();
+	if (render_3d_sky)
+		renderSky();
 
 	// Render walls
 	renderWalls();
@@ -422,6 +461,35 @@ void MapRenderer3D::renderSky() {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_ALPHA_TEST);
+
+	// Render all sky quads
+	glDisable(GL_TEXTURE_2D);
+	for (unsigned a = 0; a < n_quads; a++) {
+		// Ignore if not sky
+		if ((quads[a]->flags & SKY) == 0)
+			continue;
+
+		// Render quad
+		renderQuad(quads[a]);
+		quads[a] = quads[n_quads-1];
+		n_quads--;
+		a--;
+	}
+
+	// Render all sky flats
+	flat_last = 0;
+	for (unsigned a = 0; a < n_flats; a++) {
+		// Ignore if not sky
+		if ((flats[a]->flags & SKY) == 0)
+			continue;
+
+		// Render quad
+		renderFlat(flats[a]);
+		flats[a] = flats[n_flats-1];
+		n_flats--;
+		a--;
+	}
+	glEnable(GL_TEXTURE_2D);
 }
 
 void MapRenderer3D::updateFlatTexCoords(unsigned index, bool floor) {
@@ -472,9 +540,11 @@ void MapRenderer3D::updateSector(unsigned index) {
 
 	// Update floor
 	MapSector* sector = map->getSector(index);
+	floors[index].sector = sector;
 	floors[index].texture = theMapEditor->textureManager().getFlat(sector->floorTexture());
 	floors[index].colour = map->getSectorColour(sector, 1, true);
 	floors[index].light = map->getSectorLight(sector, 1);
+	floors[index].flags = 0;
 	if (sector->floorTexture() == theGameConfiguration->skyFlat())
 		floors[index].flags |= SKY;
 
@@ -487,9 +557,11 @@ void MapRenderer3D::updateSector(unsigned index) {
 	}
 
 	// Update ceiling
+	ceilings[index].sector = sector;
 	ceilings[index].texture = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
 	ceilings[index].colour = map->getSectorColour(sector, 2, true);
 	ceilings[index].light = map->getSectorLight(sector, 2);
+	ceilings[index].flags = CEIL;
 	if (sector->ceilingTexture() == theGameConfiguration->skyFlat())
 		ceilings[index].flags |= SKY;
 
@@ -510,6 +582,64 @@ void MapRenderer3D::updateSector(unsigned index) {
 	}
 }
 
+void MapRenderer3D::renderFlat(flat_3d_t* flat) {
+	// Setup special rendering options
+	float alpha = flat->alpha;
+	if (flat->flags & SKY && render_3d_sky) {
+		alpha = 0;
+		glDisable(GL_ALPHA_TEST);
+	}
+
+	// Setup colour/light
+	setLight(flat->colour, flat->light, alpha);
+
+	// Render flat
+	if (OpenGL::vboSupport()) {
+		// Setup for floor or ceiling
+		if (flat->flags & CEIL) {
+			if (flat_last != 2) {
+				glCullFace(GL_BACK);
+				glBindBuffer(GL_ARRAY_BUFFER, vbo_ceilings);
+				Polygon2D::setupVBOPointers();
+				flat_last = 2;
+			}
+		}
+		else {
+			if (flat_last != 1) {
+				glCullFace(GL_FRONT);
+				glBindBuffer(GL_ARRAY_BUFFER, vbo_floors);
+				Polygon2D::setupVBOPointers();
+				flat_last = 1;
+			}
+		}
+
+		// Render
+		flat->sector->getPolygon()->renderVBO(false);
+	}
+	else {
+		glPushMatrix();
+
+		// Setup for floor or ceiling
+		if (flat->flags & CEIL) {
+			glCullFace(GL_BACK);
+			glTranslated(0, 0, flat->sector->intProperty("heightceiling"));
+		}
+		else {
+			glCullFace(GL_FRONT);
+			glTranslated(0, 0, flat->sector->intProperty("heightfloor"));
+		}
+
+		// Render
+		flat->sector->getPolygon()->render();
+
+		glPopMatrix();
+	}
+
+	// Reset settings
+	if (flat->flags & SKY && render_3d_sky)
+		glEnable(GL_ALPHA_TEST);
+}
+
 void MapRenderer3D::renderFlats() {
 	// Check for map
 	if (!map)
@@ -518,108 +648,40 @@ void MapRenderer3D::renderFlats() {
 	// Init textures
 	glEnable(GL_TEXTURE_2D);
 
-	// Use VBOs if supported
-	if (GLEW_ARB_vertex_buffer_object)
-		return renderFlatsVBO();
-
-	// Render floors
-	glCullFace(GL_FRONT);
-	uint8_t alpha = 255;
-	GLTexture* tex = NULL;
-	GLTexture* tex_last = NULL;
-	for (unsigned a = 0; a < map->nSectors(); a++) {
-		MapSector* sector = map->getSector(a);
-
-		// Skip if invisible
-		if (dist_sectors[a] < 0)
-			continue;
-
-		// Check distance if needed
-		if (render_max_dist > 0) {
-			if (dist_sectors[a] > render_max_dist)
+	// Render all visible flats, ordered by texture
+	unsigned a = 0;
+	flat_last = 0;
+	while (n_flats > 0) {
+		tex_last = NULL;
+		a = 0;
+		while (a < n_flats) {
+			// Check texture
+			if (!tex_last && flats[a]->texture) {
+				tex_last = flats[a]->texture;
+				flats[a]->texture->bind();
+			}
+			if (flats[a]->texture != tex_last) {
+				a++;
 				continue;
-			// Double-check distance
-			dist_sectors[a] = map->distanceToSector(cam_position.x, cam_position.y, a, render_max_dist);
-			if (dist_sectors[a] > render_max_dist && !sector->boundingBox().point_within(cam_position.x, cam_position.y))
-				continue;
+			}
+
+			// Render flat
+			renderFlat(flats[a]);
+			flats[a] = flats[n_flats-1];
+			n_flats--;
 		}
-
-		// Check for sky
-		if (floors[a].flags & SKY)
-			alpha = 0;
-		else
-			alpha = 255;
-
-		// Update sector info if needed
-		if (floors[a].updated_time < sector->modifiedTime())
-			updateSector(a);
-
-		// Bind texture if needed
-		tex = floors[a].texture;
-		if (tex) {
-			if (!tex_last)
-				glEnable(GL_TEXTURE_2D);
-			if (tex != tex_last)
-				tex->bind();
-		}
-		else if (tex_last)
-			glDisable(GL_TEXTURE_2D);
-		tex_last = tex;
-
-		// Set polygon texture coordinates
-		updateFlatTexCoords(a, true);
-
-		// Render flat
-		glPushMatrix();
-		glTranslated(0, 0, sector->intProperty("heightfloor"));
-		floors[a].colour.a = alpha;
-		setLight(floors[a].colour, floors[a].light, calcDistFade(dist_sectors[a], render_max_dist));
-		sector->getPolygon()->render();
-		glPopMatrix();
 	}
 
-	// Render ceilings
-	glCullFace(GL_BACK);
-	for (unsigned a = 0; a < map->nSectors(); a++) {
-		MapSector* sector = map->getSector(a);
-
-		// Check distance if needed
-		if (render_max_dist > 0 && dist_sectors[a] > render_max_dist)
-			continue;
-
-		// Check for sky
-		if (ceilings[a].flags & SKY)
-			alpha = 0;
-		else
-			alpha = 255;
-
-		// Bind texture if needed
-		tex = ceilings[a].texture;
-		if (tex) {
-			if (!tex_last)
-				glEnable(GL_TEXTURE_2D);
-			if (tex != tex_last)
-				tex->bind();
-		}
-		else if (tex_last)
-			glDisable(GL_TEXTURE_2D);
-		tex_last = tex;
-
-		// Set polygon texture coordinates
-		updateFlatTexCoords(a, false);
-
-		// Render flat
-		glPushMatrix();
-		glTranslated(0, 0, sector->intProperty("heightceiling"));
-		ceilings[a].colour.a = alpha;
-		setLight(ceilings[a].colour, ceilings[a].light, calcDistFade(dist_sectors[a], render_max_dist));
-		sector->getPolygon()->render();
-		glPopMatrix();
-	}
-
+	// Reset gl stuff
 	glDisable(GL_TEXTURE_2D);
+	if (OpenGL::vboSupport()) {
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 }
 
+/*
 void MapRenderer3D::renderFlatsVBO() {
 	// First, check if any polygon vertex data has changed (in this case we need to refresh the entire vbo)
 	bool vbo_updated = false;
@@ -737,6 +799,7 @@ void MapRenderer3D::renderFlatsVBO() {
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+*/
 
 void MapRenderer3D::setupQuad(MapRenderer3D::quad_3d_t* quad, double x1, double y1, double x2, double y2, double top, double bottom) {
 	// Left
@@ -1104,7 +1167,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 
 void MapRenderer3D::renderQuad(MapRenderer3D::quad_3d_t* quad, float alpha) {
 	// Setup special rendering options
-	if (quad->flags & SKY) {
+	if (quad->flags & SKY && render_3d_sky) {
 		alpha = 0;
 		glDisable(GL_ALPHA_TEST);
 	}
@@ -1123,122 +1186,37 @@ void MapRenderer3D::renderQuad(MapRenderer3D::quad_3d_t* quad, float alpha) {
 	glEnd();
 
 	// Reset settings
-	if (quad->flags & SKY)
+	if (quad->flags & SKY && render_3d_sky)
 		glEnable(GL_ALPHA_TEST);
 	else if (quad->flags & MIDTEX)
 		glAlphaFunc(GL_GREATER, 0.0f);
 }
 
 void MapRenderer3D::renderWalls() {
-	// Create quads array if empty
-	if (!quads)
-		quads = (quad_3d_t**)malloc(sizeof(quad_3d_t*) * map->nLines() * 4);
-
-	// Init textures
+	// Init
 	glEnable(GL_TEXTURE_2D);
-	GLTexture* tex_last = NULL;
+	glCullFace(GL_BACK);
 
-	// Go through lines
-	MapLine* line;
-	float distfade;
-	unsigned nquads = 0;
-	unsigned updates = 0;
-	fpoint2_t strafe(cam_position.x+cam_strafe.x, cam_position.y+cam_strafe.y);
-	for (unsigned a = 0; a < lines.size(); a++) {
-		line = map->getLine(a);
-
-		// Skip if not visible
-		if (!lines[a].visible)
-			continue;
-
-		// Check side of camera
-		if (MathStuff::lineSide(line->x1(), line->y1(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0 &&
-			MathStuff::lineSide(line->x2(), line->y2(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0)
-			continue;
-
-		// Check for distance fade
-		if (render_max_dist > 0)
-			distfade = calcDistFade(MathStuff::distanceToLine(cam_position.x, cam_position.y, line->x1(), line->y1(), line->x2(), line->y2()), render_max_dist);
-		else
-			distfade = 1.0f;
-
-		// Update line if needed
-		if (lines[a].updated_time < line->modifiedTime()) {
-			updateLine(a);
-			//updates++;
-			//if (updates > 500)
-			//	break;
-		}
-
-		// Determine quads to be drawn
-		quad_3d_t* quad;
-		for (unsigned q = 0; q < lines[a].quads.size(); q++) {
-			// Check we're on the right side of the quad
-			quad = &(lines[a].quads[q]);
-			if (MathStuff::lineSide(cam_position.x, cam_position.y, quad->points[0].x, quad->points[0].y, quad->points[2].x, quad->points[2].y) < 0)
-				continue;
-
-			if (!render_sort) {
-				// Bind the texture if needed
-				if (quad->texture) {
-					if (!tex_last)
-						glEnable(GL_TEXTURE_2D);
-					if (lines[a].quads[q].texture != tex_last)
-						lines[a].quads[q].texture->bind();
-				}
-				else if (tex_last)
-					glDisable(GL_TEXTURE_2D);
-				tex_last = quad->texture;
-
-				// Render quad
-				renderQuad(quad, distfade);
+	// Render all visible quads, ordered by texture
+	unsigned a = 0;
+	while (n_quads > 0) {
+		tex_last = NULL;
+		a = 0;
+		while (a < n_quads) {
+			// Check texture
+			if (!tex_last && quads[a]->texture) {
+				tex_last = quads[a]->texture;
+				quads[a]->texture->bind();
 			}
-			else {
-				quads[nquads] = quad;
-				quad->alpha = distfade;
-				nquads++;
-			}
-		}
-	}
-
-	if (render_sort) {
-		// Render all sky quads first
-		glDisable(GL_TEXTURE_2D);
-		for (unsigned a = 0; a < nquads; a++) {
-			// Ignore if not sky
-			if ((quads[a]->flags & SKY) == 0)
+			if (quads[a]->texture != tex_last) {
+				a++;
 				continue;
+			}
 
 			// Render quad
-			renderQuad(quads[a]);
-			quads[a] = quads[nquads-1];
-			nquads--;
-			a--;
-		}
-		glEnable(GL_TEXTURE_2D);
-
-		// Render all visible quads, ordered by texture
-		GLTexture* tex_current = NULL;
-		unsigned a = 0;
-		while (nquads > 0) {
-			tex_current = NULL;
-			a = 0;
-			while (a < nquads) {
-				// Check texture
-				if (!tex_current && quads[a]->texture) {
-					tex_current = quads[a]->texture;
-					quads[a]->texture->bind();
-				}
-				if (quads[a]->texture != tex_current) {
-					a++;
-					continue;
-				}
-
-				// Render quad
-				renderQuad(quads[a], quads[a]->alpha);
-				quads[a] = quads[nquads-1];
-				nquads--;
-			}
+			renderQuad(quads[a], quads[a]->alpha);
+			quads[a] = quads[n_quads-1];
+			n_quads--;
 		}
 	}
 
@@ -1293,9 +1271,9 @@ void MapRenderer3D::updateThing(unsigned index, MapThing* thing) {
 }
 
 void MapRenderer3D::renderThings() {
-	// Init textures
+	// Init
 	glEnable(GL_TEXTURE_2D);
-	GLTexture* tex_last = NULL;
+	glCullFace(GL_BACK);
 	GLTexture* tex = NULL;
 
 	// Go through things
@@ -1510,4 +1488,109 @@ float MapRenderer3D::calcDistFade(double distance, double max) {
 		return 1.0f - ((distance - (max - faderange)) / faderange);
 	else
 		return 1.0f;
+}
+
+void MapRenderer3D::checkVisibleQuads() {
+	// Create quads array if empty
+	if (!quads)
+		quads = (quad_3d_t**)malloc(sizeof(quad_3d_t*) * map->nLines() * 4);
+
+	// Go through lines
+	MapLine* line;
+	float distfade;
+	n_quads = 0;
+	unsigned updates = 0;
+	fpoint2_t strafe(cam_position.x+cam_strafe.x, cam_position.y+cam_strafe.y);
+	for (unsigned a = 0; a < lines.size(); a++) {
+		line = map->getLine(a);
+
+		// Skip if not visible
+		if (!lines[a].visible)
+			continue;
+
+		// Check side of camera
+		if (MathStuff::lineSide(line->x1(), line->y1(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0 &&
+			MathStuff::lineSide(line->x2(), line->y2(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0)
+			continue;
+
+		// Check for distance fade
+		if (render_max_dist > 0)
+			distfade = calcDistFade(MathStuff::distanceToLine(cam_position.x, cam_position.y, line->x1(), line->y1(), line->x2(), line->y2()), render_max_dist);
+		else
+			distfade = 1.0f;
+
+		// Update line if needed
+		if (lines[a].updated_time < line->modifiedTime()) {
+			updateLine(a);
+			//updates++;
+			//if (updates > 500)
+			//	break;
+		}
+
+		// Determine quads to be drawn
+		quad_3d_t* quad;
+		for (unsigned q = 0; q < lines[a].quads.size(); q++) {
+			// Check we're on the right side of the quad
+			quad = &(lines[a].quads[q]);
+			if (MathStuff::lineSide(cam_position.x, cam_position.y, quad->points[0].x, quad->points[0].y, quad->points[2].x, quad->points[2].y) < 0)
+				continue;
+
+			quads[n_quads] = quad;
+			quad->alpha = distfade;
+			n_quads++;
+		}
+	}
+}
+
+void MapRenderer3D::checkVisibleFlats() {
+	// Create flats array if empty
+	if (!flats)
+		flats = (flat_3d_t**)malloc(sizeof(flat_3d_t*) * map->nSectors() * 2);
+
+	// Go through sectors
+	MapSector* sector;
+	n_flats = 0;
+	float alpha;
+	for (unsigned a = 0; a < map->nSectors(); a++) {
+		sector = map->getSector(a);
+
+		// Skip if invisible
+		if (dist_sectors[a] < 0)
+			continue;
+
+		// Check distance if needed
+		if (render_max_dist > 0) {
+			if (dist_sectors[a] > render_max_dist)
+				continue;
+			// Double-check distance
+			dist_sectors[a] = map->distanceToSector(cam_position.x, cam_position.y, a, render_max_dist);
+			if (dist_sectors[a] > render_max_dist && !sector->boundingBox().point_within(cam_position.x, cam_position.y)) {
+				dist_sectors[a] = -1;
+				continue;
+			}
+		}
+
+		// Update sector info if needed
+		if (floors[a].updated_time < sector->modifiedTime())
+			updateSector(a);
+
+		// Set distance fade alpha
+		if (render_max_dist > 0)
+			alpha = calcDistFade(dist_sectors[a], render_max_dist);
+		else
+			alpha = 1.0f;
+		floors[a].alpha = alpha;
+		ceilings[a].alpha = alpha;
+
+		// Add floor flat
+		flats[n_flats++] = &(floors[a]);
+	}
+	for (unsigned a = 0; a < map->nSectors(); a++) {
+		// Skip if invisible
+		if (dist_sectors[a] < 0)
+			continue;
+
+		// Add ceiling flat
+		flats[n_flats++] = &(ceilings[a]);
+	}
 }

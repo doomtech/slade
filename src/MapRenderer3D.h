@@ -15,6 +15,10 @@ private:
 	bool		fullbright;
 	bool		fog;
 	int			last_light;
+	GLTexture*	tex_last;
+	unsigned	n_quads;
+	unsigned	n_flats;
+	int			flat_last;
 
 	// Visibility
 	vector<float>	dist_sectors;
@@ -38,6 +42,9 @@ private:
 
 		// Quad flags
 		MIDTEX	= 0x04,
+
+		// Flat flags
+		CEIL	= 0x04,
 
 		// Thing flags
 		ICON	= 0x02,
@@ -89,6 +96,8 @@ private:
 		rgba_t		colour;
 		GLTexture*	texture;
 		plane_t		plane;
+		float		alpha;
+		MapSector*	sector;
 		long		updated_time;
 
 		flat_3d_t() {
@@ -96,6 +105,8 @@ private:
 			texture = NULL;
 			updated_time = 0;
 			flags = 0;
+			alpha = 1.0f;
+			sector = NULL;
 		}
 	};
 
@@ -105,6 +116,7 @@ private:
 	vector<thing_3d_t>	things;
 	vector<flat_3d_t>	floors;
 	vector<flat_3d_t>	ceilings;
+	flat_3d_t**			flats;
 
 	// VBOs
 	GLuint	vbo_floors;
@@ -156,8 +168,9 @@ public:
 	// Flats
 	void	updateFlatTexCoords(unsigned index, bool floor);
 	void	updateSector(unsigned index);
+	void	renderFlat(flat_3d_t* flat);
 	void	renderFlats();
-	void	renderFlatsVBO();
+	//void	renderFlatsVBO();
 
 	// Walls
 	void	setupQuad(quad_3d_t* quad, double x1, double y1, double x2, double y2, double top, double bottom);
@@ -177,6 +190,8 @@ public:
 	// Visibility checking
 	void	quickVisDiscard();
 	float	calcDistFade(double distance, double max = -1);
+	void	checkVisibleQuads();
+	void	checkVisibleFlats();
 };
 
 #endif//__MAP_RENDERER_3D_H__
