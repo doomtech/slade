@@ -7,6 +7,7 @@ class GLTexture;
 class ThingType;
 class MapThing;
 class MapSector;
+class Polygon2D;
 class MapRenderer3D {
 private:
 	SLADEMap*	map;
@@ -16,8 +17,7 @@ private:
 	int			last_light;
 
 	// Visibility
-	vector<double>	dist_sectors;
-	vector<double>	dist_lines;
+	vector<float>	dist_sectors;
 
 	// Camera
 	fpoint3_t	cam_position;
@@ -31,15 +31,16 @@ private:
 	// Structs
 	enum {
 		// Common flags
-		CALCULATED	= 0x01,
-		
-		// Thing flags
-		ICON		= 0x02,
+		TRANS	= 0x01,
+
+		// Quad/flat flags
+		SKY		= 0x02,
 
 		// Quad flags
-		TRANS		= 0x02,
-		SKY			= 0x04,
-		MIDTEX		= 0x08,
+		MIDTEX	= 0x04,
+
+		// Thing flags
+		ICON	= 0x02,
 	};
 	struct gl_vertex_t {
 		float x, y, z;
@@ -60,11 +61,11 @@ private:
 		}
 	};
 	struct line_3d_t {
-		uint8_t				flags;
 		vector<quad_3d_t>	quads;
 		long				updated_time;
+		bool				visible;
 
-		line_3d_t() { flags = 0; updated_time = 0; }
+		line_3d_t() { updated_time = 0; visible = true; }
 	};
 	struct thing_3d_t {
 		uint8_t		flags;
@@ -82,11 +83,28 @@ private:
 			updated_time = 0;
 		}
 	};
+	struct flat_3d_t {
+		uint8_t		flags;
+		uint8_t		light;
+		rgba_t		colour;
+		GLTexture*	texture;
+		plane_t		plane;
+		long		updated_time;
+
+		flat_3d_t() {
+			light = 255;
+			texture = NULL;
+			updated_time = 0;
+			flags = 0;
+		}
+	};
 
 	// Map Structures
 	vector<line_3d_t>	lines;
-	vector<thing_3d_t>	things;
 	quad_3d_t**			quads;
+	vector<thing_3d_t>	things;
+	vector<flat_3d_t>	floors;
+	vector<flat_3d_t>	ceilings;
 
 	// VBOs
 	GLuint	vbo_floors;
@@ -119,7 +137,7 @@ public:
 	void	buildSkyCircle();
 
 	// Camera
-	void	cameraMove(double distance);
+	void	cameraMove(double distance, bool z = true);
 	void	cameraTurn(double angle);
 	void	cameraMoveUp(double distance);
 	void	cameraStrafe(double distance);
@@ -136,7 +154,8 @@ public:
 	void	renderSky();
 
 	// Flats
-	void	updateSectorVBO(unsigned index);
+	void	updateFlatTexCoords(unsigned index, bool floor);
+	void	updateSector(unsigned index);
 	void	renderFlats();
 	void	renderFlatsVBO();
 

@@ -9,8 +9,9 @@ TODO List ---------------------------------------------------------------
 
 --- Bugs ---
 - Gfx doesn't update after being converted
-- Random crash on view/convert of invalid gfx
 - No handling for when a line is moved to overlap another
+- Problem with line drawing and reusing existing sectors
+- Sidedefs in UDMF getting "" texture instead of the proper default "-"
 
 --- Map Editor ---
 - Checks:
@@ -20,15 +21,23 @@ TODO List ---------------------------------------------------------------
 - Non-power-of-two textures (where simply expanding the texture canvas to 128x128 won't work)
 	- Will probably have to implement some kind of resize for this (perhaps FreeImage can do it nicely?)
 - 3d mode
+	- Hilight/selection
+	- Editing
+	- Better vis checking
+	- MAPINFO parsing for sky texture
+	- Thing boxes
 - Editing:
 	- Line properties update on line draw
 	- Proper UDMF/Hexen/Doom64 Map saving (BEHAVIOR, SCRIPTS, DIALOGUE, LIGHTS, MACROS, etc.)
 	- Generalised sector and line specials
 	- Rotate/scale objects
+	- Join sectors
+- Script editor
 - Better UDMF property handling
 - (Possibly) better line/thing flag handling
 - 'Tag edit' mode
 - Default values handling
+- Optimise Polygon2D splitting somehow, it creates many unneeded splits
 
 
 --- Minor Problems/Annoyances ---

@@ -1876,6 +1876,15 @@ CONSOLE_COMMAND(m_vertex_attached, 1) {
 	}
 }
 
+CONSOLE_COMMAND(n_polys ,0) {
+	SLADEMap& map = theMapEditor->mapEditor().getMap();
+	int npoly = 0;
+	for (unsigned a = 0; a < map.nSectors(); a++)
+		npoly += map.getSector(a)->getPolygon()->nSubPolys();
+
+	theConsole->logMessage(S_FMT("%d polygons total", npoly));
+}
+
 /*
 CONSOLE_COMMAND(m_test_save, 1) {
 	vector<ArchiveEntry*> entries;

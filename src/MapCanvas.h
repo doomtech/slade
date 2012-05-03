@@ -55,6 +55,7 @@ private:
 	bool		mouse_movebegin;
 	int			draw_state;
 	bool		mouse_locked;
+	bool		mouse_warp;
 
 	// Info overlays
 	int					last_hilight;

@@ -182,6 +182,7 @@ public:
 
 	// Info
 	rgba_t	getSectorColour(MapSector* sector, int where = 0, bool fullbright = false);
+	uint8_t	getSectorLight(MapSector* sector, int where = 0);
 	string	getAdjacentLineTexture(MapVertex* vertex, int tex_part = 255);
 
 	// Creation

@@ -37,6 +37,7 @@
 CVAR(Bool, gl_tex_enable_np2, true, CVAR_SAVE)
 CVAR(Bool, gl_point_sprite, true, CVAR_SAVE)
 CVAR(Bool, gl_tweak_accuracy, true, CVAR_SAVE)
+CVAR(Bool, gl_vbo, true, CVAR_SAVE)
 
 namespace OpenGL {
 	wxGLContext*	context = NULL;
@@ -122,12 +123,20 @@ bool OpenGL::np2TexSupport() {
 	return GLEW_ARB_texture_non_power_of_two && gl_tex_enable_np2;
 }
 
-/* OpenGL::np2TexSupport
+/* OpenGL::pointSpriteSupport
  * Returns true if the installed OpenGL version supports point
  * sprites, false otherwise
  *******************************************************************/
 bool OpenGL::pointSpriteSupport() {
 	return GLEW_ARB_point_sprite && gl_point_sprite;
+}
+
+/* OpenGL::vboSupport
+ * Returns true if the installed OpenGL version supports vertex
+ * buffer objects, false otherwise
+ *******************************************************************/
+bool OpenGL::vboSupport() {
+	return GLEW_ARB_vertex_buffer_object && gl_vbo;
 }
 
 /* OpenGL::validTexDimension

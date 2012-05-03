@@ -32,8 +32,6 @@ float sq_thing_tc[] = { 0.0f, 1.0f,
 						1.0f, 0.0f,
 						1.0f, 1.0f };
 
-#define FORCE_NO_VBO 0
-
 MapRenderer2D::MapRenderer2D(SLADEMap* map) {
 	// Init variables
 	this->map = map;
@@ -108,7 +106,7 @@ void MapRenderer2D::renderVertices(float alpha) {
 	glColor4f(col.fr(), col.fg(), col.fb(), col.fa()*alpha);
 
 	// Render the vertices depending on what features are supported
-	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
+	if (OpenGL::vboSupport())
 		renderVerticesVBO();
 	else
 		renderVerticesImmediate();
@@ -264,7 +262,7 @@ void MapRenderer2D::renderLines(bool show_direction, float alpha) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Render the lines depending on what features are supported
-	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
+	if (OpenGL::vboSupport())
 		renderLinesVBO(show_direction, alpha);
 	else
 		renderLinesImmediate(show_direction, alpha);
@@ -1153,7 +1151,7 @@ void MapRenderer2D::renderFlats(int type, bool texture, float alpha) {
 	if (alpha <= 0.01f)
 		return;
 
-	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
+	if (OpenGL::vboSupport())
 		renderFlatsVBO(type, texture, alpha);
 	else
 		renderFlatsImmediate(type, texture, alpha);
@@ -1924,7 +1922,7 @@ void MapRenderer2D::forceUpdate(float line_alpha) {
 	this->view_scale = view_scale;
 	this->view_scale_inv = 1.0 / view_scale;
 
-	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO) {
+	if (OpenGL::vboSupport()) {
 		updateVerticesVBO();
 		updateLinesVBO(lines_dirs, line_alpha);
 	} else {

@@ -5,6 +5,11 @@
 #include "SLADEMap.h"
 #include "GameConfiguration.h"
 
+struct selection_3d_t {
+	int		index;
+	uint8_t	type;
+};
+
 class MapCanvas;
 class MapEditor {
 private:
@@ -46,6 +51,10 @@ private:
 	};
 	vector<editor_msg_t>	editor_messages;
 
+	// 3d mode
+	selection_3d_t			hilight_3d;
+	vector<selection_3d_t>	selection_3d;
+
 public:
 	enum {
 		// Editor modes
@@ -59,6 +68,14 @@ public:
 		SECTOR_BOTH = 0,
 		SECTOR_FLOOR,
 		SECTOR_CEILING,
+
+		// 3d mode selection type
+		SEL_LINE_TOP,
+		SEL_LINE_MIDDLE,
+		SEL_LINE_BOTTOM,
+		SEL_FLOOR,
+		SEL_CEILING,
+		SEL_THING,
 	};
 
 	MapEditor();

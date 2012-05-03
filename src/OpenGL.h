@@ -9,6 +9,7 @@ namespace OpenGL {
 	bool			init();
 	bool			np2TexSupport();
 	bool			pointSpriteSupport();
+	bool			vboSupport();
 	bool			validTexDimension(unsigned dim);
 	float			maxPointSize();
 	unsigned		maxTextureSize();

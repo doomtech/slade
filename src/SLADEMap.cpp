@@ -2207,13 +2207,14 @@ vector<int> SLADEMap::nearestThingMulti(double x, double y) {
 }
 
 int SLADEMap::inSector(double x, double y) {
+	/* the below method doesn't quite work correctly
 	// Check point with sector bboxes
 	bool* stest = new bool[sides.size()];
-	memset(stest, 0, sides.size());
+	memset(stest, 1, sides.size());
 	for (unsigned a = 0; a < sectors.size(); a++) {
-		if (sectors[a]->boundingBox().point_within(x, y)) {
+		if (!sectors[a]->boundingBox().point_within(x, y)) {
 			for (unsigned s = 0; s < sectors[a]->connected_sides.size(); s++)
-				stest[sectors[a]->connected_sides[s]->getIndex()] = true;
+				stest[sectors[a]->connected_sides[s]->getIndex()] = false;
 		}
 	}
 
@@ -2237,10 +2238,11 @@ int SLADEMap::inSector(double x, double y) {
 
 	// Return if no nearest line found
 	if (nline < 0) return -1;
+	*/
 
 	// Find nearest line
-	//int nline = nearestLine(x, y, 999999);
-	//if (nline < 0) return -1;
+	int nline = nearestLine(x, y, 999999);
+	if (nline < 0) return -1;
 
 	// Check what side of the line the point is on
 	MapLine* line = lines[nline];
@@ -2545,6 +2547,40 @@ void SLADEMap::getLinesById(int id, vector<MapLine*>& list) {
 	}
 }
 
+uint8_t SLADEMap::getSectorLight(MapSector* sector, int where) {
+	// Get sector light level
+	int light = sector->intProperty("lightlevel");
+
+	// Check for UDMF+ZDoom namespace
+	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+		// Get specific light level
+		if (where == 1) {
+			// Floor
+			int fl = sector->intProperty("lightfloor");
+			if (sector->boolProperty("lightfloorabsolute"))
+				light = fl;
+			else
+				light += fl;
+		}
+		else if (where == 2) {
+			// Ceiling
+			int cl = sector->intProperty("lightceiling");
+			if (sector->boolProperty("lightceilingabsolute"))
+				light = cl;
+			else
+				light += cl;
+		}
+	}
+
+	// Clamp light level
+	if (light > 255)
+		light = 255;
+	if (light < 0)
+		light = 0;
+
+	return light;
+}
+
 rgba_t SLADEMap::getSectorColour(MapSector* sector, int where, bool fullbright) {
 	// Check for UDMF+ZDoom namespace
 	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
@@ -2552,10 +2588,12 @@ rgba_t SLADEMap::getSectorColour(MapSector* sector, int where, bool fullbright) 
 		int intcol = sector->intProperty("lightcolor");
 		wxColour wxcol(intcol);
 
+		// Ignore light level if fullbright
+		if (fullbright)
+			return rgba_t(wxcol.Blue(), wxcol.Green(), wxcol.Red(), 255);
+
 		// Get sector light level
 		int light = sector->intProperty("lightlevel");
-		if (fullbright)
-			light = 255;
 
 		// Get specific light level
 		if (where == 1) {
