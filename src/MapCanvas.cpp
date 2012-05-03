@@ -1339,6 +1339,7 @@ void MapCanvas::updateInfoOverlay() {
 
 void MapCanvas::forceRefreshRenderer() {
 	renderer_2d->forceUpdate();
+	renderer_3d->clearData();
 }
 
 void MapCanvas::changeEditMode(int mode) {

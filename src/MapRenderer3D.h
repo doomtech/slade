@@ -146,6 +146,7 @@ public:
 
 	bool	init();
 	void	refresh();
+	void	clearData();
 	void	buildSkyCircle();
 
 	// Camera

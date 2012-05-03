@@ -91,6 +91,17 @@ void MapRenderer3D::refresh() {
 	//wxLogMessage("sky1: %s, sky2: %s", CHR(skytex1), CHR(skytex2));
 }
 
+void MapRenderer3D::clearData() {
+	// Clear map structures
+	lines.clear();
+	things.clear();
+	floors.clear();
+	ceilings.clear();
+	
+	// Clear everything else
+	refresh();
+}
+
 void MapRenderer3D::buildSkyCircle() {
 	double rot = 0;
 	for (unsigned a = 0; a < 32; a++) {
@@ -583,6 +594,10 @@ void MapRenderer3D::updateSector(unsigned index) {
 }
 
 void MapRenderer3D::renderFlat(flat_3d_t* flat) {
+	// Skip if no sector (for whatever reason)
+	if (!flat->sector)
+		return;
+		
 	// Setup special rendering options
 	float alpha = flat->alpha;
 	if (flat->flags & SKY && render_3d_sky) {

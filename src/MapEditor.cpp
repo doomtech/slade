@@ -114,6 +114,9 @@ bool MapEditor::openMap(Archive::mapdesc_t map) {
 			canvas->set3dCameraThing(cam);
 		else if (pstart)
 			canvas->set3dCameraThing(pstart);
+			
+		// Reset rendering data
+		canvas->forceRefreshRenderer();
 	}
 
 	return true;
