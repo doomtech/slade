@@ -252,6 +252,84 @@ fpoint2_t MapLine::dirTabPoint() {
 	return fpoint2_t(mid.x - invdir.x*tablen, mid.y - invdir.y*tablen);
 }
 
+double MapLine::distanceTo(double x, double y) {
+	// Update length data if needed
+	if (length < 0) {
+		length = MathStuff::distance(vertex1->xPos(), vertex1->yPos(), vertex2->xPos(), vertex2->yPos());
+		ca = (vertex2->xPos() - vertex1->xPos()) / length;
+		sa = (vertex2->yPos() - vertex1->yPos()) / length;
+	}
+
+	// Calculate intersection point
+	double mx, ix, iy;
+	mx = (-vertex1->xPos()+x)*ca + (-vertex1->yPos()+y)*sa;
+	if (mx <= 0)		mx = 0.00001;				// Clip intersection to line (but not exactly on endpoints)
+	else if (mx >= length)	mx = length - 0.00001;	// ^^
+	ix = vertex1->xPos() + mx*ca;
+	iy = vertex1->yPos() + mx*sa;
+
+	// Calculate distance to line
+	return sqrt((ix-x)*(ix-x) + (iy-y)*(iy-y));
+}
+
+int MapLine::needsTexture() {
+	// Check line is valid
+	if (!side1)
+		return 0;
+
+	// If line is 1-sided, it only needs front middle
+	if (!side2)
+		return TEX_FRONT_MIDDLE;
+
+	// Get sector heights
+	int floor_front = frontSector()->intProperty("heightfloor");
+	int ceiling_front = frontSector()->intProperty("heightceiling");
+	int floor_back = backSector()->intProperty("heightfloor");
+	int ceiling_back = backSector()->intProperty("heightceiling");
+
+	// Front lower
+	int tex = 0;
+	if (floor_front < floor_back)
+		tex |= TEX_FRONT_LOWER;
+
+	// Back lower
+	else if (floor_front > floor_back)
+		tex |= TEX_BACK_LOWER;
+
+	// Front upper
+	if (ceiling_front > ceiling_back)
+		tex |= TEX_FRONT_UPPER;
+
+	// Back upper
+	else if (ceiling_front < ceiling_back)
+		tex |= TEX_BACK_UPPER;
+
+	return tex;
+}
+
+void MapLine::clearUnneededTextures() {
+	// Check needed textures
+	int tex = needsTexture();
+
+	// Clear any unneeded textures
+	if (side1) {
+		if ((tex & TEX_FRONT_MIDDLE) == 0)
+			setStringProperty("side1.texturemiddle", "-");
+		if ((tex & TEX_FRONT_UPPER) == 0)
+			setStringProperty("side1.texturetop", "-");
+		if ((tex & TEX_FRONT_LOWER) == 0)
+			setStringProperty("side1.texturebottom", "-");
+	}
+	if (side2) {
+		if ((tex & TEX_BACK_MIDDLE) == 0)
+			setStringProperty("side2.texturemiddle", "-");
+		if ((tex & TEX_BACK_UPPER) == 0)
+			setStringProperty("side2.texturetop", "-");
+		if ((tex & TEX_BACK_LOWER) == 0)
+			setStringProperty("side2.texturebottom", "-");
+	}
+}
+
 void MapLine::resetInternals() {
 	// Reset line internals
 	length = -1;

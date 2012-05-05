@@ -2104,35 +2104,22 @@ int SLADEMap::nearestVertex(double x, double y, double min) {
 	return index;
 }
 
-double SLADEMap::fastDistanceToLine(double x, double y, unsigned line, double mindist) {
-	MapLine* l = lines[line];
-
-	// Check with line bounding box first (since we have a minimum distance)
-	if (x < min(l->vertex1->x, l->vertex2->x) - mindist || x > max(l->vertex1->x, l->vertex2->x) + mindist ||
-		y < min(l->vertex1->y, l->vertex2->y) - mindist || y > max(l->vertex1->y, l->vertex2->y) + mindist)
-		return mindist+1;
-
-	// Calculate intersection point
-	double len = l->getLength();
-	double mx, ix, iy;
-	mx = (-l->vertex1->x+x)*l->ca + (-l->vertex1->y+y)*l->sa;
-	if (mx <= 0)		mx = 0.00001;		// Clip intersection to line (but not exactly on endpoints)
-	else if (mx >= len)	mx = len - 0.00001;	// ^^
-	ix = l->vertex1->x + mx*l->ca;
-	iy = l->vertex1->y + mx*l->sa;
-
-	// Calculate distance to line
-	return sqrt((ix-x)*(ix-x) + (iy-y)*(iy-y));
-}
-
 int SLADEMap::nearestLine(double x, double y, double mindist) {
 	// Go through lines
 	double min_dist = mindist;
 	double dist = 0;
 	int index = -1;
+	MapLine* l;
 	for (unsigned a = 0; a < lines.size(); a++) {
-		// Calculate distance to line (fast)
-		dist = fastDistanceToLine(x, y, a, min_dist);
+		l = lines[a];
+
+		// Check with line bounding box first (since we have a minimum distance)
+		if (x < min(l->vertex1->x, l->vertex2->x) - mindist || x > max(l->vertex1->x, l->vertex2->x) + mindist ||
+			y < min(l->vertex1->y, l->vertex2->y) - mindist || y > max(l->vertex1->y, l->vertex2->y) + mindist)
+			continue;
+
+		// Calculate distance to line
+		dist = l->distanceTo(x, y);
 
 		// Check if it's nearer than the previous nearest
 		if (dist < min_dist && dist < mindist) {
@@ -2206,53 +2193,16 @@ vector<int> SLADEMap::nearestThingMulti(double x, double y) {
 	return ret;
 }
 
-int SLADEMap::inSector(double x, double y) {
-	/* the below method doesn't quite work correctly
-	// Check point with sector bboxes
-	bool* stest = new bool[sides.size()];
-	memset(stest, 1, sides.size());
+int SLADEMap::sectorAt(double x, double y) {
+	// Go through sectors
 	for (unsigned a = 0; a < sectors.size(); a++) {
-		if (!sectors[a]->boundingBox().point_within(x, y)) {
-			for (unsigned s = 0; s < sectors[a]->connected_sides.size(); s++)
-				stest[sectors[a]->connected_sides[s]->getIndex()] = false;
-		}
+		// Check if point is within sector
+		if (sectors[a]->isWithin(x, y))
+			return a;
 	}
 
-	// Go through sides
-	double min_dist = 999999;
-	int nline = -1;
-	for (unsigned a = 0; a < sides.size(); a++) {
-		// Ignore if not marked
-		if (!stest[a])
-			continue;
-
-		// Get distance to parent line
-		int line = sides[a]->parent->index;
-		double dist = fastDistanceToLine(x, y, line, 999999);
-		if (dist < min_dist) {
-			min_dist = dist;
-			nline = line;
-		}
-	}
-	delete[] stest;
-
-	// Return if no nearest line found
-	if (nline < 0) return -1;
-	*/
-
-	// Find nearest line
-	int nline = nearestLine(x, y, 999999);
-	if (nline < 0) return -1;
-
-	// Check what side of the line the point is on
-	MapLine* line = lines[nline];
-	double side = MathStuff::lineSide(x, y, line->x1(), line->y1(), line->x2(), line->y2());
-
-	// Return the sector on that side
-	if (side >= 0)
-		return sectorIndex(line->frontSector());
-	else
-		return sectorIndex(line->backSector());
+	// Not within a sector
+	return -1;
 }
 
 bbox_t SLADEMap::getMapBBox() {
@@ -2382,135 +2332,6 @@ MapVertex* SLADEMap::lineCrossVertex(double x1, double y1, double x2, double y2)
 	return cv;
 }
 
-double SLADEMap::distanceToSector(double x, double y, unsigned index, double maxdist) {
-	// Check index
-	if (index >= sectors.size())
-		return -1;
-
-	if (maxdist < 0)
-		maxdist = 9999999;
-
-	// Check bounding box first
-	MapSector* sector = sectors[index];
-	bbox_t bbox = sector->boundingBox();
-	double min_dist = 9999999;
-	double dist = MathStuff::distanceToLine(x, y, bbox.min.x, bbox.min.y, bbox.min.x, bbox.max.y);
-	if (dist < min_dist) min_dist = dist;
-	dist = MathStuff::distanceToLine(x, y, bbox.min.x, bbox.max.y, bbox.max.x, bbox.max.y);
-	if (dist < min_dist) min_dist = dist;
-	dist = MathStuff::distanceToLine(x, y, bbox.max.x, bbox.max.y, bbox.max.x, bbox.min.y);
-	if (dist < min_dist) min_dist = dist;
-	dist = MathStuff::distanceToLine(x, y, bbox.max.x, bbox.min.y, bbox.min.x, bbox.min.y);
-	if (dist < min_dist) min_dist = dist;
-
-	if (min_dist > maxdist && !bbox.point_within(x, y))
-		return -1;
-
-	// Check lines of sector
-	vector<MapLine*> list;
-	getLinesOfSector(sector, list);
-	for (unsigned a = 0; a < list.size(); a++) {
-		MapLine* line = list[a];
-		dist = MathStuff::distanceToLine(x, y, line->x1(), line->y1(), line->x2(), line->y2());
-		if (dist < min_dist)
-			min_dist = dist;
-	}
-
-	return min_dist;
-}
-
-bool SLADEMap::lineInSector(MapLine* line, MapSector* sector) {
-	if (line->side1 && line->side1->sector == sector ||
-		line->side2 && line->side2->sector == sector)
-		return true;
-	else
-		return false;
-}
-
-bool SLADEMap::getLinesOfSector(unsigned index, vector<MapLine*>& list) {
-	// Get sector
-	MapSector* sector = getSector(index);
-	return getLinesOfSector(sector, list);
-}
-
-bool SLADEMap::getLinesOfSector(MapSector* sector, vector<MapLine*>& list) {
-	if (!sector) return false;
-
-	// Go through sides in sector
-	MapSide* side = NULL;
-	for (unsigned a = 0; a < sector->connected_sides.size(); a++) {
-		side = sector->connected_sides[a];
-
-		// Add the side's parent line to the list if it doesn't already exist
-		if (std::find(list.begin(), list.end(), side->parent) == list.end())
-			list.push_back(side->parent);
-	}
-
-	return true;
-}
-
-bool SLADEMap::getVerticesOfSector(unsigned index, vector<MapVertex*>& list) {
-	// Get sector
-	MapSector* sector = getSector(index);
-	if (!sector) return false;
-
-	// Go through sides in sector
-	MapSide* side = NULL;
-	MapLine* line = NULL;
-	for (unsigned a = 0; a < sector->connected_sides.size(); a++) {
-		side = sector->connected_sides[a];
-		line = side->getParentLine();
-
-		// Add the side's parent line's vertices to the list if they doesn't already exist
-		if (line->v1() && std::find(list.begin(), list.end(), line->v1()) == list.end())
-			list.push_back(line->v1());
-		if (line->v2() && std::find(list.begin(), list.end(), line->v2()) == list.end())
-			list.push_back(line->v2());
-	}
-
-	return true;
-}
-
-int SLADEMap::lineNeedsTexture(unsigned index) {
-	// Check index
-	if (index >= lines.size())
-		return 0;
-
-	// Check line is valid
-	MapLine* line = lines[index];
-	if (!line->side1)
-		return 0;
-
-	// If line is 1-sided, it only needs front middle
-	if (!line->side2)
-		return TEX_FRONT_MIDDLE;
-
-	// Get sector heights
-	int floor_front = line->frontSector()->intProperty("heightfloor");
-	int ceiling_front = line->frontSector()->intProperty("heightceiling");
-	int floor_back = line->backSector()->intProperty("heightfloor");
-	int ceiling_back = line->backSector()->intProperty("heightceiling");
-
-	// Front lower
-	int tex = 0;
-	if (floor_front < floor_back)
-		tex |= TEX_FRONT_LOWER;
-
-	// Back lower
-	else if (floor_front > floor_back)
-		tex |= TEX_BACK_LOWER;
-
-	// Front upper
-	if (ceiling_front > ceiling_back)
-		tex |= TEX_FRONT_UPPER;
-
-	// Back upper
-	else if (ceiling_front < ceiling_back)
-		tex |= TEX_BACK_UPPER;
-
-	return tex;
-}
-
 void SLADEMap::getSectorsByTag(int tag, vector<MapSector*>& list) {
 	// Find sectors with matching tag
 	for (unsigned a = 0; a < sectors.size(); a++) {
@@ -2531,7 +2352,7 @@ void SLADEMap::getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list
 	// Find things with matching id contained in sector with matching tag
 	for (unsigned a = 0; a < things.size(); a++) {
 		if (things[a]->prop("id").getIntValue() == id) {
-			int si = inSector(things[a]->xPos(), things[a]->yPos());
+			int si = sectorAt(things[a]->xPos(), things[a]->yPos());
 			if (si > -1 && (unsigned)si < sectors.size() && sectors[si]->prop("id").getIntValue() == tag) {
 				list.push_back(things[a]);
 			}
@@ -2544,93 +2365,6 @@ void SLADEMap::getLinesById(int id, vector<MapLine*>& list) {
 	for (unsigned a = 0; a < lines.size(); a++) {
 		if (lines[a]->prop("id").getIntValue() == id)
 			list.push_back(lines[a]);
-	}
-}
-
-uint8_t SLADEMap::getSectorLight(MapSector* sector, int where) {
-	// Get sector light level
-	int light = sector->intProperty("lightlevel");
-
-	// Check for UDMF+ZDoom namespace
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
-		// Get specific light level
-		if (where == 1) {
-			// Floor
-			int fl = sector->intProperty("lightfloor");
-			if (sector->boolProperty("lightfloorabsolute"))
-				light = fl;
-			else
-				light += fl;
-		}
-		else if (where == 2) {
-			// Ceiling
-			int cl = sector->intProperty("lightceiling");
-			if (sector->boolProperty("lightceilingabsolute"))
-				light = cl;
-			else
-				light += cl;
-		}
-	}
-
-	// Clamp light level
-	if (light > 255)
-		light = 255;
-	if (light < 0)
-		light = 0;
-
-	return light;
-}
-
-rgba_t SLADEMap::getSectorColour(MapSector* sector, int where, bool fullbright) {
-	// Check for UDMF+ZDoom namespace
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
-		// Get sector light colour
-		int intcol = sector->intProperty("lightcolor");
-		wxColour wxcol(intcol);
-
-		// Ignore light level if fullbright
-		if (fullbright)
-			return rgba_t(wxcol.Blue(), wxcol.Green(), wxcol.Red(), 255);
-
-		// Get sector light level
-		int light = sector->intProperty("lightlevel");
-
-		// Get specific light level
-		if (where == 1) {
-			// Floor
-			int fl = sector->intProperty("lightfloor");
-			if (sector->boolProperty("lightfloorabsolute"))
-				light = fl;
-			else
-				light += fl;
-		}
-		else if (where == 2) {
-			// Ceiling
-			int cl = sector->intProperty("lightceiling");
-			if (sector->boolProperty("lightceilingabsolute"))
-				light = cl;
-			else
-				light += cl;
-		}
-
-		// Clamp light level
-		if (light > 255)
-			light = 255;
-		if (light < 0)
-			light = 0;
-
-		// Calculate and return the colour
-		float lightmult = (float)light / 255.0f;
-		return rgba_t(wxcol.Blue() * lightmult, wxcol.Green() * lightmult, wxcol.Red() * lightmult, 255);
-	}
-	else {
-		// Other format, simply return the light level
-		if (fullbright)
-			return rgba_t(255, 255, 255, 255);
-		else {
-			int light = sector->intProperty("lightlevel");
-			return rgba_t(light, light, light, 255);
-		}
 	}
 }
 
@@ -2716,7 +2450,7 @@ MapVertex* SLADEMap::createVertex(double x, double y, double split_dist) {
 			if (lines[a]->v1() == nv || lines[a]->v2() == nv)
 				continue;
 
-			if (fastDistanceToLine(x, y, a, split_dist) < split_dist) {
+			if (lines[a]->distanceTo(x, y) < split_dist) {
 				wxLogMessage("Vertex at (%1.2f,%1.2f) splits line %d", x, y, a);
 				splitLine(a, nv->index);
 			}
@@ -2991,41 +2725,6 @@ void SLADEMap::moveThing(unsigned thing, double nx, double ny) {
 	t->modified_time = theApp->runTimer();
 }
 
-void SLADEMap::thingSetAnglePoint(unsigned thing, fpoint2_t point) {
-	// Check index
-	if (thing >= things.size())
-		return;
-
-	// Calculate direction vector
-	MapThing* t = things[thing];
-	fpoint2_t vec(point.x - t->x, point.y - t->y);
-	double mag = sqrt((vec.x * vec.x) + (vec.y * vec.y));
-	double x = vec.x / mag;
-	double y = vec.y / mag;
-
-	// Determine angle
-	int angle = 0;
-	if (x > 0.89)				// east
-		angle = 0;
-	else if (x < -0.89)			// west
-		angle = 180;
-	else if (y > 0.89)			// north
-		angle = 90;
-	else if (y < -0.89)			// south
-		angle = 270;
-	else if (x > 0 && y > 0)	// northeast
-		angle = 45;
-	else if (x < 0 && y > 0)	// northwest
-		angle = 135;
-	else if (x < 0 && y < 0)	// southwest
-		angle = 225;
-	else if (x > 0 && y < 0)	// southeast
-		angle = 315;
-
-	// Set thing angle
-	t->setIntProperty("angle", angle);
-}
-
 void SLADEMap::splitLinesAt(MapVertex* vertex, double split_dist) {
 	// Check if this vertex splits any lines (if needed)
 	unsigned nlines = lines.size();
@@ -3034,7 +2733,7 @@ void SLADEMap::splitLinesAt(MapVertex* vertex, double split_dist) {
 		if (lines[a]->v1() == vertex || lines[a]->v2() == vertex)
 			continue;
 
-		if (fastDistanceToLine(vertex->x, vertex->y, a, split_dist) < split_dist) {
+		if (lines[a]->distanceTo(vertex->x, vertex->y) < split_dist) {
 			wxLogMessage("Vertex at (%1.2f,%1.2f) splits line %d", vertex->x, vertex->y, a);
 			splitLine(a, vertexIndex(vertex));
 		}
@@ -3076,33 +2775,6 @@ bool SLADEMap::setLineSector(unsigned line, unsigned sector, bool front) {
 		side->setSector(sectors[sector]);
 
 		return false;
-	}
-}
-
-void SLADEMap::clearLineUnneededTextures(unsigned index) {
-	// Check index
-	if (index >= lines.size())
-		return;
-
-	// Check line needed textures
-	int tex = lineNeedsTexture(index);
-
-	// Clear any unneeded textures
-	if (lines[index]->side1) {
-		if ((tex & TEX_FRONT_MIDDLE) == 0)
-			lines[index]->setStringProperty("side1.texturemiddle", "-");
-		if ((tex & TEX_FRONT_UPPER) == 0)
-			lines[index]->setStringProperty("side1.texturetop", "-");
-		if ((tex & TEX_FRONT_LOWER) == 0)
-			lines[index]->setStringProperty("side1.texturebottom", "-");
-	}
-	if (lines[index]->side2) {
-		if ((tex & TEX_BACK_MIDDLE) == 0)
-			lines[index]->setStringProperty("side2.texturemiddle", "-");
-		if ((tex & TEX_BACK_UPPER) == 0)
-			lines[index]->setStringProperty("side2.texturetop", "-");
-		if ((tex & TEX_BACK_LOWER) == 0)
-			lines[index]->setStringProperty("side2.texturebottom", "-");
 	}
 }
 

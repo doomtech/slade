@@ -63,6 +63,8 @@ public:
 	void	setFloatProperty(string key, double value);
 
 	void	copy(MapObject* c);
+
+	void	setAnglePoint(fpoint2_t point);
 };
 
 #endif //__MAPTHING_H__

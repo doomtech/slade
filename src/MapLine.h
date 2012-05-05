@@ -8,6 +8,16 @@ class MapVertex;
 class MapSide;
 class MapSector;
 
+// Line texture ids
+enum {
+	TEX_FRONT_MIDDLE	= 0x01,
+	TEX_FRONT_UPPER		= 0x02,
+	TEX_FRONT_LOWER		= 0x04,
+	TEX_BACK_MIDDLE		= 0x08,
+	TEX_BACK_UPPER		= 0x10,
+	TEX_BACK_LOWER		= 0x20,
+};
+
 struct doomline_t {
 	uint16_t vertex1;
 	uint16_t vertex2;
@@ -91,6 +101,9 @@ public:
 	double		getLength();
 	bool		doubleSector();
 	fpoint2_t	dirTabPoint();
+	double		distanceTo(double x, double y);
+	int			needsTexture();
+	void		clearUnneededTextures();
 
 	void	resetInternals();
 	void	flip(bool sides = true);

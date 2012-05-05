@@ -130,6 +130,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
 	Bind(wxEVT_KEY_UP, &MapCanvas::onKeyUp, this);
 	Bind(wxEVT_LEFT_DOWN, &MapCanvas::onMouseDown, this);
+	Bind(wxEVT_LEFT_DCLICK, &MapCanvas::onMouseDown, this);
 	Bind(wxEVT_RIGHT_DOWN, &MapCanvas::onMouseDown, this);
 	Bind(wxEVT_MIDDLE_DOWN, &MapCanvas::onMouseDown, this);
 	Bind(wxEVT_AUX1_DOWN, &MapCanvas::onMouseDown, this);
@@ -373,7 +374,7 @@ void MapCanvas::viewMatchSpot(double mx, double my, double sx, double sy) {
 void MapCanvas::set3dCameraThing(MapThing* thing) {
 	// Determine position
 	fpoint3_t pos(thing->xPos(), thing->yPos(), 40);
-	int sector = editor->getMap().inSector(pos.x, pos.y);
+	int sector = editor->getMap().sectorAt(pos.x, pos.y);
 	if (sector >= 0)
 		pos.z += editor->getMap().getSector(sector)->intProperty("heightfloor");
 
@@ -777,6 +778,30 @@ void MapCanvas::drawMap2d() {
 	}
 }
 
+void MapCanvas::drawMap3d() {
+	// Setup 3d renderer view
+	renderer_3d->setupView(GetSize().x, GetSize().y);
+
+	// Render 3d map
+	renderer_3d->renderMap();
+
+	// Determine hilight
+	selection_3d_t hl = renderer_3d->determineHilight();
+	editor->set3dHilight(hl);
+
+	// Draw hilight if any
+	if (hl.index >= 0)
+		renderer_3d->renderHilight(hl, anim_flash_level);
+
+	// Draw selection if any
+	vector<selection_3d_t> selection = editor->get3dSelection();
+	if (selection.size() > 0) {
+		renderer_3d->renderFlatSelection(selection);
+		renderer_3d->renderWallSelection(selection);
+		renderer_3d->renderThingSelection(selection);
+	}
+}
+
 /* MapCanvas::draw
  * Draw the current map (2d or 3d) and any overlays etc
  *******************************************************************/
@@ -793,13 +818,9 @@ void MapCanvas::draw() {
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisable(GL_TEXTURE_2D);
 
-	// Draw 3d map if in 3d mode
-	if (editor->editMode() == MapEditor::MODE_3D) {
-		renderer_3d->setupView(GetSize().x, GetSize().y);
-		renderer_3d->renderMap();
-	}
-
-	// Otherwise, draw 2d map
+	// Draw 2d or 3d map depending on mode
+	if (editor->editMode() == MapEditor::MODE_3D)
+		drawMap3d();
 	else
 		drawMap2d();
 
@@ -845,6 +866,21 @@ void MapCanvas::draw() {
 	if (overlay_current)
 		overlay_current->draw(GetSize().x, GetSize().y, anim_overlay_fade);
 
+	// Draw crosshair if 3d mode
+	if (editor->editMode() == MapEditor::MODE_3D) {
+		COL_WHITE.set_gl();
+		glEnable(GL_LINE_SMOOTH);
+		glLineWidth(1.5f);
+		double midx = GetSize().x * 0.5;
+		double midy = GetSize().y * 0.5;
+		glBegin(GL_LINES);
+		glVertex2d(midx - 4, midy);
+		glVertex2d(midx + 4, midy);
+		glVertex2d(midx, midy - 4);
+		glVertex2d(midx, midy + 4);
+		glEnd();
+	}
+
 	// FPS counter
 	if (map_showfps) {
 		if (frametime_last > 0) {
@@ -876,23 +912,6 @@ bool MapCanvas::update2d(double mult) {
 	// Do item moving if needed
 	if (mouse_state == MSTATE_MOVE)
 		editor->doMove(mouse_pos_m);
-
-	// Flashing animation for hilight
-	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
-	if (anim_flash_inc) {
-		anim_flash_level += 0.015f*mult;
-		if (anim_flash_level >= 1.0f) {
-			anim_flash_inc = false;
-			anim_flash_level = 1.0f;
-		}
-	}
-	else {
-		anim_flash_level -= 0.015f*mult;
-		if (anim_flash_level <= 0.5f) {
-			anim_flash_inc = true;
-			anim_flash_level = 0.6f;
-		}
-	}
 
 	// --- Fade map objects depending on mode ---
 
@@ -1126,6 +1145,23 @@ void MapCanvas::update(long frametime) {
 		mode_anim = update3d(mult);
 	else
 		mode_anim = update2d(mult);
+
+	// Flashing animation for hilight
+	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
+	if (anim_flash_inc) {
+		anim_flash_level += 0.015f*mult;
+		if (anim_flash_level >= 1.0f) {
+			anim_flash_inc = false;
+			anim_flash_level = 1.0f;
+		}
+	}
+	else {
+		anim_flash_level -= 0.015f*mult;
+		if (anim_flash_level <= 0.5f) {
+			anim_flash_inc = true;
+			anim_flash_level = 0.6f;
+		}
+	}
 
 	// Fader for info overlay
 	bool fade_anim = true;
@@ -1961,11 +1997,18 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 	}
 
 	// Left button
-	if (e.LeftDown()) {
-		// If the mouse is unlocked and we're in 3d mode, lock the mouse
-		if (!mouse_locked && editor->editMode() == MapEditor::MODE_3D) {
-			mouseToCenter();
-			lockMouse(true);
+	if (e.LeftDown() || e.LeftDClick()) {
+		// 3d mode
+		if (editor->editMode() == MapEditor::MODE_3D) {
+			// If the mouse is unlocked, lock the mouse
+			if (!mouse_locked) {
+				mouseToCenter();
+				lockMouse(true);
+			}
+			else
+				editor->selectCurrent();
+
+			return;
 		}
 
 		// Line drawing state, add line draw point
@@ -2121,8 +2164,8 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	// Check for 3d mode
 	if (editor->editMode() == MapEditor::MODE_3D && mouse_locked) {
 		// Get relative mouse movement
-		int xrel = e.GetX() - (GetSize().x * 0.5);
-		int yrel = e.GetY() - (GetSize().y * 0.5);
+		double xrel = e.GetX() - int(GetSize().x * 0.5);
+		double yrel = e.GetY() - int(GetSize().y * 0.5);
 
 		renderer_3d->cameraTurn(xrel*0.1);
 		renderer_3d->cameraPitch(-yrel*0.003);

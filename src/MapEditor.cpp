@@ -144,7 +144,7 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 	else if (edit_mode == MODE_LINES)
 		hilight_item = map.nearestLine(mouse_pos.x, mouse_pos.y, 32/dist_scale);
 	else if (edit_mode == MODE_SECTORS)
-		hilight_item = map.inSector(mouse_pos.x, mouse_pos.y);
+		hilight_item = map.sectorAt(mouse_pos.x, mouse_pos.y);
 	else if (edit_mode == MODE_THINGS) {
 		hilight_item = -1;
 
@@ -366,37 +366,71 @@ void MapEditor::selectAll() {
 }
 
 bool MapEditor::selectCurrent(bool clear_none) {
-	// If nothing is hilighted
-	if (hilight_item == -1) {
-		// Clear selection if specified
-		if (clear_none) {
-			if (canvas) canvas->itemsSelected(selection, false);
-			selection.clear();
-			selectionUpdated();
-			addEditorMessage("Selection cleared");
+	// --- 3d mode ---
+	if (edit_mode == MODE_3D) {
+		// If nothing is hilighted
+		if (hilight_3d.index == -1) {
+			// Clear selection if specified
+			if (clear_none) {
+				selection_3d.clear();
+				addEditorMessage("Selection cleared");
+			}
+
+			return false;
 		}
 
-		return false;
-	}
-
-	// Otherwise, check if item is in selection
-	for (unsigned a = 0; a < selection.size(); a++) {
-		if (selection[a] == hilight_item) {
-			// Already selected, deselect
-			selection.erase(selection.begin() + a);
-			if (canvas) canvas->itemSelected(hilight_item, false);
-			selectionUpdated();
-			return true;
+		// Otherwise, check if item is in selection
+		for (unsigned a = 0; a < selection_3d.size(); a++) {
+			if (selection_3d[a].index == hilight_3d.index &&
+				selection_3d[a].type == hilight_3d.type) {
+				// Already selected, deselect
+				selection_3d.erase(selection_3d.begin() + a);
+				addEditorMessage("deselected");
+				return true;
+			}
 		}
+
+		// Not already selected, add to selection
+		selection_3d.push_back(hilight_3d);
+		addEditorMessage("selected");
+
+		return true;
 	}
 
-	// Not already selected, add to selection
-	selection.push_back(hilight_item);
-	if (canvas) canvas->itemSelected(hilight_item, true);
+	// --- 2d mode ---
+	else {
+		// If nothing is hilighted
+		if (hilight_item == -1) {
+			// Clear selection if specified
+			if (clear_none) {
+				if (canvas) canvas->itemsSelected(selection, false);
+				selection.clear();
+				selectionUpdated();
+				addEditorMessage("Selection cleared");
+			}
 
-	selectionUpdated();
+			return false;
+		}
 
-	return true;
+		// Otherwise, check if item is in selection
+		for (unsigned a = 0; a < selection.size(); a++) {
+			if (selection[a] == hilight_item) {
+				// Already selected, deselect
+				selection.erase(selection.begin() + a);
+				if (canvas) canvas->itemSelected(hilight_item, false);
+				selectionUpdated();
+				return true;
+			}
+		}
+
+		// Not already selected, add to selection
+		selection.push_back(hilight_item);
+		if (canvas) canvas->itemSelected(hilight_item, true);
+
+		selectionUpdated();
+
+		return true;
+	}
 }
 
 bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax, bool add) {
@@ -793,7 +827,7 @@ bool MapEditor::beginMove(fpoint2_t mouse_pos) {
 		// Sectors mode
 		else if (edit_mode == MODE_SECTORS) {
 			for (unsigned a = 0; a < move_items.size(); a++)
-				map.getVerticesOfSector(move_items[a], move_verts);
+				map.getSector(move_items[a])->getVertices(move_verts);
 		}
 	}
 
@@ -868,7 +902,7 @@ void MapEditor::endMove() {
 		else if (edit_mode == MODE_SECTORS) {
 			vector<MapVertex*> sv;
 			for (unsigned a = 0; a < move_items.size(); a++)
-				map.getVerticesOfSector(move_items[a], sv);
+				map.getSector(move_items[a])->getVertices(sv);
 
 			for (unsigned a = 0; a < sv.size(); a++)
 				move_verts[map.vertexIndex(sv[a])] = true;
@@ -1173,13 +1207,13 @@ void MapEditor::thingQuickAngle(fpoint2_t mouse_pos) {
 
 	// If selection is empty, check for hilight
 	if (selection.size() == 0 && hilight_item >= 0) {
-		map.thingSetAnglePoint(hilight_item, mouse_pos);
+		map.getThing(hilight_item)->setAnglePoint(mouse_pos);
 		return;
 	}
 
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++)
-		map.thingSetAnglePoint(selection[a], mouse_pos);
+		map.getThing(selection[a])->setAnglePoint(mouse_pos);
 }
 
 void MapEditor::createObject(double x, double y) {
@@ -1715,7 +1749,7 @@ void MapEditor::endLineDraw(bool apply) {
 
 			// Clear any unneeded textures
 			MapLine* line = side->getParentLine();
-			map.clearLineUnneededTextures(line->getIndex());
+			line->clearUnneededTextures();
 
 			// Set middle texture if needed
 			if (side == line->s1() && !line->s2() && side->stringProperty("texturemiddle") == "-") {
@@ -1870,6 +1904,21 @@ CONSOLE_COMMAND(m_show_item, 1) {
 	theMapEditor->mapEditor().showItem(index);
 }
 
+
+
+
+
+// testing stuff
+
+CONSOLE_COMMAND(m_test_sector, 0) {
+	sf::Clock clock;
+	SLADEMap& map = theMapEditor->mapEditor().getMap();
+	for (unsigned a = 0; a < map.nThings(); a++)
+		map.sectorAt(map.getThing(a)->xPos(), map.getThing(a)->yPos());
+	wxLogMessage("Took %dms", clock.getElapsedTime().asMilliseconds());
+}
+
+/*
 CONSOLE_COMMAND(m_vertex_attached, 1) {
 	MapVertex* vertex = theMapEditor->mapEditor().getMap().getVertex(atoi(CHR(args[0])));
 	if (vertex) {
@@ -1878,7 +1927,9 @@ CONSOLE_COMMAND(m_vertex_attached, 1) {
 			wxLogMessage("Line #%d", vertex->connectedLine(a)->getIndex());
 	}
 }
+*/
 
+/*
 CONSOLE_COMMAND(n_polys ,0) {
 	SLADEMap& map = theMapEditor->mapEditor().getMap();
 	int npoly = 0;
@@ -1887,6 +1938,7 @@ CONSOLE_COMMAND(n_polys ,0) {
 
 	theConsole->logMessage(S_FMT("%d polygons total", npoly));
 }
+*/
 
 /*
 CONSOLE_COMMAND(m_test_save, 1) {

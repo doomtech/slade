@@ -10,16 +10,6 @@
 #include "Archive.h"
 #include "PropertyList.h"
 
-// Line texture ids
-enum {
-	TEX_FRONT_MIDDLE	= 0x01,
-	TEX_FRONT_UPPER		= 0x02,
-	TEX_FRONT_LOWER		= 0x04,
-	TEX_BACK_MIDDLE		= 0x08,
-	TEX_BACK_UPPER		= 0x10,
-	TEX_BACK_LOWER		= 0x20,
-};
-
 class ParseTreeNode;
 class SLADEMap {
 friend class MapEditor;
@@ -156,23 +146,15 @@ public:
 	bool	removeThing(unsigned index);
 
 	// Geometry
-	double				fastDistanceToLine(double x, double y, unsigned line, double mindist = 64);
 	int					nearestVertex(double x, double y, double min = 64);
 	int					nearestLine(double x, double y, double min = 64);
 	int					nearestThing(double x, double y, double min = 64);
 	vector<int>			nearestThingMulti(double x, double y);
-	int					inSector(double x, double y);
+	int					sectorAt(double x, double y);
 	bbox_t				getMapBBox();
 	MapVertex*			vertexAt(double x, double y);
 	vector<fpoint2_t>	cutLines(double x1, double y1, double x2, double y2);
 	MapVertex*			lineCrossVertex(double x1, double y1, double x2, double y2);
-	double				distanceToSector(double x, double y, unsigned index, double maxdist = -1);
-
-	bool	lineInSector(MapLine* line, MapSector* sector);
-	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);
-	bool	getLinesOfSector(MapSector* sector, vector<MapLine*>& list);
-	bool	getVerticesOfSector(unsigned index, vector<MapVertex*>& list);
-	int		lineNeedsTexture(unsigned index);
 
 	// Tags/Ids
 	void	getSectorsByTag(int tag, vector<MapSector*>& list);
@@ -181,8 +163,6 @@ public:
 	void	getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list);
 
 	// Info
-	rgba_t	getSectorColour(MapSector* sector, int where = 0, bool fullbright = false);
-	uint8_t	getSectorLight(MapSector* sector, int where = 0);
 	string	getAdjacentLineTexture(MapVertex* vertex, int tex_part = 255);
 
 	// Creation
@@ -199,10 +179,8 @@ public:
 	MapVertex*	mergeVerticesPoint(double x, double y);
 	void		splitLine(unsigned line, unsigned vertex);
 	void		moveThing(unsigned thing, double nx, double ny);
-	void		thingSetAnglePoint(unsigned thing, fpoint2_t point);
 	void		splitLinesAt(MapVertex* vertex, double split_dist = 0);
 	bool		setLineSector(unsigned line, unsigned sector, bool front = true);
-	void		clearLineUnneededTextures(unsigned index);
 
 	// Checks
 	int		removeDetachedVertices();

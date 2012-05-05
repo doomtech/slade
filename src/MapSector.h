@@ -6,6 +6,8 @@
 #include "Polygon2D.h"
 
 class MapSide;
+class MapLine;
+class MapVertex;
 
 struct doomsector_t
 {
@@ -64,6 +66,12 @@ public:
 	vector<MapSide*>&	connectedSides() { return connected_sides; }
 	void				resetPolygon() { poly_needsupdate = true; }
 	Polygon2D*			getPolygon();
+	bool				isWithin(double x, double y);
+	double				distanceTo(double x, double y, double maxdist = -1);
+	bool				getLines(vector<MapLine*>& list);
+	bool				getVertices(vector<MapVertex*>& list);
+	uint8_t				getLight(int where = 0);
+	rgba_t				getColour(int where = 0, bool fullbright = false);
 
 	void	connectSide(MapSide* side);
 	void	disconnectSide(MapSide* side);

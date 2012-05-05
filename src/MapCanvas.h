@@ -114,6 +114,7 @@ public:
 	void	drawThingQuickAngleLines();
 	void	drawLineDrawLines();
 	void	drawMap2d();
+	void	drawMap3d();
 	void	draw();
 
 	// Frame updates

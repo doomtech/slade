@@ -8,6 +8,8 @@
 struct selection_3d_t {
 	int		index;
 	uint8_t	type;
+
+	selection_3d_t() { index = -1; type = 0; }
 };
 
 class MapCanvas;
@@ -70,9 +72,9 @@ public:
 		SECTOR_CEILING,
 
 		// 3d mode selection type
-		SEL_LINE_TOP,
-		SEL_LINE_MIDDLE,
-		SEL_LINE_BOTTOM,
+		SEL_SIDE_TOP = 0,
+		SEL_SIDE_MIDDLE,
+		SEL_SIDE_BOTTOM,
 		SEL_FLOOR,
 		SEL_CEILING,
 		SEL_THING,
@@ -94,6 +96,9 @@ public:
 	bool				hilightLocked() { return hilight_locked; }
 	void				lockHilight(bool lock = true) { hilight_locked = lock; }
 	bool				gridSnap() { return grid_snap; }
+
+	vector<selection_3d_t>&	get3dSelection() { return selection_3d; }
+	void					set3dHilight(selection_3d_t hl) { hilight_3d = hl; }
 
 	void	setEditMode(int mode);
 	void	setSectorEditMode(int mode);

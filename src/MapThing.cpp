@@ -80,3 +80,33 @@ void MapThing::copy(MapObject* c) {
 	// Other properties
 	MapObject::copy(c);
 }
+
+void MapThing::setAnglePoint(fpoint2_t point) {
+	// Calculate direction vector
+	fpoint2_t vec(point.x - x, point.y - y);
+	double mag = sqrt((vec.x * vec.x) + (vec.y * vec.y));
+	double x = vec.x / mag;
+	double y = vec.y / mag;
+
+	// Determine angle
+	int angle = 0;
+	if (x > 0.89)				// east
+		angle = 0;
+	else if (x < -0.89)			// west
+		angle = 180;
+	else if (y > 0.89)			// north
+		angle = 90;
+	else if (y < -0.89)			// south
+		angle = 270;
+	else if (x > 0 && y > 0)	// northeast
+		angle = 45;
+	else if (x < 0 && y > 0)	// northwest
+		angle = 135;
+	else if (x < 0 && y < 0)	// southwest
+		angle = 225;
+	else if (x > 0 && y < 0)	// southeast
+		angle = 315;
+
+	// Set thing angle
+	setIntProperty("angle", angle);
+}

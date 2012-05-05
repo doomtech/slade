@@ -2,11 +2,9 @@
 #ifndef __MAP_RENDERER_3D_H__
 #define __MAP_RENDERER_3D_H__
 
-class SLADEMap;
+#include "MapEditor.h"
+
 class GLTexture;
-class ThingType;
-class MapThing;
-class MapSector;
 class Polygon2D;
 class MapRenderer3D {
 private:
@@ -35,19 +33,22 @@ private:
 	// Structs
 	enum {
 		// Common flags
-		TRANS	= 0x01,
+		TRANS	= 2,
 
 		// Quad/flat flags
-		SKY		= 0x02,
+		SKY		= 4,
 
 		// Quad flags
-		MIDTEX	= 0x04,
+		BACK	= 8,
+		UPPER	= 16,
+		LOWER	= 32,
+		MIDTEX	= 48,
 
 		// Flat flags
-		CEIL	= 0x04,
+		CEIL	= 8,
 
 		// Thing flags
-		ICON	= 0x02,
+		ICON	= 4,
 	};
 	struct gl_vertex_t {
 		float x, y, z;
@@ -171,7 +172,7 @@ public:
 	void	updateSector(unsigned index);
 	void	renderFlat(flat_3d_t* flat);
 	void	renderFlats();
-	//void	renderFlatsVBO();
+	void	renderFlatSelection(vector<selection_3d_t>& selection, float alpha = 1.0f);
 
 	// Walls
 	void	setupQuad(quad_3d_t* quad, double x1, double y1, double x2, double y2, double top, double bottom);
@@ -179,10 +180,12 @@ public:
 	void	updateLine(unsigned index);
 	void	renderQuad(quad_3d_t* quad, float alpha = 1.0f);
 	void	renderWalls();
+	void	renderWallSelection(vector<selection_3d_t>& selection, float alpha = 1.0f);
 
 	// Things
 	void	updateThing(unsigned index, MapThing* thing);
 	void	renderThings();
+	void	renderThingSelection(vector<selection_3d_t>& selection, float alpha = 1.0f);
 
 	// VBO stuff
 	void	updateFlatsVBO();
@@ -193,6 +196,10 @@ public:
 	float	calcDistFade(double distance, double max = -1);
 	void	checkVisibleQuads();
 	void	checkVisibleFlats();
+
+	// Hilight
+	selection_3d_t	determineHilight();
+	void			renderHilight(selection_3d_t hilight, float alpha = 1.0f);
 };
 
 #endif//__MAP_RENDERER_3D_H__

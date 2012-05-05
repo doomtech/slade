@@ -90,6 +90,13 @@ double MathStuff::distance(double x1, double y1, double x2, double y2) {
 	return sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
 }
 
+/* MathStuff::distance3d
+ * Returns the distance between [x1,y1,z1] and [x2,y2,z2]
+ *******************************************************************/
+double MathStuff::distance3d(double x1, double y1, double z1, double x2, double y2, double z2) {
+	return sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1));
+}
+
 /* MathStuff::lineSide
  * Returns the side of the line from [x1,y1] to [x2,y2] that the
  * point at [x,y] lies on. Positive is front, negative is back, zero
@@ -214,18 +221,17 @@ bool MathStuff::linesIntersect(double l1x1, double l1y1, double l1x2, double l1y
 	return false;
 }
 
-double MathStuff::distanceRayLine(fpoint2_t ray_origin, fpoint2_t ray2, double x1, double y1, double x2, double y2) {
-	//fpoint2_t ray2 = ray_origin+ray_dir;
-
-	double u_ray = ((x2 - x1) * (ray_origin.y - y1) - (y2 - y1) * (ray_origin.x - x1)) /
-				  ((y2 - y1) * (ray2.x - ray_origin.x) - (x2 - x1) * (ray2.y - ray_origin.y));
-	double u_line = ((ray2.x - ray_origin.x) * (ray_origin.y - y1) - (ray2.y - ray_origin.y) * (ray_origin.x - x1)) /
-				   ((y2 - y1) * (ray2.x - ray_origin.x) - (x2 - x1) * (ray2.y - ray_origin.y));
-
-	if (u_ray >= 0 && u_line >= 0 && u_line <= 1)
-		return u_ray;
-	else
-		return -1;
+double MathStuff::distanceRayLine(fpoint2_t r1, fpoint2_t r2, double x1, double y1, double x2, double y2) {
+	// Calculate the intersection distance from the ray
+	double u_ray = ((x2 - x1) * (r1.y - y1) - (y2 - y1) * (r1.x - x1)) /
+				  ((y2 - y1) * (r2.x - r1.x) - (x2 - x1) * (r2.y - r1.y));
+	
+	// Calculate the intersection distance from the line
+	double u_line = ((r2.x - r1.x) * (r1.y - y1) - (r2.y - r1.y) * (r1.x - x1)) /
+				   ((y2 - y1) * (r2.x - r1.x) - (x2 - x1) * (r2.y - r1.y));
+	
+	// Return the distance on the ray if intersecting, or return -1
+	if((u_ray >= 0)/* && (u_ray <= 1024) */&& (u_line >= 0) && (u_line <= 1)) return u_ray; else return -1;
 }
 
 double MathStuff::angle2DRad(fpoint2_t p1, fpoint2_t p2, fpoint2_t p3) {
@@ -340,6 +346,17 @@ double MathStuff::radToDeg(double angle) {
 
 fpoint2_t MathStuff::vectorAngle(double angle_rad) {
 	return fpoint2_t(cos(-angle_rad), -sin(-angle_rad));
+}
+
+double MathStuff::distanceRayPlane(fpoint3_t r_o, fpoint3_t r_v, plane_t plane) {
+	fpoint3_t p_normal = plane.normal();
+	double cos_a = r_v.dot(p_normal);
+
+	// parallel to the plane (alpha=90)
+	if (cos_a == 0)
+		return -1;
+
+	return ((plane.d - r_o.dot(p_normal)) / cos_a);
 }
 
 
