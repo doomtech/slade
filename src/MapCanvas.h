@@ -138,6 +138,8 @@ public:
 	// Keybind/action handlers (that use UI features - anything else goes to MapEditor)
 	void	changeThingType();
 	void	changeSectorTexture();
+	void	changeThingType3d(selection_3d_t first);
+	void	changeTexture3d(selection_3d_t first);
 
 	// Keybind handling
 	void	onKeyBindPress(string name);

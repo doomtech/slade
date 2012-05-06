@@ -1300,6 +1300,8 @@ void MapRenderer3D::renderWallSelection(vector<selection_3d_t>& selection, float
 			// Check quad is correct side
 			if (map->getLine(line)->s1() == side && lines[line].quads[q].flags & BACK)
 				continue;
+			if (map->getLine(line)->s2() == side && (lines[line].quads[q].flags & BACK) == 0)
+				continue;
 
 			// Check quad is correct part
 			if (lines[line].quads[q].flags & UPPER) {
@@ -1703,7 +1705,9 @@ void MapRenderer3D::checkVisibleQuads() {
 			distfade = 1.0f;
 
 		// Update line if needed
-		if (lines[a].updated_time < line->modifiedTime()) {
+		if (lines[a].updated_time < line->modifiedTime() ||
+			(line->s1() && lines[a].updated_time < line->s1()->modifiedTime()) ||
+			(line->s2() && lines[a].updated_time < line->s2()->modifiedTime())) {
 			updateLine(a);
 			//updates++;
 			//if (updates > 500)

@@ -693,22 +693,38 @@ void MapEditor::getSelectedSectors(vector<MapSector*>& list) {
 }
 
 void MapEditor::getSelectedThings(vector<MapThing*>& list) {
-	if (edit_mode != MODE_THINGS)
-		return;
+	if (edit_mode == MODE_3D) {
+		// Multiple selection
+		if (selection_3d.size() > 1) {
+			for (unsigned a = 0; a < selection_3d.size(); a++) {
+				if (selection_3d[a].type == SEL_THING)
+					list.push_back(map.getThing(selection_3d[a].index));
+			}
+		}
 
-	// Multiple selection
-	if (selection.size() > 1) {
-		for (unsigned a = 0; a < selection.size(); a++)
-			list.push_back(map.getThing(selection[a]));
+		// Single selection
+		else if (selection_3d.size() == 1 && selection_3d[0].type == SEL_THING)
+			list.push_back(map.getThing(selection_3d[0].index));
+
+		// No selection (use hilight
+		else if (hilight_3d.index >= 0 && hilight_3d.type == SEL_THING)
+			list.push_back(map.getThing(hilight_3d.index));
 	}
+	else if (edit_mode == MODE_THINGS) {
+		// Multiple selection
+		if (selection.size() > 1) {
+			for (unsigned a = 0; a < selection.size(); a++)
+				list.push_back(map.getThing(selection[a]));
+		}
 
-	// Single selection
-	else if (selection.size() == 1)
-		list.push_back(map.getThing(selection[0]));
+		// Single selection
+		else if (selection.size() == 1)
+			list.push_back(map.getThing(selection[0]));
 
-	// No selection (use hilight)
-	else if (hilight_item >= 0)
-		list.push_back(map.getThing(hilight_item));
+		// No selection (use hilight)
+		else if (hilight_item >= 0)
+			list.push_back(map.getThing(hilight_item));
+	}
 }
 
 void MapEditor::getSelectedObjects(vector<MapObject*>& list) {
@@ -1181,7 +1197,7 @@ void MapEditor::changeSectorLight(int amount) {
 
 void MapEditor::changeThingType(int newtype) {
 	// Do nothing if not in things mode
-	if (edit_mode != MODE_THINGS)
+	if (edit_mode != MODE_THINGS && edit_mode != MODE_3D)
 		return;
 
 	// Get selected things (if any)
@@ -2044,38 +2060,40 @@ string MapEditor::getModeString() {
 bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 	// --- General keybinds ---
 
-	// Increment grid
-	if (key == "me2d_grid_inc")
-		incrementGrid();
+	if (edit_mode != MODE_3D) {
+		// Increment grid
+		if (key == "me2d_grid_inc")
+			incrementGrid();
 
-	// Decrement grid
-	else if (key == "me2d_grid_dec")
-		decrementGrid();
+		// Decrement grid
+		else if (key == "me2d_grid_dec")
+			decrementGrid();
 
-	// Select all
-	else if (key == "select_all")
-		selectAll();
+		// Select all
+		else if (key == "select_all")
+			selectAll();
 
-	// Clear selection
-	else if (key == "me2d_clear_selection") {
-		clearSelection();
-		addEditorMessage("Selection cleared");
-	}
+		// Clear selection
+		else if (key == "me2d_clear_selection") {
+			clearSelection();
+			addEditorMessage("Selection cleared");
+		}
 
-	// Lock/unlock hilight
-	else if (key == "me2d_lock_hilight") {
-		// Toggle lock
-		hilight_locked = !hilight_locked;
+		// Lock/unlock hilight
+		else if (key == "me2d_lock_hilight") {
+			// Toggle lock
+			hilight_locked = !hilight_locked;
 
-		// Add editor message
-		if (hilight_locked)
-			addEditorMessage("Locked current hilight");
-		else
-			addEditorMessage("Unlocked hilight");
+			// Add editor message
+			if (hilight_locked)
+				addEditorMessage("Locked current hilight");
+			else
+				addEditorMessage("Unlocked hilight");
+		}
 	}
 
 	// --- Line mode keybinds ---
-	else if (key.StartsWith("me2d_line") && edit_mode == MODE_LINES) {
+	if (key.StartsWith("me2d_line") && edit_mode == MODE_LINES) {
 		// Split line
 		if (key == "me2d_line_split")	splitLine(position.x, position.y);
 		else

@@ -1580,6 +1580,98 @@ void MapCanvas::changeSectorTexture() {
 	editor->lockHilight(hl_lock);
 }
 
+void MapCanvas::changeThingType3d(selection_3d_t first) {
+	// Get first selected thing
+	MapThing* thing = editor->getMap().getThing(first.index);
+
+	// Do nothing if no things selected/hilighted
+	if (!thing)
+		return;
+
+	// Open type browser
+	ThingTypeBrowser browser(theMapEditor, thing->getType());
+	if (browser.ShowModal() == wxID_OK)
+		editor->changeThingType(browser.getSelectedType());
+}
+
+void MapCanvas::changeTexture3d(selection_3d_t first) {
+	// Check index
+	if (first.index < 0)
+		return;
+
+	// Get initial texture
+	string tex;
+	int type = 0;
+	if (first.type == MapEditor::SEL_FLOOR) {
+		tex = editor->getMap().getSector(first.index)->floorTexture();
+		type = 1;
+	}
+	else if (first.type == MapEditor::SEL_CEILING) {
+		tex = editor->getMap().getSector(first.index)->ceilingTexture();
+		type = 1;
+	}
+	else if (first.type == MapEditor::SEL_SIDE_BOTTOM)
+		tex = editor->getMap().getSide(first.index)->stringProperty("texturebottom");
+	else if (first.type == MapEditor::SEL_SIDE_MIDDLE)
+		tex = editor->getMap().getSide(first.index)->stringProperty("texturemiddle");
+	else if (first.type == MapEditor::SEL_SIDE_TOP)
+		tex = editor->getMap().getSide(first.index)->stringProperty("texturetop");
+
+	// Open texture browser
+	MapTextureBrowser browser(theMapEditor, type, tex);
+	browser.SetTitle("Browse Texture");
+	if (browser.ShowModal() == wxID_OK) {
+		bool mix = theGameConfiguration->mixTexFlats();
+		tex = browser.getSelectedItem()->getName();
+		selection_3d_t hl = editor->hilightItem3d();
+		
+		// Apply to flats
+		vector<selection_3d_t>& selection = editor->get3dSelection();
+		if (mix || type == 1) {
+			// Selection
+			if (selection.size() > 0) {
+				for (unsigned a = 0; a < selection.size(); a++) {
+					if (selection[a].type == MapEditor::SEL_FLOOR)
+						editor->getMap().getSector(selection[a].index)->setStringProperty("texturefloor", tex);
+					else if (selection[a].type == MapEditor::SEL_CEILING)
+						editor->getMap().getSector(selection[a].index)->setStringProperty("textureceiling", tex);
+				}
+			}
+			else if (hl.index >= 0) {
+				// Hilight if no selection
+				if (hl.type == MapEditor::SEL_FLOOR)
+					editor->getMap().getSector(hl.index)->setStringProperty("texturefloor", tex);
+				else if (hl.type == MapEditor::SEL_CEILING)
+					editor->getMap().getSector(hl.index)->setStringProperty("textureceiling", tex);
+			}
+		}
+
+		// Apply to walls
+		if (mix || type == 0) {
+			// Selection
+			if (selection.size() > 0) {
+				for (unsigned a = 0; a < selection.size(); a++) {
+					if (selection[a].type == MapEditor::SEL_SIDE_BOTTOM)
+						editor->getMap().getSide(selection[a].index)->setStringProperty("texturebottom", tex);
+					else if (selection[a].type == MapEditor::SEL_SIDE_MIDDLE)
+						editor->getMap().getSide(selection[a].index)->setStringProperty("texturemiddle", tex);
+					else if (selection[a].type == MapEditor::SEL_SIDE_TOP)
+						editor->getMap().getSide(selection[a].index)->setStringProperty("texturetop", tex);
+				}
+			}
+			else if (hl.index >= 0) {
+				// Hilight if no selection
+				if (hl.type == MapEditor::SEL_SIDE_BOTTOM)
+					editor->getMap().getSide(hl.index)->setStringProperty("texturebottom", tex);
+				else if (hl.type == MapEditor::SEL_SIDE_MIDDLE)
+					editor->getMap().getSide(hl.index)->setStringProperty("texturemiddle", tex);
+				else if (hl.type == MapEditor::SEL_SIDE_TOP)
+					editor->getMap().getSide(hl.index)->setStringProperty("texturetop", tex);
+			}
+		}
+	}
+}
+
 void MapCanvas::onKeyBindPress(string name) {
 	// Check if an overlay is active
 	if (overlayActive()) {
@@ -2171,6 +2263,20 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 
 	// Right button
 	else if (e.RightDown()) {
+		// 3d mode
+		if (editor->editMode() == MapEditor::MODE_3D) {
+			// Get first selected item
+			selection_3d_t first = editor->hilightItem3d();
+			if (editor->get3dSelection().size() > 0)
+				first = editor->get3dSelection()[0];
+
+			// Check type
+			if (first.type == MapEditor::SEL_THING)
+				changeThingType3d(first);
+			else
+				changeTexture3d(first);
+		}
+
 		// Remove line draw point if in line drawing state
 		if (mouse_state == MSTATE_LINE_DRAW) {
 			// Line drawing
