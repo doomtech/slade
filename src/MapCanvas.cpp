@@ -64,6 +64,8 @@ CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
 CVAR(Bool, selection_clear_click, false, CVAR_SAVE)
 CVAR(Bool, map_showfps, false, CVAR_SAVE)
 CVAR(Bool, camera_3d_gravity, true, CVAR_SAVE)
+CVAR(Int, camera_3d_crosshair_size, 6, CVAR_SAVE)
+CVAR(Bool, camera_3d_show_distance, false, CVAR_SAVE)
 
 // for testing
 PolygonSplitter splitter;
@@ -76,6 +78,7 @@ SectorBuilder sbuilder;
 EXTERN_CVAR(Int, vertex_size)
 EXTERN_CVAR(Bool, vertex_round)
 EXTERN_CVAR(Float, render_max_dist)
+EXTERN_CVAR(Int, render_3d_things)
 
 
 /* MapCanvas::MapCanvas
@@ -825,6 +828,8 @@ void MapCanvas::draw() {
 		drawMap2d();
 
 	// Draw info overlay
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0.0f, GetSize().x, GetSize().y, 0.0f, -1.0f, 1.0f);
@@ -868,21 +873,55 @@ void MapCanvas::draw() {
 
 	// Draw crosshair if 3d mode
 	if (editor->editMode() == MapEditor::MODE_3D) {
-		COL_WHITE.set_gl();
+		// Get crosshair colour
+		rgba_t col = ColourConfiguration::getColour("map_3d_crosshair");
+		col.set_gl();
+
+		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_LINE_SMOOTH);
 		glLineWidth(1.5f);
+
 		double midx = GetSize().x * 0.5;
 		double midy = GetSize().y * 0.5;
+		int size = camera_3d_crosshair_size;
+
 		glBegin(GL_LINES);
-		glVertex2d(midx - 4, midy);
-		glVertex2d(midx + 4, midy);
-		glVertex2d(midx, midy - 4);
-		glVertex2d(midx, midy + 4);
+		// Right
+		col.set_gl(false);
+		glVertex2d(midx+1, midy);
+		glColor4f(col.fr(), col.fg(), col.fb(), 0.0f);
+		glVertex2d(midx+size, midy);
+
+		// Left
+		col.set_gl(false);
+		glVertex2d(midx-1, midy);
+		glColor4f(col.fr(), col.fg(), col.fb(), 0.0f);
+		glVertex2d(midx-size, midy);
+
+		// Bottom
+		col.set_gl(false);
+		glVertex2d(midx, midy+1);
+		glColor4f(col.fr(), col.fg(), col.fb(), 0.0f);
+		glVertex2d(midx, midy+size);
+
+		// Top
+		col.set_gl(false);
+		glVertex2d(midx, midy-1);
+		glColor4f(col.fr(), col.fg(), col.fb(), 0.0f);
+		glVertex2d(midx, midy-size);
 		glEnd();
+
+		// Draw item distance (if any)
+		if (renderer_3d->itemDistance() >= 0 && camera_3d_show_distance) {
+			glEnable(GL_TEXTURE_2D);
+			col.set_gl(true);
+			Drawing::drawText(S_FMT("%d", renderer_3d->itemDistance()), midx+5, midy+5, rgba_t(255, 255, 255, 200), Drawing::FONT_SMALL);
+		}
 	}
 
 	// FPS counter
 	if (map_showfps) {
+		glEnable(GL_TEXTURE_2D);
 		if (frametime_last > 0) {
 			int fps = 1.0 / (frametime_last/1000.0);
 			fps_avg.push_back(fps);
@@ -1763,6 +1802,24 @@ void MapCanvas::keyBinds3d(string name) {
 	// Release mouse cursor
 	else if (name == "me3d_release_mouse")
 		lockMouse(false);
+
+	// Toggle things
+	else if (name == "me3d_toggle_things") {
+		// Change thing display type
+		render_3d_things = render_3d_things + 1;
+		if (render_3d_things > 1)
+			render_3d_things = 0;
+
+		// Editor message
+		if (render_3d_things == 0)
+			editor->addEditorMessage("Things disabled");
+		else
+			editor->addEditorMessage("Things enabled: Sprites");
+	}
+
+	// Send to map editor
+	else
+		editor->handleKeyBind(name, mouse_pos_m);
 }
 
 void MapCanvas::onKeyBindRelease(string name) {
@@ -2005,8 +2062,12 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 				mouseToCenter();
 				lockMouse(true);
 			}
-			else
-				editor->selectCurrent();
+			else {
+				if (e.ShiftDown())	// Shift down, select all matching adjacent structures
+					editor->selectAdjacent3d(editor->hilightItem3d());
+				else	// Toggle selection
+					editor->selectCurrent();
+			}
 
 			return;
 		}

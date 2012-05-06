@@ -64,6 +64,7 @@ namespace Drawing {
 	sf::Font			font_bold;
 	sf::Font			font_boldcondensed;
 	sf::Font			font_mono;
+	sf::Font			font_small;
 	sf::RenderWindow*	render_target = NULL;
 #else
 	FTFont*	font_normal;
@@ -71,6 +72,7 @@ namespace Drawing {
 	FTFont*	font_bold;
 	FTFont*	font_boldcondensed;
 	FTFont*	font_mono;
+	FTFont* font_small;
 #endif
 };
 
@@ -107,6 +109,10 @@ void Drawing::initFonts() {
 	// Monospace
 	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_mono.ttf");
 	if (entry) font_mono.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
+
+	// Small
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans.ttf");
+	if (entry) font_small.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 8);
 }
 #else
 /* Drawing::initFonts
@@ -133,7 +139,7 @@ void Drawing::initFonts() {
 
 	// Monospace
 	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_mono.ttf");
-	if (entry) font_mono.loadFromMemory((const char*)entry->getData(), entry->getSize());
+	if (entry) font_small.loadFromMemory((const char*)entry->getData(), entry->getSize());
 }
 #endif//SFML_VERSION_MAJOR
 
@@ -206,6 +212,19 @@ void Drawing::initFonts() {
 		if (font_mono->Error()) {
 			delete font_mono;
 			font_mono = NULL;
+		}
+	}
+
+	// Small
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans.ttf");
+	if (entry) {
+		font_small = new FTTextureFont(entry->getData(), entry->getSize());
+		font_small->FaceSize(8);
+
+		// Check it loaded ok
+		if (font_small->Error()) {
+			delete font_small;
+			font_small = NULL;
 		}
 	}
 }
@@ -374,6 +393,7 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	case FONT_BOLD:				sf_str.SetFont(font_bold); break;
 	case FONT_BOLDCONDENSED:	sf_str.SetFont(font_boldcondensed); break;
 	case FONT_MONOSPACE:		sf_str.SetFont(font_mono); break;
+	case FONT_SMALL:			sf_str.SetFont(font_small); break;
 	default:					sf_str.SetFont(font_normal); break;
 	};
 	sf_str.SetSize(sf_str.GetFont().GetCharacterSize());
@@ -413,6 +433,7 @@ fpoint2_t Drawing::textExtents(string text, int font) {
 	case FONT_BOLD:				sf_str.SetFont(font_bold); break;
 	case FONT_BOLDCONDENSED:	sf_str.SetFont(font_boldcondensed); break;
 	case FONT_MONOSPACE:		sf_str.SetFont(font_mono); break;
+	case FONT_SMALL:			sf_str.SetFont(font_small); break;
 	default:					sf_str.SetFont(font_normal); break;
 	};
 	sf_str.SetSize(sf_str.GetFont().GetCharacterSize());
@@ -444,9 +465,13 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	case FONT_BOLD:				sf_str.setFont(font_bold); break;
 	case FONT_BOLDCONDENSED:	sf_str.setFont(font_boldcondensed); break;
 	case FONT_MONOSPACE:		sf_str.setFont(font_mono); break;
+	case FONT_SMALL:			sf_str.setFont(font_normal); break;
 	default:					sf_str.setFont(font_normal); break;
 	};
-	sf_str.setCharacterSize(12);
+	if (font == FONT_SMALL)
+		sf_str.setCharacterSize(8);
+	else
+		sf_str.setCharacterSize(12);
 
 	// Setup alignment
 	if (alignment != ALIGN_LEFT) {
@@ -497,9 +522,13 @@ fpoint2_t Drawing::textExtents(string text, int font) {
 	case FONT_BOLD:				sf_str.setFont(font_bold); break;
 	case FONT_BOLDCONDENSED:	sf_str.setFont(font_boldcondensed); break;
 	case FONT_MONOSPACE:		sf_str.setFont(font_mono); break;
+	case FONT_SMALL:			sf_str.setFont(font_normal); break;
 	default:					sf_str.setFont(font_normal); break;
 	};
-	sf_str.setCharacterSize(12);
+	if (font == FONT_SMALL)
+		sf_str.setCharacterSize(8);
+	else
+		sf_str.setCharacterSize(12);
 
 	// Return width and height of text
 	sf::FloatRect rect = sf_str.getGlobalBounds();
@@ -526,6 +555,7 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	case FONT_BOLD:				ftgl_font = font_bold; break;
 	case FONT_BOLDCONDENSED:	ftgl_font = font_boldcondensed; break;
 	case FONT_MONOSPACE:		ftgl_font = font_mono; break;
+	case FONT_SMALL:			ftgl_font = font_small; break;
 	default:					ftgl_font = font_normal; break;
 	};
 
@@ -575,6 +605,7 @@ fpoint2_t Drawing::textExtents(string text, int font) {
 	case FONT_BOLD:				ftgl_font = font_bold; break;
 	case FONT_BOLDCONDENSED:	ftgl_font = font_boldcondensed; break;
 	case FONT_MONOSPACE:		ftgl_font = font_mono; break;
+	case FONT_SMALL:			ftgl_font = font_small; break;
 	default:					ftgl_font = font_normal; break;
 	};
 

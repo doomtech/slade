@@ -9,7 +9,10 @@ struct selection_3d_t {
 	int		index;
 	uint8_t	type;
 
-	selection_3d_t() { index = -1; type = 0; }
+	selection_3d_t(int index = -1, uint8_t type = 0) {
+		this->index = index;
+		this->type = type;
+	}
 };
 
 class MapCanvas;
@@ -56,6 +59,7 @@ private:
 	// 3d mode
 	selection_3d_t			hilight_3d;
 	vector<selection_3d_t>	selection_3d;
+	bool					wallMatchesNotSelected(MapSide* side, uint8_t part, string tex);	// Helper for selectAdjacent3d
 
 public:
 	enum {
@@ -99,6 +103,7 @@ public:
 
 	vector<selection_3d_t>&	get3dSelection() { return selection_3d; }
 	void					set3dHilight(selection_3d_t hl) { hilight_3d = hl; }
+	selection_3d_t			hilightItem3d() { return hilight_3d; }
 
 	void	setEditMode(int mode);
 	void	setSectorEditMode(int mode);
@@ -166,6 +171,9 @@ public:
 	void		setShapeDrawOrigin(fpoint2_t point, bool nearest = false);
 	void		updateShapeDraw(fpoint2_t point);
 	void		endLineDraw(bool apply = true);
+
+	// 3d mode
+	void	selectAdjacent3d(selection_3d_t item);
 
 	// Editor messages
 	unsigned	numEditorMessages();

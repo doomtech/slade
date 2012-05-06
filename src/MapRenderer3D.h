@@ -29,6 +29,7 @@ private:
 	fpoint3_t	cam_dir3d;
 	fpoint3_t	cam_strafe;
 	double		gravity;
+	int			item_dist;
 
 	// Structs
 	enum {
@@ -144,6 +145,7 @@ public:
 	bool	fogEnabled() { return fog; }
 	void	enableFullbright(bool enable = true) { fullbright = enable; }
 	void	enableFog(bool enable = true) { fog = enable; }
+	int		itemDistance() { return item_dist; }
 
 	bool	init();
 	void	refresh();

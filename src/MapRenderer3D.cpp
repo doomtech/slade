@@ -14,6 +14,7 @@ CVAR(Bool, render_fog_quality, true, CVAR_SAVE)
 CVAR(Bool, render_max_dist_adaptive, true, CVAR_SAVE)
 CVAR(Int, render_adaptive_ms, 15, CVAR_SAVE)
 CVAR(Bool, render_3d_sky, true, CVAR_SAVE)
+CVAR(Int, render_3d_things, 1, CVAR_SAVE)
 
 
 MapRenderer3D::MapRenderer3D(SLADEMap* map) {
@@ -341,7 +342,8 @@ void MapRenderer3D::renderMap() {
 	renderFlats();
 
 	// Render things
-	renderThings();
+	if (render_3d_things > 0)
+		renderThings();
 
 	// Check elapsed time
 	if (render_max_dist_adaptive) {
@@ -1411,6 +1413,10 @@ void MapRenderer3D::renderThings() {
 }
 
 void MapRenderer3D::renderThingSelection(vector<selection_3d_t>& selection, float alpha) {
+	// Do nothing if no things visible
+	if (render_3d_things == 0)
+		return;
+
 	// Setup gl stuff
 	glLineWidth(3.0f);
 	glDisable(GL_TEXTURE_2D);
@@ -1797,7 +1803,15 @@ selection_3d_t MapRenderer3D::determineHilight() {
 		}
 	}
 
-	// Check things
+	// Update item distance
+	if (min_dist >= 9999999 || min_dist < 0)
+		item_dist = -1;
+	else
+		item_dist = MathStuff::round(min_dist);
+
+	// Check things (if visible)
+	if (render_3d_things == 0)
+		return current;
 	double halfwidth, theight;
 	for (unsigned a = 0; a < map->nThings(); a++) {
 		// Ignore if not visible
@@ -1829,6 +1843,12 @@ selection_3d_t MapRenderer3D::determineHilight() {
 			min_dist = dist;
 		}
 	}
+
+	// Update item distance
+	if (min_dist >= 9999999 || min_dist < 0)
+		item_dist = -1;
+	else
+		item_dist = MathStuff::round(min_dist);
 
 	return current;
 }

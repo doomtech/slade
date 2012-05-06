@@ -17,6 +17,7 @@ namespace Drawing {
 		FONT_BOLD,
 		FONT_BOLDCONDENSED,
 		FONT_MONOSPACE,
+		FONT_SMALL,
 
 		// Text alignment
 		ALIGN_LEFT = 0,
