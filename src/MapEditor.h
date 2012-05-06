@@ -174,6 +174,7 @@ public:
 
 	// 3d mode
 	void	selectAdjacent3d(selection_3d_t item);
+	void	changeSectorLight3d(int amount, bool sector = true);
 
 	// Editor messages
 	unsigned	numEditorMessages();

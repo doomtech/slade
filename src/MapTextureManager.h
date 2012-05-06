@@ -32,8 +32,8 @@ public:
 	void	setArchive(Archive* archive);
 	void	refreshResources();
 
-	GLTexture*	getTexture(string name);
-	GLTexture*	getFlat(string name);
+	GLTexture*	getTexture(string name, bool mixed);
+	GLTexture*	getFlat(string name, bool mixed);
 	GLTexture*	getSprite(string name, string translation = "", string palette = "");
 	GLTexture*	getEditorImage(string name);
 	int			getVerticalOffset(string name);

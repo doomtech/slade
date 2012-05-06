@@ -202,6 +202,9 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	SetInitialSize(wxSize(768, 600));
 	SetMinSize(wxSize(540, 400));
 	CenterOnParent();
+
+	// Set focus to canvas
+	canvas->SetFocus();
 }
 
 /* BrowserWindow::~BrowserWindow

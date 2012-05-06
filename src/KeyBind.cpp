@@ -434,6 +434,14 @@ void KeyBind::initBinds() {
 	addBind("me3d_clear_selection", keypress_t("C"), "Clear selection", group);
 	addBind("me3d_toggle_things", keypress_t("T"), "Toggle thing display", group);
 	addBind("me3d_toggle_hilight", keypress_t("H"), "Toggle hilight", group);
+	addBind("me3d_light_up16", keypress_t("'"), "Sector Light level up 16", group);
+	addBind("me3d_light_up", keypress_t("'", KPM_SHIFT), "Sector Light level up 1", group);
+	addBind("me3d_light_down16", keypress_t(";"), "Sector ight level down 16", group);
+	addBind("me3d_light_down", keypress_t(";", KPM_SHIFT), "Sector Light level down 1", group);
+	addBind("me3d_light_flat_up16", keypress_t("'", KPM_CTRL), "Flat Light level up 16", group);
+	addBind("me3d_light_flat_up", keypress_t("'", KPM_SHIFT|KPM_CTRL), "Flat Light level up 1", group);
+	addBind("me3d_light_flat_down16", keypress_t(";", KPM_CTRL), "Flat Light level down 16", group);
+	addBind("me3d_light_flat_down", keypress_t(";", KPM_SHIFT|KPM_CTRL), "Flat Light level down 1", group);
 
 	// Entry List (el*)
 	group = "Entry List";
@@ -496,7 +504,7 @@ string KeyBind::writeBinds() {
 
 		// '.' indicates no binds
 		if (kb.keys.size() == 0)
-			ret += " .";
+			ret += " unbound";
 
 		// Go through all bound keys
 		for (unsigned a = 0; a < kb.keys.size(); a++) {
@@ -540,7 +548,7 @@ bool KeyBind::readBinds(Tokenizer& tz) {
 			string keystr = tz.getToken();
 
 			// Finish if no keys are bound
-			if (keystr == ".")
+			if (keystr == "unbound")
 				break;
 
 			// Parse key string

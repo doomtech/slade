@@ -2015,6 +2015,69 @@ void MapEditor::selectAdjacent3d(selection_3d_t item) {
 	}
 }
 
+void MapEditor::changeSectorLight3d(int amount, bool sector) {
+	// Get items to process
+	vector<selection_3d_t> items;
+	if (selection_3d.size() == 0 && hilight_3d.type != SEL_THING)
+		items.push_back(hilight_3d);
+	else {
+		for (unsigned a = 0; a < selection_3d.size(); a++) {
+			if (selection_3d[a].type != SEL_THING)
+				items.push_back(selection_3d[a]);
+		}
+	}
+
+	// Determine if separate floor/ceiling light levels are supported
+	bool separate = false;
+	if (theGameConfiguration->getMapFormat() == MAP_UDMF &&
+		S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom"))
+		separate = true;
+
+	// Go through items
+	for (unsigned a = 0; a < items.size(); a++) {
+		// Wall
+		if (items[a].type == SEL_SIDE_BOTTOM || items[a].type == SEL_SIDE_MIDDLE || items[a].type == SEL_SIDE_TOP) {
+			// Get side
+			MapSide* side = map.getSide(items[a].index);
+			if (!side) continue;
+
+			// Check for decrease when light = 255
+			if (side->getSector()->getLight(0) == 255 && amount < -1)
+				amount++;
+
+			// Change sector light level
+			side->getSector()->changeLight(amount);
+		}
+
+		// Flat
+		if (items[a].type == SEL_FLOOR || items[a].type == SEL_CEILING) {
+			// Get sector
+			MapSector* s = map.getSector(items[a].index);
+
+			// Change light level
+			if (items[a].type == SEL_FLOOR && separate && !sector)
+				s->changeLight(amount, 1);
+			else if (items[a].type == SEL_CEILING && separate && !sector)
+				s->changeLight(amount, 2);
+			else {
+				// Check for decrease when light = 255
+				if (s->getLight(0) == 255 && amount < -1)
+					amount++;
+
+				s->changeLight(amount, 0);
+			}
+		}
+	}
+
+	// Editor message
+	if (items.size() > 0) {
+		if (amount > 0)
+			addEditorMessage(S_FMT("Light increased by %d", amount));
+		else
+			addEditorMessage(S_FMT("Light decreased by %d", -amount));
+	}
+}
+
 string MapEditor::getEditorMessage(int index) {
 	// Check index
 	if (index < 0 || index >= (int)editor_messages.size())
@@ -2132,6 +2195,16 @@ bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 			clearSelection();
 			addEditorMessage("Selection cleared");
 		}
+
+		// Light changes
+		else if	(key == "me3d_light_up16")			changeSectorLight3d(16);
+		else if (key == "me3d_light_up")			changeSectorLight3d(1);
+		else if (key == "me3d_light_down16")		changeSectorLight3d(-16);
+		else if (key == "me3d_light_down")			changeSectorLight3d(-1);
+		else if (key == "me3d_light_flat_up16")		changeSectorLight3d(16, false);
+		else if (key == "me3d_light_flat_up")		changeSectorLight3d(1, false);
+		else if (key == "me3d_light_flat_down16")	changeSectorLight3d(-16, false);
+		else if (key == "me3d_light_flat_down")		changeSectorLight3d(-1, false);
 	}
 
 	// Not handled

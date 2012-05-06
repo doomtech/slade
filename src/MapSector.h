@@ -71,6 +71,7 @@ public:
 	bool				getLines(vector<MapLine*>& list);
 	bool				getVertices(vector<MapVertex*>& list);
 	uint8_t				getLight(int where = 0);
+	void				changeLight(int amount, int where = 0);
 	rgba_t				getColour(int where = 0, bool fullbright = false);
 
 	void	connectSide(MapSide* side);

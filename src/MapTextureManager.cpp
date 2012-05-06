@@ -23,7 +23,7 @@ MapTextureManager::MapTextureManager(Archive* archive) {
 MapTextureManager::~MapTextureManager() {
 }
 
-GLTexture* MapTextureManager::getTexture(string name) {
+GLTexture* MapTextureManager::getTexture(string name, bool mixed) {
 	// Get texture matching name
 	map_tex_t& mtex = textures[name.Upper()];
 
@@ -60,10 +60,12 @@ GLTexture* MapTextureManager::getTexture(string name) {
 		etex = theResourceManager->getTextureEntry(name, "textures", archive);
 		textypefound = TEXTYPE_TEXTURE;
 	}
+	/*
 	if (etex == NULL) {
 		etex = theResourceManager->getTextureEntry(name, "flats", archive);
 		textypefound = TEXTYPE_FLAT;
 	}
+	*/
 	if (etex) {
 		SImage image;
 		// Get image format hint from type, if any
@@ -89,13 +91,21 @@ GLTexture* MapTextureManager::getTexture(string name) {
 		}
 	}
 
-	if (!mtex.texture)
-		mtex.texture = &(GLTexture::missingTex());
+	// Not found
+	if (!mtex.texture) {
+		// Try flats if mixed
+		if (mixed)
+			return getFlat(name, false);
+
+		// Otherwise use missing texture
+		else
+			mtex.texture = &(GLTexture::missingTex());
+	}
 
 	return mtex.texture;
 }
 
-GLTexture* MapTextureManager::getFlat(string name) {
+GLTexture* MapTextureManager::getFlat(string name, bool mixed) {
 	// Get flat matching name
 	map_tex_t& mtex = flats[name.Upper()];
 
@@ -127,7 +137,7 @@ GLTexture* MapTextureManager::getFlat(string name) {
 	if (!mtex.texture) {
 		ArchiveEntry * entry = theResourceManager->getTextureEntry(name, "hires", archive);
 		if (entry == NULL)
-			entry = theResourceManager->getTextureEntry(name, "textures", archive);
+			entry = theResourceManager->getTextureEntry(name, "flats", archive);
 		if (entry == NULL)
 			entry = theResourceManager->getFlatEntry(name, archive);
 		if (entry) {
@@ -140,6 +150,7 @@ GLTexture* MapTextureManager::getFlat(string name) {
 		}
 	}
 
+	/*
 	// Try composite textures then
 	if (!mtex.texture) {
 		CTexture* ctex = theResourceManager->getTexture(name, archive);
@@ -152,9 +163,18 @@ GLTexture* MapTextureManager::getFlat(string name) {
 			}
 		}
 	}
+	*/
 
-	if (!mtex.texture)
-		mtex.texture = &(GLTexture::missingTex());
+	// Not found
+	if (!mtex.texture) {
+		// Try textures if mixed
+		if (mixed)
+			return getTexture(name, false);
+
+		// Otherwise use missing texture
+		else
+			mtex.texture = &(GLTexture::missingTex());
+	}
 
 	return mtex.texture;
 }

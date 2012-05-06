@@ -1690,9 +1690,11 @@ void MapCanvas::onKeyBindPress(string name) {
 	// Toggle 3d mode
 	if (name == "map_toggle_3d") {
 		if (editor->editMode() == MapEditor::MODE_3D)
-			changeEditMode(MapEditor::MODE_LINES);
-		else
+			changeEditMode(mode_last);
+		else {
+			mode_last = editor->editMode();
 			changeEditMode(MapEditor::MODE_3D);
+		}
 	}
 
 	// Handle keybinds depending on mode

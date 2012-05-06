@@ -27,9 +27,9 @@ bool MapTexBrowserItem::loadImage() {
 
 	// Get texture or flat depending on type
 	if (type == "texture")
-		tex = theMapEditor->textureManager().getTexture(name);
+		tex = theMapEditor->textureManager().getTexture(name, false);
 	else if (type == "flat")
-		tex = theMapEditor->textureManager().getFlat(name);
+		tex = theMapEditor->textureManager().getFlat(name, false);
 
 	if (tex) {
 		image = tex;

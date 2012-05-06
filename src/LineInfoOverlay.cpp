@@ -171,7 +171,7 @@ void LineInfoOverlay::drawTexture(float alpha, int x, int y, string texture, str
 		glPopMatrix();
 
 		// Get texture
-		GLTexture* tex = theMapEditor->textureManager().getTexture(texture);
+		GLTexture* tex = theMapEditor->textureManager().getTexture(texture, theGameConfiguration->mixTexFlats());
 
 		// Draw texture
 		if (tex) {

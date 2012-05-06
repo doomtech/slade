@@ -243,6 +243,34 @@ uint8_t MapSector::getLight(int where) {
 	return light;
 }
 
+void MapSector::changeLight(int amount, int where) {
+	// Get current light level
+	int light = getLight(where);
+
+	// Clamp amount
+	if (light + amount > 255)
+		amount -= ((light+amount) - 255);
+	else if (light + amount < 0)
+		amount = -light;
+
+	// Check for UDMF+ZDoom namespace
+	bool separate = false;
+	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom"))
+		separate = true;
+
+	// Change light level by amount
+	if (where == 1 && separate) {
+		int cur = intProperty("lightfloor");
+		setIntProperty("lightfloor", cur + amount);
+	}
+	else if (where == 2 && separate) {
+		int cur = intProperty("lightceiling");
+		setIntProperty("lightceiling", cur + amount);
+	}
+	else
+		setIntProperty("lightlevel", light + amount);
+}
+
 rgba_t MapSector::getColour(int where, bool fullbright) {
 	// Check for UDMF+ZDoom namespace
 	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {

@@ -1181,9 +1181,9 @@ void MapRenderer2D::renderFlatsImmediate(int type, bool texture, float alpha) {
 		if (texture) {
 			// Get the sector texture
 			if (type <= 1)
-				tex = theMapEditor->textureManager().getFlat(sector->floorTexture());
+				tex = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());
 			else
-				tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
+				tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture(), theGameConfiguration->mixTexFlats());
 
 			// Bind the texture if needed
 			if (tex) {
@@ -1295,9 +1295,9 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 		if (texture) {
 			// Get the sector texture
 			if (type <= 1)
-				tex = theMapEditor->textureManager().getFlat(sector->floorTexture());
+				tex = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());
 			else
-				tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
+				tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture(), theGameConfiguration->mixTexFlats());
 		}
 
 		// Setup polygon texture info if needed

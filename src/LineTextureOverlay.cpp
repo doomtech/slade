@@ -228,14 +228,14 @@ void LineTextureOverlay::drawTexture(float alpha, int size, tex_inf_t& tex, stri
 	if (tex.textures.size() > 0) {
 		// Draw first texture
 		rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
-		tex_first = theMapEditor->textureManager().getTexture(tex.textures[0]);
+		tex_first = theMapEditor->textureManager().getTexture(tex.textures[0], theGameConfiguration->mixTexFlats());
 		Drawing::drawTextureWithin(tex_first, tex.position.x - halfsize, tex.position.y - halfsize,
 									tex.position.x + halfsize, tex.position.y + halfsize, 0, 2);
 
 		// Draw up to 4 subsequent textures (overlaid)
 		rgba_t(255, 255, 255, 127*alpha, 0).set_gl();
 		for (unsigned a = 1; a < tex.textures.size() && a < 5; a++) {
-			Drawing::drawTextureWithin(theMapEditor->textureManager().getTexture(tex.textures[a]),
+			Drawing::drawTextureWithin(theMapEditor->textureManager().getTexture(tex.textures[a], theGameConfiguration->mixTexFlats()),
 										tex.position.x - halfsize, tex.position.y - halfsize,
 										tex.position.x + halfsize, tex.position.y + halfsize, 0, 2);
 		}

@@ -483,9 +483,9 @@ void MapRenderer3D::renderSky() {
 
 	// Get sky texture
 	if (!skytex2.IsEmpty())
-		sky = theMapEditor->textureManager().getTexture(skytex2);
+		sky = theMapEditor->textureManager().getTexture(skytex2, false);
 	else
-		sky = theMapEditor->textureManager().getTexture(skytex1);
+		sky = theMapEditor->textureManager().getTexture(skytex1, false);
 	if (sky) {
 		// Bind texture
 		sky->bind();
@@ -619,7 +619,7 @@ void MapRenderer3D::updateSector(unsigned index) {
 	// Update floor
 	MapSector* sector = map->getSector(index);
 	floors[index].sector = sector;
-	floors[index].texture = theMapEditor->textureManager().getFlat(sector->floorTexture());
+	floors[index].texture = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());
 	floors[index].colour = sector->getColour(1, true);
 	floors[index].light = sector->getLight(1);
 	floors[index].flags = 0;
@@ -641,7 +641,7 @@ void MapRenderer3D::updateSector(unsigned index) {
 
 	// Update ceiling
 	ceilings[index].sector = sector;
-	ceilings[index].texture = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
+	ceilings[index].texture = theMapEditor->textureManager().getFlat(sector->ceilingTexture(), theGameConfiguration->mixTexFlats());
 	ceilings[index].colour = sector->getColour(2, true);
 	ceilings[index].light = sector->getLight(2);
 	ceilings[index].flags = CEIL;
@@ -892,6 +892,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 	bool upeg = theGameConfiguration->lineBasicFlagSet("dontpegtop", line);
 	bool lpeg = theGameConfiguration->lineBasicFlagSet("dontpegbottom", line);
 	double xoff, yoff, sx, sy;
+	bool mixed = theGameConfiguration->mixTexFlats();
 
 	// Get first side info
 	int floor1 = line->frontSector()->intProperty("heightfloor");
@@ -929,7 +930,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		setupQuad(&quad, line->x1(), line->y1(), line->x2(), line->y2(), ceiling1, floor1);
 		quad.colour = colour1;
 		quad.light = light1;
-		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturemiddle"));
+		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturemiddle"), mixed);
 		setupQuadTexCoords(&quad, length, xoff1, yoff1, lpeg, sx, sy);
 
 		// Add middle quad and finish
@@ -981,7 +982,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		setupQuad(&quad, line->x1(), line->y1(), line->x2(), line->y2(), floor2, floor1);
 		quad.colour = colour1;
 		quad.light = light1;
-		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturebottom"));
+		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturebottom"), mixed);
 		setupQuadTexCoords(&quad, length, xoff, yoff, false, sx, sy);
 		if (line->backSector()->floorTexture() == sky_flat) quad.flags |= SKY;
 		quad.flags |= LOWER;
@@ -996,7 +997,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad_3d_t quad;
 
 		// Get texture
-		quad.texture = theMapEditor->textureManager().getTexture(midtex1);
+		quad.texture = theMapEditor->textureManager().getTexture(midtex1, mixed);
 
 		// Determine offsets
 		xoff = xoff1;
@@ -1064,7 +1065,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		setupQuad(&quad, line->x1(), line->y1(), line->x2(), line->y2(), ceiling1, ceiling2);
 		quad.colour = colour1;
 		quad.light = light1;
-		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturetop"));
+		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturetop"), mixed);
 		setupQuadTexCoords(&quad, length, xoff, yoff, !upeg, sx, sy);
 		if (line->backSector()->ceilingTexture() == sky_flat) quad.flags |= SKY;
 		quad.flags |= UPPER;
@@ -1103,7 +1104,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		setupQuad(&quad, line->x2(), line->y2(), line->x1(), line->y1(), floor1, floor2);
 		quad.colour = colour2;
 		quad.light = light2;
-		quad.texture = theMapEditor->textureManager().getTexture(line->s2()->stringProperty("texturebottom"));
+		quad.texture = theMapEditor->textureManager().getTexture(line->s2()->stringProperty("texturebottom"), mixed);
 		setupQuadTexCoords(&quad, length, xoff, yoff, false, sx, sy);
 		if (line->frontSector()->floorTexture() == sky_flat) quad.flags |= SKY;
 		quad.flags |= BACK;
@@ -1119,7 +1120,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad_3d_t quad;
 
 		// Get texture
-		quad.texture = theMapEditor->textureManager().getTexture(midtex2);
+		quad.texture = theMapEditor->textureManager().getTexture(midtex2, mixed);
 
 		// Determine offsets
 		xoff = xoff2;
@@ -1188,7 +1189,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		setupQuad(&quad, line->x2(), line->y2(), line->x1(), line->y1(), ceiling2, ceiling1);
 		quad.colour = colour2;
 		quad.light = light2;
-		quad.texture = theMapEditor->textureManager().getTexture(line->s2()->stringProperty("texturetop"));
+		quad.texture = theMapEditor->textureManager().getTexture(line->s2()->stringProperty("texturetop"), mixed);
 		setupQuadTexCoords(&quad, length, xoff, yoff, !upeg, sx, sy);
 		if (line->frontSector()->ceilingTexture() == sky_flat) quad.flags |= SKY;
 		quad.flags |= BACK;
@@ -1685,6 +1686,7 @@ void MapRenderer3D::checkVisibleQuads() {
 	float distfade;
 	n_quads = 0;
 	unsigned updates = 0;
+	bool update = false;
 	fpoint2_t strafe(cam_position.x+cam_strafe.x, cam_position.y+cam_strafe.y);
 	for (unsigned a = 0; a < lines.size(); a++) {
 		line = map->getLine(a);
@@ -1705,9 +1707,22 @@ void MapRenderer3D::checkVisibleQuads() {
 			distfade = 1.0f;
 
 		// Update line if needed
-		if (lines[a].updated_time < line->modifiedTime() ||
-			(line->s1() && lines[a].updated_time < line->s1()->modifiedTime()) ||
-			(line->s2() && lines[a].updated_time < line->s2()->modifiedTime())) {
+		update = false;
+		if (lines[a].updated_time < line->modifiedTime())	// Check line modified
+			update = true;
+		if (!update && line->s1()) {
+			// Check front side/sector modified
+			if (lines[a].updated_time < line->s1()->modifiedTime() ||
+				lines[a].updated_time < line->frontSector()->modifiedTime())
+				update = true;
+		}
+		if (!update && line->s2()) {
+			// Check back side/sector modified
+			if (lines[a].updated_time < line->s2()->modifiedTime() ||
+				lines[a].updated_time < line->backSector()->modifiedTime())
+				update = true;
+		}
+		if (update) {
 			updateLine(a);
 			//updates++;
 			//if (updates > 500)

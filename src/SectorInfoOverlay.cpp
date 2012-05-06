@@ -130,7 +130,7 @@ void SectorInfoOverlay::drawTexture(float alpha, int x, int y, string texture, s
 		glPopMatrix();
 
 		// Get texture
-		GLTexture* tex = theMapEditor->textureManager().getFlat(texture);
+		GLTexture* tex = theMapEditor->textureManager().getFlat(texture, theGameConfiguration->mixTexFlats());
 
 		// Draw texture
 		if (tex) {
