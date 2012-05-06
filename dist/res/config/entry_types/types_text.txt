@@ -151,6 +151,7 @@ entry_types
 	{
 		name = "Mapinfo";
 		match_name = "mapinfo";
+		text_language = "z_mapinfo";
 	}
 
 	zmapinfo : text

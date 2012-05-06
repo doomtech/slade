@@ -2174,7 +2174,12 @@ CONSOLE_COMMAND(m_test_sector, 0) {
 	SLADEMap& map = theMapEditor->mapEditor().getMap();
 	for (unsigned a = 0; a < map.nThings(); a++)
 		map.sectorAt(map.getThing(a)->xPos(), map.getThing(a)->yPos());
-	wxLogMessage("Took %dms", clock.getElapsedTime().asMilliseconds());
+#if SFML_VERSION_MAJOR < 2	// SFML 1.6: uppercase G, returns time in seconds as a float
+	long ms = clock.GetElapsedTime() * 1000;
+#else						// SFML 2.0: lowercase G, returns a Time object
+	long ms = clock.getElapsedTime().asMilliseconds();
+#endif
+	wxLogMessage("Took %dms", ms);
 }
 
 /*
