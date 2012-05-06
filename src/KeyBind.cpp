@@ -458,6 +458,17 @@ void KeyBind::initBinds() {
 	addBind("me3d_wall_yoff_down", keypress_t("num_down"), "Y offset down 1", group);
 	addBind("me3d_wall_toggle_link_ofs", keypress_t("O"), "Toggle linked wall offsets", group);
 
+	// Map Editor 3D Flats (me3d_flat*)
+	group = "Map Editor 3D Mode Flats";
+	addBind("me3d_flat_height_up8", keypress_t("num_plus"), "Height up 8", group);
+	addBind("me3d_flat_height_up8", keypress_t("mwheelup"));
+	addBind("me3d_flat_height_up", keypress_t("num_plus", KPM_SHIFT), "Height up 1", group);
+	addBind("me3d_flat_height_up", keypress_t("mwheelup", KPM_SHIFT));
+	addBind("me3d_flat_height_down8", keypress_t("num_minus"), "Height down 8", group);
+	addBind("me3d_flat_height_down8", keypress_t("mwheeldown"));
+	addBind("me3d_flat_height_down", keypress_t("num_minus", KPM_SHIFT), "Height down 1", group);
+	addBind("me3d_flat_height_down", keypress_t("mwheeldown", KPM_SHIFT));
+
 	// Entry List (el*)
 	group = "Entry List";
 	addBind("el_new", keypress_t("N", KPM_CTRL), "New Entry", group);

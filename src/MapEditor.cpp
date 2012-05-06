@@ -2150,6 +2150,91 @@ void MapEditor::changeWallOffset3d(int amount, bool x) {
 	}
 }
 
+void MapEditor::changeSectorHeight3d(int amount) {
+	// Get items to process
+	vector<selection_3d_t> items;
+	if (selection_3d.size() == 0 && hilight_3d.type != SEL_THING)
+		items.push_back(hilight_3d);
+	else {
+		for (unsigned a = 0; a < selection_3d.size(); a++) {
+			if (selection_3d[a].type != SEL_THING)
+				items.push_back(selection_3d[a]);
+		}
+	}
+
+	// Go through items
+	vector<int> ceilings;
+	for (unsigned a = 0; a < items.size(); a++) {
+		// Wall (ceiling only for now)
+		if (items[a].type == SEL_SIDE_BOTTOM || items[a].type == SEL_SIDE_MIDDLE || items[a].type == SEL_SIDE_TOP) {
+			// Get sector
+			MapSector* sector = map.getSide(items[a].index)->getSector();
+
+			// Check this sector's ceiling hasn't already been changed
+			bool done = false;
+			int index = sector->getIndex();
+			for (unsigned b = 0; b < ceilings.size(); b++) {
+				if (ceilings[b] == index) {
+					done = true;
+					break;
+				}
+			}
+			if (done)
+				continue;
+
+			// Change height
+			int height = sector->intProperty("heightceiling");
+			sector->setIntProperty("heightceiling", height + amount);
+
+			// Set to changed
+			ceilings.push_back(index);
+		}
+
+		// Floor
+		else if (items[a].type == SEL_FLOOR) {
+			// Get sector
+			MapSector* sector = map.getSector(items[a].index);
+
+			// Change height
+			int height = sector->intProperty("heightfloor");
+			sector->setIntProperty("heightfloor", height + amount);
+		}
+
+		// Ceiling
+		else if (items[a].type == SEL_CEILING) {
+			// Get sector
+			MapSector* sector = map.getSector(items[a].index);
+
+			// Check this sector's ceiling hasn't already been changed
+			bool done = false;
+			int index = sector->getIndex();
+			for (unsigned b = 0; b < ceilings.size(); b++) {
+				if (ceilings[b] == index) {
+					done = true;
+					break;
+				}
+			}
+			if (done)
+				continue;
+
+			// Change height
+			int height = sector->intProperty("heightceiling");
+			sector->setIntProperty("heightceiling", height + amount);
+
+			// Set to changed
+			ceilings.push_back(sector->getIndex());
+		}
+	}
+
+	// Editor message
+	if (items.size() > 0) {
+		if (amount > 0)
+			addEditorMessage(S_FMT("Height increased by %d", amount));
+		else
+			addEditorMessage(S_FMT("Height decreased by %d", -amount));
+	}
+}
+
 string MapEditor::getEditorMessage(int index) {
 	// Check index
 	if (index < 0 || index >= (int)editor_messages.size())
@@ -2315,6 +2400,12 @@ bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 		else if	(key == "me3d_wall_yoff_up")	changeWallOffset3d(1, false);
 		else if	(key == "me3d_wall_yoff_down8")	changeWallOffset3d(-8, false);
 		else if	(key == "me3d_wall_yoff_down")	changeWallOffset3d(-1, false);
+
+		// Height changes
+		else if	(key == "me3d_flat_height_up8")		changeSectorHeight3d(8);
+		else if	(key == "me3d_flat_height_up")		changeSectorHeight3d(1);
+		else if	(key == "me3d_flat_height_down8")	changeSectorHeight3d(-8);
+		else if	(key == "me3d_flat_height_down")	changeSectorHeight3d(-1);
 	}
 
 	// Not handled

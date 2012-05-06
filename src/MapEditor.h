@@ -178,6 +178,7 @@ public:
 	void	selectAdjacent3d(selection_3d_t item);
 	void	changeSectorLight3d(int amount);
 	void	changeWallOffset3d(int amount, bool x);
+	void	changeSectorHeight3d(int amount);
 
 	// Editor messages
 	unsigned	numEditorMessages();
