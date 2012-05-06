@@ -30,6 +30,8 @@ MapEditor::MapEditor() {
 	grid_snap = true;
 	copy_thing = NULL;
 	copy_sector = NULL;
+	link_3d_light = true;
+	link_3d_offset = true;
 }
 
 MapEditor::~MapEditor() {
@@ -2015,7 +2017,7 @@ void MapEditor::selectAdjacent3d(selection_3d_t item) {
 	}
 }
 
-void MapEditor::changeSectorLight3d(int amount, bool sector) {
+void MapEditor::changeSectorLight3d(int amount) {
 	// Get items to process
 	vector<selection_3d_t> items;
 	if (selection_3d.size() == 0 && hilight_3d.type != SEL_THING)
@@ -2026,12 +2028,6 @@ void MapEditor::changeSectorLight3d(int amount, bool sector) {
 				items.push_back(selection_3d[a]);
 		}
 	}
-
-	// Determine if separate floor/ceiling light levels are supported
-	bool separate = false;
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF &&
-		S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom"))
-		separate = true;
 
 	// Go through items
 	for (unsigned a = 0; a < items.size(); a++) {
@@ -2055,9 +2051,9 @@ void MapEditor::changeSectorLight3d(int amount, bool sector) {
 			MapSector* s = map.getSector(items[a].index);
 
 			// Change light level
-			if (items[a].type == SEL_FLOOR && separate && !sector)
+			if (items[a].type == SEL_FLOOR && !link_3d_light)
 				s->changeLight(amount, 1);
-			else if (items[a].type == SEL_CEILING && separate && !sector)
+			else if (items[a].type == SEL_CEILING && !link_3d_light)
 				s->changeLight(amount, 2);
 			else {
 				// Check for decrease when light = 255
@@ -2075,6 +2071,82 @@ void MapEditor::changeSectorLight3d(int amount, bool sector) {
 			addEditorMessage(S_FMT("Light increased by %d", amount));
 		else
 			addEditorMessage(S_FMT("Light decreased by %d", -amount));
+	}
+}
+
+void MapEditor::changeWallOffset3d(int amount, bool x) {
+	// Get items to process
+	vector<selection_3d_t> items;
+	if (selection_3d.size() == 0) {
+		if (hilight_3d.type >= SEL_SIDE_TOP && hilight_3d.type <= SEL_SIDE_BOTTOM)
+			items.push_back(hilight_3d);
+	}
+	else {
+		for (unsigned a = 0; a < selection_3d.size(); a++) {
+			if (selection_3d[a].type >= SEL_SIDE_TOP && selection_3d[a].type <= SEL_SIDE_BOTTOM)
+				items.push_back(selection_3d[a]);
+		}
+	}
+
+	// Go through items
+	vector<int> done;
+	for (unsigned a = 0; a < items.size(); a++) {
+		MapSide* side = map.getSide(items[a].index);
+
+		// If offsets are linked, just change the whole side offset
+		if (link_3d_offset) {
+			// Check we haven't processed this side already
+			bool d = false;
+			for (unsigned b = 0; b < done.size(); b++) {
+				if (done[b] == items[a].index) {
+					d = true;
+					break;
+				}
+			}
+			if (d)
+				continue;
+
+			// Change the appropriate offset
+			if (x) {
+				int offset = side->intProperty("offsetx");
+				side->setIntProperty("offsetx", offset + amount);
+			}
+			else {
+				int offset = side->intProperty("offsety");
+				side->setIntProperty("offsety", offset + amount);
+			}
+
+			// Add to done list
+			done.push_back(items[a].index);
+		}
+
+		// Unlinked offsets
+		else {
+			// Build property string (offset[x/y]_[top/mid/bottom])
+			string ofs = "offsetx";
+			if (!x) ofs = "offsety";
+			if (items[a].type == SEL_SIDE_BOTTOM)
+				ofs += "_bottom";
+			else if (items[a].type == SEL_SIDE_TOP)
+				ofs += "_top";
+			else
+				ofs += "_mid";
+
+			// Change the offset
+			int offset = side->floatProperty(ofs);
+			side->setFloatProperty(ofs, offset + amount);
+		}
+	}
+
+	// Editor message
+	if (items.size() > 0) {
+		string axis = "X";
+		if (!x) axis = "Y";
+
+		if (amount > 0)
+			addEditorMessage(S_FMT("%s offset increased by %d", CHR(axis), amount));
+		else
+			addEditorMessage(S_FMT("%s offset decreased by %d", CHR(axis), -amount));
 	}
 }
 
@@ -2190,21 +2262,59 @@ bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 
 	// --- 3d mode keybinds ---
 	else if (key.StartsWith("me3d_") && edit_mode == MODE_3D) {
+		// Check for extended udmf properties
+		bool ext = false;
+		if (theGameConfiguration->getMapFormat() == MAP_UDMF &&
+			S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom"))
+			ext = true;
+
 		// Clear selection
 		if (key == "me3d_clear_selection") {
 			clearSelection();
 			addEditorMessage("Selection cleared");
 		}
 
+		// Toggle linked light levels
+		else if (key == "me3d_light_toggle_link") {
+			if (!ext)
+				addEditorMessage("Unlinked light levels not supported in this game configuration");
+			else {
+				link_3d_light = !link_3d_light;
+				if (link_3d_light)
+					addEditorMessage("Flat light levels linked");
+				else
+					addEditorMessage("Flat light levels unlinked");
+			}
+		}
+
+		// Toggle linked offsets
+		else if (key == "me3d_wall_toggle_link_ofs") {
+			if (!ext)
+				addEditorMessage("Unlinked wall offsets not supported in this game configuration");
+			else {
+				link_3d_offset = !link_3d_offset;
+				if (link_3d_offset)
+					addEditorMessage("Wall offsets linked");
+				else
+					addEditorMessage("Wall offsets unlinked");
+			}
+		}
+
 		// Light changes
-		else if	(key == "me3d_light_up16")			changeSectorLight3d(16);
-		else if (key == "me3d_light_up")			changeSectorLight3d(1);
-		else if (key == "me3d_light_down16")		changeSectorLight3d(-16);
-		else if (key == "me3d_light_down")			changeSectorLight3d(-1);
-		else if (key == "me3d_light_flat_up16")		changeSectorLight3d(16, false);
-		else if (key == "me3d_light_flat_up")		changeSectorLight3d(1, false);
-		else if (key == "me3d_light_flat_down16")	changeSectorLight3d(-16, false);
-		else if (key == "me3d_light_flat_down")		changeSectorLight3d(-1, false);
+		else if	(key == "me3d_light_up16")		changeSectorLight3d(16);
+		else if (key == "me3d_light_up")		changeSectorLight3d(1);
+		else if (key == "me3d_light_down16")	changeSectorLight3d(-16);
+		else if (key == "me3d_light_down")		changeSectorLight3d(-1);
+
+		// Wall offset changes
+		else if	(key == "me3d_wall_xoff_up8")	changeWallOffset3d(8, true);
+		else if	(key == "me3d_wall_xoff_up")	changeWallOffset3d(1, true);
+		else if	(key == "me3d_wall_xoff_down8")	changeWallOffset3d(-8, true);
+		else if	(key == "me3d_wall_xoff_down")	changeWallOffset3d(-1, true);
+		else if	(key == "me3d_wall_yoff_up8")	changeWallOffset3d(8, false);
+		else if	(key == "me3d_wall_yoff_up")	changeWallOffset3d(1, false);
+		else if	(key == "me3d_wall_yoff_down8")	changeWallOffset3d(-8, false);
+		else if	(key == "me3d_wall_yoff_down")	changeWallOffset3d(-1, false);
 	}
 
 	// Not handled

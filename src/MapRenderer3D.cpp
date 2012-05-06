@@ -931,7 +931,7 @@ void MapRenderer3D::updateLine(unsigned index) {
 		quad.colour = colour1;
 		quad.light = light1;
 		quad.texture = theMapEditor->textureManager().getTexture(line->s1()->stringProperty("texturemiddle"), mixed);
-		setupQuadTexCoords(&quad, length, xoff1, yoff1, lpeg, sx, sy);
+		setupQuadTexCoords(&quad, length, xoff, yoff, lpeg, sx, sy);
 
 		// Add middle quad and finish
 		lines[index].quads.push_back(quad);
@@ -1002,6 +1002,12 @@ void MapRenderer3D::updateLine(unsigned index) {
 		// Determine offsets
 		xoff = xoff1;
 		yoff = 0;
+		if (udmf_zdoom) {
+			if (line->s1()->hasProp("offsetx_mid"))
+				xoff += line->s1()->floatProperty("offsetx_mid");
+			if (line->s1()->hasProp("offsety_mid"))
+				yoff += line->s1()->floatProperty("offsety_mid");
+		}
 
 		// Texture scale
 		sx = sy = 1;
@@ -1125,6 +1131,12 @@ void MapRenderer3D::updateLine(unsigned index) {
 		// Determine offsets
 		xoff = xoff2;
 		yoff = 0;
+		if (udmf_zdoom) {
+			if (line->s2()->hasProp("offsetx_mid"))
+				xoff += line->s2()->floatProperty("offsetx_mid");
+			if (line->s2()->hasProp("offsety_mid"))
+				yoff += line->s2()->floatProperty("offsety_mid");
+		}
 
 		// Texture scale
 		sx = sy = 1;

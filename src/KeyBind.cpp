@@ -419,6 +419,16 @@ void KeyBind::initBinds() {
 
 	// Map Editor 3D (me3d*)
 	group = "Map Editor 3D Mode";
+	addBind("me3d_toggle_fog", keypress_t("F"), "Toggle fog", group);
+	addBind("me3d_toggle_fullbright", keypress_t("B"), "Toggle full brightness", group);
+	addBind("me3d_toggle_gravity", keypress_t("G"), "Toggle camera gravity", group);
+	addBind("me3d_release_mouse", keypress_t("tab"), "Release mouse cursor", group);
+	addBind("me3d_clear_selection", keypress_t("C"), "Clear selection", group);
+	addBind("me3d_toggle_things", keypress_t("T"), "Toggle thing display", group);
+	addBind("me3d_toggle_hilight", keypress_t("H"), "Toggle hilight", group);
+
+	// Map Editor 3D Camera (me3d_camera*)
+	group = "Map Editor 3D Mode Camera";
 	addBind("me3d_camera_forward", keypress_t("W"), "Camera forward", group);
 	addBind("me3d_camera_back", keypress_t("S"), "Camera backward", group);
 	addBind("me3d_camera_left", keypress_t("A"), "Camera strafe left", group);
@@ -427,21 +437,26 @@ void KeyBind::initBinds() {
 	addBind("me3d_camera_down", keypress_t("down"), "Camera move down", group);
 	addBind("me3d_camera_turn_left", keypress_t("left"), "Camera turn left", group);
 	addBind("me3d_camera_turn_right", keypress_t("right"), "Camera turn right", group);
-	addBind("me3d_toggle_fog", keypress_t("F"), "Toggle fog", group);
-	addBind("me3d_toggle_fullbright", keypress_t("B"), "Toggle full brightness", group);
-	addBind("me3d_toggle_gravity", keypress_t("G"), "Toggle camera gravity", group);
-	addBind("me3d_release_mouse", keypress_t("tab"), "Release mouse cursor", group);
-	addBind("me3d_clear_selection", keypress_t("C"), "Clear selection", group);
-	addBind("me3d_toggle_things", keypress_t("T"), "Toggle thing display", group);
-	addBind("me3d_toggle_hilight", keypress_t("H"), "Toggle hilight", group);
-	addBind("me3d_light_up16", keypress_t("'"), "Sector Light level up 16", group);
-	addBind("me3d_light_up", keypress_t("'", KPM_SHIFT), "Sector Light level up 1", group);
-	addBind("me3d_light_down16", keypress_t(";"), "Sector ight level down 16", group);
-	addBind("me3d_light_down", keypress_t(";", KPM_SHIFT), "Sector Light level down 1", group);
-	addBind("me3d_light_flat_up16", keypress_t("'", KPM_CTRL), "Flat Light level up 16", group);
-	addBind("me3d_light_flat_up", keypress_t("'", KPM_SHIFT|KPM_CTRL), "Flat Light level up 1", group);
-	addBind("me3d_light_flat_down16", keypress_t(";", KPM_CTRL), "Flat Light level down 16", group);
-	addBind("me3d_light_flat_down", keypress_t(";", KPM_SHIFT|KPM_CTRL), "Flat Light level down 1", group);
+
+	// Map Editor 3D Light (me3d_light*)
+	group = "Map Editor 3D Mode Light";
+	addBind("me3d_light_up16", keypress_t("'"), "Sector light level up 16", group);
+	addBind("me3d_light_up", keypress_t("'", KPM_SHIFT), "Sector light level up 1", group);
+	addBind("me3d_light_down16", keypress_t(";"), "Sector light level down 16", group);
+	addBind("me3d_light_down", keypress_t(";", KPM_SHIFT), "Sector light level down 1", group);
+	addBind("me3d_light_toggle_link", keypress_t("L"), "Toggle linked flat light levels", group);
+
+	// Map Editor 3D Walls (me3d_wall*)
+	group = "Map Editor 3D Mode Walls";
+	addBind("me3d_wall_xoff_up8", keypress_t("num_4"), "X offset up 8", group);
+	addBind("me3d_wall_xoff_up", keypress_t("num_left"), "X offset up 1", group);
+	addBind("me3d_wall_xoff_down8", keypress_t("num_6"), "X offset down 8", group);
+	addBind("me3d_wall_xoff_down", keypress_t("num_right"), "X offset down 1", group);
+	addBind("me3d_wall_yoff_up8", keypress_t("num_8"), "Y offset up 8", group);
+	addBind("me3d_wall_yoff_up", keypress_t("num_up"), "Y offset up 1", group);
+	addBind("me3d_wall_yoff_down8", keypress_t("num_2"), "Y offset down 8", group);
+	addBind("me3d_wall_yoff_down", keypress_t("num_down"), "Y offset down 1", group);
+	addBind("me3d_wall_toggle_link_ofs", keypress_t("O"), "Toggle linked wall offsets", group);
 
 	// Entry List (el*)
 	group = "Entry List";

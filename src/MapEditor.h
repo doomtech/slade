@@ -29,6 +29,8 @@ private:
 	int			gridsize;
 	int			sector_mode;
 	bool		grid_snap;
+	bool		link_3d_light;
+	bool		link_3d_offset;
 
 	// Tagged items
 	vector<MapSector*>	tagged_sectors;
@@ -174,7 +176,8 @@ public:
 
 	// 3d mode
 	void	selectAdjacent3d(selection_3d_t item);
-	void	changeSectorLight3d(int amount, bool sector = true);
+	void	changeSectorLight3d(int amount);
+	void	changeWallOffset3d(int amount, bool x);
 
 	// Editor messages
 	unsigned	numEditorMessages();
