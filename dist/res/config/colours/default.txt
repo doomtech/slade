@@ -129,20 +129,23 @@ colours {
 		rgb = 255, 0, 0;
 	}
 
-
 	map_editor_message {
-
 		name = "Editor Message";
-
 		group = "Map Editor";
-
 		rgb = 255, 200, 100;
-
 	}
 	
 	map_linedraw {
 		name = "Line Drawing";
 		group = "Map Editor";
 		rgb = 0, 150, 50;
+	}
+	
+	map_3d_crosshair {
+		name = "3D Crosshair";
+		group = "Map Editor";
+		rgb = 180, 190, 255;
+		alpha = 255;
+		additive = true;
 	}
 }
