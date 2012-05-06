@@ -15,6 +15,7 @@ CVAR(Bool, render_max_dist_adaptive, true, CVAR_SAVE)
 CVAR(Int, render_adaptive_ms, 15, CVAR_SAVE)
 CVAR(Bool, render_3d_sky, true, CVAR_SAVE)
 CVAR(Int, render_3d_things, 1, CVAR_SAVE)
+CVAR(Int, render_3d_hilight, 1, CVAR_SAVE)
 
 
 MapRenderer3D::MapRenderer3D(SLADEMap* map) {
@@ -113,6 +114,66 @@ void MapRenderer3D::buildSkyCircle() {
 		sky_circle[a].set(sin(rot), -cos(rot));
 		rot -= (3.1415926535897932384626433832795 * 2) / 32.0;
 	}
+}
+
+MapRenderer3D::quad_3d_t* MapRenderer3D::getQuad(selection_3d_t item) {
+	// Check item type
+	if (item.type != MapEditor::SEL_SIDE_BOTTOM &&
+		item.type != MapEditor::SEL_SIDE_MIDDLE &&
+		item.type != MapEditor::SEL_SIDE_TOP)
+		return NULL;
+
+	// Get side
+	MapSide* side = map->getSide(item.index);
+	if (!side)
+		return NULL;
+
+	// Find matching quad
+	int lindex = side->getParentLine()->getIndex();
+	for (unsigned a = 0; a < lines[lindex].quads.size(); a++) {
+		quad_3d_t* quad = &lines[lindex].quads[a];
+
+		// Check side
+		if (side == side->getParentLine()->s1() && quad->flags & BACK)
+			continue;
+		if (side == side->getParentLine()->s2() && (quad->flags & BACK) == 0)
+			continue;
+
+		// Check part
+		if (item.type == MapEditor::SEL_SIDE_BOTTOM) {
+			if (quad->flags & LOWER)
+				return quad;
+		}
+		if (item.type == MapEditor::SEL_SIDE_TOP) {
+			if (quad->flags & UPPER)
+				return quad;
+		}
+		if (item.type == MapEditor::SEL_SIDE_MIDDLE) {
+			if ((quad->flags & UPPER) == 0 && (quad->flags & LOWER) == 0)
+				return quad;
+		}
+	}
+
+	// Not found
+	return NULL;
+}
+
+MapRenderer3D::flat_3d_t* MapRenderer3D::getFlat(selection_3d_t item) {
+	// Check index
+	if (item.index >= floors.size())
+		return NULL;
+
+	// Floor
+	if (item.type == MapEditor::SEL_FLOOR)
+		return &floors[item.index];
+
+	// Ceiling
+	else if (item.type == MapEditor::SEL_CEILING)
+		return &ceilings[item.index];
+
+	// Wrong type
+	else
+		return NULL;
 }
 
 void MapRenderer3D::cameraMove(double distance, bool z) {
@@ -726,7 +787,7 @@ void MapRenderer3D::renderFlatSelection(vector<selection_3d_t>& selection, float
 	col1.a *= alpha;
 	col1.set_gl();
 	rgba_t col2 = col1;
-	col2.a *= 0.7;
+	col2.a *= 0.5;
 
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
@@ -1215,7 +1276,7 @@ void MapRenderer3D::renderWallSelection(vector<selection_3d_t>& selection, float
 	col1.a *= alpha;
 	col1.set_gl();
 	rgba_t col2 = col1;
-	col2.a *= 0.7;
+	col2.a *= 0.5;
 
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
@@ -1429,7 +1490,7 @@ void MapRenderer3D::renderThingSelection(vector<selection_3d_t>& selection, floa
 	col1.a *= alpha;
 	col1.set_gl();
 	rgba_t col2 = col1;
-	col2.a *= 0.7;
+	col2.a *= 0.5;
 
 	// Go through selection
 	double halfwidth, theight, x1, y1, x2, y2;
@@ -1855,7 +1916,7 @@ selection_3d_t MapRenderer3D::determineHilight() {
 
 void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 	// Do nothing if no item hilighted
-	if (hilight.index < 0)
+	if (hilight.index < 0 || render_3d_hilight == 0)
 		return;
 
 	// Setup gl stuff
@@ -1907,11 +1968,22 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 		if (!quad)
 			return;
 
-		// Render quad with hilight
+		// Render outline
 		glBegin(GL_LINE_LOOP);
 		for (unsigned a = 0; a < 4; a++)
 			glVertex3f(quad->points[a].x, quad->points[a].y, quad->points[a].z);
 		glEnd();
+
+		// Render fill (if needed)
+		if (render_3d_hilight > 1) {
+			glCullFace(GL_BACK);
+			col_hilight.a *= 0.5;
+			col_hilight.set_gl(false);
+			glBegin(GL_QUADS);
+			for (unsigned a = 0; a < 4; a++)
+				glVertex3f(quad->points[a].x, quad->points[a].y, quad->points[a].z);
+			glEnd();
+		}
 	}
 
 	// Sector hilight
@@ -1923,12 +1995,16 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 
 		// Translate to floor/ceiling height
 		glPushMatrix();
-		if (hilight.type == MapEditor::SEL_FLOOR)
+		if (hilight.type == MapEditor::SEL_FLOOR) {
 			glTranslated(0, 0, sector->intProperty("heightfloor"));
-		else
+			glCullFace(GL_FRONT);
+		}
+		else {
 			glTranslated(0, 0, sector->intProperty("heightceiling"));
+			glCullFace(GL_BACK);
+		}
 
-		// Draw sector outline
+		// Render sector outline
 		vector<MapLine*> lines;
 		sector->getLines(lines);
 		glBegin(GL_LINES);
@@ -1937,6 +2013,13 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 			glVertex3d(lines[a]->x2(), lines[a]->y2(), 0);
 		}
 		glEnd();
+
+		// Render fill if needed
+		if (render_3d_hilight > 1) {
+			col_hilight.a *= 0.5;
+			col_hilight.set_gl(false);
+			sector->getPolygon()->render();
+		}
 
 		glPopMatrix();
 	}
@@ -1970,6 +2053,19 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 		glVertex3f(x2, y2, z);
 		glVertex3f(x2, y2, z + theight);
 		glEnd();
+
+		// Render fill if needed
+		if (render_3d_hilight > 1) {
+			glCullFace(GL_BACK);
+			col_hilight.a *= 0.5;
+			col_hilight.set_gl(false);
+			glBegin(GL_QUADS);
+			glVertex3f(x1, y1, z + theight);
+			glVertex3f(x1, y1, z);
+			glVertex3f(x2, y2, z);
+			glVertex3f(x2, y2, z + theight);
+			glEnd();
+		}
 	}
 
 	glEnable(GL_DEPTH_TEST);

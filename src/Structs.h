@@ -563,6 +563,10 @@ struct plane_t {
 		c = c / mag;
 		d = d / mag;
 	}
+
+	float height_at(float x, float y) {
+		return ((-a * x) + (-b * y) + d) / c;
+	}
 };
 
 

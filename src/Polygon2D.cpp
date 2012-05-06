@@ -34,7 +34,12 @@ void Polygon2D::setZ(float z) {
 }
 
 void Polygon2D::setZ(plane_t plane) {
-	// TODO
+	// Go through all sub-polys
+	for (unsigned a = 0; a < subpolys.size(); a++) {
+		// Set all vertex z values
+		for (unsigned v = 0; v < subpolys[a]->n_vertices; v++)
+			subpolys[a]->vertices[v].z = plane.height_at(subpolys[a]->vertices[v].x, subpolys[a]->vertices[v].y);
+	}
 }
 
 void Polygon2D::addSubPoly() {
@@ -194,7 +199,7 @@ void Polygon2D::render() {
 		glBegin(GL_POLYGON);
 		for (unsigned v = 0; v < poly->n_vertices; v++) {
 			glTexCoord2f(poly->vertices[v].tx, poly->vertices[v].ty);
-			glVertex2d(poly->vertices[v].x, poly->vertices[v].y);
+			glVertex3d(poly->vertices[v].x, poly->vertices[v].y, poly->vertices[v].z);
 		}
 		glEnd();
 	}

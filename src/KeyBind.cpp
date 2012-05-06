@@ -433,6 +433,7 @@ void KeyBind::initBinds() {
 	addBind("me3d_release_mouse", keypress_t("tab"), "Release mouse cursor", group);
 	addBind("me3d_clear_selection", keypress_t("C"), "Clear selection", group);
 	addBind("me3d_toggle_things", keypress_t("T"), "Toggle thing display", group);
+	addBind("me3d_toggle_hilight", keypress_t("H"), "Toggle hilight", group);
 
 	// Entry List (el*)
 	group = "Entry List";

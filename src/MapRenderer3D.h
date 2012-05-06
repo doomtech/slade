@@ -7,30 +7,7 @@
 class GLTexture;
 class Polygon2D;
 class MapRenderer3D {
-private:
-	SLADEMap*	map;
-	bool		udmf_zdoom;
-	bool		fullbright;
-	bool		fog;
-	int			last_light;
-	GLTexture*	tex_last;
-	unsigned	n_quads;
-	unsigned	n_flats;
-	int			flat_last;
-
-	// Visibility
-	vector<float>	dist_sectors;
-
-	// Camera
-	fpoint3_t	cam_position;
-	fpoint2_t	cam_direction;
-	double		cam_pitch;
-	double		cam_angle;
-	fpoint3_t	cam_dir3d;
-	fpoint3_t	cam_strafe;
-	double		gravity;
-	int			item_dist;
-
+public:
 	// Structs
 	enum {
 		// Common flags
@@ -43,7 +20,7 @@ private:
 		BACK	= 8,
 		UPPER	= 16,
 		LOWER	= 32,
-		MIDTEX	= 48,
+		MIDTEX	= 64,
 
 		// Flat flags
 		CEIL	= 8,
@@ -112,32 +89,6 @@ private:
 		}
 	};
 
-	// Map Structures
-	vector<line_3d_t>	lines;
-	quad_3d_t**			quads;
-	vector<thing_3d_t>	things;
-	vector<flat_3d_t>	floors;
-	vector<flat_3d_t>	ceilings;
-	flat_3d_t**			flats;
-
-	// VBOs
-	GLuint	vbo_floors;
-	GLuint	vbo_ceilings;
-	GLuint	vbo_walls;
-
-	// Sky
-	struct gl_vertex_ex_t {
-		float x, y, z;
-		float tx, ty;
-		float alpha;
-	};
-	string		skytex1;
-	string		skytex2;
-	rgba_t		skycol_top;
-	rgba_t		skycol_bottom;
-	fpoint2_t	sky_circle[32];
-
-public:
 	MapRenderer3D(SLADEMap* map = NULL);
 	~MapRenderer3D();
 
@@ -151,6 +102,9 @@ public:
 	void	refresh();
 	void	clearData();
 	void	buildSkyCircle();
+
+	quad_3d_t*	getQuad(selection_3d_t item);
+	flat_3d_t*	getFlat(selection_3d_t item);
 
 	// Camera
 	void	cameraMove(double distance, bool z = true);
@@ -202,6 +156,55 @@ public:
 	// Hilight
 	selection_3d_t	determineHilight();
 	void			renderHilight(selection_3d_t hilight, float alpha = 1.0f);
+
+private:
+	SLADEMap*	map;
+	bool		udmf_zdoom;
+	bool		fullbright;
+	bool		fog;
+	int			last_light;
+	GLTexture*	tex_last;
+	unsigned	n_quads;
+	unsigned	n_flats;
+	int			flat_last;
+
+	// Visibility
+	vector<float>	dist_sectors;
+
+	// Camera
+	fpoint3_t	cam_position;
+	fpoint2_t	cam_direction;
+	double		cam_pitch;
+	double		cam_angle;
+	fpoint3_t	cam_dir3d;
+	fpoint3_t	cam_strafe;
+	double		gravity;
+	int			item_dist;
+
+	// Map Structures
+	vector<line_3d_t>	lines;
+	quad_3d_t**			quads;
+	vector<thing_3d_t>	things;
+	vector<flat_3d_t>	floors;
+	vector<flat_3d_t>	ceilings;
+	flat_3d_t**			flats;
+
+	// VBOs
+	GLuint	vbo_floors;
+	GLuint	vbo_ceilings;
+	GLuint	vbo_walls;
+
+	// Sky
+	struct gl_vertex_ex_t {
+		float x, y, z;
+		float tx, ty;
+		float alpha;
+	};
+	string		skytex1;
+	string		skytex2;
+	rgba_t		skycol_top;
+	rgba_t		skycol_bottom;
+	fpoint2_t	sky_circle[32];
 };
 
 #endif//__MAP_RENDERER_3D_H__

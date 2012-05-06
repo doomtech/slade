@@ -10,6 +10,7 @@
 #include "KeyBind.h"
 #include "MainApp.h"
 #include "MCOverlay.h"
+#include "MapRenderer3D.h"
 #include <SFML/System.hpp>
 
 class MapEditor;
@@ -18,7 +19,6 @@ class MapSide;
 class ThingType;
 class GLTexture;
 class MapRenderer2D;
-class MapRenderer3D;
 class MapThing;
 class MapCanvas : public OGLCanvas, public KeyBindHandler, public SActionHandler {
 private:
@@ -128,6 +128,8 @@ public:
 
 	void	itemSelected(int index, bool selected = true);
 	void	itemsSelected(vector<int>& items, bool selected = true);
+	void	itemSelected3d(selection_3d_t item, bool selected = true);
+	void	itemsSelected3d(vector<selection_3d_t>& items, bool selected = true);
 	void	updateInfoOverlay();
 	void	forceRefreshRenderer();
 	void	changeEditMode(int mode);

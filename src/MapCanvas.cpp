@@ -79,6 +79,7 @@ EXTERN_CVAR(Int, vertex_size)
 EXTERN_CVAR(Bool, vertex_round)
 EXTERN_CVAR(Float, render_max_dist)
 EXTERN_CVAR(Int, render_3d_things)
+EXTERN_CVAR(Int, render_3d_hilight)
 
 
 /* MapCanvas::MapCanvas
@@ -762,8 +763,10 @@ void MapCanvas::drawMap2d() {
 	}
 
 	// Draw animations
-	for (unsigned a = 0; a < animations.size(); a++)
-		animations[a]->draw();
+	for (unsigned a = 0; a < animations.size(); a++) {
+		if (!animations[a]->mode3d())
+			animations[a]->draw();
+	}
 
 	// Draw moving stuff if needed
 	if (mouse_state == MSTATE_MOVE) {
@@ -798,10 +801,14 @@ void MapCanvas::drawMap3d() {
 
 	// Draw selection if any
 	vector<selection_3d_t> selection = editor->get3dSelection();
-	if (selection.size() > 0) {
-		renderer_3d->renderFlatSelection(selection);
-		renderer_3d->renderWallSelection(selection);
-		renderer_3d->renderThingSelection(selection);
+	renderer_3d->renderFlatSelection(selection);
+	renderer_3d->renderWallSelection(selection);
+	renderer_3d->renderThingSelection(selection);
+
+	// Draw animations
+	for (unsigned a = 0; a < animations.size(); a++) {
+		if (animations[a]->mode3d())
+			animations[a]->draw();
 	}
 }
 
@@ -1095,21 +1102,8 @@ bool MapCanvas::update2d(double mult) {
 	// Update renderer scale
 	renderer_2d->setScale(view_scale_inter);
 
-	// Update animations
-	bool anim_running = false;
-	for (unsigned a = 0; a < animations.size(); a++) {
-		if (!animations[a]->update(theApp->runTimer())) {
-			// If animation is finished, delete and remove from the list
-			delete animations[a];
-			animations.erase(animations.begin() + a);
-			a--;
-		}
-		else
-			anim_running = true;
-	}
-
 	// Check if framerate shouldn't be throttled
-	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || view_anim || anim_mode_crossfade)
+	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || view_anim || anim_mode_crossfade)
 		return true;
 	else
 		return false;
@@ -1240,15 +1234,28 @@ void MapCanvas::update(long frametime) {
 	if (overlayActive())
 		overlay_current->update(frametime);
 
+	// Update animations
+	bool anim_running = false;
+	for (unsigned a = 0; a < animations.size(); a++) {
+		if (!animations[a]->update(theApp->runTimer())) {
+			// If animation is finished, delete and remove from the list
+			delete animations[a];
+			animations.erase(animations.begin() + a);
+			a--;
+		}
+		else
+			anim_running = true;
+	}
+
 	// Determine the framerate limit
 #ifdef USE_SFML_RENDERWINDOW
 	// SFML RenderWindow can handle high framerates better than wxGLCanvas, or something like that
-	if (mode_anim || fade_anim || overlay_fade_anim)
+	if (mode_anim || fade_anim || overlay_fade_anim || anim_running)
 		fr_idle = 0;
 	else	// No high-priority animations running, throttle framerate
 		fr_idle = 25;
 #else
-	if (mode_anim || fade_anim || overlay_fade_anim)
+	if (mode_anim || fade_anim || overlay_fade_anim || anim_running)
 		fr_idle = 5;
 	else	// No high-priority animations running, throttle framerate
 		fr_idle = 30;
@@ -1400,6 +1407,42 @@ void MapCanvas::itemsSelected(vector<int>& items, bool selected) {
 		// Start animation
 		animations.push_back(new MCASectorSelection(theApp->runTimer(), polys, selected));
 	}
+}
+
+void MapCanvas::itemSelected3d(selection_3d_t item, bool selected) {
+	// Wall selected
+	if (item.type == MapEditor::SEL_SIDE_BOTTOM ||
+		item.type == MapEditor::SEL_SIDE_TOP ||
+		item.type == MapEditor::SEL_SIDE_MIDDLE) {
+		// Get quad
+		MapRenderer3D::quad_3d_t* quad = renderer_3d->getQuad(item);
+
+		if (quad) {
+			// Get quad points
+			fpoint3_t points[4];
+			for (unsigned a = 0; a < 4; a++)
+				points[a].set(quad->points[a].x, quad->points[a].y, quad->points[a].z);
+
+			// Start animation
+			animations.push_back(new MCA3dWallSelection(theApp->runTimer(), points, selected));
+		}
+	}
+
+	// Flat selected
+	if (item.type == MapEditor::SEL_CEILING || item.type == MapEditor::SEL_FLOOR) {
+		// Get flat
+		MapRenderer3D::flat_3d_t* flat = renderer_3d->getFlat(item);
+
+		// Start animation
+		if (flat)
+			animations.push_back(new MCA3dFlatSelection(theApp->runTimer(), flat->sector, flat->plane, selected));
+	}
+}
+
+void MapCanvas::itemsSelected3d(vector<selection_3d_t>& items, bool selected) {
+	// Just do one animation per item in 3d mode
+	for (unsigned a = 0; a < items.size(); a++)
+		itemSelected3d(items[a], selected);
 }
 
 void MapCanvas::updateInfoOverlay() {
@@ -1815,6 +1858,22 @@ void MapCanvas::keyBinds3d(string name) {
 			editor->addEditorMessage("Things disabled");
 		else
 			editor->addEditorMessage("Things enabled: Sprites");
+	}
+
+	// Toggle hilight
+	else if (name == "me3d_toggle_hilight") {
+		// Change hilight type
+		render_3d_hilight = render_3d_hilight + 1;
+		if (render_3d_hilight > 2)
+			render_3d_hilight = 0;
+
+		// Editor message
+		if (render_3d_hilight == 0)
+			editor->addEditorMessage("Hilight disabled");
+		else if (render_3d_hilight == 1)
+			editor->addEditorMessage("Hilight enabled: Outline");
+		else if (render_3d_hilight == 2)
+			editor->addEditorMessage("Hilight enabled: Solid");
 	}
 
 	// Send to map editor

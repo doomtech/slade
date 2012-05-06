@@ -330,8 +330,10 @@ void MapEditor::selectionUpdated() {
 }
 
 void MapEditor::clearSelection() {
-	if (edit_mode == MODE_3D)
+	if (edit_mode == MODE_3D) {
+		if (canvas) canvas->itemsSelected3d(selection_3d, false);
 		selection_3d.clear();
+	}
 	else {
 		if (canvas) canvas->itemsSelected(selection, false);
 		selection.clear();
@@ -376,6 +378,7 @@ bool MapEditor::selectCurrent(bool clear_none) {
 		if (hilight_3d.index == -1) {
 			// Clear selection if specified
 			if (clear_none) {
+				if (canvas) canvas->itemsSelected3d(selection_3d, false);
 				selection_3d.clear();
 				addEditorMessage("Selection cleared");
 			}
@@ -389,14 +392,14 @@ bool MapEditor::selectCurrent(bool clear_none) {
 				selection_3d[a].type == hilight_3d.type) {
 				// Already selected, deselect
 				selection_3d.erase(selection_3d.begin() + a);
-				addEditorMessage("deselected");
+				if (canvas) canvas->itemSelected3d(hilight_3d, false);
 				return true;
 			}
 		}
 
 		// Not already selected, add to selection
 		selection_3d.push_back(hilight_3d);
-		addEditorMessage("selected");
+		if (canvas) canvas->itemSelected3d(hilight_3d);
 
 		return true;
 	}
@@ -1778,6 +1781,28 @@ void MapEditor::endLineDraw(bool apply) {
 }
 
 bool MapEditor::wallMatchesNotSelected(MapSide* side, uint8_t part, string tex) {
+	// Check for blank texture where it isn't needed
+	if (tex == "-") {
+		MapLine* line = side->getParentLine();
+		int needed = line->needsTexture();
+		if (side == line->s1()) {
+			if (part == SEL_SIDE_TOP && (needed & TEX_FRONT_UPPER) == 0)
+				return false;
+			if (part == SEL_SIDE_MIDDLE && (needed & TEX_FRONT_MIDDLE) == 0)
+				return false;
+			if (part == SEL_SIDE_BOTTOM && (needed & TEX_FRONT_LOWER) == 0)
+				return false;
+		}
+		else if (side == line->s2()) {
+			if (part == SEL_SIDE_TOP && (needed & TEX_BACK_UPPER) == 0)
+				return false;
+			if (part == SEL_SIDE_MIDDLE && (needed & TEX_BACK_MIDDLE) == 0)
+				return false;
+			if (part == SEL_SIDE_BOTTOM && (needed & TEX_BACK_LOWER) == 0)
+				return false;
+		}
+	}
+
 	// Check texture
 	if (part == SEL_SIDE_TOP && side->stringProperty("texturetop") != tex)
 		return false;
@@ -1808,8 +1833,10 @@ void MapEditor::selectAdjacent3d(selection_3d_t item) {
 			break;
 		}
 	}
-	if (!selected)
+	if (!selected) {
 		selection_3d.push_back(item);
+		if (canvas) canvas->itemSelected3d(item);
+	}
 
 	// Flat
 	if (item.type == SEL_FLOOR || item.type == SEL_CEILING) {

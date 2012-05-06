@@ -5,10 +5,13 @@
 class MCAnimation {
 protected:
 	long	starttime;
+	bool	mode_3d;
 
 public:
-	MCAnimation(long start) { starttime = start; }
+	MCAnimation(long start, bool mode_3d = false) { starttime = start; this->mode_3d = mode_3d; }
 	~MCAnimation() {}
+
+	bool	mode3d() { return mode_3d; }
 
 	virtual bool update(long time) { return false; }
 	virtual void draw() {}
@@ -86,6 +89,36 @@ private:
 public:
 	MCASectorSelection(long start, vector<Polygon2D*>& polys, bool select = true);
 	~MCASectorSelection();
+
+	bool update(long time);
+	void draw();
+};
+
+class MCA3dWallSelection : public MCAnimation {
+private:
+	fpoint3_t	points[4];
+	bool		select;
+	float		fade;
+
+public:
+	MCA3dWallSelection(long start, fpoint3_t points[4], bool select = true);
+	~MCA3dWallSelection();
+
+	bool update(long time);
+	void draw();
+};
+
+class MapSector;
+class MCA3dFlatSelection : public MCAnimation {
+private:
+	MapSector*	sector;
+	plane_t		plane;
+	bool		select;
+	float		fade;
+
+public:
+	MCA3dFlatSelection(long start, MapSector* sector, plane_t plane, bool select = true);
+	~MCA3dFlatSelection();
 
 	bool update(long time);
 	void draw();

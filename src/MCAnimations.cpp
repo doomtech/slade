@@ -312,3 +312,109 @@ void MCASectorSelection::draw() {
 	for (unsigned a = 0; a < polygons.size(); a++)
 		polygons[a]->render();
 }
+
+
+
+MCA3dWallSelection::MCA3dWallSelection(long start, fpoint3_t points[4], bool select) : MCAnimation(start, true) {
+	// Init variables
+	this->select = select;
+	this->fade = 1.0f;
+	this->points[0] = points[0];
+	this->points[1] = points[1];
+	this->points[2] = points[2];
+	this->points[3] = points[3];
+}
+
+MCA3dWallSelection::~MCA3dWallSelection() {
+}
+
+bool MCA3dWallSelection::update(long time) {
+	// Determine fade amount (0.0-1.0 over 150ms)
+	fade = 1.0f - ((time - starttime) * 0.004f);
+
+	// Check if animation is finished
+	if (fade < 0.0f || fade > 1.0f)
+		return false;
+	else
+		return true;
+}
+
+void MCA3dWallSelection::draw() {
+	// Setup colour
+	rgba_t col;
+	if (select)
+		col.set(255, 255, 255, 180*fade, 1);
+	else {
+		col = ColourConfiguration::getColour("map_selection");
+		col.a *= fade*0.75;
+	}
+	col.set_gl();
+
+	// Draw quad outline
+	glLineWidth(3.0f);
+	glEnable(GL_LINE_SMOOTH);
+	glBegin(GL_LINE_LOOP);
+	for (unsigned a = 0; a < 4; a++)
+		glVertex3d(points[a].x, points[a].y, points[a].z);
+	glEnd();
+
+	// Draw quad fill
+	col.a *= 0.6;
+	col.set_gl(false);
+	glBegin(GL_QUADS);
+	for (unsigned a = 0; a < 4; a++)
+		glVertex3d(points[a].x, points[a].y, points[a].z);
+	glEnd();
+}
+
+
+
+
+MCA3dFlatSelection::MCA3dFlatSelection(long start, MapSector* sector, plane_t plane, bool select) : MCAnimation(start, true) {
+	// Init variables
+	this->sector = sector;
+	this->plane = plane;
+	this->select = select;
+	this->fade = 1.0f;
+}
+
+MCA3dFlatSelection::~MCA3dFlatSelection() {
+}
+
+bool MCA3dFlatSelection::update(long time) {
+	// Determine fade amount (0.0-1.0 over 150ms)
+	fade = 1.0f - ((time - starttime) * 0.004f);
+
+	// Check if animation is finished
+	if (fade < 0.0f || fade > 1.0f)
+		return false;
+	else
+		return true;
+}
+
+void MCA3dFlatSelection::draw() {
+	if (!sector)
+		return;
+
+	// Setup colour
+	rgba_t col;
+	if (select)
+		col.set(255, 255, 255, 180*fade, 1);
+	else {
+		col = ColourConfiguration::getColour("map_selection");
+		col.a *= fade*0.75;
+	}
+	col.set_gl();
+	glDisable(GL_CULL_FACE);
+
+	// Set polygon to plane height
+	sector->getPolygon()->setZ(plane);
+
+	// Render flat
+	sector->getPolygon()->render();
+
+	// Reset polygon height
+	sector->getPolygon()->setZ(0);
+
+	glEnable(GL_CULL_FACE);
+}
