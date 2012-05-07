@@ -49,3 +49,16 @@ add_executable(slade WIN32
 
 target_link_libraries(slade ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${wxWidgets_LIBRARIES} ${FLUIDSYNTH_LIBRARIES} ${FREEIMAGE_LIBRARIES} ${SFML_LIBRARY} ${FTGL_LIBRARY} ${OPENGL_LIBRARIES} ${FREETYPE_LIBRARIES} ${GLEW_LIBRARY} ${GTK2_LIBRARIES} modplug)
 set_target_properties(slade PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SLADE_OUTPUT_DIR})
+
+if(APPLE)
+add_custom_command(TARGET slade
+	POST_BUILD
+	COMMAND mkdir -p ${SLADE_OUTPUT_DIR}/SLADE.app/Contents/
+	COMMAND mkdir -p ${SLADE_OUTPUT_DIR}/SLADE.app/Contents/MacOS/
+	COMMAND mkdir -p ${SLADE_OUTPUT_DIR}/SLADE.app/Contents/Resources/
+	COMMAND cp ${SLADE_OUTPUT_DIR}/../Info.plist ${SLADE_OUTPUT_DIR}/SLADE.app/Contents/
+	COMMAND cp ${SLADE_OUTPUT_DIR}/../SLADE-osx.icns ${SLADE_OUTPUT_DIR}/SLADE.app/Contents/Resources/
+	COMMAND mv ${SLADE_OUTPUT_DIR}/slade ${SLADE_OUTPUT_DIR}/SLADE.app/Contents/MacOS/
+	COMMAND rsync -aC ${SLADE_OUTPUT_DIR}/res/ ${SLADE_OUTPUT_DIR}/SLADE.app/Contents/Resources
+)
+endif()
