@@ -1265,8 +1265,13 @@ void MapCanvas::update(long frametime) {
 }
 
 void MapCanvas::mouseToCenter() {
+#if SFML_VERSION_MAJOR > 1
+	wxRect rect = GetScreenRect();
+	sf::Mouse::setPosition(sf::Vector2i(rect.x + int(rect.width*0.5), rect.y + int(rect.height*0.5)));
+#else
 	mouse_warp = true;
 	WarpPointer(GetSize().x * 0.5, GetSize().y * 0.5);
+#endif
 	/*
 	wxRect rect = GetScreenRect();
 #if SFML_VERSION_MAJOR < 2
