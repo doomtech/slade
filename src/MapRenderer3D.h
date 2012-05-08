@@ -65,6 +65,7 @@ public:
 			flags = 0;
 			type = NULL;
 			sector = NULL;
+			sprite = NULL;
 			z = 0;
 			updated_time = 0;
 		}

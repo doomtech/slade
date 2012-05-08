@@ -1814,6 +1814,12 @@ selection_3d_t MapRenderer3D::determineHilight() {
 	double min_dist = 9999999;
 	selection_3d_t current;
 	fpoint2_t strafe(cam_position.x+cam_strafe.x, cam_position.y+cam_strafe.y);
+	
+	// Check for required map structures
+	if (!map || lines.size() != map->nLines() ||
+		floors.size() != map->nSectors() ||
+		things.size() != map->nThings())
+		return current;
 
 	// Check lines
 	double height, dist;
@@ -1906,6 +1912,10 @@ selection_3d_t MapRenderer3D::determineHilight() {
 		return current;
 	double halfwidth, theight;
 	for (unsigned a = 0; a < map->nThings(); a++) {
+		// Ignore if no sprite
+		if (!things[a].sprite)
+			continue;
+			
 		// Ignore if not visible
 		MapThing* thing = map->getThing(a);
 		if (MathStuff::lineSide(thing->xPos(), thing->yPos(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0)
