@@ -76,7 +76,7 @@ ns_special_t special_namespaces[] = {
 	{ "voxels",		"vx"	},
 	{ "music",		"ds"	}, // Doom 64 puts music and sound effects here
 };
-const int n_special_namespaces = 10;
+const int n_special_namespaces = 11;
 
 /*******************************************************************
  * EXTERNAL VARIABLES
@@ -145,6 +145,7 @@ void WadArchive::updateNamespaces() {
 			wad_ns_pair_t ns(entry, NULL);
 			string name = entry->getName();
 			ns.name = name.Left(name.Length() - 6).Lower();
+			ns.start_index = entryIndex(ns.start);
 
 			// Convert some special cases (because technically PP_START->P_END is a valid namespace)
 			if (ns.name == "pp")
@@ -176,10 +177,29 @@ void WadArchive::updateNamespaces() {
 				ns_name = "t";
 
 			// Check if it's the end of an existing namespace
+			int index = entryIndex(entry);
+
+			bool found = false;
 			for (unsigned b = 0; b < namespaces.size(); b++) {
+				// Can't close a namespace that starts afterwards
+				if (namespaces[b].start_index > index)
+					break;
+				// Can't close an already-closed namespace
+				if (namespaces[b].end != NULL)
+					continue;
 				if (S_CMP(ns_name, namespaces[b].name)) {
+					found = true;
 					namespaces[b].end = entry;
+					namespaces[b].end_index = index;
+					break;
 				}
+			}
+			// Flat hack: closing the flat namespace without opening it
+			if (found == false && ns_name == "f") {
+				wad_ns_pair_t ns(getRoot()->getEntry(0), entry);
+				ns.start_index = 0;
+				ns.end_index = index;
+				namespaces.push_back(ns);
 			}
 		}
 	}
@@ -191,6 +211,8 @@ void WadArchive::updateNamespaces() {
 		getRoot()->getEntry(numEntries()-2)->getName().Matches("TABLES")) {
 			wad_ns_pair_t ns(getRoot()->getEntry(0), getRoot()->getEntry(numEntries()-1));
 			ns.name = "rott";
+			ns.start_index = 0;
+			ns.end_index = entryIndex(ns.end);
 			namespaces.push_back(ns);
 	}
 
@@ -217,7 +239,8 @@ void WadArchive::updateNamespaces() {
 		ns.end_index = entryIndex(ns.end);
 
 		// Testing
-		//wxLogMessage("Namespace %s from %s to %s", CHR(ns.name), CHR(ns.start->getName()), CHR(ns.end->getName()));
+		//wxLogMessage("Namespace %s from %s (%d) to %s (%d)", CHR(ns.name), 
+		//	CHR(ns.start->getName()), ns.start_index, CHR(ns.end->getName()), ns.end_index);
 	}
 }
 

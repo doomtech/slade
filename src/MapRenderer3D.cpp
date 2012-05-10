@@ -160,7 +160,7 @@ MapRenderer3D::quad_3d_t* MapRenderer3D::getQuad(selection_3d_t item) {
 
 MapRenderer3D::flat_3d_t* MapRenderer3D::getFlat(selection_3d_t item) {
 	// Check index
-	if (item.index >= floors.size())
+	if ((unsigned)item.index >= floors.size())
 		return NULL;
 
 	// Floor
