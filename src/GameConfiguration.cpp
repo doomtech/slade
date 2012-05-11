@@ -62,6 +62,13 @@ void GameConfiguration::setDefaults() {
 	sky_flat = "F_SKY1";
 }
 
+string GameConfiguration::udmfNamespace() {
+	if (map_format != MAP_UDMF)
+		return "";
+	else
+		return udmf_namespace.Lower();
+}
+
 string GameConfiguration::readConfigName(MemChunk& mc) {
 	Tokenizer tz;
 	tz.openMem(&mc, "gameconfig");

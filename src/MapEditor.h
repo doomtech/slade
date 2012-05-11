@@ -61,7 +61,13 @@ private:
 	// 3d mode
 	selection_3d_t			hilight_3d;
 	vector<selection_3d_t>	selection_3d;
-	bool					wallMatchesNotSelected(MapSide* side, uint8_t part, string tex);	// Helper for selectAdjacent3d
+
+	// Helper for selectAdjacent3d
+	bool wallMatches(MapSide* side, uint8_t part, string tex);
+	void getAdjacentWalls3d(selection_3d_t item, vector<selection_3d_t>& list);
+
+	// Helper for autoAlignX3d
+	void doAlignX3d(MapSide* side, int offset, string tex, vector<selection_3d_t>& walls_done);
 
 public:
 	enum {
@@ -76,6 +82,11 @@ public:
 		SECTOR_BOTH = 0,
 		SECTOR_FLOOR,
 		SECTOR_CEILING,
+
+		// Selection
+		DESELECT = 0,
+		SELECT,
+		TOGGLE,
 
 		// 3d mode selection type
 		SEL_SIDE_TOP = 0,
@@ -135,6 +146,7 @@ public:
 	void		getSelectedObjects(vector<MapObject*>& list);
 	void		showItem(int index);
 	bool		isHilightOrSelection() { return selection.size() > 0 || hilight_item != -1; }
+	void		selectItem3d(selection_3d_t item, int sel = TOGGLE);
 
 	// Grid
 	void	incrementGrid();
@@ -179,6 +191,9 @@ public:
 	void	changeSectorLight3d(int amount);
 	void	changeWallOffset3d(int amount, bool x);
 	void	changeSectorHeight3d(int amount);
+	void	autoAlignX3d(selection_3d_t start);
+	void	resetWall3d();
+	void	toggleUnpegged3d(bool lower);
 
 	// Editor messages
 	unsigned	numEditorMessages();

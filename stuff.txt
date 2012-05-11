@@ -21,8 +21,10 @@ TODO List ---------------------------------------------------------------
 - Non-power-of-two textures (where simply expanding the texture canvas to 128x128 won't work)
 	- Will probably have to implement some kind of resize for this (perhaps FreeImage can do it nicely?)
 - 3d mode
-	- Hilight/selection
-	- Editing
+	- Auto-align
+	- Thing z height editing
+	- Texture/properties copy+paste
+	- Info overlay
 	- Better vis checking
 	- MAPINFO parsing for sky texture
 	- Thing boxes

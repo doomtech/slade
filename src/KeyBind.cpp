@@ -426,6 +426,8 @@ void KeyBind::initBinds() {
 	addBind("me3d_clear_selection", keypress_t("C"), "Clear selection", group);
 	addBind("me3d_toggle_things", keypress_t("T"), "Toggle thing display", group);
 	addBind("me3d_toggle_hilight", keypress_t("H"), "Toggle hilight", group);
+	addBind("me3d_copy_tex_type", keypress_t("C", KPM_CTRL), "Copy texture or thing type", group);
+	addBind("me3d_paste_tex_type", keypress_t("V", KPM_CTRL), "Paste texture or thing type", group);
 
 	// Map Editor 3D Camera (me3d_camera*)
 	group = "Map Editor 3D Mode Camera";
@@ -444,7 +446,7 @@ void KeyBind::initBinds() {
 	addBind("me3d_light_up", keypress_t("'", KPM_SHIFT), "Sector light level up 1", group);
 	addBind("me3d_light_down16", keypress_t(";"), "Sector light level down 16", group);
 	addBind("me3d_light_down", keypress_t(";", KPM_SHIFT), "Sector light level down 1", group);
-	addBind("me3d_light_toggle_link", keypress_t("L"), "Toggle linked flat light levels", group);
+	addBind("me3d_light_toggle_link", keypress_t("L", KPM_CTRL), "Toggle linked flat light levels", group);
 
 	// Map Editor 3D Walls (me3d_wall*)
 	group = "Map Editor 3D Mode Walls";
@@ -456,7 +458,11 @@ void KeyBind::initBinds() {
 	addBind("me3d_wall_yoff_up", keypress_t("num_up"), "Y offset up 1", group);
 	addBind("me3d_wall_yoff_down8", keypress_t("num_2"), "Y offset down 8", group);
 	addBind("me3d_wall_yoff_down", keypress_t("num_down"), "Y offset down 1", group);
-	addBind("me3d_wall_toggle_link_ofs", keypress_t("O"), "Toggle linked wall offsets", group);
+	addBind("me3d_wall_toggle_link_ofs", keypress_t("O", KPM_CTRL), "Toggle linked wall offsets", group);
+	addBind("me3d_wall_autoalign_x", keypress_t("A", KPM_CTRL), "Auto-align textures on X", group);
+	addBind("me3d_wall_reset", keypress_t("R"), "Reset wall (offsets and scaling)", group);
+	addBind("me3d_wall_unpeg_lower", keypress_t("L"), "Toggle lower unpegged", group);
+	addBind("me3d_wall_unpeg_upper", keypress_t("U"), "Toggle upper unpegged", group);
 
 	// Map Editor 3D Flats (me3d_flat*)
 	group = "Map Editor 3D Mode Flats";

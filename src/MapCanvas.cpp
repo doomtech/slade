@@ -66,6 +66,7 @@ CVAR(Bool, map_showfps, false, CVAR_SAVE)
 CVAR(Bool, camera_3d_gravity, true, CVAR_SAVE)
 CVAR(Int, camera_3d_crosshair_size, 6, CVAR_SAVE)
 CVAR(Bool, camera_3d_show_distance, false, CVAR_SAVE)
+CVAR(Int, map_bg_ms, 30, CVAR_SAVE)
 
 // for testing
 PolygonSplitter splitter;
@@ -1253,12 +1254,12 @@ void MapCanvas::update(long frametime) {
 	if (mode_anim || fade_anim || overlay_fade_anim || anim_running)
 		fr_idle = 0;
 	else	// No high-priority animations running, throttle framerate
-		fr_idle = 25;
+		fr_idle = map_bg_ms;
 #else
 	if (mode_anim || fade_anim || overlay_fade_anim || anim_running)
 		fr_idle = 5;
 	else	// No high-priority animations running, throttle framerate
-		fr_idle = 30;
+		fr_idle = map_bg_ms;
 #endif
 
 	frametime_last = frametime;
