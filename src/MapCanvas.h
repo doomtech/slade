@@ -7,6 +7,7 @@
 #include "LineInfoOverlay.h"
 #include "SectorInfoOverlay.h"
 #include "ThingInfoOverlay.h"
+#include "InfoOverlay3d.h"
 #include "KeyBind.h"
 #include "MainApp.h"
 #include "MCOverlay.h"
@@ -60,10 +61,12 @@ private:
 
 	// Info overlays
 	int					last_hilight;
+	int					last_hilight_type;
 	VertexInfoOverlay	info_vertex;
 	LineInfoOverlay		info_line;
 	SectorInfoOverlay	info_sector;
 	ThingInfoOverlay	info_thing;
+	InfoOverlay3D		info_3d;
 	MCOverlay*			overlay_current;
 
 	// View properties

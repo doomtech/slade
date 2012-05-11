@@ -67,6 +67,7 @@ CVAR(Bool, camera_3d_gravity, true, CVAR_SAVE)
 CVAR(Int, camera_3d_crosshair_size, 6, CVAR_SAVE)
 CVAR(Bool, camera_3d_show_distance, false, CVAR_SAVE)
 CVAR(Int, map_bg_ms, 30, CVAR_SAVE)
+CVAR(Bool, info_overlay_3d, true, CVAR_SAVE)
 
 // for testing
 PolygonSplitter splitter;
@@ -796,6 +797,14 @@ void MapCanvas::drawMap3d() {
 	selection_3d_t hl = renderer_3d->determineHilight();
 	editor->set3dHilight(hl);
 
+	// Update 3d info overlay
+	if (info_overlay_3d && hl.index >= 0) {
+		info_3d.update(hl.index, hl.type, &(editor->getMap()));
+		anim_info_show = true;
+	}
+	else
+		anim_info_show = false;
+
 	// Draw hilight if any
 	if (hl.index >= 0)
 		renderer_3d->renderHilight(hl, anim_flash_level);
@@ -850,7 +859,7 @@ void MapCanvas::draw() {
 		glTranslatef(0.375f, 0.375f, 0);
 
 	// Check if we have to update the info
-	if (editor->hilightItem() != last_hilight) {
+	if (editor->editMode() != MapEditor::MODE_3D && editor->hilightItem() != last_hilight) {
 		// Update hilight index
 		last_hilight = editor->hilightItem();
 		anim_info_show = (last_hilight != -1);
@@ -874,6 +883,8 @@ void MapCanvas::draw() {
 		info_sector.draw(GetSize().y, GetSize().x, anim_info_fade);
 	else if (editor->editMode() == MapEditor::MODE_THINGS)
 		info_thing.draw(GetSize().y, GetSize().x, anim_info_fade);
+	else if (editor->editMode() == MapEditor::MODE_3D)
+		info_3d.draw(GetSize().y, GetSize().x, GetSize().x * 0.5, anim_info_fade);
 
 	// Draw current fullscreen overlay
 	if (overlay_current)
@@ -1975,6 +1986,10 @@ void MapCanvas::keyBinds3d(string name) {
 		else if (render_3d_hilight == 2)
 			editor->addEditorMessage("Hilight enabled: Solid");
 	}
+
+	// Toggle info overlay
+	else if (name == "me3d_toggle_info")
+		info_overlay_3d = !info_overlay_3d;
 
 	// Send to map editor
 	else

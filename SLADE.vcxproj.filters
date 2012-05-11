@@ -843,6 +843,9 @@
     <ClCompile Include="src\InputPrefsPanel.cpp">
       <Filter>Dialogs\Preferences</Filter>
     </ClCompile>
+    <ClCompile Include="src\InfoOverlay3d.cpp">
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1577,6 +1580,9 @@
     </ClInclude>
     <ClInclude Include="src\PrefsPanelBase.h">
       <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InfoOverlay3d.h">
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

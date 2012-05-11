@@ -156,6 +156,7 @@
     <ClCompile Include="src\HexEditorPanel.cpp" />
     <ClCompile Include="src\HexEntryPanel.cpp" />
     <ClCompile Include="src\HogArchive.cpp" />
+    <ClCompile Include="src\InfoOverlay3d.cpp" />
     <ClCompile Include="src\InputPrefsPanel.cpp" />
     <ClCompile Include="src\InterfacePrefsPanel.cpp" />
     <ClCompile Include="src\KeyBind.cpp" />
@@ -390,6 +391,7 @@
     <ClInclude Include="src\HexEntryPanel.h" />
     <ClInclude Include="src\HogArchive.h" />
     <ClInclude Include="src\ImageFormats.h" />
+    <ClInclude Include="src\InfoOverlay3d.h" />
     <ClInclude Include="src\InputPrefsPanel.h" />
     <ClInclude Include="src\InterfacePrefsPanel.h" />
     <ClInclude Include="src\KeyBind.h" />
