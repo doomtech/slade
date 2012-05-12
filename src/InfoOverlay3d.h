@@ -3,12 +3,15 @@
 #define __INFO_OVERLAY_3D_H__
 
 class SLADEMap;
+class GLTexture;
 class InfoOverlay3D {
 private:
 	vector<string>	info;
-	vector<string>	info_wall;
+	vector<string>	info2;
 	int				current_type;
-	string			texture;
+	string			texname;
+	GLTexture*		texture;
+	bool			thing_icon;
 
 public:
 	InfoOverlay3D();

@@ -43,9 +43,11 @@ private:
 	vector<int>	move_items;
 	int			move_item_closest;
 
-	// Object properties
+	// Object properties and copy/paste
 	MapThing*	copy_thing;
 	MapSector*	copy_sector;
+	string		copy_texture;
+	double		copy_offsets[2];
 
 	// Drawing
 	vector<fpoint2_t>	draw_points;
@@ -95,6 +97,11 @@ public:
 		SEL_FLOOR,
 		SEL_CEILING,
 		SEL_THING,
+
+		// Copy/paste types
+		COPY_TEXTYPE = 0,
+		COPY_OFFSETS,
+		COPY_SCALE,
 	};
 
 	MapEditor();
@@ -194,6 +201,8 @@ public:
 	void	autoAlignX3d(selection_3d_t start);
 	void	resetWall3d();
 	void	toggleUnpegged3d(bool lower);
+	void	copy3d(int type);
+	void	paste3d(int type);
 
 	// Editor messages
 	unsigned	numEditorMessages();

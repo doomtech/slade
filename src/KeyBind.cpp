@@ -427,7 +427,9 @@ void KeyBind::initBinds() {
 	addBind("me3d_toggle_things", keypress_t("T"), "Toggle thing display", group);
 	addBind("me3d_toggle_hilight", keypress_t("H"), "Toggle hilight", group);
 	addBind("me3d_copy_tex_type", keypress_t("C", KPM_CTRL), "Copy texture or thing type", group);
+	addBind("me3d_copy_tex_type", keypress_t("mouse3"));
 	addBind("me3d_paste_tex_type", keypress_t("V", KPM_CTRL), "Paste texture or thing type", group);
+	addBind("me3d_paste_tex_type", keypress_t("mouse3", KPM_SHIFT));
 	addBind("me3d_toggle_info", keypress_t("I"), "Toggle information overlay", group);
 
 	// Map Editor 3D Camera (me3d_camera*)

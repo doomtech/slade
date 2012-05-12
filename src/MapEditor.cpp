@@ -2452,6 +2452,133 @@ void MapEditor::toggleUnpegged3d(bool lower) {
 		addEditorMessage("Upper Unpegged flag toggled");
 }
 
+void MapEditor::copy3d(int type) {
+	// Check hilight
+	if (hilight_3d.index < 0)
+		return;
+
+	// Upper wall
+	else if (hilight_3d.type == SEL_SIDE_TOP) {
+		// Texture
+		if (type == COPY_TEXTYPE)
+			copy_texture = map.getSide(hilight_3d.index)->stringProperty("texturetop");
+	}
+
+	// Middle wall
+	else if (hilight_3d.type == SEL_SIDE_MIDDLE) {
+		// Texture
+		if (type == COPY_TEXTYPE)
+			copy_texture = map.getSide(hilight_3d.index)->stringProperty("texturemiddle");
+	}
+
+	// Lower wall
+	else if (hilight_3d.type == SEL_SIDE_BOTTOM) {
+		// Texture
+		if (type == COPY_TEXTYPE)
+			copy_texture = map.getSide(hilight_3d.index)->stringProperty("texturebottom");
+	}
+
+	// Floor
+	else if (hilight_3d.type == SEL_FLOOR) {
+		// Texture
+		if (type == COPY_TEXTYPE)
+			copy_texture = map.getSector(hilight_3d.index)->floorTexture();
+	}
+
+	// Ceiling
+	else if (hilight_3d.type == SEL_CEILING) {
+		// Texture
+		if (type == COPY_TEXTYPE)
+			copy_texture = map.getSector(hilight_3d.index)->ceilingTexture();
+	}
+
+	// Thing
+	else if (hilight_3d.type == SEL_THING) {
+		if (!copy_thing)
+			copy_thing = new MapThing();
+
+		copy_thing->copy(map.getThing(hilight_3d.index));
+	}
+
+	// Flash
+	if (canvas)
+		canvas->itemSelected3d(hilight_3d);
+
+	// Editor message
+	if (type == COPY_TEXTYPE) {
+		if (hilight_3d.type == SEL_THING)
+			addEditorMessage("Copied Thing Type");
+		else
+			addEditorMessage("Copied Texture");
+	}
+}
+
+void MapEditor::paste3d(int type) {
+	// Get items to paste to
+	vector<selection_3d_t> items;
+	if (selection_3d.size() == 0 && hilight_3d.index >= 0)
+		items.push_back(hilight_3d);
+	else if (selection_3d.size() > 0) {
+		for (unsigned a = 0; a < selection_3d.size(); a++)
+			items.push_back(selection_3d[a]);
+	}
+	else
+		return;
+
+	// Go through items
+	for (unsigned a = 0; a < items.size(); a++) {
+		// Upper wall
+		if (items[a].type == SEL_SIDE_TOP) {
+			// Texture
+			if (type == COPY_TEXTYPE)
+				map.getSide(items[a].index)->setStringProperty("texturetop", copy_texture);
+		}
+
+		// Middle wall
+		if (items[a].type == SEL_SIDE_MIDDLE) {
+			// Texture
+			if (type == COPY_TEXTYPE)
+				map.getSide(items[a].index)->setStringProperty("texturemiddle", copy_texture);
+		}
+
+		// Lower wall
+		if (items[a].type == SEL_SIDE_BOTTOM) {
+			// Texture
+			if (type == COPY_TEXTYPE)
+				map.getSide(items[a].index)->setStringProperty("texturebottom", copy_texture);
+		}
+
+		// Floor
+		if (items[a].type == SEL_FLOOR) {
+			// Texture
+			if (type == COPY_TEXTYPE)
+				map.getSector(items[a].index)->setStringProperty("texturefloor", copy_texture);
+		}
+
+		// Ceiling
+		if (items[a].type == SEL_CEILING) {
+			// Texture
+			if (type == COPY_TEXTYPE)
+				map.getSector(items[a].index)->setStringProperty("textureceiling", copy_texture);
+		}
+
+		// Thing
+		if (items[a].type == SEL_THING) {
+			// Type
+			if (type == COPY_TEXTYPE)
+				map.getThing(items[a].index)->setIntProperty("type", copy_thing->getType());
+		}
+	}
+
+	// Editor message
+	if (type == COPY_TEXTYPE) {
+		if (hilight_3d.type == SEL_THING)
+			addEditorMessage("Pasted Thing Type");
+		else
+			addEditorMessage("Pasted Texture");
+	}
+}
+
 string MapEditor::getEditorMessage(int index) {
 	// Check index
 	if (index < 0 || index >= (int)editor_messages.size())
@@ -2601,6 +2728,10 @@ bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 					addEditorMessage("Wall offsets unlinked");
 			}
 		}
+
+		// Copy/paste
+		else if (key == "me3d_copy_tex_type")	copy3d(COPY_TEXTYPE);
+		else if (key == "me3d_paste_tex_type")	paste3d(COPY_TEXTYPE);
 
 		// Light changes
 		else if	(key == "me3d_light_up16")		changeSectorLight3d(16);
