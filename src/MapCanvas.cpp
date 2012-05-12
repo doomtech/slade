@@ -567,15 +567,14 @@ void MapCanvas::drawLineDrawLines() {	// Best function name ever
 	}
 
 	// Draw lines
+	int npoints = editor->nLineDrawPoints();
 	glLineWidth(2.0f);
-	glBegin(GL_LINE_STRIP);
-	for (unsigned a = 0; a < editor->nLineDrawPoints(); a++) {
-		fpoint2_t point = editor->lineDrawPoint(a);
-		glVertex2d(point.x, point.y);
+	if (npoints > 1) {
+		for (unsigned a = 0; a < npoints - 1; a++)
+			Drawing::drawLineTabbed(editor->lineDrawPoint(a), editor->lineDrawPoint(a+1));
 	}
-	if (draw_state == DSTATE_LINE)
-		glVertex2d(end.x, end.y);
-	glEnd();
+	if (npoints > 0 && draw_state == DSTATE_LINE)
+		Drawing::drawLineTabbed(editor->lineDrawPoint(npoints-1), end);
 
 	// Draw points
 	glPointSize(vertex_size);

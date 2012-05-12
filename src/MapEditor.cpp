@@ -1607,9 +1607,9 @@ void MapEditor::updateShapeDraw(fpoint2_t point) {
 	// Rectangle
 	if (shapedraw_shape == 0) {
 		draw_points.push_back(fpoint2_t(tl.x, tl.y));
-		draw_points.push_back(fpoint2_t(br.x, tl.y));
-		draw_points.push_back(fpoint2_t(br.x, br.y));
 		draw_points.push_back(fpoint2_t(tl.x, br.y));
+		draw_points.push_back(fpoint2_t(br.x, br.y));
+		draw_points.push_back(fpoint2_t(br.x, tl.y));
 		draw_points.push_back(fpoint2_t(tl.x, tl.y));
 	}
 
@@ -1694,7 +1694,9 @@ void MapEditor::endLineDraw(bool apply) {
 		vector<me_ls_t> edges;
 		for (unsigned a = nl_start; a < map.nLines(); a++) {
 			edges.push_back(me_ls_t(map.getLine(a), true));
-			edges.push_back(me_ls_t(map.getLine(a), false));
+			fpoint2_t mid = map.getLine(a)->midPoint();
+			if (map.sectorAt(mid.x, mid.y) >= 0)
+				edges.push_back(me_ls_t(map.getLine(a), false));
 		}
 		
 		// Build sectors
@@ -1741,10 +1743,10 @@ void MapEditor::endLineDraw(bool apply) {
 				}
 
 				// If we can reuse the sector, do so
-				if (!reused) {
+				if (!reused)
 					sectors_reused.push_back(sector);
+				else
 					sector = NULL;
-				}
 			}
 			
 			// Create sector

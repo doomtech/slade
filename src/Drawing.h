@@ -31,6 +31,8 @@ namespace Drawing {
 	// Basic drawing
 	void drawLine(fpoint2_t start, fpoint2_t end);
 	void drawLine(double x1, double y1, double x2, double y2);
+	void drawLineTabbed(fpoint2_t start, fpoint2_t end, double tab = 0.1, double tab_max = 16);
+	void drawLineTabbed(double x1, double y1, double x2, double y2, double tab = 0.1, double tab_max = 16);
 	void drawRect(fpoint2_t tl, fpoint2_t br);
 	void drawRect(double x1, double y1, double x2, double y2);
 	void drawFilledRect(fpoint2_t tl, fpoint2_t br);
