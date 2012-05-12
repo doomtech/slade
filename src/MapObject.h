@@ -38,7 +38,7 @@ public:
 	long		modifiedTime() { return modified_time; }
 
 	PropertyList&	props()				{ return properties; }
-	Property&		prop(string key)	{ return properties[key]; }
+	//Property&		prop(string key)	{ return properties[key]; }
 	bool			hasProp(string key)	{ return properties.propertyExists(key); }
 
 	// Generic property modification

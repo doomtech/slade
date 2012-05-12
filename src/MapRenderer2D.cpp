@@ -225,7 +225,7 @@ rgba_t MapRenderer2D::lineColour(MapLine* line, bool ignore_filter) {
 
 	if (line) {
 		// Check for special line
-		if ((int)line->prop("special") > 0)
+		if (line->intProperty("special") > 0)
 			col.set(ColourConfiguration::getColour("map_line_special"));
 		else if (line->s1())
 			col.set(ColourConfiguration::getColour("map_line_normal"));
@@ -915,7 +915,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 		thing = map->getThing(a);
 		x = thing->xPos();
 		y = thing->yPos();
-		angle = thing->prop("angle").getFloatValue();
+		angle = thing->intProperty("angle");
 
 		// Set alpha
 		if (thing->isFiltered())
@@ -953,7 +953,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 			ThingType* tt = theGameConfiguration->thingType(thing->getType());
 			x = thing->xPos();
 			y = thing->yPos();
-			angle = thing->prop("angle").getFloatValue();
+			angle = thing->intProperty("angle");
 
 			// Set alpha
 			if (thing->isFiltered())
@@ -981,7 +981,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 
 				glPushMatrix();
 				glTranslated(x, y, 0);
-				glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
+				glRotated(thing->intProperty("angle"), 0, 0, 1);
 
 				glBegin(GL_QUADS);
 				glTexCoord2f(0.0f, 1.0f);	glVertex2d(-32, -32);
@@ -1691,7 +1691,7 @@ void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) 
 		thing = map->getThing(things[a]);
 		x = thing->xPos() + move_vec.x;
 		y = thing->yPos() + move_vec.y;
-		angle = thing->prop("angle").getFloatValue();
+		angle = thing->intProperty("angle");
 
 		// Get thing type properties from game configuration
 		ThingType* tt = theGameConfiguration->thingType(thing->getType());
@@ -1715,7 +1715,7 @@ void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) 
 			ThingType* tt = theGameConfiguration->thingType(thing->getType());
 			x = thing->xPos() + move_vec.x;
 			y = thing->yPos() + move_vec.y;
-			angle = thing->prop("angle").getFloatValue();
+			angle = thing->intProperty("angle");
 
 			renderSpriteThing(x, y, angle, tt, 1.0f, true);
 		}

@@ -28,9 +28,9 @@ void LineInfoOverlay::update(MapLine* line) {
 	info.push_back(S_FMT("Length: %d", MathStuff::round(line->getLength())));
 
 	// Line special
-	int as_id = line->prop("special").getIntValue();
+	int as_id = line->intProperty("special");
 	if (line->props().propertyExists("macro")) {
-		int macro = line->prop("macro").getIntValue();
+		int macro = line->intProperty("macro");
 		info.push_back(S_FMT("Macro: #%d", macro));
 	} else
 		info.push_back(S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id))));
@@ -42,11 +42,11 @@ void LineInfoOverlay::update(MapLine* line) {
 	// Line args (or sector tag)
 	if (theGameConfiguration->getMapFormat() == MAP_HEXEN || theGameConfiguration->getMapFormat() == MAP_UDMF) {
 		int args[5];
-		args[0] = line->prop("arg0");
-		args[1] = line->prop("arg1");
-		args[2] = line->prop("arg2");
-		args[3] = line->prop("arg3");
-		args[4] = line->prop("arg4");
+		args[0] = line->intProperty("arg0");
+		args[1] = line->intProperty("arg1");
+		args[2] = line->intProperty("arg2");
+		args[3] = line->intProperty("arg3");
+		args[4] = line->intProperty("arg4");
 		string argstr = theGameConfiguration->actionSpecial(as_id)->getArgsString(args);
 		if (!argstr.IsEmpty())
 			info.push_back(S_FMT("%s", CHR(argstr)));
@@ -54,7 +54,7 @@ void LineInfoOverlay::update(MapLine* line) {
 			info.push_back("No Args");
 	}
 	else
-		info.push_back(S_FMT("Sector Tag: %d", line->prop("arg0").getIntValue()));
+		info.push_back(S_FMT("Sector Tag: %d", line->intProperty("arg0")));
 
 	// Line flags
 	//info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->lineFlagsString(line))));
@@ -62,28 +62,28 @@ void LineInfoOverlay::update(MapLine* line) {
 	// Front side
 	MapSide* s = line->s1();
 	if (s) {
-		int xoff = s->prop("offsetx");
-		int yoff = s->prop("offsety");
+		int xoff = s->intProperty("offsetx");
+		int yoff = s->intProperty("offsety");
 		side_front.exists = true;
 		side_front.info = S_FMT("Front Side #%d (Sector %d)", s->getIndex(), s->getSector()->getIndex());
 		side_front.offsets = S_FMT("Offsets: (%d, %d)", xoff, yoff);
-		side_front.tex_upper = s->prop("texturetop").getStringValue();
-		side_front.tex_middle = s->prop("texturemiddle").getStringValue();
-		side_front.tex_lower = s->prop("texturebottom").getStringValue();
+		side_front.tex_upper = s->stringProperty("texturetop");
+		side_front.tex_middle = s->stringProperty("texturemiddle");
+		side_front.tex_lower = s->stringProperty("texturebottom");
 	}
 	else side_front.exists = false;
 
 	// Back side
 	s = line->s2();
 	if (s) {
-		int xoff = s->prop("offsetx");
-		int yoff = s->prop("offsety");
+		int xoff = s->intProperty("offsetx");
+		int yoff = s->intProperty("offsety");
 		side_back.exists = true;
 		side_back.info = S_FMT("Back Side #%d (Sector %d)", s->getIndex(), s->getSector()->getIndex());
 		side_back.offsets = S_FMT("Offsets: (%d, %d)", xoff, yoff);
-		side_back.tex_upper = s->prop("texturetop").getStringValue();
-		side_back.tex_middle = s->prop("texturemiddle").getStringValue();
-		side_back.tex_lower = s->prop("texturebottom").getStringValue();
+		side_back.tex_upper = s->stringProperty("texturetop");
+		side_back.tex_middle = s->stringProperty("texturemiddle");
+		side_back.tex_lower = s->stringProperty("texturebottom");
 	}
 	else side_back.exists = false;
 }

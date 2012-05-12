@@ -174,6 +174,7 @@ public:
 	void	flipLines(bool sides = true);
 	void	changeSectorHeight(int amount, bool floor = true, bool ceiling = true);
 	void	changeSectorLight(int amount);
+	void	joinSectors(bool remove_lines);
 	void	changeThingType(int newtype);
 	void	thingQuickAngle(fpoint2_t mouse_pos);
 	

@@ -1380,9 +1380,9 @@ void MapRenderer3D::updateThing(unsigned index, MapThing* thing) {
 	// Determine z position
 	if (things[index].sector) {
 		// Get sector floor (or ceiling) height
-		int sheight = things[index].sector->prop("heightfloor").getIntValue();
+		int sheight = things[index].sector->intProperty("heightfloor");
 		if (things[index].type->isHanging()) {
-			sheight = things[index].sector->prop("heightceiling").getIntValue();
+			sheight = things[index].sector->intProperty("heightceiling");
 			sheight -= theight;
 		}
 
@@ -1392,7 +1392,7 @@ void MapRenderer3D::updateThing(unsigned index, MapThing* thing) {
 			things[index].z -= render_thing_icon_size*0.5;
 		if (things[index].z < sheight)
 			things[index].z = sheight;
-		things[index].z += thing->prop("height").getFloatValue();
+		things[index].z += thing->floatProperty("height");
 	}
 
 	// Adjust height by sprite Y offset if needed

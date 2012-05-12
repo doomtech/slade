@@ -10,8 +10,7 @@ TODO List ---------------------------------------------------------------
 --- Bugs ---
 - Gfx doesn't update after being converted
 - No handling for when a line is moved to overlap another
-- Problem with line drawing and reusing existing sectors
-- Sidedefs in UDMF getting "" texture instead of the proper default "-"
+- Map editor isn't using custom palettes any more for some reason
 
 --- Map Editor ---
 - Checks:
@@ -21,24 +20,23 @@ TODO List ---------------------------------------------------------------
 - Non-power-of-two textures (where simply expanding the texture canvas to 128x128 won't work)
 	- Will probably have to implement some kind of resize for this (perhaps FreeImage can do it nicely?)
 - 3d mode
-	- Auto-align
+	- Auto-align Y
 	- Thing z height editing
-	- Texture/properties copy+paste
-	- Info overlay
+	- Offsets/scaling copy+paste
+	- Flat offset/scale editing (udmf+zdoom)
 	- Better vis checking
-	- MAPINFO parsing for sky texture
-	- Thing boxes
+	- (Z)MAPINFO parsing for sky texture
+	- Thing boxes (might not bother with full boxes unless I add game-accurate 'height' property to thing configurations)
 - Editing:
-	- Line properties update on line draw
 	- Proper UDMF/Hexen/Doom64 Map saving (BEHAVIOR, SCRIPTS, DIALOGUE, LIGHTS, MACROS, etc.)
 	- Generalised sector and line specials
 	- Rotate/scale objects
-	- Join sectors
+	- Light increments should probably be defined in game configs (8 for zdoom, 16 for others)
+	- Copy+paste sectors/lines
 - Script editor
-- Better UDMF property handling
+- Better UDMF property handling, proper support for unknown properties read with the map
 - (Possibly) better line/thing flag handling
 - 'Tag edit' mode
-- Default values handling
 - Optimise Polygon2D splitting somehow, it creates many unneeded splits
 
 

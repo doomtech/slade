@@ -21,20 +21,20 @@ void SectorInfoOverlay::update(MapSector* sector) {
 	info.clear();
 
 	// Info (index + type)
-	int t = sector->prop("special").getIntValue();
+	int t = sector->intProperty("special");
 	string type = S_FMT("%s (Type %d)", CHR(theGameConfiguration->sectorTypeName(t)), t);
 	info.push_back(S_FMT("Sector #%d: %s", sector->getIndex(), CHR(type)));
 
 	// Height
-	int fh = sector->prop("heightfloor");
-	int ch = sector->prop("heightceiling");
+	int fh = sector->intProperty("heightfloor");
+	int ch = sector->intProperty("heightceiling");
 	info.push_back(S_FMT("Height: %d to %d (%d total)", fh, ch, ch - fh));
 
 	// Brightness
-	info.push_back(S_FMT("Brightness: %d", sector->prop("lightlevel").getIntValue()));
+	info.push_back(S_FMT("Brightness: %d", sector->intProperty("lightlevel")));
 
 	// Tag
-	info.push_back(S_FMT("Tag: %d", sector->prop("id").getIntValue()));
+	info.push_back(S_FMT("Tag: %d", sector->intProperty("id")));
 
 	// Textures
 	ftex = sector->floorTexture();

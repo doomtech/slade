@@ -130,6 +130,8 @@ string UDMFProperty::getStringRep() {
 	case TYPE_SSPECIAL: ret += ", type = sectorspecial"; break;
 	case TYPE_TTYPE: ret += ", type = thingtype"; break;
 	case TYPE_ANGLE: ret += ", type = angle"; break;
+	case TYPE_TEX_WALL: ret += ", type = wall texture"; break;
+	case TYPE_TEX_FLAT: ret += ", type = flat texture"; break;
 	default: ret += ", ******unknown type********"; break;
 	};
 

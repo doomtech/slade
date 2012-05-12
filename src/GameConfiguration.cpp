@@ -947,7 +947,7 @@ bool GameConfiguration::thingFlagSet(unsigned index, MapThing* thing) {
 		return false;
 
 	// Check if flag is set
-	int flags = thing->prop("flags");
+	int flags = thing->intProperty("flags");
 	if (flags & flags_thing[index].flag)
 		return true;
 	else
@@ -978,7 +978,7 @@ void GameConfiguration::setThingFlag(unsigned index, MapThing* thing, bool set) 
 		return;
 
 	// Determine new flags value
-	int flags = thing->prop("flags");
+	int flags = thing->intProperty("flags");
 	if (set)
 		flags |= flags_thing[index].flag;
 	else
@@ -1002,7 +1002,7 @@ bool GameConfiguration::lineFlagSet(unsigned index, MapLine* line) {
 		return false;
 
 	// Check if flag is set
-	int flags = line->prop("flags");
+	int flags = line->intProperty("flags");
 	if (flags & flags_line[index].flag)
 		return true;
 	else
@@ -1042,7 +1042,7 @@ string GameConfiguration::lineFlagsString(MapLine* line) {
 		return "";
 
 	// Get raw flags
-	int flags = line->prop("flags");
+	int flags = line->intProperty("flags");
 	// TODO: UDMF flags
 
 	// Check against all flags
@@ -1068,7 +1068,7 @@ void GameConfiguration::setLineFlag(unsigned index, MapLine* line, bool set) {
 		return;
 
 	// Determine new flags value
-	int flags = line->prop("flags");
+	int flags = line->intProperty("flags");
 	if (set)
 		flags |= flags_line[index].flag;
 	else
@@ -1119,7 +1119,7 @@ string GameConfiguration::spacTriggerString(MapLine* line) {
 	// Hexen format
 	if (map_format == MAP_HEXEN) {
 		// Get raw flags
-		int flags = line->prop("flags");
+		int flags = line->intProperty("flags");
 
 		// Get SPAC trigger value from flags
 		int trigger = ((flags & 0x1c00) >> 10);
@@ -1178,7 +1178,7 @@ void GameConfiguration::setLineSpacTrigger(unsigned index, MapLine* line) {
 	int trigger = triggers_line[index].flag;
 
 	// Get raw line flags
-	int flags = line->prop("flags");
+	int flags = line->intProperty("flags");
 
 	// Apply trigger to flags
 	trigger = trigger << 10;

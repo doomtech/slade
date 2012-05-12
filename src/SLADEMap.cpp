@@ -296,11 +296,11 @@ bool SLADEMap::addSide(doomside_t& s) {
 	MapSide* ns = new MapSide(getSector(s.sector), this);
 
 	// Setup side properties
-	ns->prop("texturetop") = wxString::FromAscii(s.tex_upper, 8);
-	ns->prop("texturebottom") = wxString::FromAscii(s.tex_lower, 8);
-	ns->prop("texturemiddle") = wxString::FromAscii(s.tex_middle, 8);
-	ns->prop("offsetx") = s.x_offset;
-	ns->prop("offsety") = s.y_offset;
+	ns->properties["texturetop"] = wxString::FromAscii(s.tex_upper, 8);
+	ns->properties["texturebottom"] = wxString::FromAscii(s.tex_lower, 8);
+	ns->properties["texturemiddle"] = wxString::FromAscii(s.tex_middle, 8);
+	ns->properties["offsetx"] = s.x_offset;
+	ns->properties["offsety"] = s.y_offset;
 
 	// Add side
 	sides.push_back(ns);
@@ -312,11 +312,11 @@ bool SLADEMap::addSide(doom64side_t& s) {
 	MapSide* ns = new MapSide(getSector(s.sector), this);
 
 	// Setup side properties
-	ns->prop("texturetop") = theResourceManager->getTextureName(s.tex_upper);
-	ns->prop("texturebottom") = theResourceManager->getTextureName(s.tex_lower);
-	ns->prop("texturemiddle") = theResourceManager->getTextureName(s.tex_middle);
-	ns->prop("offsetx") = s.x_offset;
-	ns->prop("offsety") = s.y_offset;
+	ns->properties["texturetop"] = theResourceManager->getTextureName(s.tex_upper);
+	ns->properties["texturebottom"] = theResourceManager->getTextureName(s.tex_lower);
+	ns->properties["texturemiddle"] = theResourceManager->getTextureName(s.tex_middle);
+	ns->properties["offsetx"] = s.x_offset;
+	ns->properties["offsety"] = s.y_offset;
 
 	// Add side
 	sides.push_back(ns);
@@ -355,10 +355,10 @@ bool SLADEMap::addLine(doomline_t& l) {
 	MapLine* nl = new MapLine(v1, v2, s1, s2, this);
 
 	// Setup line properties
-	nl->prop("arg0") = l.sector_tag;
-	nl->prop("id") = l.sector_tag;
-	nl->prop("special") = l.type;
-	nl->prop("flags") = l.flags;
+	nl->properties["arg0"] = l.sector_tag;
+	nl->properties["id"] = l.sector_tag;
+	nl->properties["special"] = l.type;
+	nl->properties["flags"] = l.flags;
 
 	// Add line
 	lines.push_back(nl);
@@ -406,13 +406,13 @@ bool SLADEMap::addLine(doom64line_t& l) {
 	MapLine* nl = new MapLine(v1, v2, s1, s2, this);
 
 	// Setup line properties
-	nl->prop("arg0") = l.sector_tag;
+	nl->properties["arg0"] = l.sector_tag;
 	if (l.type & 0x100)
-		nl->prop("macro") = l.type & 0xFF;
+		nl->properties["macro"] = l.type & 0xFF;
 	else
-		nl->prop("special") = l.type & 0xFF;
-	nl->prop("flags") = (int)l.flags;
-	nl->prop("extraflags") = l.type >> 9;
+		nl->properties["special"] = l.type & 0xFF;
+	nl->properties["flags"] = (int)l.flags;
+	nl->properties["extraflags"] = l.type >> 9;
 
 	// Add line
 	lines.push_back(nl);
@@ -424,11 +424,11 @@ bool SLADEMap::addSector(doomsector_t& s) {
 	MapSector* ns = new MapSector(wxString::FromAscii(s.f_tex, 8), wxString::FromAscii(s.c_tex, 8), this);
 
 	// Setup sector properties
-	ns->prop("heightfloor") = s.f_height;
-	ns->prop("heightceiling") = s.c_height;
-	ns->prop("lightlevel") = s.light;
-	ns->prop("special") = s.special;
-	ns->prop("id") = s.tag;
+	ns->properties["heightfloor"] = s.f_height;
+	ns->properties["heightceiling"] = s.c_height;
+	ns->properties["lightlevel"] = s.light;
+	ns->properties["special"] = s.special;
+	ns->properties["id"] = s.tag;
 
 	// Add sector
 	sectors.push_back(ns);
@@ -442,17 +442,17 @@ bool SLADEMap::addSector(doom64sector_t& s) {
 		theResourceManager->getTextureName(s.c_tex), this);
 
 	// Setup sector properties
-	ns->prop("heightfloor") = s.f_height;
-	ns->prop("heightceiling") = s.c_height;
-	ns->prop("lightlevel") = 255;
-	ns->prop("special") = s.special;
-	ns->prop("id") = s.tag;
-	ns->prop("flags") = s.flags;
-	ns->prop("color_things") = s.color[0];
-	ns->prop("color_floor") = s.color[1];
-	ns->prop("color_ceiling") = s.color[2];
-	ns->prop("color_upper") = s.color[3];
-	ns->prop("color_lower") = s.color[4];
+	ns->properties["heightfloor"] = s.f_height;
+	ns->properties["heightceiling"] = s.c_height;
+	ns->properties["lightlevel"] = 255;
+	ns->properties["special"] = s.special;
+	ns->properties["id"] = s.tag;
+	ns->properties["flags"] = s.flags;
+	ns->properties["color_things"] = s.color[0];
+	ns->properties["color_floor"] = s.color[1];
+	ns->properties["color_ceiling"] = s.color[2];
+	ns->properties["color_upper"] = s.color[3];
+	ns->properties["color_lower"] = s.color[4];
 
 	// Add sector
 	sectors.push_back(ns);
@@ -464,8 +464,8 @@ bool SLADEMap::addThing(doomthing_t& t) {
 	MapThing* nt = new MapThing(t.x, t.y, t.type, this);
 
 	// Setup thing properties
-	nt->prop("angle") = t.angle;
-	nt->prop("flags") = t.flags;
+	nt->properties["angle"] = t.angle;
+	nt->properties["flags"] = t.flags;
 
 	// Add thing
 	things.push_back(nt);
@@ -477,10 +477,10 @@ bool SLADEMap::addThing(doom64thing_t& t) {
 	MapThing* nt = new MapThing(t.x, t.y, t.type, this);
 
 	// Setup thing properties
-	nt->prop("angle") = t.angle;
-	nt->prop("height") = (double)t.z;
-	nt->prop("flags") = t.flags;
-	nt->prop("id") = t.tid;
+	nt->properties["angle"] = t.angle;
+	nt->properties["height"] = (double)t.z;
+	nt->properties["flags"] = t.flags;
+	nt->properties["id"] = t.tid;
 
 	// Add thing
 	things.push_back(nt);
@@ -702,21 +702,21 @@ bool SLADEMap::addLine(hexenline_t& l) {
 	MapLine* nl = new MapLine(v1, v2, s1, s2, this);
 
 	// Setup line properties
-	nl->prop("arg0") = l.args[0];
-	nl->prop("arg1") = l.args[1];
-	nl->prop("arg2") = l.args[2];
-	nl->prop("arg3") = l.args[3];
-	nl->prop("arg4") = l.args[4];
-	nl->prop("special") = l.type;
-	nl->prop("flags") = l.flags;
+	nl->properties["arg0"] = l.args[0];
+	nl->properties["arg1"] = l.args[1];
+	nl->properties["arg2"] = l.args[2];
+	nl->properties["arg3"] = l.args[3];
+	nl->properties["arg4"] = l.args[4];
+	nl->properties["special"] = l.type;
+	nl->properties["flags"] = l.flags;
 
 	// Handle some special cases
 	if (l.type) {
 		int needs_tag = theGameConfiguration->actionSpecial(l.type)->needsTag();
 		if (needs_tag == AS_TT_LINEID || needs_tag == AS_TT_1LINEID_2LINE) {
-			nl->prop("id") = l.args[0];
+			nl->properties["id"] = l.args[0];
 		} else if (needs_tag == AS_TT_LINEID_HI5) {
-			nl->prop("id") = (l.args[0] + (l.args[4]<<8));
+			nl->properties["id"] = (l.args[0] + (l.args[4]<<8));
 		}
 	}
 
@@ -730,16 +730,16 @@ bool SLADEMap::addThing(hexenthing_t& t) {
 	MapThing* nt = new MapThing(t.x, t.y, t.type, this);
 
 	// Setup thing properties
-	nt->prop("angle") = t.angle;
-	nt->prop("height") = (double)t.z;
-	nt->prop("special") = t.special;
-	nt->prop("flags") = t.flags;
-	nt->prop("id") = t.tid;
-	nt->prop("arg0") = t.args[0];
-	nt->prop("arg1") = t.args[1];
-	nt->prop("arg2") = t.args[2];
-	nt->prop("arg3") = t.args[3];
-	nt->prop("arg4") = t.args[4];
+	nt->properties["angle"] = t.angle;
+	nt->properties["height"] = (double)t.z;
+	nt->properties["special"] = t.special;
+	nt->properties["flags"] = t.flags;
+	nt->properties["id"] = t.tid;
+	nt->properties["arg0"] = t.args[0];
+	nt->properties["arg1"] = t.args[1];
+	nt->properties["arg2"] = t.args[2];
+	nt->properties["arg3"] = t.args[3];
+	nt->properties["arg4"] = t.args[4];
 
 	// Add thing
 	things.push_back(nt);
@@ -1030,7 +1030,7 @@ bool SLADEMap::addVertex(ParseTreeNode* def) {
 		if (prop == prop_x || prop == prop_y)
 			continue;
 
-		nv->prop(prop->getName()) = prop->getValue();
+		nv->properties[prop->getName()] = prop->getValue();
 	}
 
 	// Add vertex to map
@@ -1071,7 +1071,7 @@ bool SLADEMap::addSide(ParseTreeNode* def) {
 		if (prop == prop_sector)
 			continue;
 
-		ns->prop(prop->getName()) = prop->getValue();
+		ns->properties[prop->getName()] = prop->getValue();
 		//wxLogMessage("Property %s type %s (%s)", CHR(prop->getName()), CHR(prop->getValue().typeString()), CHR(prop->getValue().getStringValue()));
 	}
 
@@ -1127,7 +1127,7 @@ bool SLADEMap::addLine(ParseTreeNode* def) {
 		if (prop == prop_v1 || prop == prop_v2 || prop == prop_s1 || prop == prop_s2)
 			continue;
 
-		nl->prop(prop->getName()) = prop->getValue();
+		nl->properties[prop->getName()] = prop->getValue();
 	}
 
 	// Add line to map
@@ -1147,7 +1147,7 @@ bool SLADEMap::addSector(ParseTreeNode* def) {
 	MapSector* ns = new MapSector(prop_ftex->getStringValue(), prop_ctex->getStringValue(), this);
 
 	// Set some reasonable defaults
-	ns->prop("id") = 0;
+	//ns->properties["id"] = 0;
 
 	// Add extra sector info
 	ParseTreeNode* prop = NULL;
@@ -1158,7 +1158,7 @@ bool SLADEMap::addSector(ParseTreeNode* def) {
 		if (prop == prop_ftex || prop == prop_ctex)
 			continue;
 
-		ns->prop(prop->getName()) = prop->getValue();
+		ns->properties[prop->getName()] = prop->getValue();
 	}
 
 	// Add sector to map
@@ -1200,7 +1200,7 @@ bool SLADEMap::addThing(ParseTreeNode* def) {
 		if (prop == prop_x || prop == prop_y || prop == prop_type)
 			continue;
 
-		nt->prop(prop->getName()) = prop->getValue();
+		nt->properties[prop->getName()] = prop->getValue();
 	}
 
 	// Add thing to map
@@ -1787,7 +1787,10 @@ bool SLADEMap::writeDoom64Map(vector<ArchiveEntry*>& map_entries) {
 
 	// TODO: Write LIGHTS and MACROS
 
-	return true;}
+	return true;
+}
+
+//#include <SFML/System.hpp>
 
 bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 	// Check entry was given
@@ -1798,7 +1801,10 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 	wxFile tempfile(appPath("sladetemp.txt", DIR_TEMP), wxFile::write);
 
 	// Write map namespace
+	tempfile.Write("// Written by SLADE3\n");
 	tempfile.Write(S_FMT("namespace=\"%s\";\n", CHR(udmf_namespace)));
+
+	//sf::Clock clock;
 
 	// Write things
 	for (unsigned a = 0; a < things.size(); a++) {
@@ -1818,8 +1824,10 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 
 		tempfile.Write("}\n\n");
 	}
+	//wxLogMessage("Writing things took %dms", clock.getElapsedTime().asMilliseconds());
 
 	// Write lines
+	//clock.restart();
 	for (unsigned a = 0; a < lines.size(); a++) {
 		tempfile.Write(S_FMT("linedef//#%d\n{\n", a));
 
@@ -1839,8 +1847,10 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 
 		tempfile.Write("}\n\n");
 	}
+	//wxLogMessage("Writing lines took %dms", clock.getElapsedTime().asMilliseconds());
 
 	// Write sides
+	//clock.restart();
 	for (unsigned a = 0; a < sides.size(); a++) {
 		tempfile.Write(S_FMT("sidedef//#%d\n{\n", a));
 
@@ -1855,8 +1865,10 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 
 		tempfile.Write("}\n\n");
 	}
+	//wxLogMessage("Writing sides took %dms", clock.getElapsedTime().asMilliseconds());
 
 	// Write vertices
+	//clock.restart();
 	for (unsigned a = 0; a < vertices.size(); a++) {
 		tempfile.Write(S_FMT("vertex//#%d\n{\n", a));
 
@@ -1871,8 +1883,10 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 
 		tempfile.Write("}\n\n");
 	}
+	//wxLogMessage("Writing vertices took %dms", clock.getElapsedTime().asMilliseconds());
 
 	// Write sectors
+	//clock.restart();
 	for (unsigned a = 0; a < sectors.size(); a++) {
 		tempfile.Write(S_FMT("sector//#%d\n{\n", a));
 
@@ -1887,6 +1901,7 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 
 		tempfile.Write("}\n\n");
 	}
+	//wxLogMessage("Writing sectors took %dms", clock.getElapsedTime().asMilliseconds());
 
 	// Close file
 	tempfile.Close();
@@ -1947,6 +1962,7 @@ bool SLADEMap::removeVertex(unsigned index) {
 	delete vertices[index];
 	vertices[index] = vertices.back();
 	vertices[index]->index = index;
+	vertices[index]->modified_time = theApp->runTimer();
 	vertices.pop_back();
 
 	geometry_updated = theApp->runTimer();
@@ -1982,6 +1998,7 @@ bool SLADEMap::removeLine(unsigned index) {
 	delete lines[index];
 	lines[index] = lines[lines.size()-1];
 	lines[index]->index = index;
+	lines[index]->modified_time = theApp->runTimer();
 	lines.pop_back();
 
 	geometry_updated = theApp->runTimer();
@@ -2017,6 +2034,7 @@ bool SLADEMap::removeSide(unsigned index) {
 	delete sides[index];
 	sides[index] = sides.back();
 	sides[index]->index = index;
+	sides[index]->modified_time = theApp->runTimer();
 	sides.pop_back();
 
 	return true;
@@ -2043,6 +2061,7 @@ bool SLADEMap::removeSector(unsigned index) {
 	delete sectors[index];
 	sectors[index] = sectors.back();
 	sectors[index]->index = index;
+	sectors[index]->modified_time = theApp->runTimer();
 	sectors.pop_back();
 
 	return true;
@@ -2065,6 +2084,7 @@ bool SLADEMap::removeThing(unsigned index) {
 	delete things[index];
 	things[index] = things.back();
 	things[index]->index = index;
+	things[index]->modified_time = theApp->runTimer();
 	things.pop_back();
 
 	return true;
@@ -2335,7 +2355,7 @@ MapVertex* SLADEMap::lineCrossVertex(double x1, double y1, double x2, double y2)
 void SLADEMap::getSectorsByTag(int tag, vector<MapSector*>& list) {
 	// Find sectors with matching tag
 	for (unsigned a = 0; a < sectors.size(); a++) {
-		if (sectors[a]->prop("id").getIntValue() == tag)
+		if (sectors[a]->intProperty("id") == tag)
 			list.push_back(sectors[a]);
 	}
 }
@@ -2343,7 +2363,7 @@ void SLADEMap::getSectorsByTag(int tag, vector<MapSector*>& list) {
 void SLADEMap::getThingsById(int id, vector<MapThing*>& list) {
 	// Find things with matching id
 	for (unsigned a = 0; a < things.size(); a++) {
-		if (things[a]->prop("id").getIntValue() == id)
+		if (things[a]->intProperty("id") == id)
 			list.push_back(things[a]);
 	}
 }
@@ -2351,9 +2371,9 @@ void SLADEMap::getThingsById(int id, vector<MapThing*>& list) {
 void SLADEMap::getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list) {
 	// Find things with matching id contained in sector with matching tag
 	for (unsigned a = 0; a < things.size(); a++) {
-		if (things[a]->prop("id").getIntValue() == id) {
+		if (things[a]->intProperty("id") == id) {
 			int si = sectorAt(things[a]->xPos(), things[a]->yPos());
-			if (si > -1 && (unsigned)si < sectors.size() && sectors[si]->prop("id").getIntValue() == tag) {
+			if (si > -1 && (unsigned)si < sectors.size() && sectors[si]->intProperty("id") == tag) {
 				list.push_back(things[a]);
 			}
 		}
@@ -2363,7 +2383,7 @@ void SLADEMap::getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list
 void SLADEMap::getLinesById(int id, vector<MapLine*>& list) {
 	// Find lines with matching id
 	for (unsigned a = 0; a < lines.size(); a++) {
-		if (lines[a]->prop("id").getIntValue() == id)
+		if (lines[a]->intProperty("id") == id)
 			list.push_back(lines[a]);
 	}
 }
@@ -2666,6 +2686,7 @@ void SLADEMap::splitLine(unsigned line, unsigned vertex) {
 	l->vertex2 = v;
 	v->connectLine(l);
 	l->length = -1;
+	l->modified_time = theApp->runTimer();
 
 	// Create and add new sides
 	MapSide* s1 = NULL;

@@ -192,22 +192,22 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 				MapLine* line = map.getLine(hilight_item);
 				if (line->s2()) back = line->s2()->getSector();
 				if (line->s1()) front = line->s1()->getSector();
-				needs_tag = theGameConfiguration->actionSpecial((int)line->prop("special"))->needsTag();
-				tag = line->prop("arg0");
-				arg2 = line->prop("arg1");
-				arg3 = line->prop("arg2");
-				arg4 = line->prop("arg3");
-				arg5 = line->prop("arg4");
+				needs_tag = theGameConfiguration->actionSpecial(line->intProperty("special"))->needsTag();
+				tag = line->intProperty("arg0");
+				arg2 = line->intProperty("arg1");
+				arg3 = line->intProperty("arg2");
+				arg4 = line->intProperty("arg3");
+				arg5 = line->intProperty("arg4");
 
 			// Hexen and UDMF things can have specials too
 			} else /* edit_mode == MODE_THINGS */ {
 				MapThing* thing = map.getThing(hilight_item);
-				needs_tag = theGameConfiguration->actionSpecial((int)thing->prop("special"))->needsTag();
-				tag = thing->prop("arg0");
-				arg2 = thing->prop("arg1");
-				arg3 = thing->prop("arg2");
-				arg4 = thing->prop("arg3");
-				arg5 = thing->prop("arg4");
+				needs_tag = theGameConfiguration->actionSpecial(thing->intProperty("special"))->needsTag();
+				tag = thing->intProperty("arg0");
+				arg2 = thing->intProperty("arg1");
+				arg3 = thing->intProperty("arg2");
+				arg4 = thing->intProperty("arg3");
+				arg5 = thing->intProperty("arg4");
 			}
 
 			// Sector tag
@@ -1225,6 +1225,67 @@ void MapEditor::changeSectorLight(int amount) {
 
 	// Update display
 	updateDisplay();
+}
+
+void MapEditor::joinSectors(bool remove_lines) {
+	// Check edit mode
+	if (edit_mode != MODE_SECTORS)
+		return;
+
+	// Check selection
+	if (selection.size() < 2)
+		return;
+
+	// Get 'target' sector
+	MapSector* target = map.getSector(selection[0]);
+
+	// Init list of lines
+	vector<MapLine*> lines;
+
+	// Go through selection
+	for (unsigned a = 1; a < selection.size(); a++) {
+		// Go through sector sides
+		MapSector* sector = map.getSector(selection[a]);
+		while (sector->connectedSides().size() > 0) {
+			// Set sector
+			MapSide* side = sector->connectedSides()[0];
+			side->setSector(target);
+
+			// Add line to list if not already there
+			bool exists = false;
+			for (unsigned l = 0; l < lines.size(); l++) {
+				if (side->getParentLine() == lines[l]) {
+					exists = true;
+					break;
+				}
+			}
+			if (!exists)
+				lines.push_back(side->getParentLine());
+		}
+
+		// Delete sector
+		map.removeSector(sector);
+	}
+
+	// Remove any changed lines that now have the target sector on both sides (if needed)
+	int nlines = 0;
+	if (remove_lines) {
+		for (unsigned a = 0; a < lines.size(); a++) {
+			if (lines[a]->frontSector() == target && lines[a]->backSector() == target) {
+				map.removeLine(lines[a]);
+				nlines++;
+			}
+		}
+	}
+
+	// Editor message
+	if (nlines == 0)
+		addEditorMessage(S_FMT("Joined %d Sectors", selection.size()));
+	else
+		addEditorMessage(S_FMT("Joined %d Sectors (removed %d Lines)", selection.size(), nlines));
+
+	// Clear selection
+	selection.clear();
 }
 
 void MapEditor::changeThingType(int newtype) {
@@ -2687,6 +2748,11 @@ bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 		else if (key == "me2d_sector_light_up")		changeSectorLight(1);
 		else if (key == "me2d_sector_light_down16")	changeSectorLight(-16);
 		else if (key == "me2d_sector_light_down")	changeSectorLight(-1);
+
+		// Join
+		else if (key == "me2d_sector_join")			joinSectors(true);
+		else if (key == "me2d_sector_join_keep")	joinSectors(false);
+
 		else
 			return false;
 	}
