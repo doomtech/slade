@@ -570,7 +570,7 @@ void MapCanvas::drawLineDrawLines() {	// Best function name ever
 	int npoints = editor->nLineDrawPoints();
 	glLineWidth(2.0f);
 	if (npoints > 1) {
-		for (unsigned a = 0; a < npoints - 1; a++)
+		for (int a = 0; a < npoints - 1; a++)
 			Drawing::drawLineTabbed(editor->lineDrawPoint(a), editor->lineDrawPoint(a+1));
 	}
 	if (npoints > 0 && draw_state == DSTATE_LINE)
@@ -716,13 +716,17 @@ void MapCanvas::drawMap2d() {
 
 
 	// Draw tagged sectors/lines/things if needed
-	if (!overlayActive()) {
-		if (editor->taggedSectors().size() > 0 && mouse_state == MSTATE_NORMAL)
+	if (!overlayActive() && mouse_state == MSTATE_NORMAL) {
+		if (editor->taggedSectors().size() > 0)
 			renderer_2d->renderTaggedFlats(editor->taggedSectors(), anim_flash_level);
-		else if (editor->taggedLines().size() > 0 && mouse_state == MSTATE_NORMAL)
+		if (editor->taggedLines().size() > 0)
 			renderer_2d->renderTaggedLines(editor->taggedLines(), anim_flash_level);
-		else if (editor->taggedThings().size() > 0 && mouse_state == MSTATE_NORMAL)
+		if (editor->taggedThings().size() > 0)
 			renderer_2d->renderTaggedThings(editor->taggedThings(), anim_flash_level);
+		if (editor->taggingLines().size() > 0)
+			renderer_2d->renderTaggingLines(editor->taggingLines(), anim_flash_level);
+		if (editor->taggingThings().size() > 0)
+			renderer_2d->renderTaggingThings(editor->taggingThings(), anim_flash_level);
 	}
 
 	// Draw selection numbers if needed
@@ -1882,8 +1886,10 @@ void MapCanvas::keyBinds2d(string name) {
 	// Create object
 	else if (name == "me2d_create_object" && mouse_state == MSTATE_NORMAL) {
 		// If in lines mode, begin line drawing
-		if (editor->editMode() == MapEditor::MODE_LINES)
+		if (editor->editMode() == MapEditor::MODE_LINES) {
+			draw_state = DSTATE_LINE;
 			mouse_state = MSTATE_LINE_DRAW;
+		}
 		else
 			editor->createObject(mouse_pos_m.x, mouse_pos_m.y);
 	}

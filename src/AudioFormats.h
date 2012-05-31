@@ -232,6 +232,25 @@ public:
 	}
 };
 
+class IMFDataFormat : public EntryDataFormat {
+public:
+	IMFDataFormat() : EntryDataFormat("imf") {};
+	~IMFDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 13) {
+			// Check format
+			if (mc[0] == 'A' && mc[1] == 'D' && mc[2] == 'L' &&
+				mc[3] == 'I' && mc[4] == 'B' &&	mc[5] == 1 &&
+				mc[6] == 0 && mc[7] == 0 && mc[8] == 1) {
+					return EDF_TRUE;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
 class DoomSoundDataFormat : public EntryDataFormat {
 public:
 	DoomSoundDataFormat() : EntryDataFormat("snd_doom") {};
@@ -399,6 +418,16 @@ public:
 			}
 		}
 		return EDF_FALSE;
+	}
+};
+
+class WolfSoundDataFormat : public EntryDataFormat {
+public:
+	WolfSoundDataFormat() : EntryDataFormat("snd_wolf") {};
+	~WolfSoundDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return (mc.getSize() > 0 ? EDF_MAYBE : EDF_FALSE);
 	}
 };
 

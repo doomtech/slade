@@ -47,11 +47,7 @@ enum WolfConstants {
 	STARTPICS,
 	STARTPICM,
 	STARTSPRITES,
-	STARTTILE8,
-	LATCHPICS_LUMP_START,
-	LATCHPICS_LUMP_END,
-	LATCH_START = LATCHPICS_LUMP_START,
-	LATCH_END = LATCHPICS_LUMP_END,
+	STARTTILE8 = STARTPICM,
 	STARTPAL,
 	ENDPAL,
 	TITLE1PIC,
@@ -60,33 +56,36 @@ enum WolfConstants {
 	ENDSCREEN9PIC,
 	IDGUYS1PIC,
 	IDGUYS2PIC,
+	PLACEHOLDER,
 };
-#define return4(a, b, c, d, e) switch(a) { case 0: return b; case 1: return c; case 2: return d; case 3: return e; }
+#define return7(a, b, c, d, e, f, g, h) switch(a) { case 0: return b; case 1: return c; case 2: return d; case 3: return e; case 4: return f; case 5: return g; case 6: return h; }
 size_t WolfConstant(int name, size_t numlumps) {
-	int game = 0; // 0: wolf shareware, 1: wolf full, 2: spear demo, 3: spear full
+	int game = 0;	// 0: wolf shareware V, 1: wolf shareware E, 2: wolf shareware ?
+					// 3: wolf full V, 4: wolf fulll E,
+					// 5: spear demo V, 6: spear full V
+					// There's also a GFXV_SDM, but with the same numlumps as GFXE_WL6 so screw it.
 	switch (numlumps) {
-		case 556: break;
-		case 149: game = 1; break;
-		case 133: game = 2; break;
-		case 169: game = 3; break;
+		case 133: game = 5; break;	// GFXV_SDM
+		case 149: game = 3; break;	// GFXV_WL6
+		case 156: game = 2; break;	// It's the version I have but it's not in the Wolf source code...
+		case 169: game = 6; break;	// GFXV_SOD
+		case 414: game = 4; break;	// GFXE_WL6: Just a mess of chunks without anything usable
+		case 556: game = 0; break;	// GFXV_WL1
+		case 558: game = 1;	break;	// GFXE_WL1
 		default: return 0;
 	}
-	switch (name) {
-		case LATCH_START:	return4(game,  95,  91,  79, 101) break;
-		case LATCH_END:		return4(game, 138, 134, 127, 149) break;
-		case STARTPICS:		return4(game,   3,   3,   3,   3) break;
-		case STARTPICM:		return4(game, 139, 135, 128, 150) break;
-		case STARTSPRITES:	return4(game, 139, 135, 128, 150) break;
-		case STARTTILE8:	return4(game, 139, 135, 128, 150) break;
-		case NUMTILE8:		return4(game,  72,  72,  72,  72) break;
-		case STARTPAL:		return4(game,   0,   0, 131, 153) break;
-		case ENDPAL:		return4(game,   0,   0, 131, 163) break;
-		case TITLE1PIC:		return4(game,   0,   0,  74,  79) break;
-		case TITLE2PIC:		return4(game,   0,   0,  75,  80) break;
-		case ENDSCREEN1PIC:	return4(game,   0,   0,   0,  81) break;
-		case ENDSCREEN9PIC:	return4(game,   0,   0,   0,  89) break;
-		case IDGUYS1PIC:	return4(game,   0,   0,   0,  93) break;
-		case IDGUYS2PIC:	return4(game,   0,   0,   0,  94) break;
+	switch (name) {					//	  VW1, EW1, ?W1, VW6, EW6, SDM, SOD
+		case STARTPICS:		return7(game,   3,   3,   3,   3,   0,   3,   3) break;
+		case STARTPICM:		return7(game, 139, 142, 147, 135,   0, 128, 150) break;
+		case NUMTILE8:		return7(game,  72,  72,  72,  72,   0,  72,  72) break;
+		case STARTPAL:		return7(game,   0,   0,   0,   0,   0, 131, 153) break;
+		case ENDPAL:		return7(game,   0,   0,   0,   0,   0, 131, 163) break;
+		case TITLE1PIC:		return7(game,   0,   0,   0,   0,   0,  74,  79) break;
+		case TITLE2PIC:		return7(game,   0,   0,   0,   0,   0,  75,  80) break;
+		case ENDSCREEN1PIC:	return7(game,   0,   0,   0,   0,   0,   0,  81) break;
+		case ENDSCREEN9PIC:	return7(game,   0,   0,   0,   0,   0,   0,  89) break;
+		case IDGUYS1PIC:	return7(game,   0,   0,   0,   0,   0,   0,  93) break;
+		case IDGUYS2PIC:	return7(game,   0,   0,   0,   0,   0,   0,  94) break;
 	}
 	return 0;
 }
@@ -366,13 +365,14 @@ bool WolfArchive::open(MemChunk& mc) {
 
 	// Read Wolf header
 	mc.seek(0, SEEK_SET);
-	uint16_t num_lumps;
-	mc.read(&num_lumps, 2);		// Number of chunks
+	uint16_t num_chunks, num_lumps;
+	mc.read(&num_chunks, 2);	// Number of chunks
 	mc.read(&spritestart, 2);	// First sprite
 	mc.read(&soundstart, 2);	// First sound
-	num_lumps	= wxINT16_SWAP_ON_BE(num_lumps);
+	num_chunks	= wxINT16_SWAP_ON_BE(num_chunks);
 	spritestart	= wxINT16_SWAP_ON_BE(spritestart);
 	soundstart	= wxINT16_SWAP_ON_BE(soundstart);
+	num_lumps	= num_chunks;
 
 	// Stop announcements (don't want to be announcing modification due to entries being added etc)
 	setMuted(true);
@@ -380,9 +380,9 @@ bool WolfArchive::open(MemChunk& mc) {
 	// Read the offsets
 	theSplashWindow->setProgressMessage("Reading Wolf archive data");
 	WolfHandle * pages = new WolfHandle[num_lumps];
-	for (uint32_t d = 0; d < num_lumps; d++) {
+	for (uint32_t d = 0; d < num_chunks; d++) {
 		// Update splash window progress
-		theSplashWindow->setProgress(((float)d / (float)num_lumps*2.0f));
+		theSplashWindow->setProgress(((float)d / (float)num_chunks*2.0f));
 
 		// Read offset info
 		uint32_t offset = 0;
@@ -391,7 +391,7 @@ bool WolfArchive::open(MemChunk& mc) {
 
 		// If the lump data goes before the end of the directory,
 		// the data file is invalid
-		if (pages[d].offset < (unsigned)((num_lumps + 1) * 6)) {
+		if (pages[d].offset != 0 && pages[d].offset < (unsigned)((num_lumps + 1) * 6)) {
 			delete[] pages;
 			wxLogMessage("WolfArchive::open: Wolf archive is invalid or corrupt");
 			Global::error = "Archive is invalid and/or corrupt ";
@@ -401,39 +401,60 @@ bool WolfArchive::open(MemChunk& mc) {
 	}
 
 	// Then read the sizes
-	for (uint32_t d = 0; d < num_lumps; d++) {
+	for (uint32_t d = 0, l = 0; d < num_chunks; d++) {
 		// Update splash window progress
-		theSplashWindow->setProgress(((float)(d + num_lumps) / (float)num_lumps*2.0f));
+		theSplashWindow->setProgress(((float)(d + num_chunks) / (float)num_chunks*2.0f));
 
 		// Read size info
 		uint16_t size = 0;
-		mc.read(&size,	2);		// Offset
+		mc.read(&size,	2);		// Size
 		size	= wxINT16_SWAP_ON_BE(size);
 
 		// Wolf chunks have no names, so just give them a number
 		string name;
-		if (d < spritestart)		name = "WAL";
-		else if (d < soundstart)	name = "SPR";
-		else						name = "SND";
-		name += S_FMT("%05d", d);
+		if (d < spritestart)		name = S_FMT("WAL%05d", l);
+		else if (d < soundstart)	name = S_FMT("SPR%05d", l - spritestart);
+		else						name = S_FMT("SND%05d", l - soundstart);
 
-		// Create & setup lump
-		ArchiveEntry* nlump = new ArchiveEntry(name, size);
-		nlump->setLoaded(false);
-		nlump->exProp("Offset") = (int)pages[d].offset;
-		nlump->setState(0);
+		++l;
 
-		// Add to entry list
-		getRoot()->addEntry(nlump);
+		// Shareware versions do not include all lumps,
+		// no need to bother with fakes
+		if (pages[d].offset > 0) {
 
-		// If the lump data goes past the end of file,
-		// the data file is invalid
-		if (getEntryOffset(nlump) + size > mc.getSize()) {
-			delete[] pages;
-			wxLogMessage("WolfArchive::open: Wolf archive is invalid or corrupt");
-			Global::error = "Archive is invalid and/or corrupt";
-			setMuted(false);
-			return false;
+			// Digitized sounds can be made of multiple pages
+			size_t e = d;
+			if (d >= soundstart && size == 4096) {
+				size_t fullsize = 4096;
+				do {
+					mc.read(&size, 2);
+					size = wxINT16_SWAP_ON_BE(size);
+					fullsize += size;
+					++e;
+				} while (size == 4096);
+				size = fullsize;
+			}
+
+			// Create & setup lump
+			ArchiveEntry* nlump = new ArchiveEntry(name, size);
+			nlump->setLoaded(false);
+			nlump->exProp("Offset") = (int)pages[d].offset;
+			nlump->setState(0);
+
+			d = e;
+
+			// Add to entry list
+			getRoot()->addEntry(nlump);
+
+			// If the lump data goes past the end of file,
+			// the data file is invalid
+			if (getEntryOffset(nlump) + size > mc.getSize()) {
+				delete[] pages;
+				wxLogMessage("WolfArchive::open: Wolf archive is invalid or corrupt");
+				Global::error = "Archive is invalid and/or corrupt";
+				setMuted(false);
+				return false;
+			}
 		}
 
 	}
@@ -703,11 +724,12 @@ bool WolfArchive::openGraph(MemChunk& head, MemChunk& data, MemChunk& dict) {
 		if (d == 0)														name = "INF";
 		else if (d == 1 || d == 2)										name = "FNT";
 		else if (d >= WC(STARTPICS)) {
-			if (d >= WC(STARTPAL) && d < WC(ENDPAL))					name = "PAL";
+			if (d >= WC(STARTPAL) && d <= WC(ENDPAL))					name = "PAL";
 			else if (d == WC(TITLE1PIC) || d == WC(TITLE2PIC))			name = "TIT";
-			else if (d == WC(IDGUYS1PIC)|| d == WC(IDGUYS1PIC))			name = "IDG";
+			else if (d == WC(IDGUYS1PIC)|| d == WC(IDGUYS2PIC))			name = "IDG";
 			else if (d >= WC(ENDSCREEN1PIC) && d <= WC(ENDSCREEN9PIC))	name = "END";
 			else if (d < WC(STARTPICM)) 								name = "PIC";
+			else if (d == WC(STARTTILE8))								name = "TIL";
 			else														name = "LMP";
 		}
 		else name = "LMP";
@@ -972,24 +994,31 @@ bool WolfArchive::isWolfArchive(string filename) {
 	for (size_t a = 0; a < num_lumps; ++a) {
 		file.Read(&offset, 4);
 		offset = wxINT32_SWAP_ON_BE(offset);
-		if (offset < lastoffset || offset % 512) {
+		if (offset == 0) {
+			// Empty entry (we're opening a shareware/demo archive)
+		} else if (offset < lastoffset || offset % 512) {
 			delete[] pages;
 			return false;
 		}
-		lastoffset = offset;
+		if (offset > 0)
+			lastoffset = offset;
 		pages[a].offset = offset;
 	}
 	uint16_t lastsize = 0;
+	lastoffset = pages[0].offset;
 	for (size_t b = 0; b < num_lumps; ++b) {
 		file.Read(&size, 2);
-		size = wxINT16_SWAP_ON_BE(size);
-		pagesize += (size / 512) + ((size % 512) ? 1 : 0);
-		pages[b].size = size;
-		if (b > 0 && (pages[b - 1].offset + pages[b - 1].size) > pages[b].offset) {
-			delete[] pages;
-			return false;
-		}
-		lastsize = size;
+		if (pages[b].offset > 0) {
+			size = wxINT16_SWAP_ON_BE(size);
+			pagesize += (size / 512) + ((size % 512) ? 1 : 0);
+			pages[b].size = size;
+			if (b > 0 && lastoffset + lastsize > pages[b].offset) {
+				delete[] pages;
+				return false;
+			}
+			lastoffset = pages[b].offset;
+			lastsize = size;
+		} else pages[b].size = 0;
 	}
 	delete[] pages;
 	return ((pagesize * 512) <= filesize || filesize >= lastoffset + lastsize);

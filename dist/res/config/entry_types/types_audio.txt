@@ -116,7 +116,31 @@ entry_types
 		category = "Audio";
 		editor = audio;
 	}
-
+	
+	imf
+	{
+		name = "IMF OPL File";
+		format = imf;
+		icon = "e_sound";
+		reliability = 120;
+		export_ext = "imf";
+		category = "Audio";
+		editor = audio;
+	}
+	
+	snd_wolf
+	{
+		name = "Sound (Wolf3D Format)";
+		format = snd_wolf;
+		icon = "e_sound";
+		match_name = "SND0*";
+		match_archive = "archive_wolf";
+		reliability = 10;
+		export_ext = "swp";
+		category = "Audio";
+		editor = audio;
+	}
+	
 	// This is used to interpret a raw sample
 	snd_bloodsfx
 	{

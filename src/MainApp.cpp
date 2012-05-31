@@ -378,6 +378,7 @@ void MainApp::initActions() {
 	new SAction("arch_clean_textures", "Remove Unused &Textures", "", "Remove any unused textures");
 	new SAction("arch_clean_flats", "Remove Unused &Flats", "", "Remove any unused flats");
 	new SAction("arch_check_duplicates", "Check Duplicate Entry Names", "", "Checks the archive for any entries sharing the same name");
+	new SAction("arch_check_duplicates2", "Check Duplicate Entry Content", "", "Checks the archive for any entries sharing the same data");
 	new SAction("arch_clean_iwaddupes", "Remove Entries Duplicated from IWAD", "", "Remove entries that are exact duplicates of entries from the base resource archive");
 	new SAction("arch_entry_rename", "Rename", "t_rename", "Rename the selected entries");
 	new SAction("arch_entry_rename_each", "Rename Each", "t_renameeach", "Rename separately all the selected entries");

@@ -223,6 +223,7 @@ ArchiveEntry* CTPatchEx::getPatchEntry(Archive* parent) {
 	// 'Patch' type: patches > graphics
 	if (type == PTYPE_PATCH) {
 		ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "patches", parent);
+		if (!entry) entry = theResourceManager->getFlatEntry(name, parent);
 		if (!entry) entry = theResourceManager->getPatchEntry(name, "graphics", parent);
 		return entry;
 	}
@@ -231,6 +232,7 @@ ArchiveEntry* CTPatchEx::getPatchEntry(Archive* parent) {
 	if (type == PTYPE_GRAPHIC) {
 		ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "graphics", parent);
 		if (!entry) entry = theResourceManager->getPatchEntry(name, "patches", parent);
+		if (!entry) entry = theResourceManager->getFlatEntry(name, parent);
 		return entry;
 	}
 	// Silence warnings
@@ -357,7 +359,7 @@ string CTPatchEx::asText() {
 	string text = S_FMT("\t%s %s, %d, %d\n", CHR(typestring), CHR(name), offset_x, offset_y);
 
 	// Check if we need to write any extra properties
-	if (!flip_x && !flip_y && rotation == 0 && blendtype == 0 && alpha == 1.0f && S_CMPNOCASE(style, "Copy"))
+	if (!flip_x && !flip_y && !use_offsets && rotation == 0 && blendtype == 0 && alpha == 1.0f && S_CMPNOCASE(style, "Copy"))
 		return text;
 	else
 		text += "\t{\n";

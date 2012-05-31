@@ -87,7 +87,7 @@ public:
 	~SLADEMap();
 
 	// Map entry ordering
-	enum {
+	enum MapEntries {
 		THINGS = 0,
 		LINEDEFS,
 		SIDEDEFS,
@@ -161,6 +161,8 @@ public:
 	void	getThingsById(int id, vector<MapThing*>& list);
 	void	getLinesById(int id, vector<MapLine*>& list);
 	void	getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list);
+	void	getTaggingThingsById(int id, int type, vector<MapThing*>& list);
+	void	getTaggingLinesById(int id, int type, vector<MapLine*>& list);
 
 	// Info
 	string	getAdjacentLineTexture(MapVertex* vertex, int tex_part = 255);

@@ -104,14 +104,20 @@ public:
 
 		// Import all dragged files, inserting after the item they were dragged onto
 		for (int a = filenames.size()-1; a >= 0; a--) {
-			wxFileName fn(filenames[a]);
+			// Is this a directory?
+			if (wxDirExists(filenames[a])) {
+				// TODO: Handle folders with recursively importing all content
+				// and converting to namespaces if dropping in a treeless archive.
+			} else {
+				wxFileName fn(filenames[a]);
 
-			// Create new entry
-			ArchiveEntry* entry = parent->getArchive()->addNewEntry(fn.GetFullName(), index, list->getCurrentDir());
+				// Create new entry
+				ArchiveEntry* entry = parent->getArchive()->addNewEntry(fn.GetFullName(), index, list->getCurrentDir());
 
-			// Import the file to it
-			entry->importFile(filenames[a]);
-			EntryType::detectEntryType(entry);
+				// Import the file to it
+				entry->importFile(filenames[a]);
+				EntryType::detectEntryType(entry);
+			}
 		}
 
 		return true;
@@ -328,6 +334,7 @@ void ArchivePanel::addMenus() {
 		theApp->getAction("arch_clean_textures")->addToMenu(menu_clean);
 		theApp->getAction("arch_clean_flats")->addToMenu(menu_clean);
 		theApp->getAction("arch_check_duplicates")->addToMenu(menu_clean);
+		theApp->getAction("arch_check_duplicates2")->addToMenu(menu_clean);
 		theApp->getAction("arch_clean_iwaddupes")->addToMenu(menu_clean);
 		menu_archive->AppendSubMenu(menu_clean, "&Maintenance");
 	}
@@ -1385,6 +1392,9 @@ bool ArchivePanel::dSndWavConvert() {
 		// Convert Doom Sound -> WAV if the entry is Doom Sound format
 		if (selection[a]->getType()->getFormat() == "snd_doom")
 			worked = Conversions::doomSndToWav(selection[a]->getMCData(), wav);
+		// Or Wolfenstein 3D sound format
+		else if (selection[a]->getType()->getFormat() == "snd_wolf")
+			worked = Conversions::wolfSndToWav(selection[a]->getMCData(), wav);
 		// Or Creative Voice File format
 		else if (selection[a]->getType()->getFormat() == "snd_voc")
 			worked = Conversions::vocToWav(selection[a]->getMCData(), wav);
@@ -1756,6 +1766,10 @@ bool ArchivePanel::handleAction(string id) {
 		ArchiveOperations::checkDuplicateEntryNames(archive);
 
 	// Archive->Maintenance->Check Duplicate Entry Names
+	else if (id == "arch_check_duplicates2")
+		ArchiveOperations::checkDuplicateEntryContent(archive);
+
+	// Archive->Maintenance->Check Duplicate Entry Names
 	else if (id == "arch_clean_iwaddupes")
 		ArchiveOperations::removeEntriesUnchangedFromIWAD(archive);
 
@@ -2026,7 +2040,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		}
 		if (!dsnd_selected) {
 			if (selection[a]->getType()->getFormat() == "snd_doom" ||
-				selection[a]->getType()->getFormat() == "snd_doom64" ||
+				selection[a]->getType()->getFormat() == "snd_wolf" ||
 				selection[a]->getType()->getFormat() == "snd_bloodsfx" ||
 				selection[a]->getType()->getFormat() == "snd_voc")
 				dsnd_selected = true;

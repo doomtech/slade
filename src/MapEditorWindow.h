@@ -66,4 +66,12 @@ public:
 // Define for less cumbersome MapEditorWindow::getInstance()
 #define theMapEditor MapEditorWindow::getInstance()
 
+enum ThingDrawTypes {
+	TDT_SQUARE,
+	TDT_ROUND,
+	TDT_SPRITE,
+	TDT_SQUARESPRITE,
+	TDT_FRAMEDSPRITE,
+};
+
 #endif //__MAPEDITORWINDOW_H__

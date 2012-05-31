@@ -77,6 +77,7 @@ public:
 	void	renderLineHilight(int index, float fade);
 	void	renderLineSelection(vector<int>& selection, float fade = 1.0f);
 	void	renderTaggedLines(vector<MapLine*>& lines, float fade);
+	void	renderTaggingLines(vector<MapLine*>& lines, float fade);
 
 	// Things
 	bool	setupThingOverlay();
@@ -84,12 +85,13 @@ public:
 	void	renderRoundThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
 	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool fitradius = false);
 	void	renderSimpleSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
-	bool	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool showicon = true);
+	bool	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool showicon = true, bool framed = false);
 	void	renderThings(float alpha = 1.0f, bool force_dir = false);
 	void	renderThingsImmediate(float alpha);
 	void	renderThingHilight(int index, float fade);
 	void	renderThingSelection(vector<int>& selection, float fade = 1.0f);
 	void	renderTaggedThings(vector<MapThing*>& things, float fade);
+	void	renderTaggingThings(vector<MapThing*>& things, float fade);
 
 	// Flats (sectors)
 	void	renderFlats(int type = 0, bool texture = true, float alpha = 1.0f);

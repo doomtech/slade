@@ -1800,6 +1800,9 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 	// Open temp text file
 	wxFile tempfile(appPath("sladetemp.txt", DIR_TEMP), wxFile::write);
 
+	// When creating a new map, retrieve UDMF namespace information from the configuration
+	if (udmf_namespace.IsEmpty()) udmf_namespace = theGameConfiguration->udmfNamespace();
+
 	// Write map namespace
 	tempfile.Write("// Written by SLADE3\n");
 	tempfile.Write(S_FMT("namespace=\"%s\";\n", CHR(udmf_namespace)));
@@ -2385,6 +2388,161 @@ void SLADEMap::getLinesById(int id, vector<MapLine*>& list) {
 	for (unsigned a = 0; a < lines.size(); a++) {
 		if (lines[a]->intProperty("id") == id)
 			list.push_back(lines[a]);
+	}
+}
+
+void SLADEMap::getTaggingThingsById(int id, int type, vector<MapThing*>& list) {
+	// Find things with special affecting matching id
+	for (unsigned a = 0; a < things.size(); a++) {
+		if (things[a]->intProperty("special")) {
+			int needs_tag, tag, arg2, arg3, arg4, arg5;
+			needs_tag = theGameConfiguration->actionSpecial(things[a]->intProperty("special"))->needsTag();
+			tag = things[a]->intProperty("arg0");
+			arg2 = things[a]->intProperty("arg1");
+			arg3 = things[a]->intProperty("arg2");
+			arg4 = things[a]->intProperty("arg3");
+			arg5 = things[a]->intProperty("arg4");
+			bool fits = false;
+			switch (needs_tag) {
+				case AS_TT_SECTOR:
+				case AS_TT_SECTOR_OR_BACK:
+				case AS_TT_SECTOR_AND_BACK:
+					fits = (tag == id && type == SECTORS);
+					break;
+				case AS_TT_LINE_NEGATIVE:
+					tag = abs(tag);
+				case AS_TT_LINE:
+					fits = (tag == id && type == LINEDEFS);
+					break;
+				case AS_TT_THING:
+					fits = (tag == id && type == THINGS);
+					break;
+				case AS_TT_1THING_2SECTOR:
+					fits = (type == THINGS ? (tag == id) : (arg2 == id && type == SECTORS));
+					break;
+				case AS_TT_1THING_3SECTOR:
+					fits = (type == THINGS ? (tag == id) : (arg3 == id && type == SECTORS));
+					break;
+				case AS_TT_1THING_2THING:
+					fits = (type == THINGS && (tag == id || arg2 == id));
+					break;
+				case AS_TT_1THING_4THING:
+					fits = (type == THINGS && (tag == id || arg4 == id));
+					break;
+				case AS_TT_1THING_2THING_3THING:
+					fits = (type == THINGS && (tag == id || arg2 == id || arg3 == id));
+					break;
+				case AS_TT_1SECTOR_2THING_3THING_5THING:
+					fits = (type == SECTORS ? (tag == id) : (type == THINGS &&
+						(arg2 == id || arg3 == id || arg5 == id)));
+					break;
+				case AS_TT_1LINEID_2LINE:
+					fits = (type == LINEDEFS && arg2 == id);
+					break;
+				case AS_TT_4THING:
+					fits = (type == THINGS && arg4 == id);
+					break;
+				case AS_TT_5THING:
+					fits = (type == THINGS && arg5 == id);
+					break;
+				case AS_TT_1LINE_2SECTOR:
+					fits = (type == LINEDEFS ? (tag == id) : (arg2 == id && type == SECTORS));
+					break;
+				case AS_TT_1SECTOR_2SECTOR:
+					fits = (type == SECTORS && (tag == id || arg2 == id));
+					break;
+				case AS_TT_1SECTOR_2SECTOR_3SECTOR_4SECTOR:
+					fits = (type == SECTORS && (tag == id || arg2 == id || arg3 == id || arg4 == id));
+					break;
+				case AS_TT_SECTOR_2IS3_LINE:
+					fits = (tag == id && (arg2 == 3 ? type == LINEDEFS : type == SECTORS));
+					break;
+				case AS_TT_1SECTOR_2THING:
+					fits = (type == SECTORS ? (tag == id) : (arg2 == id && type == THINGS));
+					break;
+				default:
+					break;
+			}
+			if (fits) list.push_back(things[a]);
+		}
+	}
+}
+
+void SLADEMap::getTaggingLinesById(int id, int type, vector<MapLine*>& list) {
+	// Find lines with special affecting matching id
+	for (unsigned a = 0; a < lines.size(); a++) {
+		int special = lines[a]->intProperty("special");
+		if (special) {
+			int needs_tag, tag, arg2, arg3, arg4, arg5;
+			needs_tag = theGameConfiguration->actionSpecial(lines[a]->intProperty("special"))->needsTag();
+			tag = lines[a]->intProperty("arg0");
+			arg2 = lines[a]->intProperty("arg1");
+			arg3 = lines[a]->intProperty("arg2");
+			arg4 = lines[a]->intProperty("arg3");
+			arg5 = lines[a]->intProperty("arg4");
+			bool fits = false;
+			switch (needs_tag) {
+				case AS_TT_SECTOR:
+				case AS_TT_SECTOR_OR_BACK:
+				case AS_TT_SECTOR_AND_BACK:
+					fits = (tag == id && type == SECTORS);
+					break;
+				case AS_TT_LINE_NEGATIVE:
+					tag = abs(tag);
+				case AS_TT_LINE:
+					fits = (tag == id && type == LINEDEFS);
+					break;
+				case AS_TT_THING:
+					fits = (tag == id && type == THINGS);
+					break;
+				case AS_TT_1THING_2SECTOR:
+					fits = (type == THINGS ? (tag == id) : (arg2 == id && type == SECTORS));
+					break;
+				case AS_TT_1THING_3SECTOR:
+					fits = (type == THINGS ? (tag == id) : (arg3 == id && type == SECTORS));
+					break;
+				case AS_TT_1THING_2THING:
+					fits = (type == THINGS && (tag == id || arg2 == id));
+					break;
+				case AS_TT_1THING_4THING:
+					fits = (type == THINGS && (tag == id || arg4 == id));
+					break;
+				case AS_TT_1THING_2THING_3THING:
+					fits = (type == THINGS && (tag == id || arg2 == id || arg3 == id));
+					break;
+				case AS_TT_1SECTOR_2THING_3THING_5THING:
+					fits = (type == SECTORS ? (tag == id) : (type == THINGS &&
+						(arg2 == id || arg3 == id || arg5 == id)));
+					break;
+				case AS_TT_1LINEID_2LINE:
+					fits = (type == LINEDEFS && arg2 == id);
+					break;
+				case AS_TT_4THING:
+					fits = (type == THINGS && arg4 == id);
+					break;
+				case AS_TT_5THING:
+					fits = (type == THINGS && arg5 == id);
+					break;
+				case AS_TT_1LINE_2SECTOR:
+					fits = (type == LINEDEFS ? (tag == id) : (arg2 == id && type == SECTORS));
+					break;
+				case AS_TT_1SECTOR_2SECTOR:
+					fits = (type == SECTORS && (tag == id || arg2 == id));
+					break;
+				case AS_TT_1SECTOR_2SECTOR_3SECTOR_4SECTOR:
+					fits = (type == SECTORS && (tag == id || arg2 == id || arg3 == id || arg4 == id));
+					break;
+				case AS_TT_SECTOR_2IS3_LINE:
+					fits = (tag == id && (arg2 == 3 ? type == LINEDEFS : type == SECTORS));
+					break;
+				case AS_TT_1SECTOR_2THING:
+					fits = (type == SECTORS ? (tag == id) : (arg2 == id && type == THINGS));
+					break;
+				default:
+					break;
+			}
+			if (fits) list.push_back(lines[a]);
+		}
 	}
 }
 

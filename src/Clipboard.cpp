@@ -100,6 +100,11 @@ TextureClipboardItem::TextureClipboardItem(CTexture* texture, Archive* parent) :
 	for (unsigned a = 0; a < texture->nPatches(); a++) {
 		ArchiveEntry* entry = texture->getPatch(a)->getPatchEntry(parent);
 
+		// FIXME/TODO: Do something to handle patches that are defined
+		// in TEXTURES rather than a discrete entry!
+		if (entry == NULL)
+			continue;
+
 		// Don't copy patch if it has been already
 		bool there = false;
 		for (unsigned b = 0; b < patch_entries.size(); b++) {

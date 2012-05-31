@@ -105,7 +105,7 @@ void MCAThingSelection::draw() {
 	if (!thing_overlay_square) {
 		// Get thing selection texture
 		GLTexture* tex = NULL;
-		if (thing_drawtype == 1 || thing_drawtype == 2)
+		if (thing_drawtype == TDT_ROUND || thing_drawtype == TDT_SPRITE)
 			tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
 		else
 			tex = theMapEditor->textureManager().getEditorImage("thing/square/hilight");

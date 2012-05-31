@@ -436,6 +436,56 @@ bool Conversions::bloodToWav(ArchiveEntry * in, MemChunk& out) {
 	return true;
 }
 
+/* Conversions::wolfSndToWav
+ * Converts Wolf3D sound data [in] to wav format, written to [out]
+ *******************************************************************/
+bool Conversions::wolfSndToWav(MemChunk& in, MemChunk& out) {
+	// --- Read Doom sound ---
+
+	// Read samples
+	size_t numsamples = in.getSize();
+	const uint8_t * samples = in.getData();
+
+	// --- Write WAV ---
+
+	wav_chunk_t whdr, wdhdr;
+	wav_fmtchunk_t fmtchunk;
+
+	// Setup data header
+	char did[4] = { 'd', 'a', 't', 'a' };
+	memcpy(&wdhdr.id, &did, 4);
+	wdhdr.size = numsamples;
+
+	// Setup fmt chunk
+	char fid[4] = { 'f', 'm', 't', ' ' };
+	memcpy(&fmtchunk.header.id, &fid, 4);
+	fmtchunk.header.size = 16;
+	fmtchunk.tag = 1;
+	fmtchunk.channels = 1;
+	fmtchunk.samplerate = 7042;
+	fmtchunk.datarate = 7042;
+	fmtchunk.blocksize = 1;
+	fmtchunk.bps = 8;
+
+	// Setup main header
+	char wid[4] = { 'R', 'I', 'F', 'F' };
+	memcpy(&whdr.id, &wid, 4);
+	whdr.size = wdhdr.size + fmtchunk.header.size + 8;
+
+	// Write chunks
+	out.write(&whdr, 8);
+	out.write("WAVE", 4);
+	out.write(&fmtchunk, sizeof(wav_fmtchunk_t));
+	out.write(&wdhdr, 8);
+	out.write(samples, numsamples);
+
+	// Ensure data ends on even byte boundary
+	if (numsamples % 2 != 0)
+		out.write('\0', 1);
+
+	return true;
+}
+
 /* Conversions::gmidToMidi
  * Dark Forces GMID file to Standard MIDI File
  *******************************************************************/

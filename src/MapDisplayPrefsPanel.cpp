@@ -134,8 +134,8 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : PrefsPanelBase(pa
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
 	hbox->Add(new wxStaticText(panel, -1, "Thing style: "), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
-	string t_types[] = { "Square", "Round", "Sprite", "Square + Sprite" };
-	choice_thing_drawtype = new wxChoice(panel, -1, wxDefaultPosition, wxDefaultSize, 4, t_types);
+	string t_types[] = { "Square", "Round", "Sprite", "Square + Sprite", "Framed Sprite" };
+	choice_thing_drawtype = new wxChoice(panel, -1, wxDefaultPosition, wxDefaultSize, 5, t_types);
 	hbox->Add(choice_thing_drawtype, 1, wxEXPAND);
 
 	// Always show angles

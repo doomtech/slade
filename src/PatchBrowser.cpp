@@ -227,6 +227,7 @@ bool PatchBrowser::openArchive(Archive* archive) {
 	items_root->addChild("Patches");
 	items_root->addChild("Graphics");
 	items_root->addChild("Textures");
+	items_root->addChild("Flats");
 	items_root->addChild("Sprites");
 
 	// Setup palette chooser
@@ -235,6 +236,9 @@ bool PatchBrowser::openArchive(Archive* archive) {
 	// Get a list of all available patch entries
 	vector<ArchiveEntry*> patches;
 	theResourceManager->getAllPatchEntries(patches, archive);
+
+	// Add flats, too
+	theResourceManager->getAllFlatEntries(patches, archive);
 
 	// Go through the list
 	for (unsigned a = 0; a < patches.size(); a++) {
@@ -248,6 +252,7 @@ bool PatchBrowser::openArchive(Archive* archive) {
 		string ns = entry->getParent()->detectNamespace(entry);
 		string nspace;
 		if (ns == "patches") nspace = "Patches";
+		else if (ns == "flats") nspace = "Flats";
 		else if (ns == "sprites") nspace = "Sprites";
 		else if (ns == "textures") nspace = "Textures";
 		else nspace = "Graphics";

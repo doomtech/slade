@@ -23,6 +23,8 @@ CVAR(Bool, sector_hilight_fill, true, CVAR_SAVE)
 CVAR(Bool, map_animate_hilight, true, CVAR_SAVE)
 CVAR(Bool, map_animate_selection, false, CVAR_SAVE)
 CVAR(Bool, map_animate_tagged, true, CVAR_SAVE)
+CVAR(Float, arrow_alpha, 1.0f, CVAR_SAVE)
+CVAR(Bool, arrow_colour, false, CVAR_SAVE)
 
 CVAR(Bool, test_ssplit, false, CVAR_SAVE)
 
@@ -474,15 +476,52 @@ void MapRenderer2D::renderTaggedLines(vector<MapLine*>& lines, float fade) {
 	}
 }
 
+void MapRenderer2D::renderTaggingLines(vector<MapLine*>& lines, float fade) {
+	// Reset fade if tagging animation is disabled
+	if (!map_animate_tagged)
+		fade = 1.0f;
+
+	// Set hilight colour
+	rgba_t col = ColourConfiguration::getColour("map_tagging");
+	col.a *= fade;
+	col.set_gl();
+
+	// Setup rendering properties
+	glLineWidth(line_width*5);
+
+	// Go through tagging lines
+	double x1, y1, x2, y2;
+	for (unsigned a = 0; a < lines.size(); a++) {
+		// Render line
+		MapLine* line = lines[a];
+		x1 = line->v1()->xPos();
+		y1 = line->v1()->yPos();
+		x2 = line->v2()->xPos();
+		y2 = line->v2()->yPos();
+		glBegin(GL_LINES);
+		glVertex2d(x1, y1);
+		glVertex2d(x2, y2);
+		glEnd();
+
+		// Direction tab
+		fpoint2_t mid = line->midPoint();
+		fpoint2_t tab = line->dirTabPoint();
+		glBegin(GL_LINES);
+		glVertex2d(mid.x, mid.y);
+		glVertex2d(tab.x, tab.y);
+		glEnd();
+	}
+}
+
 bool MapRenderer2D::setupThingOverlay() {
 	// Get hilight texture
 	GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
-	if (thing_drawtype == 0 || thing_drawtype == 3)
+	if (thing_drawtype == TDT_SQUARE || thing_drawtype == TDT_SQUARESPRITE || thing_drawtype == TDT_FRAMEDSPRITE)
 		tex = theMapEditor->textureManager().getEditorImage("thing/square/hilight");
 
 	// Nothing to do if thing_overlay_square is true and thing_drawtype is 1 or 2 (circles or sprites)
 	// or if the hilight circle texture isn't found for some reason
-	if (!tex || (thing_overlay_square && (thing_drawtype == 1 || thing_drawtype == 2))) {
+	if (!tex || (thing_overlay_square && (thing_drawtype == TDT_ROUND || thing_drawtype == TDT_SPRITE))) {
 		glDisable(GL_TEXTURE_2D);
 		return false;
 	}
@@ -504,7 +543,7 @@ bool MapRenderer2D::setupThingOverlay() {
 
 void MapRenderer2D::renderThingOverlay(double x, double y, double radius, bool point) {
 	// Simplest case, thing_overlay_square is true and thing_drawtype is 1 or 2 (circles or sprites)
-	if (thing_overlay_square && (thing_drawtype == 1 || thing_drawtype == 2)) {
+	if (thing_overlay_square && (thing_drawtype == TDT_ROUND || thing_drawtype == TDT_SPRITE)) {
 		// Draw square
 		glBegin(GL_QUADS);
 		glVertex2d(x - radius, y - radius);
@@ -679,7 +718,7 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	return show_angle;
 }
 
-bool MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingType* tt, float alpha, bool showicon) {
+bool MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingType* tt, float alpha, bool showicon, bool framed) {
 	// Ignore if no type given (shouldn't happen)
 	if (!tt)
 		return false;
@@ -697,13 +736,16 @@ bool MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	// Otherwise, no icon
 	int tc_start = 0;
 	if (!tex) {
-		tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_n");
+		if (framed){
+			tex = theMapEditor->textureManager().getEditorImage("thing/square/frame");
+		} else {
+			tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_n");
 
-		if (tt->isAngled() && showicon || thing_force_dir || things_angles) {
-			tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_d1");
+			if (tt->isAngled() && showicon || thing_force_dir || things_angles) {
+				tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_d1");
 
-			// Setup variables depending on angle
-			switch ((int)angle) {
+				// Setup variables depending on angle
+				switch ((int)angle) {
 			case 0:		// East: normal, texcoord 0
 				break;
 			case 45:	// Northeast: diagonal, texcoord 0
@@ -733,7 +775,8 @@ bool MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 			default:	// Unsupported angle, don't draw arrow
 				tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_n");
 				break;
-			};
+				};
+			}
 		}
 	}
 
@@ -744,7 +787,7 @@ bool MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	}
 
 	// Bind texture
-	if (tex_last != tex) {
+	if (tex && tex_last != tex) {
 		tex->bind();
 		tex_last = tex;
 	}
@@ -845,10 +888,10 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	vector<int> things_arrows;
 
 	// Draw thing shadows if needed
-	if (thing_shadow > 0.01f && thing_drawtype != 2) {
+	if (thing_shadow > 0.01f && thing_drawtype != TDT_SPRITE) {
 		glEnable(GL_TEXTURE_2D);
 		GLTexture* tex_shadow = theMapEditor->textureManager().getEditorImage("thing/shadow");
-		if (thing_drawtype == 0 || thing_drawtype == 3)
+		if (thing_drawtype == TDT_SQUARE || thing_drawtype == TDT_SQUARESPRITE)
 			tex_shadow = theMapEditor->textureManager().getEditorImage("thing/square/shadow");
 		if (tex_shadow) {
 			tex_shadow->bind();
@@ -927,21 +970,21 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 		ThingType* tt = theGameConfiguration->thingType(thing->getType());
 
 		// Draw thing depending on 'things_drawtype' cvar
-		if (thing_drawtype == 2) {		// Drawtype 2: Sprites
+		if (thing_drawtype == TDT_SPRITE) {		// Drawtype 2: Sprites
 			// Check if we need to draw the direction arrow for this thing
 			if (renderSpriteThing(x, y, angle, tt, talpha))
 				things_arrows.push_back(a);
 		}
-		else if (thing_drawtype == 1)	// Drawtype 1: Round
+		else if (thing_drawtype == TDT_ROUND)	// Drawtype 1: Round
 			renderRoundThing(x, y, angle, tt, talpha);
 		else {							// Drawtype 0 (or other): Square
-			if (renderSquareThing(x, y, angle, tt, talpha, thing_drawtype != 3))
+			if (renderSquareThing(x, y, angle, tt, talpha, thing_drawtype < TDT_SQUARESPRITE, thing_drawtype == TDT_FRAMEDSPRITE))
 				things_arrows.push_back(a);
 		}
 	}
 
 	// Draw thing sprites within squares if that drawtype is set
-	if (thing_drawtype > 2) {
+	if (thing_drawtype > TDT_SPRITE) {
 		glEnable(GL_TEXTURE_2D);
 
 		for (unsigned a = 0; a < map->nThings(); a++) {
@@ -968,7 +1011,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 
 	// Draw any thing direction arrows needed
 	if (things_arrows.size() > 0) {
-		glColor4f(1.0f, 1.0f, 1.0f, alpha);
+		glColor4f(1.0f, 1.0f, 1.0f, alpha * arrow_alpha);
 		GLTexture* tex_arrow = theMapEditor->textureManager().getEditorImage("arrow");
 		if (tex_arrow) {
 			glEnable(GL_TEXTURE_2D);
@@ -976,6 +1019,10 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 
 			for (unsigned a = 0; a < things_arrows.size(); a++) {
 				MapThing* thing = map->getThing(things_arrows[a]);
+				if (arrow_colour) {
+					ThingType* tt = theGameConfiguration->thingType(thing->getType());
+					if (tt) glColor4f(tt->getColour().fr(), tt->getColour().fg(), tt->getColour().fb(), alpha * arrow_alpha);
+				}
 				x = thing->xPos();
 				y = thing->yPos();
 
@@ -1048,14 +1095,14 @@ void MapRenderer2D::renderThingHilight(int index, float fade) {
 	if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
 
 	// Adjust radius
-	if (thing_drawtype == 0 || thing_drawtype > 2)
+	if (thing_drawtype == TDT_SQUARE || thing_drawtype > TDT_SPRITE)
 		radius += 6;
 	else
 		radius *= 1.1 + (0.2*fade);
 
 	// Setup hilight thing texture
 	GLTexture* tex = NULL;
-	if (thing_drawtype == 0 || thing_drawtype == 3)
+	if (thing_drawtype == TDT_SQUARE || thing_drawtype == TDT_SQUARESPRITE || thing_drawtype == TDT_FRAMEDSPRITE)
 		tex = theMapEditor->textureManager().getEditorImage("thing/square/hilight");
 	else
 		tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
@@ -1135,6 +1182,40 @@ void MapRenderer2D::renderTaggedThings(vector<MapThing*>& things, float fade) {
 		// Adjust radius if the overlay isn't square
 		if (!thing_overlay_square)
 			radius += 8;
+
+		// Draw it
+		renderThingOverlay(thing->xPos(), thing->yPos(), radius, point);
+	}
+
+	// Clean up gl state
+	if (point)
+		glDisable(GL_POINT_SPRITE);
+	glDisable(GL_TEXTURE_2D);
+}
+
+void MapRenderer2D::renderTaggingThings(vector<MapThing*>& things, float fade) {
+	// Reset fade if tagging animation is disabled
+	if (!map_animate_tagged)
+		fade = 1.0f;
+
+	// Set hilight colour
+	rgba_t col = ColourConfiguration::getColour("map_tagging");
+	col.a *= fade;
+	col.set_gl();
+
+	// Setup overlay rendering
+	bool point = setupThingOverlay();
+
+	// Draw all tagging overlays
+	for (unsigned a = 0; a < things.size(); a++) {
+		MapThing* thing = things[a];
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+		double radius = tt->getRadius();
+		if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
+
+		// Adjust radius if the overlay isn't square
+		if (!thing_overlay_square)
+			radius += 12;
 
 		// Draw it
 		renderThingOverlay(thing->xPos(), thing->yPos(), radius, point);
@@ -1697,16 +1778,16 @@ void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) 
 		ThingType* tt = theGameConfiguration->thingType(thing->getType());
 
 		// Draw thing depending on 'things_drawtype' cvar
-		if (thing_drawtype == 2)		// Drawtype 2: Sprites
+		if (thing_drawtype == TDT_SPRITE)		// Drawtype 2: Sprites
 			renderSpriteThing(x, y, angle, tt, 1.0f);
-		else if (thing_drawtype == 1)	// Drawtype 1: Round
+		else if (thing_drawtype == TDT_ROUND)	// Drawtype 1: Round
 			renderRoundThing(x, y, angle, tt, 1.0f);
 		else							// Drawtype 0 (or other): Square
-			renderSquareThing(x, y, angle, tt, 1.0f, thing_drawtype != 3);
+			renderSquareThing(x, y, angle, tt, 1.0f, thing_drawtype < TDT_SQUARESPRITE, thing_drawtype == TDT_FRAMEDSPRITE);
 	}
 
 	// Draw thing sprites within squares if that drawtype is set
-	if (thing_drawtype > 2) {
+	if (thing_drawtype > TDT_SPRITE) {
 		glEnable(GL_TEXTURE_2D);
 
 		for (unsigned a = 0; a < things.size(); a++) {

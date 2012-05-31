@@ -248,7 +248,9 @@ void EntryDataFormat::initBuiltinFormats() {
 	new XMModuleDataFormat();
 	new S3MModuleDataFormat();
 	new MODModuleDataFormat();
+	new IMFDataFormat();
 	new DoomSoundDataFormat();
+	new WolfSoundDataFormat();
 	new DoomPCSpeakerDataFormat();
 	new VocDataFormat();
 	new SPDCDataFormat();

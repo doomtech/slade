@@ -522,8 +522,9 @@ bool TextureXEditor::checkTextures() {
 				// Extended texture, check if each patch exists in any open archive (or as a composite texture)
 				for (unsigned p = 0; p < tex->nPatches(); p++) {
 					ArchiveEntry* pentry = theResourceManager->getPatchEntry(tex->getPatch(p)->getName());
+					ArchiveEntry* fentry = theResourceManager->getFlatEntry(tex->getPatch(p)->getName());
 					CTexture* ptex = theResourceManager->getTexture(tex->getPatch(p)->getName());
-					if (!pentry && !ptex)
+					if (!pentry && !fentry && !ptex)
 						problems += S_FMT("Texture %s contains invalid/unknown patch %s\n", CHR(tex->getName()), CHR(tex->getPatch(p)->getName()));
 				}
 			}

@@ -83,6 +83,14 @@ colours {
 		additive = true;
 	}
 
+	map_tagging {
+		name = "Tagging Item(s)";
+		group = "Map Editor";
+		rgb = 255, 0, 100;
+		alpha = 220;
+		additive = true;
+	}
+
 	map_moving {
 		name = "Moving Item(s)";
 		group = "Map Editor";

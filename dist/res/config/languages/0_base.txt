@@ -8,7 +8,7 @@ cstyle {
 	case_sensitive = true;
 
 	keywords = {
-		void, char, short, long, int, float, double, unsigned,
+		void, char, short, long, int, float, double, unsigned, bool,
 		if, else, do, while, for, true, false, return, const, new, delete,
 		until, switch, default, case, continue, break, define, goto,
 		include

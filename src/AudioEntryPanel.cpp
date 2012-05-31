@@ -193,9 +193,11 @@ bool AudioEntryPanel::open() {
 	MemChunk convdata;
 	if (entry->getType()->getFormat() == "snd_doom")			// Doom Sound -> WAV
 		Conversions::doomSndToWav(mcdata, convdata);
+	else if (entry->getType()->getFormat() == "snd_wolf")		// Wolfenstein 3D Sound -> WAV
+		Conversions::wolfSndToWav(mcdata, convdata);
 	else if (entry->getType()->getFormat() == "snd_voc")		// Creative Voice File -> WAV
 		Conversions::vocToWav(mcdata, convdata);
-	else if (entry->getType()->getFormat() == "snd_bloodsfx")	// Creative Voice File -> WAV
+	else if (entry->getType()->getFormat() == "snd_bloodsfx")	// Blood Sound -> WAV
 		Conversions::bloodToWav(entry, convdata);
 	else if (entry->getType()->getFormat() == "mus") {			// MUS -> MIDI
 		Conversions::musToMidi(mcdata, convdata);

@@ -499,6 +499,10 @@ ArchiveEntry* ResourceManager::getPaletteEntry(string palette, Archive* priority
  * or NULL if no match found
  *******************************************************************/
 ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archive* priority) {
+	// Are we wanting to use a flat as a patch?
+	if (!nspace.CmpNoCase("flats"))
+		return getFlatEntry(patch, priority);
+
 	// Check resource with matching name exists
 	EntryResource& res = patches[patch.Upper()];
 	if (res.entries.size() == 0)

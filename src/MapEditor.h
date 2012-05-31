@@ -37,6 +37,10 @@ private:
 	vector<MapLine*>	tagged_lines;
 	vector<MapThing*>	tagged_things;
 
+	// Tagging items
+	vector<MapLine*>	tagging_lines;
+	vector<MapThing*>	tagging_things;
+
 	// Moving
 	fpoint2_t	move_origin;
 	fpoint2_t	move_vec;
@@ -117,6 +121,8 @@ public:
 	vector<MapSector*>&	taggedSectors() { return tagged_sectors; }
 	vector<MapLine*>&	taggedLines() { return tagged_lines; }
 	vector<MapThing*>&	taggedThings() { return tagged_things; }
+	vector<MapLine*>&	taggingLines() { return tagging_lines; }
+	vector<MapThing*>&	taggingThings() { return tagging_things; }
 	bool				hilightLocked() { return hilight_locked; }
 	void				lockHilight(bool lock = true) { hilight_locked = lock; }
 	bool				gridSnap() { return grid_snap; }

@@ -216,12 +216,22 @@ GLTexture* MapTextureManager::getSprite(string name, string translation, string 
 	}
 
 	// Sprite not found, look for it
+	bool found = false;
+	SImage image;
 	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
 	ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "sprites", archive);
 	if (!entry) entry = theResourceManager->getPatchEntry(name, "", archive);
 	if (entry) {
-		SImage image;
+		found = true;
 		Misc::loadImageFromEntry(&image, entry);
+	} else {	// Try composite textures then
+		CTexture* ctex = theResourceManager->getTexture(name, archive);
+		if (ctex && ctex->toImage(image, archive, pal))
+			found = true;
+	}
+
+	// We have a valid image either from an entry or a composite texture.
+	if (found) {
 		// Apply translation
 		if (!translation.IsEmpty()) image.applyTranslation(translation, pal);
 		// Apply palette override
