@@ -1369,8 +1369,8 @@ void MapEditor::createObject(double x, double y) {
 			// Editor message
 			addEditorMessage(S_FMT("Created %d line(s)", selection.size() - 1));
 
-			// Then switch to lines mode
-			setEditMode(MODE_LINES);
+			// Clear selection
+			clearSelection();
 		}
 
 		return;

@@ -66,7 +66,7 @@ CVAR(Bool, map_showfps, false, CVAR_SAVE)
 CVAR(Bool, camera_3d_gravity, true, CVAR_SAVE)
 CVAR(Int, camera_3d_crosshair_size, 6, CVAR_SAVE)
 CVAR(Bool, camera_3d_show_distance, false, CVAR_SAVE)
-CVAR(Int, map_bg_ms, 30, CVAR_SAVE)
+CVAR(Int, map_bg_ms, 15, CVAR_SAVE)
 CVAR(Bool, info_overlay_3d, true, CVAR_SAVE)
 
 // for testing
@@ -150,9 +150,9 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	Bind(wxEVT_MOUSEWHEEL, &MapCanvas::onMouseWheel, this);
 	Bind(wxEVT_LEAVE_WINDOW, &MapCanvas::onMouseLeave, this);
 	Bind(wxEVT_ENTER_WINDOW, &MapCanvas::onMouseEnter, this);
-	Bind(wxEVT_TIMER, &MapCanvas::onRTimer, this);
 	Bind(wxEVT_SET_FOCUS, &MapCanvas::onFocus, this);
 	Bind(wxEVT_KILL_FOCUS, &MapCanvas::onFocus, this);
+	Bind(wxEVT_TIMER, &MapCanvas::onRTimer, this);
 #ifdef USE_SFML_RENDERWINDOW
 	Bind(wxEVT_IDLE, &MapCanvas::onIdle, this);
 #endif
@@ -2529,12 +2529,12 @@ void MapCanvas::onRTimer(wxTimerEvent& e) {
 	// Get time since last redraw
 	long frametime = (sfclock.getElapsedTime().asMilliseconds()) - last_time;
 
-	//if (frametime < fr_idle)
-	//	return;
+	if (frametime < fr_idle)
+		return;
 
 	last_time = (sfclock.getElapsedTime().asMilliseconds());
 	update(frametime);
-	Refresh();
+	//Refresh();
 }
 #endif
 
