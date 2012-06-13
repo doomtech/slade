@@ -240,8 +240,8 @@ void WadArchive::updateNamespaces() {
 		ns.end_index = entryIndex(ns.end);
 
 		// Testing
-		wxLogMessage("Namespace %s from %s (%d) to %s (%d)", CHR(ns.name), 
-			CHR(ns.start->getName()), ns.start_index, CHR(ns.end->getName()), ns.end_index);
+		//wxLogMessage("Namespace %s from %s (%d) to %s (%d)", CHR(ns.name),
+		//	CHR(ns.start->getName()), ns.start_index, CHR(ns.end->getName()), ns.end_index);
 	}
 }
 

@@ -103,7 +103,7 @@ void MapRenderer3D::clearData() {
 	things.clear();
 	floors.clear();
 	ceilings.clear();
-	
+
 	// Clear everything else
 	refresh();
 }
@@ -292,7 +292,7 @@ void MapRenderer3D::setupView(int width, int height) {
 
 	// Calculate up vector
 	fpoint3_t up = cam_strafe.cross(cam_dir3d).normalize();
-	
+
 	// Setup camera view
 	gluLookAt(cam_position.x, cam_position.y, cam_position.z,
 				cam_position.x+cam_dir3d.x, cam_position.y+cam_dir3d.y, cam_position.z+cam_dir3d.z,
@@ -391,7 +391,7 @@ void MapRenderer3D::renderMap() {
 	// Build lists of quads and flats to render
 	checkVisibleFlats();
 	checkVisibleQuads();
-	
+
 	// Render sky
 	if (render_3d_sky)
 		renderSky();
@@ -424,7 +424,7 @@ void MapRenderer3D::renderMap() {
 				render_max_dist = 20000;
 		}
 	}
-	
+
 	// Cleanup gl state
 	glDisable(GL_ALPHA_TEST);
 	glDisable(GL_DEPTH_TEST);
@@ -528,7 +528,7 @@ void MapRenderer3D::renderSky() {
 			tx = 0.125f / ((float)sky->getWidth() / 256.0f);
 		if (sky->getHeight() > 128)
 			ty = 1.0f;
-		
+
 		renderSkySlice(1.0f, 0.5f, 0.0f, 1.0f, size, tx, ty);	// Top
 		renderSkySlice(0.5f, -0.5f, 1.0f, 1.0f, size, tx, ty);	// Middle
 		renderSkySlice(-0.5f, -1.0f, 1.0f, 0.0f, size, tx, ty);	// Bottom
@@ -584,7 +584,7 @@ void MapRenderer3D::updateFlatTexCoords(unsigned index, bool floor) {
 	double sx = 1;
 	double sy = 1;
 	double rot = 0;
-	
+
 	// Check for UDMF + ZDoom extensions
 	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
 		if (floor) {
@@ -674,7 +674,7 @@ void MapRenderer3D::renderFlat(flat_3d_t* flat) {
 	// Skip if no sector (for whatever reason)
 	if (!flat->sector)
 		return;
-		
+
 	// Setup special rendering options
 	float alpha = flat->alpha;
 	if (flat->flags & SKY && render_3d_sky) {
@@ -781,7 +781,7 @@ void MapRenderer3D::renderFlatSelection(vector<selection_3d_t>& selection, float
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_CULL_FACE);
-	
+
 	// Setup colour
 	rgba_t col1 = ColourConfiguration::getColour("map_selection");
 	col1.a *= alpha;
@@ -1283,7 +1283,7 @@ void MapRenderer3D::renderWallSelection(vector<selection_3d_t>& selection, float
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	
+
 	// Setup colour
 	rgba_t col1 = ColourConfiguration::getColour("map_selection");
 	col1.a *= alpha;
@@ -1431,7 +1431,8 @@ void MapRenderer3D::renderThings() {
 		}
 
 		// Update thing if needed
-		if (things[a].updated_time < thing->modifiedTime()) {
+		if (things[a].updated_time < thing->modifiedTime() ||
+			(things[a].sector && things[a].updated_time < things[a].sector->modifiedTime())) {
 			updateThing(a, thing);
 			update++;
 			if (update > 500)
@@ -1467,7 +1468,7 @@ void MapRenderer3D::renderThings() {
 			// Get light level from sector
 			if (things[a].sector)
 				light = things[a].sector->intProperty("lightlevel");
-			
+
 			// Icon, use thing icon colour
 			if (things[a].flags & ICON)
 				col.set(things[a].type->getColour());
@@ -1814,7 +1815,7 @@ selection_3d_t MapRenderer3D::determineHilight() {
 	double min_dist = 9999999;
 	selection_3d_t current;
 	fpoint2_t strafe(cam_position.x+cam_strafe.x, cam_position.y+cam_strafe.y);
-	
+
 	// Check for required map structures
 	if (!map || lines.size() != map->nLines() ||
 		floors.size() != map->nSectors() ||
@@ -1915,7 +1916,7 @@ selection_3d_t MapRenderer3D::determineHilight() {
 		// Ignore if no sprite
 		if (!things[a].sprite)
 			continue;
-			
+
 		// Ignore if not visible
 		MapThing* thing = map->getThing(a);
 		if (MathStuff::lineSide(thing->xPos(), thing->yPos(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0)
