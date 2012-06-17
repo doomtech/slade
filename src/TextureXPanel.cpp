@@ -42,6 +42,8 @@
 #include "KeyBind.h"
 #include "GfxConvDialog.h"
 #include "SplashWindow.h"
+#include "SFileDialog.h"
+#include "ModifyOffsetsDialog.h"
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
 
@@ -834,6 +836,163 @@ void TextureXPanel::exportTexture() {
 	theSplashWindow->hide();
 }
 
+/* TextureXPanel::exportAsPNG
+ * Converts [texture] to a PNG image (if possible) and saves the PNG
+ * data to a file [filename]. Does not alter the texture data itself
+ *******************************************************************/
+bool TextureXPanel::exportAsPNG(CTexture* texture, string filename) {
+	// Check entry was given
+	if (!texture)
+		return false;
+
+	// Create image from entry
+	SImage image;
+	if (!texture->toImage(image)) {
+		wxLogMessage("Error converting %s: %s", CHR(texture->getName()), CHR(Global::error));
+		return false;
+	}
+
+	// Write png data
+	MemChunk png;
+	SIFormat* fmt_png = SIFormat::getFormat("png");
+	if (!fmt_png->saveImage(image, png, texture_editor->getPalette())) {
+		wxLogMessage("Error converting %s", CHR(texture->getName()));
+		return false;
+	}
+
+	// Export file
+	return png.exportFile(filename);
+}
+
+/* TextureXPanel::extractTexture
+ * Create standalone image entries of any selected textures
+ *******************************************************************/
+void TextureXPanel::extractTexture() {
+	// Get selected textures
+	vector<long> selec_num = list_textures->getSelection();
+	vector<CTexture*> selection;
+
+	if (!tx_entry) return;
+
+	saveTEXTUREX();
+
+	Archive * archive = tx_entry->getParent();
+	bool force_rgba = texture_editor->getBlendRGBA();
+
+	// Go through selection
+	for (unsigned a = 0; a < selec_num.size(); ++a) {
+		selection.push_back(texturex.getTexture(selec_num[a]));
+	}
+
+
+	// If we're just exporting one texture
+	if (selection.size() == 1) {
+		string name = Misc::lumpNameToFileName(selection[0]->getName());
+		wxFileName fn(name);
+
+		// Set extension
+		fn.SetExt("png");
+
+		// Run save file dialog
+		SFileDialog::fd_info_t info;
+		if (SFileDialog::saveFile(info, "Export Texture \"" + selection[0]->getName() + "\" as PNG", "PNG Files (*.png)|*.png", this, fn.GetFullName())) {
+			// If a filename was selected, export it
+			if (!exportAsPNG(selection[0], info.filenames[0])) {
+				wxMessageBox(S_FMT("Error: %s", CHR(Global::error)), "Error", wxOK|wxICON_ERROR);
+				return;
+			}
+		}
+
+		return;
+	}
+	else {
+		// Run save files dialog
+		SFileDialog::fd_info_t info;
+		if (SFileDialog::saveFiles(info, "Export Textures as PNG (Filename will be ignored)", "PNG Files (*.png)|*.png", this)) {
+			// Show splash window
+			theSplashWindow->show("Saving converted image data...", true);
+
+			// Go through the selection
+			for (size_t a = 0; a < selection.size(); a++) {
+				// Update splash window
+				theSplashWindow->setProgressMessage(selection[a]->getName());
+				theSplashWindow->setProgress((float)a / (float)selection.size());
+
+				// Setup entry filename
+				wxFileName fn(selection[a]->getName());
+				fn.SetPath(info.path);
+				fn.SetExt("png");
+
+				// Do export
+				exportAsPNG(selection[a], fn.GetFullPath());
+			}
+
+			// Hide splash window
+			theSplashWindow->hide();
+		}
+	}
+}
+
+/* TextureXPanel::modifyOffsets
+ * Changes the offsets for each selected texture. Only for ZDoom!
+ *******************************************************************/
+bool TextureXPanel::modifyOffsets() {
+	if (!tx_entry) return false;
+	saveTEXTUREX();
+
+	// Create modify offsets dialog
+	ModifyOffsetsDialog mod;
+
+	// Run the dialog
+	if (mod.ShowModal() == wxID_CANCEL)
+		return false;
+
+	Archive * archive = tx_entry->getParent();
+	bool force_rgba = texture_editor->getBlendRGBA();
+	bool relative = mod.relativeOffset();
+	bool xc = mod.xOffChange();
+	bool yc = mod.yOffChange();
+	point2_t offsets = mod.getOffset();
+	int align = mod.getAlignType();
+
+	// Go through selection
+	vector<long> selec_num = list_textures->getSelection();
+	for (unsigned a = 0; a < selec_num.size(); ++a) {
+		CTexture * ctex = texturex.getTexture(selec_num[a]);
+		int16_t ofx = offsets.x;
+		int16_t ofy = offsets.y;
+		int w = ctex->getWidth();
+		int h = ctex->getHeight();
+
+		switch (align) {
+			case 0: // Auto Offsets selected: Monster
+				ctex->setOffsetX(w * 0.5);
+				ctex->setOffsetY(h - 4);
+				break;
+			case 1: // Auto Offsets selected: Projectile
+				ctex->setOffsetX(w * 0.5);
+				ctex->setOffsetY(h * 0.5);
+				break;
+			case 2: // Auto Offsets selected: Weapon
+				ctex->setOffsetX(-160 + (w * 0.5));
+				ctex->setOffsetY(-200 + h);
+				break;
+			default: // Set Offsets selected
+				if (relative) {
+					ofx += ctex->getOffsetX();
+					ofy += ctex->getOffsetY();
+				}
+				ctex->setOffsetX(ofx);
+				ctex->setOffsetY(ofy);
+				break;
+
+		}
+		ctex->setState(1);
+	}
+
+	return true;
+}
+
 /* TextureXPanel::handleAction
  * Handles the action [id]. Returns true if the action was handled,
  * false otherwise
@@ -870,8 +1029,12 @@ bool TextureXPanel::handleAction(string id) {
 		paste();
 	else if (id == "txed_export")
 		exportTexture();
+	else if (id == "txed_extract")
+		extractTexture();
 	else if (id == "txed_rename")
 		renameTexture();
+	else if (id == "txed_offsets")
+		modifyOffsets();
 	else
 		return false;	// Not handled here
 
@@ -916,7 +1079,10 @@ void TextureXPanel::onTextureListRightClick(wxListEvent& e) {
 	theApp->getAction("txed_delete")->addToMenu(&context);
 	context.AppendSeparator();
 	theApp->getAction("txed_rename")->addToMenu(&context);
+	if (texturex.getFormat() == TXF_TEXTURES)
+		theApp->getAction("txed_offsets")->addToMenu(&context);
 	theApp->getAction("txed_export")->addToMenu(&context);
+	theApp->getAction("txed_extract")->addToMenu(&context);
 	context.AppendSeparator();
 	theApp->getAction("txed_copy")->addToMenu(&context);
 	theApp->getAction("txed_cut")->addToMenu(&context);

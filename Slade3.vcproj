@@ -121,7 +121,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				PreprocessorDefinitions="WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;NDEBUG;UPDATEREVISION"
+				PreprocessorDefinitions="WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;SFML_STATIC;NDEBUG;UPDATEREVISION"
 				GeneratePreprocessedFile="0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -2333,7 +2333,6 @@
 			</Filter>
 			<Filter
 				Name="sfMod"
-				ParseFiles="false"
 				>
 				<File
 					RelativePath=".\src\sfMod\modplug.h"

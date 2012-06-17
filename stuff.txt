@@ -126,6 +126,9 @@ Translation dialog:
 - Source/destination palette selectable
 - Scroll through multiple preview gfx
 - Allow use with truecolour gfx
+- Tool for trimming blank space around a graphic.
+- Tool for adding blank space to either side as needed to put the x offset right in the center (better for mirrored sprites).
+
 Conversion dialog:
 - Enter and esc mapped to convert all and skip all
 

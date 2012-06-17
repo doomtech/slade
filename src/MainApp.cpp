@@ -436,6 +436,8 @@ void MainApp::initActions() {
 	new SAction("txed_new_file", "New Texture from File", "t_tex_newfile", "Create a new texture from an image file");
 	new SAction("txed_rename", "Rename Texture", "t_tex_rename", "Rename the selected texture(s)");
 	new SAction("txed_export", "Export Texture", "t_tex_export", "Create standalone images from the selected texture(s)");
+	new SAction("txed_extract", "Extract Texture", "t_tex_extract", "Export the selected texture(s) as PNG files");
+	new SAction("txed_offsets", "Modify Offsets", "t_tex_offset", "Mass modify offsets in the selected texture(s)");
 	new SAction("txed_up", "Move Up", "t_up", "Move the selected texture(s) up in the list");
 	new SAction("txed_down", "Move Down", "t_down", "Move the selected texture(s) down in the list");
 	new SAction("txed_copy", "Copy", "t_copy", "Copy the selected texture(s)");

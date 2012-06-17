@@ -794,6 +794,8 @@ bool EntryOperations::addToPatchTable(vector<ArchiveEntry*> entries) {
 
 	// Get parent archive
 	Archive* parent = entries[0]->getParent();
+	if (parent == NULL)
+		return true;
 
 	// Find patch table in parent archive
 	Archive::search_options_t opt;
@@ -807,6 +809,16 @@ bool EntryOperations::addToPatchTable(vector<ArchiveEntry*> entries) {
 			return false;
 
 		pnames = parent->findLast(opt);
+
+		// If the archive already has ZDoom TEXTURES, it might still
+		// not have a PNAMES lump; so create an empty one.
+		if (!pnames) {
+			pnames = new ArchiveEntry("PNAMES.lmp", 4);
+			uint32_t nada = 0;
+			pnames->write(&nada, 4);
+			pnames->seek(0, SEEK_SET);
+			parent->addEntry(pnames);
+		}
 	}
 
 	// Check it isn't locked (texturex editor open or iwad)

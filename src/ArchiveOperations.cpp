@@ -1145,6 +1145,30 @@ CONSOLE_COMMAND(replacespecials, 2) {
 	}
 }
 
+bool replaceTextureString(char * str, string oldtex, string newtex) {
+	bool go = true;
+	for (unsigned c = 0; c < 8; ++c) {
+		if (str[c] != oldtex[c] && oldtex[c] != '?' && oldtex[c] != '*')
+			go = false;
+		if (oldtex[c] == '*')
+			break;
+	}
+	if (go) {
+		for (unsigned i = 0; i < 8; ++i) {
+			if (i < newtex.Len()) {
+				// Keep the rest of the name as-is?
+				if (newtex[i] == '*') break;
+				// Keep just this character as-is?
+				if (newtex[i] == '?') continue;
+				// Else, copy the character
+				str[i] = newtex[i];
+			}
+			else
+				str[i] = 0;
+		}
+	}
+	return go;
+}
 size_t replaceFlatsDoomHexen(ArchiveEntry* entry, string oldtex, string newtex, bool floor, bool ceiling) {
 	if (entry == NULL) return 0;
 
@@ -1155,31 +1179,14 @@ size_t replaceFlatsDoomHexen(ArchiveEntry* entry, string oldtex, string newtex, 
 
 	doomsector_t* sectors = new doomsector_t[numsectors];
 	memcpy(sectors, entry->getData(), size);
-	char compare[9]; compare[8] = 0;
 
 	// Perform replacement
 	for (size_t s = 0; s < numsectors; ++s) {
 		fchanged = cchanged = false;
-		memcpy(compare, sectors[s].f_tex, 8);
-		if (floor && !oldtex.CmpNoCase(compare)) {
-			for (unsigned i = 0; i < 8; ++i) {
-				if (i < newtex.Len())
-					sectors[s].f_tex[i] = newtex[i];
-				else
-					sectors[s].f_tex[i] = 0;
-			}
-			fchanged = true;
-		}
-		memcpy(compare, sectors[s].c_tex, 8);
-		if (ceiling && !oldtex.CmpNoCase(compare)) {
-			for (unsigned i = 0; i < 8; ++i) {
-				if (i < newtex.Len())
-					sectors[s].c_tex[i] = newtex[i];
-				else
-					sectors[s].c_tex[i] = 0;
-			}
-			cchanged = true;
-		}
+		if (floor)
+			fchanged = replaceTextureString(sectors[s].f_tex, oldtex, newtex);
+		if (ceiling)
+			cchanged = replaceTextureString(sectors[s].c_tex, oldtex, newtex);
 		if (fchanged || cchanged)
 			++changed;
 	}
@@ -1205,36 +1212,12 @@ size_t replaceWallsDoomHexen(ArchiveEntry* entry, string oldtex, string newtex, 
 	// Perform replacement
 	for (size_t s = 0; s < numsides; ++s) {
 		lchanged = mchanged = uchanged = false;
-		memcpy(compare, sides[s].tex_lower, 8);
-		if (lower && !oldtex.CmpNoCase(compare)) {
-			for (unsigned i = 0; i < 8; ++i) {
-				if (i < newtex.Len())
-					sides[s].tex_lower[i] = newtex[i];
-				else
-					sides[s].tex_lower[i] = 0;
-			}
-			lchanged = true;
-		}
-		memcpy(compare, sides[s].tex_middle, 8);
-		if (middle && !oldtex.CmpNoCase(compare)) {
-			for (unsigned i = 0; i < 8; ++i) {
-				if (i < newtex.Len())
-					sides[s].tex_middle[i] = newtex[i];
-				else
-					sides[s].tex_middle[i] = 0;
-			}
-			mchanged = true;
-		}
-		memcpy(compare, sides[s].tex_upper, 8);
-		if (upper && !oldtex.CmpNoCase(compare)) {
-			for (unsigned i = 0; i < 8; ++i) {
-				if (i < newtex.Len())
-					sides[s].tex_upper[i] = newtex[i];
-				else
-					sides[s].tex_upper[i] = 0;
-			}
-			uchanged = true;
-		}
+		if (lower)
+			lchanged = replaceTextureString(sides[s].tex_lower, oldtex, newtex);
+		if (middle)
+			mchanged = replaceTextureString(sides[s].tex_middle, oldtex, newtex);
+		if (upper)
+			uchanged = replaceTextureString(sides[s].tex_upper, oldtex, newtex);
 		if (lchanged || mchanged || uchanged)
 			++changed;
 	}
