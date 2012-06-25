@@ -2,7 +2,7 @@
 <CodeLite_Project Name="SLADE" InternalType="Console">
   <Plugins>
     <Plugin Name="qmake">
-      <![CDATA[00040001N0005Debug0000000000000001N0009Debug-osx0000000000000001N0007Release0000000000000001N0011Release-osx000000000000]]>
+      <![CDATA[00050001N0005Debug0000000000000001N0009Debug-osx0000000000000001N0007Release0000000000000001N0013Release-CMake0000000000000001N0011Release-osx000000000000]]>
     </Plugin>
   </Plugins>
   <Description/>
@@ -604,7 +604,7 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion>
+      <Completion EnableCpp11="no">
         <ClangCmpFlags/>
         <ClangPP/>
         <SearchPaths/>
@@ -662,7 +662,7 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion>
+      <Completion EnableCpp11="no">
         <ClangCmpFlags/>
         <ClangPP/>
         <SearchPaths/>
@@ -710,7 +710,46 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion>
+      <Completion EnableCpp11="no">
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release-CMake" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g -Wall" C_Options="" Required="no" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="-O0" Required="no">
+        <LibraryPath Value="."/>
+        <LibraryPath Value="Debug"/>
+      </Linker>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="" IntermediateDirectory="./Debug" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./Debug" PauseExecWhenProcTerminates="no"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="yes">
+        <RebuildCommand/>
+        <CleanCommand>make clean</CleanCommand>
+        <BuildCommand>make</BuildCommand>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand>cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$(WXCONFIG_PATH)/wx-config</MakefileGenerationCommand>
+        <ThirdPartyToolName>Other</ThirdPartyToolName>
+        <WorkingDirectory>/Users/simon/dev/slade/dist</WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no">
         <ClangCmpFlags/>
         <ClangPP/>
         <SearchPaths/>
@@ -760,7 +799,7 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion>
+      <Completion EnableCpp11="no">
         <ClangCmpFlags/>
         <ClangPP/>
         <SearchPaths/>

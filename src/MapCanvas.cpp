@@ -2534,7 +2534,7 @@ void MapCanvas::onRTimer(wxTimerEvent& e) {
 
 	last_time = (sfclock.getElapsedTime().asMilliseconds());
 	update(frametime);
-	//Refresh();
+	Refresh();
 }
 #endif
 
