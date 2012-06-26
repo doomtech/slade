@@ -950,16 +950,16 @@ void MapEditor::doMove(fpoint2_t mouse_pos) {
 	move_vec.set(snapToGrid(dx), snapToGrid(dy));
 }
 
-void MapEditor::endMove() {
+void MapEditor::endMove(bool accept) {
 	// Move depending on edit mode
-	if (edit_mode == MODE_THINGS) {
+	if (edit_mode == MODE_THINGS && accept) {
 		// Move things
 		for (unsigned a = 0; a < move_items.size(); a++) {
 			MapThing* t = map.getThing(move_items[a]);
 			map.moveThing(move_items[a], t->xPos() + move_vec.x, t->yPos() + move_vec.y);
 		}
 	}
-	else {
+	else if (accept) {
 		// Any other edit mode we're technically moving vertices
 
 		// Get list of vertices being moved

@@ -171,7 +171,7 @@ public:
 	fpoint2_t		moveVector() { return move_vec; }
 	bool			beginMove(fpoint2_t mouse_pos);
 	void			doMove(fpoint2_t mouse_pos);
-	void			endMove();
+	void			endMove(bool accept = true);
 
 	// Editing
 	void	copyProperties();

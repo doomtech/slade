@@ -10,7 +10,7 @@ TODO List ---------------------------------------------------------------
 --- Bugs ---
 - Gfx doesn't update after being converted
 - No handling for when a line is moved to overlap another
-- Map editor isn't using custom palettes any more for some reason
+- Map editor isn't using custom palettes any more for some reason (should probably rewrite palette management stuff)
 
 --- Map Editor ---
 - Checks:
@@ -27,6 +27,7 @@ TODO List ---------------------------------------------------------------
 	- Better vis checking
 	- (Z)MAPINFO parsing for sky texture
 	- Thing boxes (might not bother with full boxes unless I add game-accurate 'height' property to thing configurations)
+	- Preferences dialog page
 - Editing:
 	- Proper UDMF/Hexen/Doom64 Map saving (BEHAVIOR, SCRIPTS, DIALOGUE, LIGHTS, MACROS, etc.)
 	- Generalised sector and line specials

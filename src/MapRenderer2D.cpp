@@ -661,7 +661,7 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	}
 
 	// Check if we have to draw the angle arrow later
-	if (tt->isAngled() || thing_force_dir)
+	if (tt->isAngled() || thing_force_dir || things_angles)
 		show_angle = true;
 
 	// If for whatever reason the thing texture doesn't exist, just draw a basic, square thing

@@ -1830,7 +1830,7 @@ void MapCanvas::keyBinds2d(string name) {
 	}
 
 	// Move items (toggle)
-	else if (name == "me2d_move" && mouse_state == MSTATE_NORMAL) {
+	else if (name == "me2d_move") {
 		if (mouse_state == MSTATE_NORMAL) {
 			if (editor->beginMove(mouse_pos_m)) {
 				mouse_state = MSTATE_MOVE;
@@ -1922,6 +1922,27 @@ void MapCanvas::keyBinds2d(string name) {
 	// Change sector texture
 	else if (name == "me2d_sector_change_texture" && editor->editMode() == MapEditor::MODE_SECTORS && mouse_state == MSTATE_NORMAL)
 		changeSectorTexture();
+
+
+	// --- Accept/cancel keys (for special states) ---
+
+	else if (name == "map_edit_accept") {
+		// Accept move
+		if (mouse_state == MSTATE_MOVE) {
+			editor->endMove();
+			mouse_state = MSTATE_NORMAL;
+			renderer_2d->forceUpdate();
+		}
+	}
+
+	else if (name == "map_edit_cancel") {
+		// Cancel move
+		if (mouse_state == MSTATE_MOVE) {
+			editor->endMove(false);
+			mouse_state = MSTATE_NORMAL;
+			renderer_2d->forceUpdate();
+		}
+	}
 
 	// Not handled here, send to editor
 	else if (mouse_state == MSTATE_NORMAL)
