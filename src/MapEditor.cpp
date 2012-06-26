@@ -1262,13 +1262,20 @@ void MapEditor::joinSectors(bool remove_lines) {
 	// Get 'target' sector
 	MapSector* target = map.getSector(selection[0]);
 
+	// Get sectors to merge
+	vector<MapSector*> sectors;
+	getSelectedSectors(sectors);
+
+	// Clear selection
+	clearSelection();
+
 	// Init list of lines
 	vector<MapLine*> lines;
 
-	// Go through selection
-	for (unsigned a = 1; a < selection.size(); a++) {
+	// Go through merge sectors
+	for (unsigned a = 1; a < sectors.size(); a++) {
 		// Go through sector sides
-		MapSector* sector = map.getSector(selection[a]);
+		MapSector* sector = sectors[a];
 		while (sector->connectedSides().size() > 0) {
 			// Set sector
 			MapSide* side = sector->connectedSides()[0];
@@ -1306,9 +1313,6 @@ void MapEditor::joinSectors(bool remove_lines) {
 		addEditorMessage(S_FMT("Joined %d Sectors", selection.size()));
 	else
 		addEditorMessage(S_FMT("Joined %d Sectors (removed %d Lines)", selection.size(), nlines));
-
-	// Clear selection
-	selection.clear();
 }
 
 void MapEditor::changeThingType(int newtype) {

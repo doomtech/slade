@@ -1011,7 +1011,10 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 
 	// Draw any thing direction arrows needed
 	if (things_arrows.size() > 0) {
-		glColor4f(1.0f, 1.0f, 1.0f, alpha * arrow_alpha);
+		rgba_t acol = COL_WHITE;
+		acol.a = 255*alpha*arrow_alpha;
+		acol.set_gl();
+		//glColor4f(1.0f, 1.0f, 1.0f, alpha * arrow_alpha);
 		GLTexture* tex_arrow = theMapEditor->textureManager().getEditorImage("arrow");
 		if (tex_arrow) {
 			glEnable(GL_TEXTURE_2D);
@@ -1021,7 +1024,12 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 				MapThing* thing = map->getThing(things_arrows[a]);
 				if (arrow_colour) {
 					ThingType* tt = theGameConfiguration->thingType(thing->getType());
-					if (tt) glColor4f(tt->getColour().fr(), tt->getColour().fg(), tt->getColour().fb(), alpha * arrow_alpha);
+					if (tt) {
+						acol.set(tt->getColour());
+						acol.a = 255*alpha*arrow_alpha;
+						acol.set_gl(false);
+						//glColor4f(tt->getColour().fr(), tt->getColour().fg(), tt->getColour().fb(), alpha * arrow_alpha);
+					}
 				}
 				x = thing->xPos();
 				y = thing->yPos();
