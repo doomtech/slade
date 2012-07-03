@@ -54,6 +54,12 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+PreferencesDialog* PreferencesDialog::instance = NULL;
+
+
+/*******************************************************************
  * PREFERENCESDIALOG CLASS FUNCTIONS
  *******************************************************************/
 
@@ -195,4 +201,17 @@ void PreferencesDialog::onButtonClicked(wxCommandEvent& e) {
 		applyPreferences();
 	else
 		e.Skip();
+}
+
+void PreferencesDialog::openPreferences(wxWindow* parent) {
+	// Create dialog if needed
+	if (!instance)
+		instance = new PreferencesDialog(parent);
+	else
+		instance->SetParent(parent);
+
+	// Show dialog
+	instance->CenterOnParent();
+	if (instance->ShowModal() == wxID_OK)
+		instance->applyPreferences();
 }

@@ -15,6 +15,9 @@ private:
 	BaseResourceArchivesPanel*	panel_bra;
 	wxButton*					btn_bra_open;
 
+	// Singleton instance
+	static PreferencesDialog*	instance;
+
 public:
 	PreferencesDialog(wxWindow* parent);
 	~PreferencesDialog();
@@ -28,6 +31,9 @@ public:
 	// Events
 	void	onBtnBRAOpenClicked(wxCommandEvent& e);
 	void	onButtonClicked(wxCommandEvent& e);
+
+	// Static functions
+	static void	openPreferences(wxWindow* parent);
 };
 
 #endif//__PREFERENCES_DIALOG_H__

@@ -493,6 +493,7 @@ void MainApp::initActions() {
 	new SAction("mapw_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
 	new SAction("mapw_showproperties", "&Item Properties", "t_properties", "Toggle the Item Properties window", "Ctrl+1");
 	new SAction("mapw_showdrawoptions", "&Shape Draw Options", "t_settings", "Toggle the Shape Drawing Options window", "Ctrl+3");
+	new SAction("mapw_showscripteditor", "Script &Editor", "e_text", "Toggle the Script Editor window", "Ctrl+4");
 	int group_flat_type = SAction::newGroup();
 	new SAction("mapw_flat_none", "Wireframe", "t_flat_w", "Don't show flats (wireframe)", "", SAction::RADIO, -1, group_flat_type);
 	new SAction("mapw_flat_untextured", "Untextured", "t_flat_u", "Show untextured flats", "", SAction::RADIO, -1, group_flat_type);
@@ -505,6 +506,8 @@ void MainApp::initActions() {
 	new SAction("mapw_thing_changetype", "Change Type", "", "Change the currently selected or hilighted thing type(s)");
 	new SAction("mapw_sector_changetexture", "Change Texture", "", "Change the currently selected or hilighted sector texture(s)");
 	new SAction("mapw_item_properties", "Properties", "t_properties", "Edit the currently selected item's properties");
+	new SAction("mapw_script_save", "Save", "t_save", "Save changes to scripts");
+	new SAction("mapw_script_compile", "Compile", "t_compile", "Compile scripts");
 }
 
 /* MainApp::OnInit

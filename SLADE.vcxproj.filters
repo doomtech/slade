@@ -151,6 +151,9 @@
     <Filter Include="Map Editor\GameConfiguration\Configurations\Maps">
       <UniqueIdentifier>{2ab62fca-ce61-4260-8a0b-98bf2d9784c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Map Editor\Script Editor">
+      <UniqueIdentifier>{d49c5796-7d32-4213-adba-acc042385491}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -845,6 +848,9 @@
     </ClCompile>
     <ClCompile Include="src\InfoOverlay3d.cpp">
       <Filter>Map Editor\UI Elements\Overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScriptEditorPanel.cpp">
+      <Filter>Map Editor\Script Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1583,6 +1589,9 @@
     </ClInclude>
     <ClInclude Include="src\InfoOverlay3d.h">
       <Filter>Map Editor\UI Elements\Overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ScriptEditorPanel.h">
+      <Filter>Map Editor\Script Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

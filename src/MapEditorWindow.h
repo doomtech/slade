@@ -11,12 +11,14 @@
 class MapObject;
 class MapObjectPropsPanel;
 class SToolBar;
+class ScriptEditorPanel;
 class MapEditorWindow : public STopWindow, public SActionHandler {
 private:
 	MapCanvas*				map_canvas;
 	MapEditor				editor;
 	MapTextureManager		tex_man;
 	MapObjectPropsPanel*	panel_obj_props;
+	ScriptEditorPanel*		panel_script_editor;
 	Archive::mapdesc_t		mdesc_current;
 
 	// Singleton instance
@@ -46,6 +48,7 @@ public:
 
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);
+	void	loadMapScripts(Archive::mapdesc_t map);
 	bool	saveMap();
 	bool	saveMapAs();
 	void	closeMap();

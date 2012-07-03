@@ -1010,7 +1010,7 @@ bool EntryOperations::convertTextures(vector<ArchiveEntry*> entries) {
  * entry previous to it, otherwise it is imported to a same-name
  * compiled library entry in the acs namespace
  *******************************************************************/
-bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen) {
+bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen, ArchiveEntry* target, wxFrame* parent) {
 	// Check entry was given
 	if (!entry)
 		return false;
@@ -1049,41 +1049,47 @@ bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen) {
 	wxExecute(command, wxEXEC_SYNC);
 
 	// Deal with focus-stealing apps
-	theMainWindow->Raise();
+	if (parent)
+		parent->Raise();
 
 	// Delete source file
 	wxRemoveFile(srcfile);
 
 	// Check it compiled successfully
 	if (wxFileExists(ofile)) {
-		// Check if the script is a map script (BEHAVIOR)
-		if (S_CMPNOCASE(entry->getName(), "SCRIPTS")) {
-			// Get entry before SCRIPTS
-			ArchiveEntry* prev = entry->prevEntry();
+		// If no target entry was given, find one
+		if (!target) {
+			// Check if the script is a map script (BEHAVIOR)
+			if (S_CMPNOCASE(entry->getName(), "SCRIPTS")) {
+				// Get entry before SCRIPTS
+				ArchiveEntry* prev = entry->prevEntry();
 
-			// Create a new entry there if it isn't BEHAVIOR
-			if (!prev || !(S_CMPNOCASE(prev->getName(), "BEHAVIOR")))
-				prev = entry->getParent()->addNewEntry("BEHAVIOR", entry->getParent()->entryIndex(entry));
+				// Create a new entry there if it isn't BEHAVIOR
+				if (!prev || !(S_CMPNOCASE(prev->getName(), "BEHAVIOR")))
+					prev = entry->getParent()->addNewEntry("BEHAVIOR", entry->getParent()->entryIndex(entry));
 
-			// Import compiled script
-			prev->importFile(ofile);
+				// Import compiled script
+				prev->importFile(ofile);
+			}
+			else {
+				// Otherwise, treat it as a library
+
+				// See if the compiled library already exists as an entry
+				Archive::search_options_t opt;
+				opt.match_namespace = "acs";
+				opt.match_name = entry->getName(true);
+				ArchiveEntry* lib = entry->getParent()->findLast(opt);
+
+				// If it doesn't exist, create it
+				if (!lib)
+					lib = entry->getParent()->addEntry(new ArchiveEntry(entry->getName(true) + ".o"), "acs");
+
+				// Import compiled script
+				lib->importFile(ofile);
+			}
 		}
-		else {
-			// Otherwise, treat it as a library
-
-			// See if the compiled library already exists as an entry
-			Archive::search_options_t opt;
-			opt.match_namespace = "acs";
-			opt.match_name = entry->getName(true);
-			ArchiveEntry* lib = entry->getParent()->findLast(opt);
-
-			// If it doesn't exist, create it
-			if (!lib)
-				lib = entry->getParent()->addEntry(new ArchiveEntry(entry->getName(true) + ".o"), "acs");
-
-			// Import compiled script
-			lib->importFile(ofile);
-		}
+		else
+			target->importFile(ofile);
 
 		// Delete compiled script file
 		wxRemoveFile(ofile);

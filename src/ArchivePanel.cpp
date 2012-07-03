@@ -1447,7 +1447,7 @@ bool ArchivePanel::compileACS(bool hexen) {
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
 		// Compile ACS script
-		EntryOperations::compileACS(selection[a], hexen);
+		EntryOperations::compileACS(selection[a], hexen, NULL, theMainWindow);
 	}
 
 	return true;

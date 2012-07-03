@@ -239,6 +239,7 @@
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\RffArchive.cpp" />
     <ClCompile Include="src\SAction.cpp" />
+    <ClCompile Include="src\ScriptEditorPanel.cpp" />
     <ClCompile Include="src\SectorBuilder.cpp" />
     <ClCompile Include="src\SectorInfoOverlay.cpp" />
     <ClCompile Include="src\SectorTextureOverlay.cpp" />
@@ -474,6 +475,7 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RffArchive.h" />
     <ClInclude Include="src\SAction.h" />
+    <ClInclude Include="src\ScriptEditorPanel.h" />
     <ClInclude Include="src\SectorBuilder.h" />
     <ClInclude Include="src\SectorInfoOverlay.h" />
     <ClInclude Include="src\SectorTextureOverlay.h" />

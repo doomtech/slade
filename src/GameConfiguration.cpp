@@ -540,7 +540,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 
 		// Scripting language
 		else if (S_CMPNOCASE(node->getName(), "script_language"))
-			script_language = node->getStringValue();
+			script_language = node->getStringValue().Lower();
 	}
 
 	// Go through all other config sections

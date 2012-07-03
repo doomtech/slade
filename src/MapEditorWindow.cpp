@@ -42,6 +42,7 @@
 #include "SFileDialog.h"
 #include "NodeBuilders.h"
 #include "ShapeDrawPanel.h"
+#include "ScriptEditorPanel.h"
 #include <wx/aui/aui.h>
 
 
@@ -147,6 +148,11 @@ void MapEditorWindow::saveLayout() {
 	pinf = m_mgr->SavePaneInfo(m_mgr->GetPane("shape_draw"));
 	file.Write(S_FMT("\"%s\"\n", CHR(pinf)));
 
+	// Script editor pane
+	file.Write("\"script_editor\" ");
+	pinf = m_mgr->SavePaneInfo(m_mgr->GetPane("script_editor"));
+	file.Write(S_FMT("\"%s\"\n", CHR(pinf)));
+
 	// Close file
 	file.Close();
 }
@@ -195,6 +201,7 @@ void MapEditorWindow::setupLayout() {
 	theApp->getAction("mapw_showproperties")->addToMenu(menu_view);
 	theApp->getAction("mapw_showconsole")->addToMenu(menu_view);
 	theApp->getAction("mapw_showdrawoptions")->addToMenu(menu_view);
+	theApp->getAction("mapw_showscripteditor")->addToMenu(menu_view);
 	menu->Append(menu_view, "View");
 
 	SetMenuBar(menu);
@@ -286,6 +293,21 @@ void MapEditorWindow::setupLayout() {
 	m_mgr->AddPane(panel_shapedraw, p_inf);
 
 
+	// --- Script Editor Panel ---
+	panel_script_editor = new ScriptEditorPanel(this);
+
+	// Setup panel info & add panel
+	p_inf.Float();
+	p_inf.BestSize(300, 300);
+	p_inf.FloatingSize(500, 400);
+	p_inf.FloatingPosition(150, 150);
+	p_inf.MinSize(300, 300);
+	p_inf.Show(true);
+	p_inf.Caption("Script Editor");
+	p_inf.Name("script_editor");
+	m_mgr->AddPane(panel_script_editor, p_inf);
+
+
 	// Load previously saved window layout
 	loadLayout();
 
@@ -326,6 +348,9 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	if (ok) {
 		mdesc_current = map;
 
+		// Load scripts if any
+		loadMapScripts(map);
+
 		// Lock map entries
 		lockMapEntries();
 
@@ -338,6 +363,28 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	}
 
 	return ok;
+}
+
+void MapEditorWindow::loadMapScripts(Archive::mapdesc_t map) {
+	// Don't bother if no scripting language specified
+	if (theGameConfiguration->scriptLanguage().IsEmpty())
+		return;
+
+	// Go through map entries
+	ArchiveEntry* entry = map.head->nextEntry();
+	while (entry && entry != map.end->nextEntry()) {
+		// Check for SCRIPTS
+		if (theGameConfiguration->scriptLanguage() == "acs_hexen" ||
+			theGameConfiguration->scriptLanguage() == "acs_zdoom") {
+			if (S_CMPNOCASE(entry->getName(), "SCRIPTS"))
+				panel_script_editor->openScripts(entry);
+			if (S_CMPNOCASE(entry->getName(), "BEHAVIOR"))
+				panel_script_editor->setCompiledEntry(entry);
+		}
+
+		// Next entry
+		entry = entry->nextEntry();
+	}
 }
 
 bool nb_warned = false;
@@ -419,6 +466,26 @@ bool MapEditorWindow::saveMap() {
 	else // TODO: doom64
 		return false;
 
+	// Check script language
+	bool acs = false;
+	if (theGameConfiguration->scriptLanguage() == "acs_hexen" ||
+		theGameConfiguration->scriptLanguage() == "acs_zdoom")
+		acs = true;
+
+	// Get current SCRIPTS and BEHAVIOUR entries (if ACS)
+	ArchiveEntry* scripts = NULL;
+	ArchiveEntry* behavior = NULL;
+	ArchiveEntry* entry = mdesc_current.head->nextEntry();
+	if (acs) {
+		while (entry && entry != mdesc_current.end->nextEntry()) {
+			if (S_CMPNOCASE(entry->getName(true), "SCRIPTS"))
+				scripts = entry;
+			else if (S_CMPNOCASE(entry->getName(true), "BEHAVIOR"))
+				behavior = entry;
+			entry = entry->nextEntry();
+		}
+	}
+
 	// Add map data to temporary wad
 	Archive* wad = new WadArchive();
 	wad->addNewEntry("MAP01");
@@ -426,6 +493,10 @@ bool MapEditorWindow::saveMap() {
 		wad->addEntry(map_data[a]);
 	if (theGameConfiguration->getMapFormat() == MAP_UDMF)
 		wad->addNewEntry("ENDMAP");
+	if (behavior)
+		wad->addEntry(behavior, "", true);
+	if (scripts)
+		wad->addEntry(scripts, "", true);
 
 	// Check for map archive
 	Archive* tempwad = NULL;
@@ -447,7 +518,7 @@ bool MapEditorWindow::saveMap() {
 	lockMapEntries(false);
 
 	// Delete current map entries
-	ArchiveEntry* entry = map.end;
+	entry = map.end;
 	Archive* archive = map.head->getParent();
 	while (entry && entry != map.head) {
 		ArchiveEntry* prev = entry->prevEntry();
@@ -468,6 +539,19 @@ bool MapEditorWindow::saveMap() {
 	else {
 		// Update map description
 		mdesc_current.end = entry;
+	}
+
+	// Update script editor
+	if (acs) {
+		entry = mdesc_current.head->nextEntry();
+		while (entry && entry != mdesc_current.end->nextEntry()) {
+			if (S_CMPNOCASE(entry->getName(true), "SCRIPTS"))
+				panel_script_editor->setScriptEntry(entry);
+			else if (S_CMPNOCASE(entry->getName(true), "BEHAVIOR"))
+				panel_script_editor->setCompiledEntry(entry);
+
+			entry = entry->nextEntry();
+		}
 	}
 
 	// Lock current map entries
@@ -579,9 +663,7 @@ bool MapEditorWindow::handleAction(string id) {
 
 	// Editor->Preferences
 	if (id == "mapw_preferences") {
-		PreferencesDialog pd(this);
-		if (pd.ShowModal() == wxID_OK)
-			pd.applyPreferences();
+		PreferencesDialog::openPreferences(this);
 		theMainWindow->getArchiveManagerPanel()->refreshAllTabs();
 
 		return true;
@@ -629,6 +711,26 @@ bool MapEditorWindow::handleAction(string id) {
 		p_inf.Show(!p_inf.IsShown());
 		map_canvas->SetFocus();
 
+		m_mgr->Update();
+		return true;
+	}
+
+	// View->Script Editor
+	else if (id == "mapw_showscripteditor") {
+		wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+		wxAuiPaneInfo& p_inf = m_mgr->GetPane("script_editor");
+
+		// Toggle window and focus
+		if (p_inf.IsShown()) {
+			p_inf.Show(false);
+			map_canvas->SetFocus();
+		}
+		else {
+			p_inf.Show(true);
+			p_inf.window->SetFocus();
+		}
+
+		p_inf.MinSize(200, 128);
 		m_mgr->Update();
 		return true;
 	}

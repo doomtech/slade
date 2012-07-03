@@ -532,9 +532,7 @@ bool MainWindow::handleAction(string id) {
 
 	// Editor->Preferences
 	if (id == "main_preferences") {
-		PreferencesDialog pd(this);
-		if (pd.ShowModal() == wxID_OK)
-			pd.applyPreferences();
+		PreferencesDialog::openPreferences(this);
 		panel_archivemanager->refreshAllTabs();
 
 		return true;

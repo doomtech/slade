@@ -1266,7 +1266,7 @@ void MapCanvas::update(long frametime) {
 #ifdef USE_SFML_RENDERWINDOW
 	// SFML RenderWindow can handle high framerates better than wxGLCanvas, or something like that
 	if (mode_anim || fade_anim || overlay_fade_anim || anim_running)
-		fr_idle = 0;
+		fr_idle = 2;
 	else	// No high-priority animations running, throttle framerate
 		fr_idle = map_bg_ms;
 #else
