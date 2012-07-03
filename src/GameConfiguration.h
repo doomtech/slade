@@ -77,6 +77,7 @@ private:
 	bool			mix_tex_flats;
 	bool			tx_textures;
 	string			sky_flat;
+	string			script_language;
 
 	struct gconf_t {
 		string	title;
@@ -147,6 +148,7 @@ public:
 	bool	txTextures() { return tx_textures; }
 	string	udmfNamespace();
 	string	skyFlat() { return sky_flat; }
+	string	scriptLanguage() { return script_language; }
 
 	string			readConfigName(MemChunk& mc);
 	void			init();

@@ -891,7 +891,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	if (thing_shadow > 0.01f && thing_drawtype != TDT_SPRITE) {
 		glEnable(GL_TEXTURE_2D);
 		GLTexture* tex_shadow = theMapEditor->textureManager().getEditorImage("thing/shadow");
-		if (thing_drawtype == TDT_SQUARE || thing_drawtype == TDT_SQUARESPRITE)
+		if (thing_drawtype == TDT_SQUARE || thing_drawtype == TDT_SQUARESPRITE || thing_drawtype == TDT_FRAMEDSPRITE)
 			tex_shadow = theMapEditor->textureManager().getEditorImage("thing/square/shadow");
 		if (tex_shadow) {
 			tex_shadow->bind();

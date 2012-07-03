@@ -60,6 +60,7 @@ void GameConfiguration::setDefaults() {
 	defaults_thing.clear();
 	maps.clear();
 	sky_flat = "F_SKY1";
+	script_language = "";
 }
 
 string GameConfiguration::udmfNamespace() {
@@ -536,6 +537,10 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 		// Sky flat
 		else if (S_CMPNOCASE(node->getName(), "sky_flat"))
 			sky_flat = node->getStringValue();
+
+		// Scripting language
+		else if (S_CMPNOCASE(node->getName(), "script_language"))
+			script_language = node->getStringValue();
 	}
 
 	// Go through all other config sections
