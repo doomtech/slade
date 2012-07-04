@@ -237,6 +237,9 @@ void TextEditor::setup() {
 	StyleSetChangeable(wxSTC_STYLE_CALLTIP, true);
 	wxFont font_ct(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	StyleSetFont(wxSTC_STYLE_CALLTIP, font_ct);
+	CallTipSetBackground(wxColour(255, 255, 180));
+	CallTipSetForeground(wxColour(0, 0, 0));
+	CallTipSetForegroundHighlight(wxColour(0, 0, 200));
 
 	// Set lexer
 	if (txed_syntax_hilight)
@@ -547,10 +550,6 @@ void TextEditor::updateCalltip() {
 	if (!language)
 		return;
 
-	// Abort if calltips are unwanted
-	if (!txed_calltips_parenthesis)
-		return;
-
 	if (!CallTipActive()) {
 		// No calltip currently showing, check if we're in a function
 		int pos = GetCurrentPos() - 1;
@@ -715,8 +714,9 @@ void TextEditor::onCharAdded(wxStyledTextEvent& e) {
 		}
 
 		// Comma, possibly update calltip
-		if (e.GetKey() == ',') {
-			if (CallTipActive())
+		if (e.GetKey() == ',' && txed_calltips_parenthesis) {
+			//openCalltip(GetCurrentPos());
+			//if (CallTipActive())
 				updateCalltip();
 		}
 	}

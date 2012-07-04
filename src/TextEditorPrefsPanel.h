@@ -14,6 +14,8 @@ private:
 	wxCheckBox*	cb_brace_match;
 	wxSpinCtrl*	spin_right_margin;
 	wxCheckBox*	cb_indent_guides;
+	wxCheckBox*	cb_calltips_mouse;
+	wxCheckBox*	cb_calltips_parenthesis;
 
 public:
 	TextEditorPrefsPanel(wxWindow* parent);

@@ -44,6 +44,8 @@ EXTERN_CVAR(Int, txed_edge_column)
 EXTERN_CVAR(Bool, txed_indent_guides)
 EXTERN_CVAR(String, txed_style_set)
 EXTERN_CVAR(Bool, txed_trim_whitespace)
+EXTERN_CVAR(Bool, txed_calltips_mouse)
+EXTERN_CVAR(Bool, txed_calltips_parenthesis)
 
 
 /*******************************************************************
@@ -100,12 +102,22 @@ TextEditorPrefsPanel::TextEditorPrefsPanel(wxWindow* parent) : PrefsPanelBase(pa
 	cb_brace_match = new wxCheckBox(this, -1, "Hilight Matching Braces");
 	sizer->Add(cb_brace_match, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Calltips on mouse hover
+	cb_calltips_mouse = new wxCheckBox(this, -1, "Show calltips on mouse hover");
+	sizer->Add(cb_calltips_mouse, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Calltips on parenthesis
+	cb_calltips_parenthesis = new wxCheckBox(this, -1, "Show calltips on opening parenthesis");
+	sizer->Add(cb_calltips_parenthesis, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
 	// Init controls
 	cb_auto_indent->SetValue(txed_auto_indent);
 	cb_trim_whitespace->SetValue(txed_trim_whitespace);
 	cb_syntax_hilight->SetValue(txed_syntax_hilight);
 	cb_indent_guides->SetValue(txed_indent_guides);
 	cb_brace_match->SetValue(txed_brace_match);
+	cb_calltips_mouse->SetValue(txed_calltips_mouse);
+	cb_calltips_parenthesis->SetValue(txed_calltips_parenthesis);
 }
 
 /* TextEditorPrefsPanel::~TextEditorPrefsPanel
@@ -125,4 +137,6 @@ void TextEditorPrefsPanel::applyPreferences() {
 	txed_brace_match = cb_brace_match->GetValue();
 	txed_tab_width = spin_tab_width->GetValue();
 	txed_edge_column = spin_right_margin->GetValue();
+	txed_calltips_mouse = cb_calltips_mouse->GetValue();
+	txed_calltips_parenthesis = cb_calltips_parenthesis->GetValue();
 }

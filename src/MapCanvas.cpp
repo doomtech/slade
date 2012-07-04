@@ -127,8 +127,6 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 #else
 	setVerticalSyncEnabled(false);
 #endif
-#else
-	timer.Start(2);
 #endif
 
 	// Bind Events
@@ -156,6 +154,8 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 #ifdef USE_SFML_RENDERWINDOW
 	Bind(wxEVT_IDLE, &MapCanvas::onIdle, this);
 #endif
+
+	timer.Start(2);
 }
 
 /* MapCanvas::~MapCanvas
