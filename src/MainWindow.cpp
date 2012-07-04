@@ -533,7 +533,6 @@ bool MainWindow::handleAction(string id) {
 	// Editor->Preferences
 	if (id == "main_preferences") {
 		PreferencesDialog::openPreferences(this);
-		panel_archivemanager->refreshAllTabs();
 
 		return true;
 	}

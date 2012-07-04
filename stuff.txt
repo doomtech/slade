@@ -11,7 +11,7 @@ TODO List ---------------------------------------------------------------
 - Gfx doesn't update after being converted
 - No handling for when a line is moved to overlap another
 - Map editor isn't using custom palettes any more for some reason (should probably rewrite palette management stuff)
-- Calltips in text editor are case-sensitive even when the language isn't
+
 
 --- Map Editor ---
 - Checks:

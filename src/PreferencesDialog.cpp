@@ -50,6 +50,7 @@
 #include "NodesPrefsPanel.h"
 #include "InputPrefsPanel.h"
 #include "Icons.h"
+#include "MainWindow.h"
 #include <wx/gbsizer.h>
 
 
@@ -214,4 +215,5 @@ void PreferencesDialog::openPreferences(wxWindow* parent) {
 	instance->CenterOnParent();
 	if (instance->ShowModal() == wxID_OK)
 		instance->applyPreferences();
+	theMainWindow->getArchiveManagerPanel()->refreshAllTabs();
 }

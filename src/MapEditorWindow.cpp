@@ -664,7 +664,6 @@ bool MapEditorWindow::handleAction(string id) {
 	// Editor->Preferences
 	if (id == "mapw_preferences") {
 		PreferencesDialog::openPreferences(this);
-		theMainWindow->getArchiveManagerPanel()->refreshAllTabs();
 
 		return true;
 	}

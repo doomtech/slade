@@ -356,9 +356,17 @@ bool TextLanguage::isFunction(string word) {
  *******************************************************************/
 TLFunction* TextLanguage::getFunction(string name) {
 	// Find function matching [name]
-	for (unsigned a = 0; a < functions.size(); a++) {
-		if (functions[a]->getName() == name)
-			return functions[a];
+	if (case_sensitive) {
+		for (unsigned a = 0; a < functions.size(); a++) {
+			if (functions[a]->getName() == name)
+				return functions[a];
+		}
+	}
+	else {
+		for (unsigned a = 0; a < functions.size(); a++) {
+			if (S_CMPNOCASE(functions[a]->getName(), name))
+				return functions[a];
+		}
 	}
 
 	// Not found

@@ -77,6 +77,10 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	text_area->Bind(wxEVT_STC_UPDATEUI, &TextEntryPanel::onUpdateUI, this);
 	cb_wordwrap->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextEntryPanel::onWordWrapChanged, this);
 
+	// Custom toolbar
+	custom_menu_name = "Text";
+	custom_toolbar_actions = "arch_scripts_compileacs;arch_scripts_compilehacs";
+
 	Layout();
 }
 
