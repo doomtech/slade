@@ -6,7 +6,7 @@
       <Project Name="SLADE" ConfigName="Debug"/>
       <Project Name="SLADE" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Project Name="SLADE" ConfigName="Release"/>
       <Project Name="SLADE" ConfigName="Release"/>
     </WorkspaceConfiguration>
@@ -18,7 +18,7 @@
       <Project Name="SLADE-osx" ConfigName="Release"/>
       <Project Name="SLADE" ConfigName="Debug-osx"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release-CMake" Selected="yes">
+    <WorkspaceConfiguration Name="Release-CMake" Selected="no">
       <Project Name="SLADE" ConfigName="Release-CMake"/>
     </WorkspaceConfiguration>
   </BuildMatrix>

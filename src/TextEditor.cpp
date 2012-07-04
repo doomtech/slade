@@ -235,7 +235,8 @@ void TextEditor::setup() {
 	StyleSet::applyCurrent(this);
 	CallTipUseStyle(10);
 	StyleSetChangeable(wxSTC_STYLE_CALLTIP, true);
-	StyleSetFont(wxSTC_STYLE_CALLTIP, wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+	wxFont font_ct(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	StyleSetFont(wxSTC_STYLE_CALLTIP, font_ct);
 
 	// Set lexer
 	if (txed_syntax_hilight)
