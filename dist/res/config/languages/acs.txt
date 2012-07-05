@@ -226,8 +226,9 @@ acs_z : acs {
 		APROP_TargetTID, APROP_TracerTID, APROP_Waterlevel, APROP_ScaleX, APROP_ScaleY, 
 		APROP_Dormant, APROP_Mass, APROP_Accuracy, APROP_Stamina, 
 
-		STYLE_None, STYLE_Normal, STYLE_Fuzzy, STYLE_SoulTrans, STYLE_OptFuzzy, 
-		STYLE_Translucent, STYLE_Add, 
+		STYLE_None, STYLE_Normal, STYLE_Fuzzy, STYLE_SoulTrans, STYLE_Stencil, 
+		STYLE_OptFuzzy, STYLE_Translucent, STYLE_Add, STYLE_Shaded, 
+		STYLE_TranslucentStencil,
 
 		LEVELINFO_PAR_TIME, LEVELINFO_CLUSTERNUM, LEVELINFO_LEVELNUM, 
 		LEVELINFO_TOTAL_SECRETS, LEVELINFO_FOUND_SECRETS, LEVELINFO_TOTAL_ITEMS, 

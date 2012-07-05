@@ -110,12 +110,23 @@ void AdvancedPrefsPanel::applyPreferences() {
 	get_cvar_list(cvars);
 
 	for (unsigned a = 0; a < cvars.size(); a++) {
-		// Check if cvar value was even modified
-		if (!pg_cvars->GetProperty(cvars[a])->HasFlag(wxPG_PROP_MODIFIED))
-			continue;
-
 		// Get cvar
 		CVar* cvar = get_cvar(cvars[a]);
+
+		// Check if cvar value was even modified
+		if (!pg_cvars->GetProperty(cvars[a])->HasFlag(wxPG_PROP_MODIFIED)) {
+			// If unmodified, it might still have been changed in another panel, so refresh it
+			if (cvar->type == CVAR_BOOLEAN)
+				pg_cvars->SetPropertyValue(cvars[a], cvar->GetValue().Bool);
+			else if (cvar->type == CVAR_INTEGER)
+				pg_cvars->SetPropertyValue(cvars[a], cvar->GetValue().Int);
+			else if (cvar->type == CVAR_FLOAT)
+				pg_cvars->SetPropertyValue(cvars[a], cvar->GetValue().Float);
+			else if (cvar->type == CVAR_STRING)
+				pg_cvars->SetPropertyValue(cvars[a], S_FMT("%s", CHR(((CStringCVar *)cvar)->value)));
+
+			continue;
+		}
 
 		// Read value from grid depending on type
 		wxVariant value = pg_cvars->GetPropertyValue(cvars[a]);

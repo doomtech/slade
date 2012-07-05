@@ -40,6 +40,13 @@
 #include <wx/clrpicker.h>
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+CVAR(Float, col_greyscale_r, 0.299, CVAR_SAVE)
+CVAR(Float, col_greyscale_g, 0.587, CVAR_SAVE)
+CVAR(Float, col_greyscale_b, 0.114, CVAR_SAVE)
+
+/*******************************************************************
  * PALETTECOLOURISEDIALOG CLASS
  *******************************************************************
  A simple dialog for the 'Colourise' function, allows the user to
@@ -540,7 +547,7 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 	custom_menu_name = "Palette";
 
 	// Setup custom toolbar
-	custom_toolbar_actions = "ppal_addcustom;ppal_exportas;ppal_importfrom;ppal_colourise;ppal_tint;ppal_tweak;ppal_invert;ppal_test;ppal_generate;ppal_duplicate;ppal_remove;ppal_removeothers;ppal_moveup;ppal_movedown";
+	custom_toolbar_actions = "ppal_addcustom;ppal_exportas;ppal_importfrom;ppal_tweak;ppal_test;ppal_generate;ppal_duplicate;ppal_remove;ppal_removeothers;ppal_moveup;ppal_movedown";
 
 	// Bind events
 	btn_nextpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnNextPal, this);
@@ -625,7 +632,7 @@ string PaletteEntryPanel::statusString() {
 	rgba_t col = pal_canvas->getSelectedColour();
 	hsl_t col2 = Misc::rgbToHsl(col);
 
-	return S_FMT("Index %i\tR %d, G %d, B %d\tH %1.3f, S: %1.3f, L %1.3f",
+	return S_FMT("Index %i\tR %d, G %d, B %d\tH %1.3f, S %1.3f, L %1.3f",
 		pal_canvas->getSelectionStart(),
 		col.r, col.g, col.b, col2.h, col2.s, col2.l);
 }
@@ -910,6 +917,96 @@ bool PaletteEntryPanel::invert() {
 	return true;
 }
 
+#include "SIFormat.h"
+/* PaletteEntryPanel::generateColormaps
+ * Generates a COLORMAP lump from the current palette
+ *******************************************************************/
+#define GREENMAP 255
+#define GRAYMAP 32
+#define DIMINISH(color, level) color = (uint8_t)((((float)color)*(32.0-level)+16.0)/32.0)
+bool PaletteEntryPanel::generateColormaps() {
+	if (!entry || !entry->getParent() || ! palettes[0])
+		return false;
+
+	MemChunk mc;
+	SImage img;
+	MemChunk imc;
+	mc.reSize(34*256);
+	mc.seek(0, SEEK_SET);
+	imc.reSize(34*256*4);
+	imc.seek(0, SEEK_SET);
+	uint8_t rgba[4];
+	rgba[3] = 255;
+
+	rgba_t rgb;
+	float grey;
+	// Generate 34 maps: the first 32 for diminishing light levels,
+	// the 33th for the inverted grey map used by invulnerability.
+	// The 34th colormap remains empty and black.
+	for (size_t l = 0; l < 34; ++l) {
+		for (size_t c = 0; c < 256; ++c) {
+			rgb = palettes[0]->colour(c);
+			if (l < 32) {
+				// Generate light maps
+				DIMINISH(rgb.r, l);
+				DIMINISH(rgb.g, l);
+				DIMINISH(rgb.b, l);
+#if (0)
+			} else if (l == GREENMAP) {
+				// Point of mostly useless trivia: the green "light amp" colormap in the Press Release beta
+				// have colors that, on average, correspond to a bit less than (R*75/256, G*225/256, B*115/256)
+#endif
+			} else if (l == GRAYMAP) {
+				// Generate inverse map
+				grey = ((float)rgb.r/256.0 * col_greyscale_r) + ((float)rgb.g/256.0 * col_greyscale_g) + ((float)rgb.b/256.0 * col_greyscale_b);
+				grey = 1.0 - grey;
+				// Clamp value: with Id Software's values, the sum is greater than 1.0 (0.299+0.587+0.144=1.030)
+				// This means the negation above can give a negative value (for example, with RGB values of 247 or more), 
+				// which will not be converted correctly to unsigned 8-bit int in the rgba_t struct.
+				if (grey < 0.0) grey = 0;
+				rgb.r = rgb.g = rgb.b = grey*255;
+			} else {
+				// Fill with 0
+				rgb = palettes[0]->colour(0);
+			}
+			rgba[0] = rgb.r; rgba[1] = rgb.g; rgba[2] = rgb.b;
+			imc.write(&rgba, 4);
+			mc[(256*l)+c] = palettes[0]->nearestColour(rgb);
+		}
+	}
+#if 0
+	// Create truecolor image
+	uint8_t * imd = new uint8_t[256*34*4];
+	memcpy(imd, imc.getData(), 256*34*4);
+	img.setImageData(imd, 256, 34, RGBA);
+	// imd will be freed by img's destructor
+	ArchiveEntry * tcolormap;
+	string name = entry->getName(true) + "-tcm.png";
+	tcolormap = new ArchiveEntry(name);
+	if (tcolormap) {
+		entry->getParent()->addEntry(tcolormap);
+		SIFormat::getFormat("png")->saveImage(img, tcolormap->getMCData());
+		EntryType::detectEntryType(tcolormap);
+	}
+#endif
+	// Now override or create new entry
+	ArchiveEntry * colormap;
+	colormap = entry->getParent()->getEntry("COLORMAP", true);
+	bool preexisting = colormap != NULL;
+	if (!colormap) {
+		// We need to create this entry
+		colormap = new ArchiveEntry("COLORMAP.lmp", 34*256);
+	}
+	if (!colormap)
+		return false;
+	colormap->importMemChunk(mc);
+	if (!preexisting) {
+		entry->getParent()->addEntry(colormap);
+	}
+	return true;
+}
+#undef DIMINISH
+
 /* PaletteEntryPanel::generatePalette
  * Just a helper for generatePalettes to make the code less redundant
  *******************************************************************/
@@ -1030,6 +1127,12 @@ bool PaletteEntryPanel::handleAction(string id) {
 		return true;
 	}
 
+	// Generate Colormaps
+	if (id == "ppal_colormap") {
+		generateColormaps();
+		return true;
+	}
+
 	// Colourise
 	else if (id == "ppal_colourise") {
 		colourise();
@@ -1114,6 +1217,7 @@ bool PaletteEntryPanel::fillCustomMenu(wxMenu * custom) {
 	theApp->getAction("ppal_duplicate")->addToMenu(custom);
 	theApp->getAction("ppal_remove")->addToMenu(custom);
 	theApp->getAction("ppal_removeothers")->addToMenu(custom);
+	theApp->getAction("ppal_colormap")->addToMenu(custom);
 	custom->AppendSeparator();
 	theApp->getAction("ppal_moveup")->addToMenu(custom);
 	theApp->getAction("ppal_movedown")->addToMenu(custom);

@@ -14,7 +14,7 @@ enum CVarType {
 union CVarValue {
 	int Int;
 	bool Bool;
-	float Float;
+	double Float;
 	const char* String;
 };
 
@@ -69,14 +69,14 @@ public:
 
 class CFloatCVar : public CVar {
 public:
-	float value;
+	double value;
 
-	CFloatCVar(string NAME, float defval, uint16_t FLAGS);
+	CFloatCVar(string NAME, double defval, uint16_t FLAGS);
 	~CFloatCVar(){}
 
-	inline operator float () const { return value; }
-	inline float operator *() const { return value; }
-	inline float operator= (float val) { value = val; return val; }
+	inline operator double () const { return value; }
+	inline double operator *() const { return value; }
+	inline double operator= (double val) { value = val; return val; }
 
 	CVarValue GetValue() { CVarValue val; val.Float = value; return val; }
 };

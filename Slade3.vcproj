@@ -273,6 +273,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ColorimetryPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ColorimetryPrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ColourPrefsPanel.cpp"
 					>
 				</File>
@@ -979,6 +987,14 @@
 			</File>
 			<File
 				RelativePath=".\src\NodeBuilders.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ScriptEditorPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ScriptEditorPanel.h"
 				>
 			</File>
 			<File
@@ -1879,6 +1895,14 @@
 				<Filter
 					Name="Palette"
 					>
+					<File
+						RelativePath=".\src\CIEDeltaEquations.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\CIEDeltaEquations.h"
+						>
+					</File>
 					<File
 						RelativePath=".\src\Palette.cpp"
 						>

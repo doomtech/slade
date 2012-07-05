@@ -11,6 +11,7 @@ TODO List ---------------------------------------------------------------
 - Gfx doesn't update after being converted
 - No handling for when a line is moved to overlap another
 - Map editor isn't using custom palettes any more for some reason (should probably rewrite palette management stuff)
+	- Double-check that, it works for me.
 
 
 --- Map Editor ---
@@ -145,6 +146,7 @@ Conversion dialog:
 --- General ---
 - Support for LZMA, Bzip2 and zip formats other than store and deflate
 - Mass research & replace of map elements (thing numbers, texture or flat names) across a map or all the maps of an archive
+	- Mostly done, still needs UDMF implementation and a solid UI for selecting maps to change, what to replace, and with what.
 
 
 
@@ -156,6 +158,8 @@ Ideas / Possible Features -----------------------------------------------
 - Hex editor
 - Font editor
 - Better UI for palette editing tools (something like the color remap maybe?)
+- UI for creating custom colormaps (with other settings than dcolors.c's)
+- Merge "Tint" and "Colourize" into a versatile image recolour feature with RGB, HSL, and Lab tweak options as well.
 - *Project system:
 	- Hide/abstract underlying archive/entry stuff
 	- Will need to specify a 'game' for the project to enable/disable certain features:
@@ -196,6 +200,17 @@ Ideas / Possible Features -----------------------------------------------
 	- AudioEntryPanel: loads all selected entries as a playlist
 - Full DECORATE editor (would go nicely with the project system above)
 - DeHackEd editor (could be an outgrowth of the DECORATE editor since it'd require actor/state management)
+- Feature to dump map information (number of vertices (+ nodebuilder vertices), of linedefs, of sidedefs, of sectors, of segs, of things)
+	- Report on flats and textures used (which ones, and how many times)
+	- Report on thing placement (using game configuration to name and categorize things)
+	- Report specials used in map (both linedefs and, if appropriate, things, using game config to name and categorize specials)
+	- Ideally would allow to output in a wiki syntax to help make the tables used in the Doom Wiki.
+- Waiting For SladeScript(tm), in four steps:
+	- Console commands to perform archive management actions (opening or creating archives, saving, importing files, exporting entries, copying, renaming, etc.)
+	- Console commands aliases (like in ZDoom)
+	- Console command batches (run all commands contained in a file or a lump)
+	- Script mode: command-line options to (1) run a console command batch at startup and optionally also (2) quit once the batch is finished.
+		- Bonus fifth step: interpret DeuTex scripts, allowing SLADE to replace that outdated tool in projects like Hacx and Freedoom.
 
 
 Other / Notes -----------------------------------------------------------

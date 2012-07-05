@@ -30,8 +30,10 @@ namespace Misc {
 	uint32_t	crc(const uint8_t *buf, uint32_t len);
 	hsl_t		rgbToHsl(double r, double g, double b);
 	rgba_t		hslToRgb(double h, double s, double t);
+	lab_t		rgbToLab(double r, double g, double b);
 	hsl_t		rgbToHsl(rgba_t rgba);
 	rgba_t		hslToRgb(hsl_t hsl);
+	lab_t		rgbToLab(rgba_t);
 
 	// Mass Rename
 	string	massRenameFilter(wxArrayString& names);

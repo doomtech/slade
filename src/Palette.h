@@ -8,15 +8,28 @@ class Palette8bit {
 private:
 	rgba_t	colours[256];
 	hsl_t	colours_hsl[256];
+	lab_t	colours_lab[256];
 	short	index_trans;
 
+	double	colourDiff(rgba_t& rgb, hsl_t& hsl, lab_t& lab, int index, int match);
+
 public:
-	enum {
+	enum PaletteFormats {
 		FORMAT_RAW,
 		FORMAT_IMAGE,
 		FORMAT_CSV,
 		FORMAT_JASC,
 		FORMAT_GIMP,
+	};
+	enum ColorMatching {
+		MATCH_DEFAULT,
+		MATCH_OLD,
+		MATCH_RGB,
+		MATCH_HSL,
+		MATCH_C76,
+		MATCH_C94,
+		MATCH_C2K,
+		MATCH_STOP,
 	};
 
 	Palette8bit();
@@ -41,7 +54,7 @@ public:
 
 	void	copyPalette(Palette8bit* copy);
 	short	findColour(rgba_t colour);
-	short	nearestColour(rgba_t colour);
+	short	nearestColour(rgba_t colour, int match = MATCH_DEFAULT);
 	size_t	countColours();
 	void	applyTranslation(Translation* trans);
 

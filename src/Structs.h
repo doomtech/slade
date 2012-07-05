@@ -324,6 +324,18 @@ struct hsl_t {
 	}
 };
 
+// lab_t: Represents a colour in CIE-L*a*b format, generally used for calculations
+struct lab_t {
+	double l, a, b;
+
+	lab_t() { l = a = b = 0; }
+	lab_t(double l, double a, double b) {
+		this->l = l;
+		this->a = a;
+		this->b = b;
+	}
+};
+
 // rect_t: A rectangle (int points)
 struct rect_t {
 	point2_t tl, br;

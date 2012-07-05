@@ -34,8 +34,22 @@
 #include "Translation.h"
 #include "SIFormat.h"
 #include "Tokenizer.h"
+#include "CIEDeltaEquations.h"
 #include <wx/filename.h>
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+CVAR(Int,	col_match, Palette8bit::MATCH_OLD, CVAR_SAVE)
+CVAR(Float, col_match_r, 1.0, CVAR_SAVE)
+CVAR(Float, col_match_g, 1.0, CVAR_SAVE)
+CVAR(Float, col_match_b, 1.0, CVAR_SAVE)
+CVAR(Float, col_match_h, 1.0, CVAR_SAVE)
+CVAR(Float, col_match_s, 1.0, CVAR_SAVE)
+CVAR(Float, col_match_l, 1.0, CVAR_SAVE)
+EXTERN_CVAR(Float, col_greyscale_r);
+EXTERN_CVAR(Float, col_greyscale_g);
+EXTERN_CVAR(Float, col_greyscale_b);
 
 /*******************************************************************
  * PALETTE8BIT CLASS FUNCTIONS
@@ -50,6 +64,7 @@ Palette8bit::Palette8bit() {
 	// Init palette (to greyscale)
 	for (int a = 0; a < 256; a++) {
 		colours[a].set(a, a, a, 255);
+		colours_lab[a].l = (double)a / 255.0;
 		colours_hsl[a].l = (double)a / 255.0;
 	}
 }
@@ -78,6 +93,7 @@ bool Palette8bit::loadMem(MemChunk& mc) {
 		if (mc.read(rgb, 3)) {
 			// Set colour in palette
 			colours[c].set(rgb[0], rgb[1], rgb[2], 255);
+			colours_lab[c] = Misc::rgbToLab((double)rgb[0]/255.0, (double)rgb[1]/255.0, (double)rgb[2]/255.0);
 			colours_hsl[c++] = Misc::rgbToHsl((double)rgb[0]/255.0, (double)rgb[1]/255.0, (double)rgb[2]/255.0);
 		}
 
@@ -103,6 +119,7 @@ bool Palette8bit::loadMem(const uint8_t* data, uint32_t size) {
 	for (size_t a = 0; a < size; a += 3) {
 		// Set colour in palette
 		colours[c].set(data[a], data[a+1], data[a+2], 255);
+		colours_lab[c] = Misc::rgbToLab((double)data[a]/255.0, (double)data[a+1]/255.0, (double)data[a+2]/255.0);
 		colours_hsl[c++] = Misc::rgbToHsl((double)data[a]/255.0, (double)data[a+1]/255.0, (double)data[a+2]/255.0);
 
 		// If we have read 256 colours, finish
@@ -350,6 +367,7 @@ bool Palette8bit::loadFile(string filename, int format) {
  *******************************************************************/
 void Palette8bit::setColour(uint8_t index, rgba_t col) {
 	colours[index].set(col);
+	colours_lab[index] = Misc::rgbToLab(col.dr(), col.dg(), col.db());
 	colours_hsl[index] = Misc::rgbToHsl(col.dr(), col.dg(), col.db());
 }
 
@@ -358,6 +376,7 @@ void Palette8bit::setColour(uint8_t index, rgba_t col) {
  *******************************************************************/
 void Palette8bit::setColourR(uint8_t index, uint8_t val) {
 	colours[index].r = val;
+	colours_lab[index] = Misc::rgbToLab(colours[index].dr(), colours[index].dg(), colours[index].db());
 	colours_hsl[index] = Misc::rgbToHsl(colours[index].dr(), colours[index].dg(), colours[index].db());
 }
 
@@ -366,6 +385,7 @@ void Palette8bit::setColourR(uint8_t index, uint8_t val) {
  *******************************************************************/
 void Palette8bit::setColourG(uint8_t index, uint8_t val) {
 	colours[index].g = val;
+	colours_lab[index] = Misc::rgbToLab(colours[index].dr(), colours[index].dg(), colours[index].db());
 	colours_hsl[index] = Misc::rgbToHsl(colours[index].dr(), colours[index].dg(), colours[index].db());
 }
 
@@ -374,6 +394,7 @@ void Palette8bit::setColourG(uint8_t index, uint8_t val) {
  *******************************************************************/
 void Palette8bit::setColourB(uint8_t index, uint8_t val) {
 	colours[index].b = val;
+	colours_lab[index] = Misc::rgbToLab(colours[index].dr(), colours[index].dg(), colours[index].db());
 	colours_hsl[index] = Misc::rgbToHsl(colours[index].dr(), colours[index].dg(), colours[index].db());
 }
 
@@ -403,25 +424,66 @@ short Palette8bit::findColour(rgba_t colour) {
 	return -1;
 }
 
+double Palette8bit::colourDiff(rgba_t& rgb, hsl_t& hsl, lab_t& lab, int index, int match)
+{
+	double d1, d2, d3;
+	switch(match) {
+		default:
+		case MATCH_OLD:		// Directly with integer values
+			d1 = rgb.r - colours[index].r;
+			d2 = rgb.g - colours[index].g;
+			d3 = rgb.b - colours[index].b;
+			break;
+		case MATCH_RGB:		// With doubles, more precise
+			d1 = rgb.dr() - colours[index].dr();
+			d2 = rgb.dg() - colours[index].dg();
+			d3 = rgb.db() - colours[index].db();
+			d1*=col_match_r;
+			d2*=col_match_g;
+			d3*=col_match_b;
+			break;
+		case MATCH_HSL:
+			d1 = hsl.h - colours_hsl[index].h;
+			// Hue wraps around!
+			if (d1 >  0.5) d1-= 1.0;
+			if (d1 < -0.5) d1+= 1.0;
+			d2 = hsl.s - colours_hsl[index].s;
+			d3 = hsl.l - colours_hsl[index].l;
+			d1*=col_match_h;
+			d2*=col_match_s;
+			d3*=col_match_l;
+			break;
+		case MATCH_C76:
+			return CIE::CIE76(lab, colours_lab[index]);
+		case MATCH_C94:
+			return CIE::CIE94(lab, colours_lab[index]);
+		case MATCH_C2K:
+			return CIE::CIEDE2000(lab, colours_lab[index]);
+	}
+	return (d1*d1)+(d2*d2)+(d3*d3);
+}
+
 /* Palette8bit::nearestColour
  * Returns the index of the closest colour in the palette to [colour]
  *******************************************************************/
-short Palette8bit::nearestColour(rgba_t colour) {
-	int min_d = 999999;
+short Palette8bit::nearestColour(rgba_t colour, int match) {
+	double min_d = 999999;
 	short index = 0;
+	hsl_t chsl = Misc::rgbToHsl(colour);
+	lab_t clab = Misc::rgbToLab(colour);
 
-	int d_r, d_g, d_b, diff;
+	if (match == MATCH_DEFAULT && col_match >= MATCH_OLD && col_match < MATCH_STOP)
+		match = col_match;
+
+	double delta;
 	for (short a = 0; a < 256; a++) {
-		d_r = colour.r - colours[a].r;
-		d_g = colour.g - colours[a].g;
-		d_b = colour.b - colours[a].b;
-		diff = (d_r*d_r)+(d_g*d_g)+(d_b*d_b);
+		delta = colourDiff(colour, chsl, clab, a, match);
 
 		// Exact match?
-		if (diff == 0)
+		if (delta == 0.0)
 			return a;
-		else if (diff < min_d) {
-			min_d = diff;
+		else if (delta < min_d) {
+			min_d = delta;
 			index = a;
 		}
 	}
@@ -551,7 +613,8 @@ void Palette8bit::colourise(rgba_t colour, int start, int end) {
 	// Colourise all colours in the range
 	for (int i = start; i <= end; ++i) {
 		rgba_t ncol(colours[i].r, colours[i].g, colours[i].b, colours[i].a, colours[i].blend);
-		double grey = (ncol.r*0.3f + ncol.g*0.59f + ncol.b*0.11f) / 255.0f;
+		double grey = (ncol.r*col_greyscale_r + ncol.g*col_greyscale_g + ncol.b*col_greyscale_b) / 255.0f;
+		if (grey > 1.0) grey = 1.0;
 		ncol.r = (uint8_t)(colour.r * grey);
 		ncol.g = (uint8_t)(colour.g * grey);
 		ncol.b = (uint8_t)(colour.b * grey);
@@ -634,6 +697,7 @@ void Palette8bit::saturate(float amount, int start, int end) {
 		if (colours_hsl[i].s > 1.)
 			colours_hsl[i].s = 1.;
 		setColour(i, Misc::hslToRgb(colours_hsl[i]));
+		colours_lab[i] = Misc::rgbToLab(colours[i].dr(), colours[i].dg(), colours[i].db());
 	}
 }
 
@@ -659,6 +723,7 @@ void Palette8bit::illuminate(float amount, int start, int end) {
 		if (colours_hsl[i].l > 1.)
 			colours_hsl[i].l = 1.;
 		setColour(i, Misc::hslToRgb(colours_hsl[i]));
+		colours_lab[i] = Misc::rgbToLab(colours[i].dr(), colours[i].dg(), colours[i].db());
 	}
 }
 
@@ -684,6 +749,7 @@ void Palette8bit::shift(float amount, int start, int end) {
 		if (colours_hsl[i].h >= 1.)
 			colours_hsl[i].h -= 1.;
 		setColour(i, Misc::hslToRgb(colours_hsl[i]));
+		colours_lab[i] = Misc::rgbToLab(colours[i].dr(), colours[i].dg(), colours[i].db());
 	}
 }
 

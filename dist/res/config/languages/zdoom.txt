@@ -171,11 +171,13 @@ z_modeldef {
 
 	keywords = {
 		MODEL, PATH, SKIN, SCALE, FRAME, FRAMEINDEX,
-		Rotation-Speed, Rotation-Vector, Rotation-Center, ZOffset
+		Rotation-Speed, Rotation-Vector, Rotation-Center, 
+		Offset, AngleOffset, PitchOffset, RollOffset, ZOffset, 
 	}
 
 	constants = {
-		PITCHFROMMOMENTUM, IGNORETRANSLATION, INTERPOLATEDOUBLEDFRAMES, ROTATING, NOINTERPOLATION
+		PITCHFROMMOMENTUM, IGNORETRANSLATION, INTERPOLATEDOUBLEDFRAMES, ROTATING, NOINTERPOLATION,
+		INHERITACTORPITCH, INHERITACTORROLL,
 	}
 }
 

@@ -478,6 +478,7 @@ void MainApp::initActions() {
 	new SAction("ppal_removeothers", "Remove Others", "t_palette_deleteothers", "Keep only this palette and erase all others");
 	new SAction("ppal_report", "Write Report", "e_text", "Write an info report on this palette");
 	new SAction("ppal_generate", "Generate Palettes", "e_palette", "Generate full range of palettes from the first");
+	new SAction("ppal_colormap", "Generate Colormaps", "e_colormap", "Generate colormap lump from the first palette");
 
 	// Map Editor Window
 	new SAction("mapw_save", "&Save Map Changes", "t_save", "Save any changes to the current map", "Ctrl+S");

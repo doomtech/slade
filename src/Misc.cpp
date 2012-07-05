@@ -45,6 +45,8 @@
  *******************************************************************/
 CVAR(Bool, size_as_string, true, CVAR_SAVE)
 CVAR(Bool, percent_encoding, false, CVAR_SAVE)
+EXTERN_CVAR(Float, col_cie_tristim_x)
+EXTERN_CVAR(Float, col_cie_tristim_z)
 
 
 /*******************************************************************
@@ -486,6 +488,42 @@ rgba_t Misc::hslToRgb(double h, double s, double l) {
 rgba_t Misc::hslToRgb(hsl_t hsl) {
 	return Misc::hslToRgb(hsl.h, hsl.s, hsl.l);
 }
+
+/* Misc::rgbToLab
+ * Converts a colour from RGB to CIE-L*a*b colourspace
+ * Conversion formulas lazily taken from easyrgb.com.
+ *******************************************************************/
+#define NORMALIZERGB(a) a = 100 * ((a > 0.04045) ? (pow(((a + 0.055) / 1.055), 2.4)) : (a / 12.92))
+#define NORMALIZEXYZ(a) a = ((a > 0.008856) ? (pow(a, (1.0/3.0))) : ((7.787*a)+(16.0/116.0)))
+lab_t Misc::rgbToLab(double r, double g, double b) {
+	double x, y, z;
+	lab_t ret;
+
+	// Step #1: convert RGB to CIE-XYZ
+	NORMALIZERGB(r);
+	NORMALIZERGB(g);
+	NORMALIZERGB(b);
+
+	x = (r * 0.4124 + g * 0.3576 + b * 0.1805) / col_cie_tristim_x;
+	y = (r * 0.2126 + g * 0.7152 + b * 0.0722) / 100.000;			// y is always 100.00
+	z = (r * 0.0193 + g * 0.1192 + b * 0.9505) / col_cie_tristim_z;
+
+	// Step #2: convert xyz to lab
+	NORMALIZEXYZ(x);
+	NORMALIZEXYZ(y);
+	NORMALIZEXYZ(z);
+
+	ret.l = (116.0 * y) - 16;
+	ret.a = 500.0 * (x - y);
+	ret.b = 200.0 * (y - z);
+	
+	return ret;
+}
+lab_t Misc::rgbToLab(rgba_t rgba) {
+	return Misc::rgbToLab(rgba.dr(), rgba.dg(), rgba.db());
+}
+#undef NORMALIZERGB
+#undef NORMALIZEXYZ
 
 // CRC-32 stuff
 

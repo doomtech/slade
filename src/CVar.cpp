@@ -76,7 +76,7 @@ void dump_cvars() {
 				printf("%s %d\n", CHR(cvars[c]->name), cvars[c]->GetValue().Bool);
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				printf("%s %1.2f\n", CHR(cvars[c]->name), cvars[c]->GetValue().Float);
+				printf("%s %1.5f\n", CHR(cvars[c]->name), cvars[c]->GetValue().Float);
 
 			if (cvars[c]->type == CVAR_STRING)
 				printf("%s \"%s\"\n", CHR(cvars[c]->name), CHR(((CStringCVar *)cvars[c])->value));
@@ -120,7 +120,7 @@ void save_cvars(wxFile& file) {
 				file.Write(S_FMT("%d\n", cvars[c]->GetValue().Bool));
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				file.Write(S_FMT("%1.2f\n", cvars[c]->GetValue().Float));
+				file.Write(S_FMT("%1.5f\n", cvars[c]->GetValue().Float));
 
 			if (cvars[c]->type == CVAR_STRING)
 				file.Write(S_FMT("\"%s\"\n", CHR(((CStringCVar *)cvars[c])->value)));
@@ -144,7 +144,7 @@ void read_cvar(string name, string value) {
 				*((CBoolCVar *) cvars[c]) = !!(atoi(CHR(value)));
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				*((CFloatCVar *) cvars[c]) = (float) atof(CHR(value));
+				*((CFloatCVar *) cvars[c]) = atof(CHR(value));
 
 			if (cvars[c]->type == CVAR_STRING)
 				*((CStringCVar *) cvars[c]) = value;
@@ -182,7 +182,7 @@ CBoolCVar::CBoolCVar(string NAME, bool defval, uint16_t FLAGS) {
 /* CFloatCVar::CFloatCVar
  * CFloatCVar class constructor
  *******************************************************************/
-CFloatCVar::CFloatCVar(string NAME, float defval, uint16_t FLAGS) {
+CFloatCVar::CFloatCVar(string NAME, double defval, uint16_t FLAGS) {
 	name = NAME;
 	flags = FLAGS;
 	value = defval;

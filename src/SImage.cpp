@@ -44,6 +44,12 @@
 #include <FreeImage.h>
 #include <wx/filefn.h>
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(Float, col_greyscale_r)
+EXTERN_CVAR(Float, col_greyscale_g)
+EXTERN_CVAR(Float, col_greyscale_b)
 
 /*******************************************************************
  * SIMAGE CLASS FUNCTIONS
@@ -1495,7 +1501,8 @@ bool SImage::colourise(rgba_t colour, Palette8bit* pal) {
 			col.set(pal->colour(data[a]));
 
 		// Colourise it
-		float grey = (col.r*0.3f + col.g*0.59f + col.b*0.11f) / 255.0f;
+		float grey = (col.r*col_greyscale_r + col.g*col_greyscale_g + col.b*col_greyscale_b) / 255.0f;
+		if (grey > 1.0) grey = 1.0;
 		col.r = colour.r*grey;
 		col.g = colour.g*grey;
 		col.b = colour.b*grey;

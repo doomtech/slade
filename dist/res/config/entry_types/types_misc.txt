@@ -89,7 +89,7 @@ entry_types
 		extra = image;
 		export_ext = "lmp";
 		category = "Data";
-		icon = "e_palette";
+		icon = "e_colormap";
 	}
 
 	transtable : colormap

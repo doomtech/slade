@@ -46,6 +46,7 @@ public:
 	bool	importFrom();
 
 	// Palette manipulation functions
+	bool	generateColormaps();
 	bool	generatePalettes();
 	bool	clearOne();
 	bool	clearOthers();
