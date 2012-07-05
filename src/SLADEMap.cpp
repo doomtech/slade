@@ -646,7 +646,7 @@ bool SLADEMap::readDoomMap(Archive::mapdesc_t map) {
 		return false;
 
 	// Remove detached vertices
-	removeDetachedVertices();
+	mapOpenChecks();
 
 	// Update item indices
 	refreshIndices();
@@ -835,7 +835,7 @@ bool SLADEMap::readHexenMap(Archive::mapdesc_t map) {
 		return false;
 
 	// Remove detached vertices
-	removeDetachedVertices();
+	mapOpenChecks();
 
 	// Update item indices
 	refreshIndices();
@@ -999,7 +999,7 @@ bool SLADEMap::readDoom64Map(Archive::mapdesc_t map) {
 		return false;
 
 	// Remove detached vertices
-	removeDetachedVertices();
+	mapOpenChecks();
 
 	// Update item indices
 	refreshIndices();
@@ -1286,7 +1286,7 @@ bool SLADEMap::readUDMFMap(Archive::mapdesc_t map) {
 		addThing(defs_things[a]);
 
 	// Remove detached vertices
-	removeDetachedVertices();
+	mapOpenChecks();
 
 	// Update item indices
 	refreshIndices();
@@ -2957,6 +2957,14 @@ bool SLADEMap::setLineSector(unsigned line, unsigned sector, bool front) {
 	}
 }
 
+void SLADEMap::mapOpenChecks() {
+	int rverts = removeDetachedVertices();
+	int rsides = removeDetachedSides();
+	int rsec = removeDetachedSectors();
+
+	wxLogMessage("Removed %d detached vertices, %d detached sides and %d detached sectors", rverts, rsides, rsec);
+}
+
 int SLADEMap::removeDetachedVertices() {
 	int count = 0;
 	for (int a = vertices.size() - 1; a >= 0; a--) {
@@ -2967,6 +2975,36 @@ int SLADEMap::removeDetachedVertices() {
 		}
 	}
 
+	refreshIndices();
+
+	return count;
+}
+
+int SLADEMap::removeDetachedSides() {
+	int count = 0;
+	for (int a = sides.size() - 1; a >= 0; a--) {
+		if (!sides[a]->parent) {
+			delete sides[a];
+			sides.erase(sides.begin() + a);
+			count++;
+		}
+	}
+
+	refreshIndices();
+
+	return count;
+}
+
+int SLADEMap::removeDetachedSectors() {
+	int count = 0;
+	for (int a = sectors.size() - 1; a >= 0; a--) {
+		if (sectors[a]->connectedSides().size() == 0) {
+			delete sectors[a];
+			sectors.erase(sectors.begin() + a);
+			count++;
+		}
+	}
+	
 	refreshIndices();
 
 	return count;

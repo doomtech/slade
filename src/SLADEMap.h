@@ -185,7 +185,10 @@ public:
 	bool		setLineSector(unsigned line, unsigned sector, bool front = true);
 
 	// Checks
+	void	mapOpenChecks();
 	int		removeDetachedVertices();
+	int		removeDetachedSides();
+	int		removeDetachedSectors();
 	int		removeZeroLengthLines();
 };
 
