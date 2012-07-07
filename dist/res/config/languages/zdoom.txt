@@ -331,7 +331,8 @@ z_textures {
 	}
 
 	constants = {
-		Inverse, Gold, Red, Green, Ice, Desaturate,
-		Copy, Translucent, Add, Subtract, ReverseSubtract, Modulate, CopyAlpha
+		Inverse, Gold, Red, Green, Ice, Desaturate, Copy, Translucent, 
+		Add, Subtract, ReverseSubtract, Modulate, CopyAlpha, Overlay,
+		CopyNewAlpha
 	}
 }

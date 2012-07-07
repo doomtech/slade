@@ -969,11 +969,15 @@ bool TextureXPanel::modifyOffsets() {
 				ctex->setOffsetX(w * 0.5);
 				ctex->setOffsetY(h - 4);
 				break;
-			case 1: // Auto Offsets selected: Projectile
+			case 1: // Auto Offsets selected: Monster (GL-friendly)
+				ctex->setOffsetX(w * 0.5);
+				ctex->setOffsetY(h);
+				break;
+			case 2: // Auto Offsets selected: Projectile
 				ctex->setOffsetX(w * 0.5);
 				ctex->setOffsetY(h * 0.5);
 				break;
-			case 2: // Auto Offsets selected: Weapon
+			case 3: // Auto Offsets selected: Weapon
 				ctex->setOffsetX(-160 + (w * 0.5));
 				ctex->setOffsetY(-200 + h);
 				break;

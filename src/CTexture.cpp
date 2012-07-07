@@ -886,9 +886,9 @@ bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal, bool fo
 			dp.blend = NORMAL;
 			dp.alpha = 1.0f;
 			dp.src_alpha = false;
-			if (patch->getStyle() == "CopyAlpha")
+			if (patch->getStyle() == "CopyAlpha" || patch->getStyle() == "Overlay")
 				dp.src_alpha = true;
-			else if (patch->getStyle() == "Translucent")
+			else if (patch->getStyle() == "Translucent" || patch->getStyle() == "CopyNewAlpha")
 				dp.alpha = patch->getAlpha();
 			else if (patch->getStyle() == "Add") {
 				dp.blend = ADD;

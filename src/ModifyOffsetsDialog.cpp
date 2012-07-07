@@ -77,6 +77,7 @@ ModifyOffsetsDialog::ModifyOffsetsDialog()
 
 	string offtypes[] = {
 		"Monster",
+		"Monster (GL-friendly)",
 		"Projectile",
 		"Hud/Weapon"
 	};

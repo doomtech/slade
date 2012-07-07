@@ -176,11 +176,15 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 				header.left = w * 0.5;
 				header.top = h - 4;
 			}
-			else if (auto_type == 1) {		// Projectile
+			else if (auto_type == 1) {		// Monster (GL-friendly)
+				header.left = w * 0.5;
+				header.top = h;
+			}
+			else if (auto_type == 2) {		// Projectile
 				header.left = w * 0.5;
 				header.top = h * 0.5;
 			}
-			else if (auto_type == 2) {		// Weapon
+			else if (auto_type == 3) {		// Weapon
 				header.left = -160 + (w * 0.5);
 				header.top = -200 + h;
 			}
