@@ -61,6 +61,7 @@
 #include "KeyBind.h"
 #include "MapEditorConfigDialog.h"
 #include "PaletteManager.h"
+#include "MapReplaceDialog.h"
 #include <wx/aui/auibook.h>
 #include <wx/aui/auibar.h>
 #include <wx/filename.h>
@@ -333,9 +334,10 @@ void ArchivePanel::addMenus() {
 		theApp->getAction("arch_clean_patches")->addToMenu(menu_clean);
 		theApp->getAction("arch_clean_textures")->addToMenu(menu_clean);
 		theApp->getAction("arch_clean_flats")->addToMenu(menu_clean);
+		theApp->getAction("arch_clean_iwaddupes")->addToMenu(menu_clean);
 		theApp->getAction("arch_check_duplicates")->addToMenu(menu_clean);
 		theApp->getAction("arch_check_duplicates2")->addToMenu(menu_clean);
-		theApp->getAction("arch_clean_iwaddupes")->addToMenu(menu_clean);
+		theApp->getAction("arch_replace_maps")->addToMenu(menu_clean);
 		menu_archive->AppendSubMenu(menu_clean, "&Maintenance");
 	}
 	if (!menu_entry) {
@@ -1772,6 +1774,12 @@ bool ArchivePanel::handleAction(string id) {
 	// Archive->Maintenance->Check Duplicate Entry Names
 	else if (id == "arch_clean_iwaddupes")
 		ArchiveOperations::removeEntriesUnchangedFromIWAD(archive);
+
+	// Archive->Maintenance->Replace in Maps
+	else if (id == "arch_replace_maps") {
+		MapReplaceDialog dlg(this, archive);
+		dlg.ShowModal();
+	}
 
 
 	// *************************************************************

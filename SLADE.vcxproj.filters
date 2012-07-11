@@ -852,6 +852,15 @@
     <ClCompile Include="src\ScriptEditorPanel.cpp">
       <Filter>Map Editor\Script Editor</Filter>
     </ClCompile>
+    <ClCompile Include="src\CIEDeltaEquations.cpp">
+      <Filter>General\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColorimetryPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapReplaceDialog.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1592,6 +1601,9 @@
     </ClInclude>
     <ClInclude Include="src\ScriptEditorPanel.h">
       <Filter>Map Editor\Script Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapReplaceDialog.h">
+      <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

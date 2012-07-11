@@ -50,6 +50,7 @@
 WX_DECLARE_STRING_HASH_MAP(int, StrIntMap);
 WX_DECLARE_HASH_MAP(int, vector<ArchiveEntry *>, wxIntegerHash, wxIntegerEqual, CRCMap);
 
+
 /*******************************************************************
  * FUNCTIONS
  *******************************************************************/
