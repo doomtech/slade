@@ -50,6 +50,8 @@
       <File Name="src/InputPrefsPanel.cpp"/>
       <File Name="src/InputPrefsPanel.h"/>
       <File Name="src/PrefsPanelBase.h"/>
+      <File Name="src/ColorimetryPrefsPanel.cpp"/>
+      <File Name="src/ColorimetryPrefsPanel.h"/>
     </VirtualDirectory>
     <File Name="src/ExtMessageDialog.h"/>
     <File Name="src/ExtMessageDialog.cpp"/>
@@ -57,6 +59,8 @@
     <File Name="src/TranslationEditorDialog.h"/>
     <File Name="src/MapEditorConfigDialog.h"/>
     <File Name="src/MapEditorConfigDialog.cpp"/>
+    <File Name="src/MapReplaceDialog.cpp"/>
+    <File Name="src/MapReplaceDialog.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="General">
     <File Name="src/Clipboard.cpp"/>
@@ -100,6 +104,8 @@
       <File Name="src/SFileDialog.h"/>
       <File Name="src/Polygon2D.cpp"/>
       <File Name="src/Polygon2D.h"/>
+      <File Name="src/CIEDeltaEquations.cpp"/>
+      <File Name="src/CIEDeltaEquations.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Console">
       <File Name="src/Console.cpp"/>
@@ -585,6 +591,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -623,6 +630,7 @@
       <General OutputFile="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" IntermediateDirectory="./Debug" Command="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       
@@ -693,6 +701,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -733,6 +742,7 @@
       <General OutputFile="" IntermediateDirectory="./Debug" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./Debug" PauseExecWhenProcTerminates="no"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -772,6 +782,7 @@
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       

@@ -10,4 +10,4 @@ namespace CIE {
 	double CIEDE2000(lab_t& col1, lab_t& col2);
 }
 
-#endif CIEDELTAEQ_H
+#endif//CIEDELTAEQ_H
