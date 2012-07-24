@@ -101,6 +101,11 @@ void TextureEditorPanel::setupLayout() {
 	choice_viewtype->Show(false); // Only show this on ZTextureEditorPanel
 	label_viewtype->Show(false);
 
+	// 'Apply Scale' checkbox
+	cb_tex_scale = new wxCheckBox(this, -1, "Apply Scale");
+	cb_tex_scale->SetValue(false);
+	hbox->Add(cb_tex_scale, 0, wxEXPAND|wxRIGHT, 4);
+
 	// 'Truecolour Preview' checkbox
 	cb_blend_rgba = new wxCheckBox(this, -1, "Truecolour Preview");
 	cb_blend_rgba->SetValue(false);
@@ -152,7 +157,7 @@ void TextureEditorPanel::setupLayout() {
 	btn_patch_duplicate->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchDuplicate, this);
 	spin_patch_left->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionXChanged, this);
 	spin_patch_top->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionYChanged, this);
-
+	cb_tex_scale->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextureEditorPanel::onApplyScaleChanged, this);
 
 	// Init layout
 	Layout();
@@ -265,6 +270,7 @@ wxPanel* TextureEditorPanel::createPatchControls(wxWindow* parent) {
 	// Add patches list
 	list_patches = new ListView(panel, -1);
 	list_patches->enableSizeUpdate(false);
+	list_patches->SetInitialSize(wxSize(100, -1));
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
 
 	// Add patch buttons
@@ -1131,4 +1137,12 @@ void TextureEditorPanel::onPatchPositionYChanged(wxSpinEvent& e) {
 	tex_canvas->redraw(true);
 
 	tex_modified = true;
+}
+
+/* TextureEditorPanel::onApplyScaleChanged
+ * Called when the 'Apply Scale' checkbox is changed
+ *******************************************************************/
+void TextureEditorPanel::onApplyScaleChanged(wxCommandEvent& e) {
+	tex_canvas->applyTexScale(cb_tex_scale->GetValue());
+	tex_canvas->redraw();
 }

@@ -154,6 +154,9 @@
     <Filter Include="Map Editor\Script Editor">
       <UniqueIdentifier>{d49c5796-7d32-4213-adba-acc042385491}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\Lua">
+      <UniqueIdentifier>{f31c9d96-4290-4a38-91d0-fb9955293323}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -860,6 +863,108 @@
     </ClCompile>
     <ClCompile Include="src\MapReplaceDialog.cpp">
       <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Map3DPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lua.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lapi.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lauxlib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lbaselib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lbitlib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lcode.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lcorolib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lctype.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\ldblib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\ldebug.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\ldo.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\ldump.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lfunc.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lgc.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\linit.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\liolib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\llex.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lmathlib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lmem.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\loadlib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lobject.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lopcodes.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\loslib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lparser.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lstate.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lstring.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lstrlib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\ltable.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\ltablib.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\ltm.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lundump.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lvm.c">
+      <Filter>External\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua\lzio.c">
+      <Filter>External\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1604,6 +1709,87 @@
     </ClInclude>
     <ClInclude Include="src\MapReplaceDialog.h">
       <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Map3DPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Lua.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lapi.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lauxlib.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lcode.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lctype.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\ldebug.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\ldo.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lfunc.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lgc.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\llex.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\llimits.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lmem.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lobject.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lopcodes.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lparser.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lstate.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lstring.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\ltable.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\ltm.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lua.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lua.hpp">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\luaconf.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lualib.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lundump.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lvm.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua\lzio.h">
+      <Filter>External\Lua</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

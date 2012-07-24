@@ -45,6 +45,7 @@
 #include "ColourPrefsPanel.h"
 #include "MapEditorPrefsPanel.h"
 #include "MapDisplayPrefsPanel.h"
+#include "Map3DPrefsPanel.h"
 #include "AdvancedPrefsPanel.h"
 #include "ArchiveManager.h"
 #include "TextEditorPrefsPanel.h"
@@ -99,6 +100,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	panel = new ACSPrefsPanel(tree_prefs);			tree_prefs->AddSubPage(panel, "ACS"); prefs_pages.push_back(panel);
 	panel = new MapEditorPrefsPanel(tree_prefs);	tree_prefs->AddPage(panel, "Map Editor"); prefs_pages.push_back(panel);
 	panel = new MapDisplayPrefsPanel(tree_prefs);	tree_prefs->AddSubPage(panel, "Display"); prefs_pages.push_back(panel);
+	panel = new Map3DPrefsPanel(tree_prefs);		tree_prefs->AddSubPage(panel, "3D Mode"); prefs_pages.push_back(panel);
 	panel = new NodesPrefsPanel(tree_prefs);		tree_prefs->AddSubPage(panel, "Node Builders"); prefs_pages.push_back(panel);
 	panel = new AdvancedPrefsPanel(tree_prefs);		tree_prefs->AddPage(panel, "Advanced"); prefs_pages.push_back(panel);
 

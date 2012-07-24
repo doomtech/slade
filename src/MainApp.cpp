@@ -46,6 +46,7 @@
 #include "MapEditorWindow.h"
 #include "GameConfiguration.h"
 #include "NodeBuilders.h"
+#include "Lua.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -505,11 +506,14 @@ void MainApp::initActions() {
 	new SAction("mapw_sectormode_floor", "Floors", "t_sector_floor", "Edit sector floors", "", SAction::RADIO, -1, group_sector_mode);
 	new SAction("mapw_sectormode_ceiling", "Ceilings", "t_sector_ceiling", "Edit sector ceilings", "", SAction::RADIO, -1, group_sector_mode);
 	new SAction("mapw_line_changetexture", "Change Texture", "", "Change the currently selected or hilighted line texture(s)");
+	new SAction("mapw_line_changespecial", "Change Special", "", "Change the currently selected or hilighted line special");
 	new SAction("mapw_thing_changetype", "Change Type", "", "Change the currently selected or hilighted thing type(s)");
 	new SAction("mapw_sector_changetexture", "Change Texture", "", "Change the currently selected or hilighted sector texture(s)");
 	new SAction("mapw_item_properties", "Properties", "t_properties", "Edit the currently selected item's properties");
 	new SAction("mapw_script_save", "Save", "t_save", "Save changes to scripts");
 	new SAction("mapw_script_compile", "Compile", "t_compile", "Compile scripts");
+	new SAction("mapw_camera_set", "Move 3d Camera Here", "", "Set the current position of the 3d mode camera to the cursor position");
+	new SAction("mapw_clear_selection", "Clear Selection", "", "Clear the current selection, if any");
 }
 
 /* MainApp::OnInit
@@ -567,6 +571,9 @@ bool MainApp::OnInit() {
 		wxMessageBox("Unable to find slade.pk3, make sure it exists in the same directory as the SLADE executable", "Error", wxICON_ERROR);
 		return false;
 	}
+
+	// Init lua
+	Lua::init();
 
 	// Show splash screen
 	theSplashWindow->init();
@@ -678,6 +685,9 @@ int MainApp::OnExit() {
 			wxLogMessage("Warning: Could not clean up temporary file \"%s\"", CHR(filename));
 		files = temp.GetNext(&filename);
 	}
+
+	// Close lua
+	Lua::close();
 
 	return 0;
 }

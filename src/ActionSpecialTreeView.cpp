@@ -48,8 +48,9 @@ void ActionSpecialTreeView::showSpecial(int special) {
 
 			// Select+show if match
 			if (specialNumber(item) == special) {
-				Select(item);
 				EnsureVisible(item);
+				Select(item);
+				SetFocus();
 				return;
 			}
 		}
@@ -120,10 +121,10 @@ int ActionSpecialTreeView::showDialog(wxWindow* parent, int init) {
 	dlg.SetSizer(sizer);
 
 	ActionSpecialTreeView* astv = new ActionSpecialTreeView(&dlg);
-	if (init >= 0) astv->showSpecial(init);
 	astv->setParentDialog(&dlg);
 	sizer->Add(astv, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(dlg.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxTOP|wxBOTTOM, 4);
+	if (init >= 0) astv->showSpecial(init);
 
 	dlg.SetSize(400, 500);
 	dlg.CenterOnScreen();

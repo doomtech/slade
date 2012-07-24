@@ -21,6 +21,7 @@ protected:
 	wxStaticText*	label_current_zoom;
 	wxCheckBox*		cb_draw_outside;
 	wxCheckBox*		cb_blend_rgba;
+	wxCheckBox*		cb_tex_scale;
 	wxStaticText*	label_viewtype;
 	wxChoice*		choice_viewtype;
 	CTextureCanvas*	tex_canvas;
@@ -107,6 +108,7 @@ public:
 	void	onPatchPositionXChanged(wxSpinEvent& e);
 	void	onPatchPositionYChanged(wxSpinEvent& e);
 	void	onContextMenu(wxCommandEvent& e);
+	void	onApplyScaleChanged(wxCommandEvent& e);
 };
 
 #endif//__TEXTURE_EDITOR_PANEL_H__

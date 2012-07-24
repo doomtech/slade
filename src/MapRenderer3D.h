@@ -115,6 +115,7 @@ public:
 	void	cameraPitch(double amount);
 	void	cameraUpdateVectors();
 	void	cameraSet(fpoint3_t position, fpoint2_t direction);
+	void	cameraSetPosition(fpoint3_t position);
 	void	cameraApplyGravity(double mult);
 
 	// -- Rendering --

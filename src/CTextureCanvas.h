@@ -26,6 +26,7 @@ private:
 	bool				dragging;
 	bool				show_grid;
 	bool				blend_rgba;
+	bool				tex_scale;
 	int					view_type;	// 0=normal, 1=sprite offsets, 2=hud offsets
 
 public:
@@ -42,6 +43,8 @@ public:
 	void		showGrid(bool show = true) { show_grid = show; }
 	void		blendRGBA(bool rgba) { blend_rgba = rgba; }
 	bool		getBlendRGBA() { return blend_rgba; }
+	bool		applyTexScale() { return tex_scale; }
+	void		applyTexScale(bool apply) { tex_scale = apply; }
 
 	void	selectPatch(int index);
 	void	deSelectPatch(int index);

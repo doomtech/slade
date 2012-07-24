@@ -252,6 +252,15 @@ void CTextureCanvas::drawTexture() {
 	// Zoom
 	glScaled(scale, scale, 1);
 
+	// Apply texture scale
+	if (tex_scale) {
+		double tscalex = texture->getScaleX();
+		if (tscalex == 0) tscalex = 1;
+		double tscaley = texture->getScaleY();
+		if (tscaley == 0) tscaley = 1;
+		glScaled(1.0 / tscalex, 1.0 / tscaley, 1);
+	}
+
 	// Draw offset guides if needed
 	drawOffsetLines();
 

@@ -48,6 +48,7 @@
 #include "SectorTextureOverlay.h"
 #include "LineTextureOverlay.h"
 #include "SectorBuilder.h"
+#include "ActionSpecialTreeView.h"
 
 
 /*******************************************************************
@@ -2094,10 +2095,43 @@ bool MapCanvas::handleAction(string id) {
 
 	// --- Context menu ---
 
+	// Move 3d mode camera
+	else if (id == "mapw_camera_set") {
+		fpoint3_t pos;
+		pos.x = mouse_pos_m.x;
+		pos.y = mouse_pos_m.y;
+		SLADEMap& map = editor->getMap();
+		MapSector* sector = map.getSector(map.sectorAt(pos.x, pos.y));
+		if (sector)
+			pos.z = sector->intProperty("heightfloor") + 40;
+		renderer_3d->cameraSetPosition(pos);
+	}
+
 	// Edit item properties
 	else if (id == "mapw_item_properties") {
+		// Get selection
+		vector<MapObject*> list;
+		editor->getSelectedObjects(list);
+
+		// Determine selection type
+		string type = "Object";
+		if (editor->editMode() == MapEditor::MODE_VERTICES)
+			type = "Vertex";
+		else if (editor->editMode() == MapEditor::MODE_LINES)
+			type = "Line";
+		else if (editor->editMode() == MapEditor::MODE_SECTORS)
+			type = "Sector";
+		else if (editor->editMode() == MapEditor::MODE_THINGS)
+			type = "Thing";
+
+		string selsize = "";
+		if (list.size() == 1)
+			type += S_FMT(" #%d", list[0]->getIndex());
+		else if (list.size() > 1)
+			selsize = S_FMT("(%d selected)", list.size());
+
 		// Create dialog for properties panel
-		wxDialog dlg(theMapEditor, -1, "Properties", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+		wxDialog dlg(theMapEditor, -1, S_FMT("%s Properties %s", CHR(type), CHR(selsize)), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 		dlg.SetInitialSize(wxSize(500, 500));
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 		dlg.SetSizer(sizer);
@@ -2111,8 +2145,6 @@ bool MapCanvas::handleAction(string id) {
 		sizer->Add(dlg.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 		// Open current selection
-		vector<MapObject*> list;
-		editor->getSelectedObjects(list);
 		panel_props->openObjects(list);
 
 		// Open the dialog and apply changes if OK was clicked
@@ -2141,6 +2173,25 @@ bool MapCanvas::handleAction(string id) {
 			overlay_current = lto;
 		}
 		return true;
+	}
+
+	// Change line special
+	else if (id == "mapw_line_changespecial") {
+		// Get selection
+		vector<MapLine*> selection;
+		editor->getSelectedLines(selection);
+
+		// Open action special selection dialog
+		if (selection.size() > 0) {
+			int as = ActionSpecialTreeView::showDialog(this, selection[0]->intProperty("special"));
+			if (as >= 0) {
+				// Set specials
+				for (unsigned a = 0; a < selection.size(); a++) {
+					selection[a]->setIntProperty("special", as);
+				}
+				renderer_2d->forceUpdate();
+			}
+		}
 	}
 
 	// --- Thing context menu ---
@@ -2396,20 +2447,30 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 			renderer_2d->forceUpdate();
 		}
 
-		else if (mouse_state == MSTATE_NORMAL && (editor->selectionSize() > 0 || editor->hilightItem() >= 0)) {
+		else if (mouse_state == MSTATE_NORMAL) {
 			// Context menu
 			wxMenu menu_context;
 
-			// Mode-specific items
-			if (editor->editMode() == MapEditor::MODE_LINES)
-				theApp->getAction("mapw_line_changetexture")->addToMenu(&menu_context);
-			else if (editor->editMode() == MapEditor::MODE_THINGS)
-				theApp->getAction("mapw_thing_changetype")->addToMenu(&menu_context);
-			else if (editor->editMode() == MapEditor::MODE_SECTORS)
-				theApp->getAction("mapw_sector_changetexture")->addToMenu(&menu_context);
+			// Set 3d camera
+			theApp->getAction("mapw_camera_set")->addToMenu(&menu_context);
 
-			// Properties
-			theApp->getAction("mapw_item_properties")->addToMenu(&menu_context);
+			// Map object stuff
+			if ((editor->selectionSize() > 0 || editor->hilightItem() >= 0)) {
+				menu_context.AppendSeparator();
+
+				// Mode-specific
+				if (editor->editMode() == MapEditor::MODE_LINES) {
+					theApp->getAction("mapw_line_changetexture")->addToMenu(&menu_context);
+					theApp->getAction("mapw_line_changespecial")->addToMenu(&menu_context);
+				}
+				else if (editor->editMode() == MapEditor::MODE_THINGS)
+					theApp->getAction("mapw_thing_changetype")->addToMenu(&menu_context);
+				else if (editor->editMode() == MapEditor::MODE_SECTORS)
+					theApp->getAction("mapw_sector_changetexture")->addToMenu(&menu_context);
+
+				// Properties
+				theApp->getAction("mapw_item_properties")->addToMenu(&menu_context);
+			}
 
 			PopupMenu(&menu_context);
 		}

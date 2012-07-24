@@ -250,6 +250,10 @@ void MapRenderer3D::cameraSet(fpoint3_t position, fpoint2_t direction) {
 	cameraUpdateVectors();
 }
 
+void MapRenderer3D::cameraSetPosition(fpoint3_t position) {
+	cam_position = position;
+}
+
 void MapRenderer3D::cameraApplyGravity(double mult) {
 	// Get current sector
 	int sector = map->sectorAt(cam_position.x, cam_position.y);

@@ -123,29 +123,34 @@ TextureReplacePanel::TextureReplacePanel(wxWindow* parent) : wxPanel(parent, -1)
 	gbsizer->Add(text_from, wxGBPosition(0, 1), wxDefaultSpan, wxEXPAND);
 
 	// To texture
-	gbsizer->Add(new wxStaticText(this, -1, "With Texture:"), wxGBPosition(0, 2), wxDefaultSpan, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT);
+	gbsizer->Add(new wxStaticText(this, -1, "With Texture:"), wxGBPosition(1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT);
 	text_to = new wxTextCtrl(this, -1);
-	gbsizer->Add(text_to, wxGBPosition(0, 3), wxDefaultSpan, wxEXPAND);
+	gbsizer->Add(text_to, wxGBPosition(1, 1), wxDefaultSpan, wxEXPAND);
+
+	sizer->Add(new wxStaticLine(this, -1, wxDefaultPosition, wxDefaultSize, wxHORIZONTAL), 0, wxEXPAND|wxALL, 4);
+
+	gbsizer = new wxGridBagSizer(4, 4);
+	sizer->Add(gbsizer, 0, wxALIGN_CENTER|wxALL, 4);
 
 	// Upper
 	cb_upper = new wxCheckBox(this, -1, "Upper Textures");
-	gbsizer->Add(cb_upper, wxGBPosition(1, 0), wxGBSpan(1, 2), wxEXPAND);
+	gbsizer->Add(cb_upper, wxGBPosition(0, 0), wxDefaultSpan, wxEXPAND);
 
 	// Middle
 	cb_middle = new wxCheckBox(this, -1, "Middle Textures");
-	gbsizer->Add(cb_middle, wxGBPosition(2, 0), wxGBSpan(1, 2), wxEXPAND);
+	gbsizer->Add(cb_middle, wxGBPosition(1, 0), wxDefaultSpan, wxEXPAND);
 
 	// Lower
 	cb_lower = new wxCheckBox(this, -1, "Lower Textures");
-	gbsizer->Add(cb_lower, wxGBPosition(3, 0), wxGBSpan(1, 2), wxEXPAND);
+	gbsizer->Add(cb_lower, wxGBPosition(2, 0), wxDefaultSpan, wxEXPAND);
 
 	// Floors
 	cb_floor = new wxCheckBox(this, -1, "Floor Textures");
-	gbsizer->Add(cb_floor, wxGBPosition(1, 2), wxGBSpan(1, 2), wxEXPAND);
+	gbsizer->Add(cb_floor, wxGBPosition(0, 1), wxDefaultSpan, wxEXPAND);
 
 	// Ceilings
 	cb_ceiling = new wxCheckBox(this, -1, "Ceiling Textures");
-	gbsizer->Add(cb_ceiling, wxGBPosition(2, 2), wxGBSpan(1, 2), wxEXPAND);
+	gbsizer->Add(cb_ceiling, wxGBPosition(1, 1), wxDefaultSpan, wxEXPAND);
 
 	sizer->AddStretchSpacer();
 }
