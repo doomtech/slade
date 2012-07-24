@@ -52,6 +52,8 @@
       <File Name="src/PrefsPanelBase.h"/>
       <File Name="src/ColorimetryPrefsPanel.cpp"/>
       <File Name="src/ColorimetryPrefsPanel.h"/>
+      <File Name="src/Map3DPrefsPanel.cpp"/>
+      <File Name="src/Map3DPrefsPanel.h"/>
     </VirtualDirectory>
     <File Name="src/ExtMessageDialog.h"/>
     <File Name="src/ExtMessageDialog.cpp"/>
@@ -122,6 +124,8 @@
     <File Name="src/ColourConfiguration.h"/>
     <File Name="src/KeyBind.cpp"/>
     <File Name="src/KeyBind.h"/>
+    <File Name="src/Lua.cpp"/>
+    <File Name="src/Lua.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">
@@ -545,6 +549,65 @@
       <File Name="src/sfMod/modplug.h"/>
       <File Name="src/sfMod/sfMod.cpp"/>
       <File Name="src/sfMod/sfMod.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Lua">
+      <File Name="src/lua/lapi.c"/>
+      <File Name="src/lua/lapi.h"/>
+      <File Name="src/lua/lauxlib.c"/>
+      <File Name="src/lua/lauxlib.h"/>
+      <File Name="src/lua/lbaselib.c"/>
+      <File Name="src/lua/lbitlib.c"/>
+      <File Name="src/lua/lcode.c"/>
+      <File Name="src/lua/lcode.h"/>
+      <File Name="src/lua/lcorolib.c"/>
+      <File Name="src/lua/lctype.c"/>
+      <File Name="src/lua/lctype.h"/>
+      <File Name="src/lua/ldblib.c"/>
+      <File Name="src/lua/ldebug.c"/>
+      <File Name="src/lua/ldebug.h"/>
+      <File Name="src/lua/ldo.c"/>
+      <File Name="src/lua/ldo.h"/>
+      <File Name="src/lua/ldump.c"/>
+      <File Name="src/lua/lfunc.c"/>
+      <File Name="src/lua/lfunc.h"/>
+      <File Name="src/lua/lgc.c"/>
+      <File Name="src/lua/lgc.h"/>
+      <File Name="src/lua/linit.c"/>
+      <File Name="src/lua/liolib.c"/>
+      <File Name="src/lua/llex.c"/>
+      <File Name="src/lua/llex.h"/>
+      <File Name="src/lua/llimits.h"/>
+      <File Name="src/lua/lmathlib.c"/>
+      <File Name="src/lua/lmem.c"/>
+      <File Name="src/lua/lmem.h"/>
+      <File Name="src/lua/loadlib.c"/>
+      <File Name="src/lua/lobject.c"/>
+      <File Name="src/lua/lobject.h"/>
+      <File Name="src/lua/lopcodes.c"/>
+      <File Name="src/lua/lopcodes.h"/>
+      <File Name="src/lua/loslib.c"/>
+      <File Name="src/lua/lparser.c"/>
+      <File Name="src/lua/lparser.h"/>
+      <File Name="src/lua/lstate.c"/>
+      <File Name="src/lua/lstate.h"/>
+      <File Name="src/lua/lstring.c"/>
+      <File Name="src/lua/lstring.h"/>
+      <File Name="src/lua/lstrlib.c"/>
+      <File Name="src/lua/ltable.c"/>
+      <File Name="src/lua/ltable.h"/>
+      <File Name="src/lua/ltablib.c"/>
+      <File Name="src/lua/ltm.c"/>
+      <File Name="src/lua/ltm.h"/>
+      <File Name="src/lua/lua.h"/>
+      <File Name="src/lua/lua.hpp"/>
+      <File Name="src/lua/luaconf.h"/>
+      <File Name="src/lua/lualib.h"/>
+      <File Name="src/lua/lundump.c"/>
+      <File Name="src/lua/lundump.h"/>
+      <File Name="src/lua/lvm.c"/>
+      <File Name="src/lua/lvm.h"/>
+      <File Name="src/lua/lzio.c"/>
+      <File Name="src/lua/lzio.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="osx">

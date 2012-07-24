@@ -35,6 +35,9 @@ include_directories(${FLUIDSYNTH_INCLUDE_DIR} ${FREEIMAGE_INCLUDE_DIR} ${SFML_IN
 set(SLADE_SOURCES
 )
 file(GLOB SLADE_SOURCES *.cpp)
+set(LUA_SOURCES
+)
+file(GLOB LUA_SOURCES lua/*.c)
 
 add_executable(slade WIN32
 	lzma/C/LzmaDec.c
@@ -44,6 +47,7 @@ add_executable(slade WIN32
 	zreaders/m_alloc.cpp
 	cl_notebook_art/cl_aui_notebook_art.cpp
 	sfMod/sfMod.cpp
+	${LUA_SOURCES}
 	${SLADE_SOURCES}
 )
 
