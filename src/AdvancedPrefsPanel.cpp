@@ -70,6 +70,13 @@ AdvancedPrefsPanel::AdvancedPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent
 AdvancedPrefsPanel::~AdvancedPrefsPanel() {
 }
 
+/* AdvancedPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void AdvancedPrefsPanel::init() {
+	refreshPropGrid();
+}
+
 /* AdvancedPrefsPanel::refreshPropGrid
  * Refreshes the cvars wxPropertyGrid
  *******************************************************************/

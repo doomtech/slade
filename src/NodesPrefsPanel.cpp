@@ -103,6 +103,21 @@ NodesPrefsPanel::NodesPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 NodesPrefsPanel::~NodesPrefsPanel() {
 }
 
+/* NodesPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void NodesPrefsPanel::init() {
+	unsigned sel = 0;
+	for (unsigned a = 0; a < NodeBuilders::nNodeBuilders(); a++) {
+		if (nodebuilder_id == NodeBuilders::getBuilder(a).id) {
+			sel = a;
+			break;
+		}
+	}
+	choice_nodebuilder->Select(sel);
+	populateOptions(nodebuilder_options);
+}
+
 /* NodesPrefsPanel::populateOptions
  * Populates the options CheckListBox with options for the currently
  * selected node builder

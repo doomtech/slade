@@ -59,7 +59,9 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-PreferencesDialog* PreferencesDialog::instance = NULL;
+string PreferencesDialog::last_page = "";
+int PreferencesDialog::width = 0;
+int PreferencesDialog::height = 0;
 
 
 /*******************************************************************
@@ -74,7 +76,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(sizer);
 
-	// Set dialog icon
+	// Set icon
 	wxIcon icon;
 	icon.CopyFromBitmap(getIcon("t_settings"));
 	SetIcon(icon);
@@ -102,7 +104,8 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	panel = new MapDisplayPrefsPanel(tree_prefs);	tree_prefs->AddSubPage(panel, "Display"); prefs_pages.push_back(panel);
 	panel = new Map3DPrefsPanel(tree_prefs);		tree_prefs->AddSubPage(panel, "3D Mode"); prefs_pages.push_back(panel);
 	panel = new NodesPrefsPanel(tree_prefs);		tree_prefs->AddSubPage(panel, "Node Builders"); prefs_pages.push_back(panel);
-	panel = new AdvancedPrefsPanel(tree_prefs);		tree_prefs->AddPage(panel, "Advanced"); prefs_pages.push_back(panel);
+	prefs_advanced = new AdvancedPrefsPanel(tree_prefs);
+	tree_prefs->AddPage(prefs_advanced, "Advanced");
 
 	// Expand all tree nodes (so it gets sized properly)
 	for (unsigned page = 0; page < tree_prefs->GetPageCount(); page++)
@@ -177,12 +180,34 @@ void PreferencesDialog::showPage(string name) {
 	}
 }
 
+/* PreferencesDialog::currentPage
+ * Returns the name of the currently selected page
+ *******************************************************************/
+string PreferencesDialog::currentPage() {
+	int sel = tree_prefs->GetSelection();
+	
+	if (sel >= 0)
+		return tree_prefs->GetPageText(sel);
+	else
+		return "";
+}
+
+/* PreferencesDialog::initPages
+ * Initialises controls on all preference panels
+ *******************************************************************/
+void PreferencesDialog::initPages() {
+	for (unsigned a = 0; a < prefs_pages.size(); a++)
+		prefs_pages[a]->init();
+	prefs_advanced->init();
+}
+
 /* PreferencesDialog::applyPreferences
  * Applies preference values from all preference panels
  *******************************************************************/
 void PreferencesDialog::applyPreferences() {
 	for (unsigned a = 0; a < prefs_pages.size(); a++)
 		prefs_pages[a]->applyPreferences();
+	prefs_advanced->applyPreferences();
 }
 
 
@@ -208,16 +233,33 @@ void PreferencesDialog::onButtonClicked(wxCommandEvent& e) {
 		e.Skip();
 }
 
-void PreferencesDialog::openPreferences(wxWindow* parent) {
-	// Create dialog if needed
-	if (!instance)
-		instance = new PreferencesDialog(parent);
-	else
-		instance->SetParent(parent);
+
+/*******************************************************************
+ * PREFERENCESDIALOG STATIC FUNCTIONS
+ *******************************************************************/
+
+/* PreferencesDialog::openPreferences
+ * Opens a preferences dialog on top of [parent], showing either the
+ * last viewed page or [initial_page] if it is specified
+ *******************************************************************/
+void PreferencesDialog::openPreferences(wxWindow* parent, string initial_page) {
+	// Setup dialog
+	PreferencesDialog dlg(parent);
+	if (initial_page.IsEmpty())
+		initial_page = last_page;
+	dlg.showPage(initial_page);
+	if (width > 0 && height > 0)
+		dlg.SetSize(width, height);
+	dlg.initPages();
+	dlg.CenterOnParent();
 
 	// Show dialog
-	instance->CenterOnParent();
-	if (instance->ShowModal() == wxID_OK)
-		instance->applyPreferences();
+	if (dlg.ShowModal() == wxID_OK)
+		dlg.applyPreferences();
 	theMainWindow->getArchiveManagerPanel()->refreshAllTabs();
+
+	// Save state
+	last_page = dlg.currentPage();
+	width = dlg.GetSize().x;
+	height = dlg.GetSize().y;
 }

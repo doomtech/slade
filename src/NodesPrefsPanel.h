@@ -15,6 +15,7 @@ public:
 	NodesPrefsPanel(wxWindow* parent);
 	~NodesPrefsPanel();
 
+	void	init();
 	void	populateOptions(string options);
 	void	applyPreferences();
 

@@ -412,11 +412,12 @@ void MapEditorWindow::buildNodes(Archive* wad) {
 	// Check for undefined path
 	if (!wxFileExists(builder.path) && !nb_warned) {
 		// Open nodebuilder preferences
-		PreferencesDialog pd(this);
-		pd.showPage("Node Builders");
-		if (pd.ShowModal() == wxID_OK)
-			pd.applyPreferences();
-		theMainWindow->getArchiveManagerPanel()->refreshAllTabs();
+		//PreferencesDialog pd(this);
+		//pd.showPage("Node Builders");
+		//if (pd.ShowModal() == wxID_OK)
+		//	pd.applyPreferences();
+		//theMainWindow->getArchiveManagerPanel()->refreshAllTabs();
+		PreferencesDialog::openPreferences(this, "Node Builders");
 
 		// Get new builder if one was selected
 		builder = NodeBuilders::getBuilder(nodebuilder_id);

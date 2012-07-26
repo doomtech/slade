@@ -9,6 +9,7 @@
 
 class TextStylePrefsPanel : public PrefsPanelBase {
 private:
+	bool				init_done;
 	wxChoice*			choice_styleset;
 	wxButton*			btn_savestyleset;
 	wxListBox*			list_styles;
@@ -40,6 +41,7 @@ public:
 	void	updateForeground();
 	void	updateBackground();
 
+	void	init();
 	void	applyPreferences();
 
 	// Events

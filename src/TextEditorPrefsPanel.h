@@ -21,6 +21,7 @@ public:
 	TextEditorPrefsPanel(wxWindow* parent);
 	~TextEditorPrefsPanel();
 
+	void	init();
 	void	applyPreferences();
 };
 

@@ -18,6 +18,7 @@ public:
 	GraphicsPrefsPanel(wxWindow* parent);
 	~GraphicsPrefsPanel();
 
+	void	init();
 	void	applyPreferences();
 
 	// Events

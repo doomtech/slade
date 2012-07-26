@@ -98,6 +98,15 @@ PNGPrefsPanel::PNGPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 PNGPrefsPanel::~PNGPrefsPanel() {
 }
 
+/* PNGPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void PNGPrefsPanel::init() {
+	text_pngoutpath->SetValue(wxString(path_pngout));
+	text_pngcrushpath->SetValue(wxString(path_pngcrush));
+	text_defloptpath->SetValue(wxString(path_deflopt));
+}
+
 /* PNGPrefsPanel::applyPreferences
  * Applies preferences from the panel controls
  *******************************************************************/

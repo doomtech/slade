@@ -13,7 +13,8 @@ public:
 	MapEditorPrefsPanel(wxWindow* parent);
 	~MapEditorPrefsPanel();
 
-	void applyPreferences();
+	void	init();
+	void	applyPreferences();
 };
 
 #endif//__MAP_EDITOR_PREFS_PANEL_H__

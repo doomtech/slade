@@ -15,6 +15,7 @@ public:
 	AudioPrefsPanel(wxWindow* parent);
 	~AudioPrefsPanel();
 
+	void	init();
 	void	applyPreferences();
 
 	// Events

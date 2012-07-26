@@ -75,6 +75,13 @@ ACSPrefsPanel::ACSPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 ACSPrefsPanel::~ACSPrefsPanel() {
 }
 
+/* ACSPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void ACSPrefsPanel::init() {
+	text_accpath->SetValue(wxString(path_acc));
+}
+
 /* ACSPrefsPanel::applyPreferences
  * Applies preferences from the panel controls
  *******************************************************************/

@@ -109,8 +109,18 @@ TextEditorPrefsPanel::TextEditorPrefsPanel(wxWindow* parent) : PrefsPanelBase(pa
 	// Calltips on parenthesis
 	cb_calltips_parenthesis = new wxCheckBox(this, -1, "Show calltips on opening parenthesis");
 	sizer->Add(cb_calltips_parenthesis, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+}
 
-	// Init controls
+/* TextEditorPrefsPanel::~TextEditorPrefsPanel
+ * TextEditorPrefsPanel class destructor
+ *******************************************************************/
+TextEditorPrefsPanel::~TextEditorPrefsPanel() {
+}
+
+/* TextEditorPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void TextEditorPrefsPanel::init() {
 	cb_auto_indent->SetValue(txed_auto_indent);
 	cb_trim_whitespace->SetValue(txed_trim_whitespace);
 	cb_syntax_hilight->SetValue(txed_syntax_hilight);
@@ -118,12 +128,8 @@ TextEditorPrefsPanel::TextEditorPrefsPanel(wxWindow* parent) : PrefsPanelBase(pa
 	cb_brace_match->SetValue(txed_brace_match);
 	cb_calltips_mouse->SetValue(txed_calltips_mouse);
 	cb_calltips_parenthesis->SetValue(txed_calltips_parenthesis);
-}
-
-/* TextEditorPrefsPanel::~TextEditorPrefsPanel
- * TextEditorPrefsPanel class destructor
- *******************************************************************/
-TextEditorPrefsPanel::~TextEditorPrefsPanel() {
+	spin_right_margin->SetValue(txed_edge_column);
+	spin_tab_width->SetValue(txed_tab_width);
 }
 
 /* TextEditorPrefsPanel::applyPreferences

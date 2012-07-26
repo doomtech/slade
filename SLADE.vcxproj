@@ -403,6 +403,7 @@
     <ClInclude Include="src\bzip2\bzlib_private.h" />
     <ClInclude Include="src\cl_notebook_art\cl_aui_notebook_art.h" />
     <ClInclude Include="src\CodePages.h" />
+    <ClInclude Include="src\ColorimetryPrefsPanel.h" />
     <ClInclude Include="src\ColourConfiguration.h" />
     <ClInclude Include="src\ColourPrefsPanel.h" />
     <ClInclude Include="src\Compression.h" />

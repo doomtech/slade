@@ -40,6 +40,7 @@ public:
 	void			addKey();
 	void			removeKey(wxTreeListItem item);
 
+	void			init();
 	void			applyPreferences();
 
 	// Events

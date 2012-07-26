@@ -156,14 +156,22 @@ TextStylePrefsPanel::TextStylePrefsPanel(wxWindow* parent) : PrefsPanelBase(pare
 	choice_styleset->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &TextStylePrefsPanel::onStyleSetSelected, this);
 
 	// Select default style
+	init_done = false;
 	list_styles->SetSelection(0);
 	updateStyleControls();
+	init_done = true;
 }
 
 /* TextStylePrefsPanel::~TextStylePrefsPanel
  * TextStylePrefsPanel class destructor
  *******************************************************************/
 TextStylePrefsPanel::~TextStylePrefsPanel() {
+}
+
+/* TextStylePrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void TextStylePrefsPanel::init() {
 }
 
 /* TextStylePrefsPanel::updateStyleControls
@@ -526,10 +534,12 @@ void TextStylePrefsPanel::onBtnSaveStyleSet(wxCommandEvent& e) {
  * Called when the style set selection is changed
  *******************************************************************/
 void TextStylePrefsPanel::onStyleSetSelected(wxCommandEvent& e) {
-	// Get selected styleset
-	StyleSet* set = StyleSet::getSet(choice_styleset->GetSelection());
-	if (set) {
-		ss_current.copySet(set);
-		updateStyleControls();
+	if (init_done) {
+		// Get selected styleset
+		StyleSet* set = StyleSet::getSet(choice_styleset->GetSelection());
+		if (set) {
+			ss_current.copySet(set);
+			updateStyleControls();
+		}
 	}
 }

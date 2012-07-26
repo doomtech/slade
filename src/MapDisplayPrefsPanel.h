@@ -38,7 +38,8 @@ public:
 	MapDisplayPrefsPanel(wxWindow* parent);
 	~MapDisplayPrefsPanel();
 
-	void applyPreferences();
+	void	init();
+	void	applyPreferences();
 };
 
 #endif//__MAP_DISPLAY_PREFS_PANEL_H__

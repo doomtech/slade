@@ -399,6 +399,7 @@ void MapRenderer3D::renderMap() {
 	// Render sky
 	if (render_3d_sky)
 		renderSky();
+	COL_WHITE.set_gl();
 
 	// Render walls
 	renderWalls();

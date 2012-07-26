@@ -84,6 +84,13 @@ ColourPrefsPanel::ColourPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 ColourPrefsPanel::~ColourPrefsPanel() {
 }
 
+/* ColourPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void ColourPrefsPanel::init() {
+	refreshPropGrid();
+}
+
 /* ColourPrefsPanel::refreshPropGrid
  * Refreshes the colour configuration wxPropertyGrid
  *******************************************************************/

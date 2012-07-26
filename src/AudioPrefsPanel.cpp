@@ -61,13 +61,12 @@ AudioPrefsPanel::AudioPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 
 	// Autoplay
 	cb_snd_autoplay = new wxCheckBox(this, -1, "Automatically play audio entries when opened");
-	cb_snd_autoplay->SetValue(snd_autoplay);
 	sizer->Add(cb_snd_autoplay, 0, wxEXPAND|wxALL, 4);
 
 	// MIDI Soundfont path
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add(new wxStaticText(this, -1, "Location of MIDI soundfont:"), 0, wxALL, 4);
-	text_soundfont_path = new wxTextCtrl(this, -1, wxString(fs_soundfont_path));
+	text_soundfont_path = new wxTextCtrl(this, -1);
 	hbox->Add(text_soundfont_path, 1, wxEXPAND|wxRIGHT, 4);
 	btn_browse_soundfont = new wxButton(this, -1, "Browse");
 	hbox->Add(btn_browse_soundfont, 0, wxEXPAND);
@@ -89,6 +88,14 @@ AudioPrefsPanel::AudioPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
  * AudioPrefsPanel class destructor
  *******************************************************************/
 AudioPrefsPanel::~AudioPrefsPanel() {
+}
+
+/* AudioPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void AudioPrefsPanel::init() {
+	cb_snd_autoplay->SetValue(snd_autoplay);
+	text_soundfont_path->SetValue(wxString(fs_soundfont_path));
 }
 
 /* AudioPrefsPanel::applyPreferences

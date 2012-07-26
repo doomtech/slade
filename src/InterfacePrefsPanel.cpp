@@ -83,21 +83,24 @@ InterfacePrefsPanel::InterfacePrefsPanel(wxWindow* parent) : PrefsPanelBase(pare
 	// Show startpage
 	cb_start_page = new wxCheckBox(this, -1, "Show Start Page on Startup");
 	sizer->Add(cb_start_page, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
-
-	// Init controls
-	cb_size_as_string->SetValue(size_as_string);
-	cb_filter_dirs->SetValue(!elist_filter_dirs);
-	cb_list_monospace->SetValue(list_font_monospace);
-	cb_start_page->SetValue(show_start_page);
-	cb_swap_epanel_bars->SetValue(swap_epanel_bars);
-	cb_context_submenus->SetValue(context_submenus);
 }
 
 /* InterfacePrefsPanel::~InterfacePrefsPanel
  * InterfacePrefsPanel class destructor
  *******************************************************************/
 InterfacePrefsPanel::~InterfacePrefsPanel() {
+}
+
+/* InterfacePrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void InterfacePrefsPanel::init() {
+	cb_size_as_string->SetValue(size_as_string);
+	cb_filter_dirs->SetValue(!elist_filter_dirs);
+	cb_list_monospace->SetValue(list_font_monospace);
+	cb_start_page->SetValue(show_start_page);
+	cb_swap_epanel_bars->SetValue(swap_epanel_bars);
+	cb_context_submenus->SetValue(context_submenus);
 }
 
 /* InterfacePrefsPanel::applyPreferences

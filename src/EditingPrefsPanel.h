@@ -13,6 +13,7 @@ public:
 	EditingPrefsPanel(wxWindow* parent);
 	~EditingPrefsPanel();
 
+	void	init();
 	void	applyPreferences();
 };
 

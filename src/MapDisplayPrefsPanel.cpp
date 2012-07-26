@@ -50,7 +50,6 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : PrefsPanelBase(pa
 
 	// Dashed grid
 	cb_grid_dashed = new wxCheckBox(panel, -1, "Dashed grid");
-	cb_grid_dashed->SetValue(grid_dashed);
 	sizer->Add(cb_grid_dashed, 0, wxEXPAND|wxALL, 4);
 
 	// Always show line direction tabs
@@ -188,8 +187,16 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : PrefsPanelBase(pa
 	cb_flat_fade = new wxCheckBox(panel, -1, "Fade flats when not in sectors mode");
 	sizer->Add(cb_flat_fade, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	Layout();
+}
 
-	// Init values
+MapDisplayPrefsPanel::~MapDisplayPrefsPanel() {
+}
+
+/* MapDisplayPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void MapDisplayPrefsPanel::init() {
 	cb_vertex_round->SetValue(vertex_round);
 	cb_line_smooth->SetValue(line_smooth);
 	cb_line_tabs_always->SetValue(line_tabs_always);
@@ -205,12 +212,11 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : PrefsPanelBase(pa
 	choice_things_always->SetSelection(things_always);
 	cb_line_fade->SetValue(line_fade);
 	cb_flat_fade->SetValue(flat_fade);
-
-
-	Layout();
-}
-
-MapDisplayPrefsPanel::~MapDisplayPrefsPanel() {
+	cb_grid_dashed->SetValue(grid_dashed);
+	slider_vertex_size->SetValue(vertex_size);
+	slider_line_width->SetValue(line_width * 10);
+	slider_thing_shadow->SetValue(thing_shadow * 10);
+	slider_flat_brightness->SetValue(flat_brightness * 10);
 }
 
 void MapDisplayPrefsPanel::applyPreferences() {

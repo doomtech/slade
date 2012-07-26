@@ -15,6 +15,7 @@ public:
 	ColourPrefsPanel(wxWindow* parent);
 	~ColourPrefsPanel();
 
+	void	init();
 	void	refreshPropGrid();
 	void	applyPreferences();
 

@@ -17,6 +17,7 @@ public:
 	PNGPrefsPanel(wxWindow* parent);
 	~PNGPrefsPanel();
 
+	void	init();
 	void	applyPreferences();
 
 	// Events

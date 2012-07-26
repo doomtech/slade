@@ -89,15 +89,12 @@ ColorimetryPrefsPanel::ColorimetryPrefsPanel(wxWindow* parent) : PrefsPanelBase(
 	sizer->Add(new wxStaticText(this, -1, "RGB weights for greyscale luminance:"), 0, wxALL, 4);
 	hbox->Add(new wxStaticText(this, -1, "R:"), 0, wxALL, 4);
 	spin_grey_r = new wxSpinCtrlDouble(this, -1, "GreyscaleRed", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 1.0, 0.001, 0.001);
-	spin_grey_r->SetValue(col_greyscale_r);
 	hbox->Add(spin_grey_r, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "G:"), 0, wxALL, 4);
 	spin_grey_g = new wxSpinCtrlDouble(this, -1, "GreyscaleGreen", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 1.0, 0.001, 0.001);
-	spin_grey_g->SetValue(col_greyscale_g);
 	hbox->Add(spin_grey_g, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "B:"), 0, wxALL, 4);
 	spin_grey_b = new wxSpinCtrlDouble(this, -1, "GreyscaleBlue", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 1.0, 0.001, 0.001);
-	spin_grey_b->SetValue(col_greyscale_b);
 	hbox->Add(spin_grey_b, 0, wxEXPAND|wxBOTTOM, 4);
 	string rbgweights[] = { "Default / Standard", "Carmack's Typo", "Linear RGB" };
 	choice_presets_grey = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 3, rbgweights);
@@ -111,7 +108,6 @@ ColorimetryPrefsPanel::ColorimetryPrefsPanel(wxWindow* parent) : PrefsPanelBase(
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	string matchers[] = { "RGB (integer)", "RGB (double)", "HSL", "CIE 76", "CIE 94", "CIEDE 2000" };
 	choice_colmatch = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 6, matchers);
-	if (col_match > Palette8bit::MATCH_DEFAULT && col_match < Palette8bit::MATCH_STOP) choice_colmatch->SetSelection(col_match - 1);
 	hbox->Add(new wxStaticText(this, -1, "Color matching:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 	hbox->Add(choice_colmatch, 1, wxEXPAND);
 	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
@@ -120,27 +116,21 @@ ColorimetryPrefsPanel::ColorimetryPrefsPanel(wxWindow* parent) : PrefsPanelBase(
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	hbox->Add(new wxStaticText(this, -1, "R:"), 0, wxALL, 4);
 	spin_factor_r = new wxSpinCtrlDouble(this, -1, "RedFactor", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_factor_r->SetValue(col_match_r);
 	hbox->Add(spin_factor_r, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "G:"), 0, wxALL, 4);
 	spin_factor_g = new wxSpinCtrlDouble(this, -1, "GreenFactor", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_factor_g->SetValue(col_match_g);
 	hbox->Add(spin_factor_g, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "B:"), 0, wxALL, 4);
 	spin_factor_b = new wxSpinCtrlDouble(this, -1, "BlueFactor", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_factor_b->SetValue(col_match_g);
 	hbox->Add(spin_factor_b, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "H:"), 0, wxALL, 4);
 	spin_factor_h = new wxSpinCtrlDouble(this, -1, "HueFactor", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_factor_h->SetValue(col_match_h);
 	hbox->Add(spin_factor_h, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "S:"), 0, wxALL, 4);
 	spin_factor_s = new wxSpinCtrlDouble(this, -1, "SatFactor", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_factor_s->SetValue(col_match_s);
 	hbox->Add(spin_factor_s, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "L:"), 0, wxALL, 4);
 	spin_factor_l = new wxSpinCtrlDouble(this, -1, "LumFactor", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_factor_l->SetValue(col_match_l);
 	hbox->Add(spin_factor_l, 0, wxEXPAND|wxBOTTOM, 4);
 	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
 	sizer->Add(vbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
@@ -151,11 +141,9 @@ ColorimetryPrefsPanel::ColorimetryPrefsPanel(wxWindow* parent) : PrefsPanelBase(
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	hbox->Add(new wxStaticText(this, -1, "X:"), 0, wxALL, 4);
 	spin_tristim_x = new wxSpinCtrlDouble(this, -1, "TriStimX", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 200.0, 100.0, 0.1);
-	spin_tristim_x->SetValue(col_cie_tristim_x);
 	hbox->Add(spin_tristim_x, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "Z:"), 0, wxALL, 4);
 	spin_tristim_z = new wxSpinCtrlDouble(this, -1, "TriStimZ", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 200.0, 100.0, 0.1);
-	spin_tristim_z->SetValue(col_cie_tristim_z);
 	hbox->Add(spin_tristim_z, 0, wxEXPAND|wxBOTTOM, 4);
 	string tristimuli[] = { 
 		"Illuminant A, 2° Observer", "Illuminant A, 10° Observer", 
@@ -179,23 +167,18 @@ ColorimetryPrefsPanel::ColorimetryPrefsPanel(wxWindow* parent) : PrefsPanelBase(
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	hbox->Add(new wxStaticText(this, -1, "KL:"), 0, wxALL, 4);
 	spin_cie_kl = new wxSpinCtrlDouble(this, -1, "KL", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_cie_kl->SetValue(col_cie_kl);
 	hbox->Add(spin_cie_kl, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "K1:"), 0, wxALL, 4);
 	spin_cie_k1 = new wxSpinCtrlDouble(this, -1, "K1", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_cie_k1->SetValue(col_cie_k1);
 	hbox->Add(spin_cie_k1, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "K2:"), 0, wxALL, 4);
 	spin_cie_k2 = new wxSpinCtrlDouble(this, -1, "K2", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_cie_k2->SetValue(col_cie_k2);
 	hbox->Add(spin_cie_k2, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "KC:"), 0, wxALL, 4);
 	spin_cie_kc = new wxSpinCtrlDouble(this, -1, "KC", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_cie_kc->SetValue(col_cie_kc);
 	hbox->Add(spin_cie_kc, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(new wxStaticText(this, -1, "KH:"), 0, wxALL, 4);
 	spin_cie_kh = new wxSpinCtrlDouble(this, -1, "KH", wxDefaultPosition, spinsize, wxSP_ARROW_KEYS, 0.0, 10.0, 1.0, 0.1);
-	spin_cie_kh->SetValue(col_cie_kh);
 	hbox->Add(spin_cie_kh, 0, wxEXPAND|wxBOTTOM, 4);
 	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
 
@@ -212,6 +195,29 @@ ColorimetryPrefsPanel::ColorimetryPrefsPanel(wxWindow* parent) : PrefsPanelBase(
  * ColorimetryPrefsPanel class destructor
  *******************************************************************/
 ColorimetryPrefsPanel::~ColorimetryPrefsPanel() {
+}
+
+/* ColorimetryPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void ColorimetryPrefsPanel::init() {
+	spin_grey_r->SetValue(col_greyscale_r);
+	spin_grey_g->SetValue(col_greyscale_g);
+	spin_grey_b->SetValue(col_greyscale_b);
+	if (col_match > Palette8bit::MATCH_DEFAULT && col_match < Palette8bit::MATCH_STOP) choice_colmatch->SetSelection(col_match - 1);
+	spin_factor_r->SetValue(col_match_r);
+	spin_factor_g->SetValue(col_match_g);
+	spin_factor_b->SetValue(col_match_b);
+	spin_factor_h->SetValue(col_match_h);
+	spin_factor_s->SetValue(col_match_s);
+	spin_factor_l->SetValue(col_match_l);
+	spin_tristim_x->SetValue(col_cie_tristim_x);
+	spin_tristim_z->SetValue(col_cie_tristim_z);
+	spin_cie_kl->SetValue(col_cie_kl);
+	spin_cie_k1->SetValue(col_cie_k1);
+	spin_cie_k2->SetValue(col_cie_k2);
+	spin_cie_kc->SetValue(col_cie_kc);
+	spin_cie_kh->SetValue(col_cie_kh);
 }
 
 /* ColorimetryPrefsPanel::applyPreferences

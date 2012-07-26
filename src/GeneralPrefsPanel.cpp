@@ -74,19 +74,26 @@ GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) 
 #ifdef WIN32
 	cb_temp_dir = new wxCheckBox(this, -1, "Write temp files to SLADE directory rather than system temp folder");
 	sizer->Add(cb_temp_dir, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-	cb_temp_dir->SetValue(temp_use_appdir);
 #endif
-
-	// Init controls
-	cb_archive_load->SetValue(archive_load_data);
-	cb_archive_close_tab->SetValue(close_archive_with_tab);
-	cb_gl_np2->SetValue(gl_tex_enable_np2);
 }
 
 /* GeneralPrefsPanel::~GeneralPrefsPanel
  * GeneralPrefsPanel class destructor
  *******************************************************************/
 GeneralPrefsPanel::~GeneralPrefsPanel() {
+}
+
+/* GeneralPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void GeneralPrefsPanel::init() {
+	cb_archive_load->SetValue(archive_load_data);
+	cb_archive_close_tab->SetValue(close_archive_with_tab);
+	cb_gl_np2->SetValue(gl_tex_enable_np2);
+
+#ifdef WIN32
+	cb_temp_dir->SetValue(temp_use_appdir);
+#endif
 }
 
 /* GeneralPrefsPanel::applyPreferences

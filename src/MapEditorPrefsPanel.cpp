@@ -18,18 +18,24 @@ MapEditorPrefsPanel::MapEditorPrefsPanel(wxWindow* parent) : PrefsPanelBase(pare
 
 	// Smooth scroll
 	cb_scroll_smooth = new wxCheckBox(this, -1, "Enable smooth scrolling");
-	cb_scroll_smooth->SetValue(scroll_smooth);
 	sizer->Add(cb_scroll_smooth, 0, wxEXPAND|wxALL, 4);
 
 	// Clear selection on click
 	cb_selection_clear_click = new wxCheckBox(this, -1, "Clear selection when nothing is clicked");
-	cb_selection_clear_click->SetValue(selection_clear_click);
 	sizer->Add(cb_selection_clear_click, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	Layout();
 }
 
 MapEditorPrefsPanel::~MapEditorPrefsPanel() {
+}
+
+/* MapEditorPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void MapEditorPrefsPanel::init() {
+	cb_scroll_smooth->SetValue(scroll_smooth);
+	cb_selection_clear_click->SetValue(selection_clear_click);
 }
 
 void MapEditorPrefsPanel::applyPreferences() {

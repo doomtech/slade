@@ -13,6 +13,7 @@ public:
 	ACSPrefsPanel(wxWindow* parent);
 	~ACSPrefsPanel();
 
+	void	init();
 	void	applyPreferences();
 
 	// Events

@@ -118,6 +118,13 @@ InputPrefsPanel::InputPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) {
 InputPrefsPanel::~InputPrefsPanel() {
 }
 
+/* InputPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void InputPrefsPanel::init() {
+	updateBindsList();
+}
+
 wxTreeListItem InputPrefsPanel::getListGroupItem(string group) {
 	// Go through items
 	wxTreeListItem item = list_binds->GetFirstChild(list_binds->GetRootItem());

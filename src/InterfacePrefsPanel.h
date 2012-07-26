@@ -17,6 +17,7 @@ public:
 	InterfacePrefsPanel(wxWindow* parent);
 	~InterfacePrefsPanel();
 
+	void	init();
 	void	applyPreferences();
 };
 

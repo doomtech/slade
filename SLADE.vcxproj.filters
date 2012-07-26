@@ -1791,6 +1791,9 @@
     <ClInclude Include="src\lua\lzio.h">
       <Filter>External\Lua</Filter>
     </ClInclude>
+    <ClInclude Include="src\ColorimetryPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="slade.ico" />

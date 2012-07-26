@@ -14,6 +14,7 @@ public:
 	~AdvancedPrefsPanel();
 
 	void	refreshPropGrid();
+	void	init();
 	void	applyPreferences();
 };
 

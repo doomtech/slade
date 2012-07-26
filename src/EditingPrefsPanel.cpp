@@ -67,16 +67,20 @@ EditingPrefsPanel::EditingPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent) 
 	choice_entry_mod = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 3, choices);
 	hbox->Add(new wxStaticText(this, -1, "Action on unsaved entry changes:"), 1, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 	hbox->Add(choice_entry_mod, 0, wxEXPAND, 0);
-
-	// Init controls
-	cb_wad_force_uppercase->SetValue(wad_force_uppercase);
-	choice_entry_mod->SetSelection(autosave_entry_changes);
 }
 
 /* EditingPrefsPanel::~EditingPrefsPanel
  * EditingPrefsPanel class destructor
  *******************************************************************/
 EditingPrefsPanel::~EditingPrefsPanel() {
+}
+
+/* EditingPrefsPanel::init
+ * Initialises panel controls
+ *******************************************************************/
+void EditingPrefsPanel::init() {
+	cb_wad_force_uppercase->SetValue(wad_force_uppercase);
+	choice_entry_mod->SetSelection(autosave_entry_changes);
 }
 
 /* EditingPrefsPanel::applyPreferences

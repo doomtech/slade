@@ -31,6 +31,7 @@ public:
 	ColorimetryPrefsPanel(wxWindow* parent);
 	~ColorimetryPrefsPanel();
 
+	void	init();
 	void	applyPreferences();
 
 	// Events

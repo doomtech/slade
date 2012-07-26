@@ -7,6 +7,7 @@ public:
 	PrefsPanelBase(wxWindow* parent) : wxPanel(parent, -1) {}
 	~PrefsPanelBase() {}
 
+	virtual void init() {}
 	virtual void applyPreferences() {}
 };
 
