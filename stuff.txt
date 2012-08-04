@@ -10,8 +10,7 @@ TODO List ---------------------------------------------------------------
 --- Bugs ---
 - Gfx doesn't update after being converted
 - No handling for when a line is moved to overlap another
-- Map editor isn't using custom palettes any more for some reason (should probably rewrite palette management stuff)
-	- Double-check that, it works for me.
+- Map editor should use PLAYPAL from resource chain on 'existing/global'
 
 
 --- Map Editor ---
@@ -41,7 +40,6 @@ TODO List ---------------------------------------------------------------
 - (Possibly) better line/thing flag handling
 - 'Tag edit' mode
 - Optimise Polygon2D splitting somehow, it creates many unneeded splits
-- Ability to set 3d mode camera position from 2d mode
 
 
 --- Minor Problems/Annoyances ---

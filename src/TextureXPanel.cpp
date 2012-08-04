@@ -1122,15 +1122,21 @@ void TextureXPanel::onTextureListKeyDown(wxKeyEvent& e) {
 			removeTexture();
 			return;
 		}
-	// Cut (Ctrl+X)
-	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'X') {
-		copy();
-		removeTexture();
-	}
 
-	// Paste (Ctrl+V)
-	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'V')
-		paste();
+		/*
+		// Cut (Ctrl+X)
+		else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'X') {
+			copy();
+			removeTexture();
+			return;
+		}
+
+		// Paste (Ctrl+V)
+		else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'V') {
+			paste();
+			return;
+		}
+		*/
 
 		// Paste
 		else if (name == "paste") {

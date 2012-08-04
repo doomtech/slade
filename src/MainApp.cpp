@@ -75,6 +75,7 @@ string	dir_data = "";
 string	dir_user = "";
 string	dir_app = "";
 bool	exiting = false;
+string	current_action = "";
 CVAR(Bool, temp_use_appdir, false, CVAR_SAVE)
 CVAR(String, dir_last, "", CVAR_SAVE)
 
@@ -151,6 +152,11 @@ public:
 
 		// Setup stack trace string
 		string trace = S_FMT("Version: %s\n", CHR(Global::version));
+		if (current_action.IsEmpty())
+			trace += "No current action\n";
+		else
+			trace += S_FMT("Current action: %s", CHR(current_action));
+		trace += "\n";
 		trace += st.getTraceString();
 
 		// Add stack trace text area
@@ -886,8 +892,11 @@ void MainApp::onMenu(wxCommandEvent& e) {
 	}
 
 	// If action is valid, send to all action handlers
-	if (!action.IsEmpty())
+	if (!action.IsEmpty()) {
+		current_action = action;
 		doAction(action);
+		current_action = "";
+	}
 
 	// Otherwise, let something else handle it
 	else
