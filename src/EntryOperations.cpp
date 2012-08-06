@@ -184,9 +184,21 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 				header.left = w * 0.5;
 				header.top = h * 0.5;
 			}
-			else if (auto_type == 3) {		// Weapon
+			else if (auto_type == 3) {		// Weapon (fullscreen)
 				header.left = -160 + (w * 0.5);
 				header.top = -200 + h;
+			}
+			else if (auto_type == 4) {		// Weapon (Doom status bar)
+				header.left = -160 + (w * 0.5);
+				header.top = -200 + 32 + h;
+			}
+			else if (auto_type == 5) {		// Weapon (Heretic status bar)
+				header.left = -160 + (w * 0.5);
+				header.top = -200 + 42 + h;
+			}
+			else if (auto_type == 6) {		// Weapon (Hexen status bar)
+				header.left = -160 + (w * 0.5);
+				header.top = -200 + 38 + h;
 			}
 		}
 		else {

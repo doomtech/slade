@@ -216,8 +216,8 @@ public:
 	int isThisFormat(MemChunk& mc) {
 		// Check size
 		if (mc.getSize() > 1084) {
-			// Check format
-			if (mc[950] >= 1 && mc[950] <= 128 && (mc[951] & 127) == 127) {
+			// Check format; note: byte 951 is used by NoiseTracker to indicate restart byte so it can be any value
+			if (mc[950] >= 1 && mc[950] <= 128 /*&& (mc[951] & 127) == 127*/) {
 				if ((mc[1080] == 'M' && mc[1081] == '.' && mc[1082] == 'K' && mc[1083] == '.') ||
 					(mc[1080] == 'M' && mc[1081] == '!' && mc[1082] == 'K' && mc[1083] == '!') ||
 					(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '4') ||

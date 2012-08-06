@@ -73,7 +73,6 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id, bool handle_timer)
 	//sf::RenderWindow::Create(GDK_WINDOW_XWINDOW(Win));
 	handle = GDK_WINDOW_XWINDOW(Win);
 #else
-	//sf::RenderWindow::Create(GetHandle());
 	handle = GetHandle();
 #endif
 
@@ -84,6 +83,7 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id, bool handle_timer)
 	// Context settings
 	sf::ContextSettings settings;
 	settings.depthBits = 32;
+	settings.stencilBits = 8;
 	sf::RenderWindow::create(handle, settings);
 #endif
 

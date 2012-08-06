@@ -278,7 +278,7 @@ bool MapPreviewCanvas::openMap(Archive::mapdesc_t map) {
 				// Check properties
 				bool special = false;
 				bool twosided = false;
-				if (l.side2 > 0)
+				if (l.side2 != 0xFFFF)
 					twosided = true;
 				if (l.type > 0)
 					special = true;
@@ -298,7 +298,7 @@ bool MapPreviewCanvas::openMap(Archive::mapdesc_t map) {
 				bool macro = false;
 				bool special = false;
 				bool twosided = false;
-				if (l.side2 > 0)
+				if (l.side2  != 0xFFFF)
 					twosided = true;
 				if (l.type > 0) {
 					if (l.type & 0x100)
@@ -320,7 +320,7 @@ bool MapPreviewCanvas::openMap(Archive::mapdesc_t map) {
 				// Check properties
 				bool special = false;
 				bool twosided = false;
-				if (l.side2 > 0)
+				if (l.side2 != 0xFFFF)
 					twosided = true;
 				if (l.type > 0)
 					special = true;

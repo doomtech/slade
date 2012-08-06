@@ -79,10 +79,13 @@ ModifyOffsetsDialog::ModifyOffsetsDialog()
 		"Monster",
 		"Monster (GL-friendly)",
 		"Projectile",
-		"Hud/Weapon"
+		"Hud/Weapon",
+		"Hud/Weapon (Doom)",
+		"Hud/Weapon (Heretic)",
+		"Hud/Weapon (Hexen)",
 	};
 
-	combo_aligntype = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 3, offtypes);
+	combo_aligntype = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 7, offtypes);
 	combo_aligntype->Select(0);
 	combo_aligntype->Enable(false);
 	hbox->Add(combo_aligntype, 0, wxEXPAND|wxALL, 4);

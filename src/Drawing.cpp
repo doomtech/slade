@@ -699,8 +699,11 @@ void Drawing::drawHud() {
 	// Draw statusbar line if needed
 	glLineWidth(1.0f);
 	glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-	if (hud_statusbar)
-		drawLine(-hw, 68, hw, 68);
+	if (hud_statusbar) {
+		drawLine(-hw, 68, hw, 68);	// Doom's status bar: 32 pixels tall
+		drawLine(-hw, 62, hw, 62);	// Hexen: 38 pixels
+		drawLine(-hw, 58, hw, 58);	// Heretic: 42 pixels
+	}
 
 	// Draw center lines if needed
 	if (hud_center) {

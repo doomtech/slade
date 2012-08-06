@@ -981,6 +981,18 @@ bool TextureXPanel::modifyOffsets() {
 				ctex->setOffsetX(-160 + (w * 0.5));
 				ctex->setOffsetY(-200 + h);
 				break;
+			case 4: // Auto Offsets selected: Weapon (Doom status bar)
+				ctex->setOffsetX(-160 + (w * 0.5));
+				ctex->setOffsetY(-200 + 32 + h);
+				break;
+			case 5: // Auto Offsets selected: Weapon (Heretic status bar)
+				ctex->setOffsetX(-160 + (w * 0.5));
+				ctex->setOffsetY(-200 + 42 + h);
+				break;
+			case 6: // Auto Offsets selected: Weapon (Hexen status bar)
+				ctex->setOffsetX(-160 + (w * 0.5));
+				ctex->setOffsetY(-200 + 38 + h);
+				break;
 			default: // Set Offsets selected
 				if (relative) {
 					ofx += ctex->getOffsetX();

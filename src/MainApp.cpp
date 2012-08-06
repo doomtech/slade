@@ -328,7 +328,7 @@ void MainApp::initLogFile() {
 	wxLogMessage("SLADE - It's a Doom Editor");
 	wxLogMessage("Version %s", Global::version.c_str());
 	wxLogMessage("Written by Simon Judd, 2008-%s", year.c_str());
-	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
+	wxLogMessage("Compiled with wxWidgets %i.%i.%i and SFML %i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER, SFML_VERSION_MAJOR, SFML_VERSION_MINOR);
 	wxLogMessage("--------------------------------");
 }
 
