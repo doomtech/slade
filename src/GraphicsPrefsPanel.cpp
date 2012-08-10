@@ -42,6 +42,7 @@ EXTERN_CVAR(String, bgtx_colour2)
 EXTERN_CVAR(Bool, gfx_show_border)
 EXTERN_CVAR(Bool, gfx_extraconv)
 EXTERN_CVAR(Int, browser_bg_type)
+EXTERN_CVAR(Bool, gfx_hilight_mouseover)
 
 
 /*******************************************************************
@@ -89,6 +90,10 @@ GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : PrefsPanelBase(parent
 	cb_show_border = new wxCheckBox(this, -1, "Show outline around graphics and textures");
 	sizer->Add(cb_show_border, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// 'Hilight gfx on mouseover'
+	cb_hilight_mouseover = new wxCheckBox(this, -1, "Hilight graphics on mouse hover");
+	sizer->Add(cb_hilight_mouseover, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
 	// 'Extra image conversion options'
 	cb_extra_gfxconv = new wxCheckBox(this, -1, "Offer additional conversion options");
 	sizer->Add(cb_extra_gfxconv, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
@@ -120,6 +125,7 @@ void GraphicsPrefsPanel::init() {
 	cb_show_border->SetValue(gfx_show_border);
 	cb_extra_gfxconv->SetValue(gfx_extraconv);
 	choice_browser_bg->SetSelection(browser_bg_type);
+	cb_hilight_mouseover->SetValue(gfx_hilight_mouseover);
 }
 
 /* GraphicsPrefsPanel::applyPreferences
@@ -134,6 +140,7 @@ void GraphicsPrefsPanel::applyPreferences() {
 	gfx_show_border = cb_show_border->GetValue();
 	gfx_extraconv = cb_extra_gfxconv->GetValue();
 	browser_bg_type = choice_browser_bg->GetSelection();
+	gfx_hilight_mouseover = cb_hilight_mouseover->GetValue();
 	theMainWindow->Refresh();
 }
 

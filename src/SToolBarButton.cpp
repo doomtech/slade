@@ -8,6 +8,7 @@
 #include "MainWindow.h"
 #include <wx/graphics.h>
 
+CVAR(Bool, toolbar_button_flat, false, CVAR_SAVE)
 
 SToolBarButton::SToolBarButton(wxWindow* parent, string action, string icon)
 : wxControl(parent, -1, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE, wxDefaultValidator, "stbutton") {
@@ -72,17 +73,24 @@ void SToolBarButton::onPaint(wxPaintEvent& e) {
 		wxColour col_toggle(r, g, b, 255);
 		wxColour col_trans(r, g, b, 150);
 
-		// Set brush/pen colours
-		gc->SetBrush(col_trans);
-		gc->SetPen(wxPen(Drawing::lightColour(col_toggle, 5.0f), 1));
+		if (toolbar_button_flat) {
+			// Draw border
+			col_trans.Set(col_trans.Red(), col_trans.Green(), col_trans.Blue(), 80);
+			gc->SetBrush(col_trans);
+			gc->SetPen(wxPen(Drawing::darkColour(col_toggle, 5.0f)));
+			gc->DrawRectangle(1, 1, 20, 20);
+		}
+		else {
+			// Draw border
+			gc->SetBrush(col_trans);
+			gc->SetPen(wxPen(Drawing::lightColour(col_toggle, 5.0f), 1));
+			gc->DrawRoundedRectangle(2, 2, 18, 18, 2);
 
-		// Draw border
-		gc->DrawRoundedRectangle(2, 2, 18, 18, 2);
-
-		// Draw outer border
-		gc->SetBrush(wxBrush(col_toggle, wxBRUSHSTYLE_TRANSPARENT));
-		gc->SetPen(wxPen(Drawing::darkColour(col_toggle, 5.0f)));
-		gc->DrawRoundedRectangle(1, 1, 20, 20, 2);
+			// Draw outer border
+			gc->SetBrush(wxBrush(col_toggle, wxBRUSHSTYLE_TRANSPARENT));
+			gc->SetPen(wxPen(Drawing::darkColour(col_toggle, 5.0f)));
+			gc->DrawRoundedRectangle(1, 1, 20, 20, 2);
+		}
 	}
 
 	// Draw border on mouseover
@@ -90,22 +98,29 @@ void SToolBarButton::onPaint(wxPaintEvent& e) {
 		// Determine transparency level
 		int trans = 160;
 		if (state == STATE_MOUSEDOWN)
-			trans = 220;
+			trans = 200;
 
 		// Create semitransparent hilight colour
 		wxColour col_trans(col_hilight.Red(), col_hilight.Green(), col_hilight.Blue(), trans);
 
-		// Set brush/pen colours
-		gc->SetBrush(col_trans);
-		gc->SetPen(wxPen(Drawing::lightColour(col_hilight, 5.0f), 1));
+		if (toolbar_button_flat) {
+			// Draw border
+			col_trans.Set(col_trans.Red(), col_trans.Green(), col_trans.Blue(), 80);
+			gc->SetBrush(col_trans);
+			gc->SetPen(wxPen(col_hilight));
+			gc->DrawRectangle(1, 1, 20, 20);
+		}
+		else {
+			// Draw border
+			gc->SetBrush(col_trans);
+			gc->SetPen(wxPen(Drawing::lightColour(col_hilight, 5.0f), 1));
+			gc->DrawRoundedRectangle(2, 2, 18, 18, 2);
 
-		// Draw border
-		gc->DrawRoundedRectangle(2, 2, 18, 18, 2);
-
-		// Draw outer border
-		gc->SetBrush(wxBrush(col_hilight, wxBRUSHSTYLE_TRANSPARENT));
-		gc->SetPen(wxPen(Drawing::darkColour(col_hilight, 5.0f)));
-		gc->DrawRoundedRectangle(1, 1, 20, 20, 2);
+			// Draw outer border
+			gc->SetBrush(wxBrush(col_hilight, wxBRUSHSTYLE_TRANSPARENT));
+			gc->SetPen(wxPen(Drawing::darkColour(col_hilight, 5.0f)));
+			gc->DrawRoundedRectangle(1, 1, 20, 20, 2);
+		}
 	}
 
 	// Draw disabled icon if disabled

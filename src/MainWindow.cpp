@@ -523,7 +523,8 @@ bool MainWindow::handleAction(string id) {
 
 		dialog_ebr.SetSizer(sizer);
 		dialog_ebr.Layout();
-		dialog_ebr.SetInitialSize(wxSize(-1, 300));
+		dialog_ebr.SetInitialSize(wxSize(500, 300));
+		dialog_ebr.CenterOnParent();
 		if (dialog_ebr.ShowModal() == wxID_OK)
 			theArchiveManager->openBaseResource(brap.getSelectedPath());
 

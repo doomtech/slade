@@ -39,6 +39,7 @@
  *******************************************************************/
 DEFINE_EVENT_TYPE(wxEVT_GFXCANVAS_OFFSET_CHANGED)
 CVAR(Bool, gfx_show_border, true, CVAR_SAVE)
+CVAR(Bool, gfx_hilight_mouseover, true, CVAR_SAVE)
 
 
 /*******************************************************************
@@ -203,7 +204,7 @@ void GfxCanvas::drawImage() {
 		tex_image->draw2d();
 
 		// Draw hilight
-		if (image_hilight) {
+		if (image_hilight && gfx_hilight_mouseover) {
 			rgba_t(255, 255, 255, 80, 1).set_gl();
 			tex_image->draw2d();
 

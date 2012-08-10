@@ -585,9 +585,36 @@ bool StyleSet::loadResourceStyles() {
 		return false;
 	}
 
+	// Read default style set first
+	ArchiveEntry* default_style = dir->getEntry("default.sss");
+	if (default_style) {
+		// Read entry data into tokenizer
+		Tokenizer tz;
+		tz.openMem(&default_style->getMCData(), default_style->getName());
+
+		// Parse it
+		ParseTreeNode root;
+		root.allowDup(true);
+		root.parse(tz);
+
+		// Read any styleset definitions
+		vector<STreeNode*> nodes = root.getChildren("styleset");
+		for (unsigned b = 0; b  < nodes.size(); b++) {
+			StyleSet* newset = new StyleSet();
+			if (newset->parseSet((ParseTreeNode*)nodes[b]))
+				style_sets.push_back(newset);
+			else
+				delete newset;
+		}
+	}
+
 	// Go through all entries within it
 	for (unsigned a = 0; a < dir->numEntries(); a++) {
 		ArchiveEntry* entry = dir->getEntry(a);
+
+		// Skip default
+		if (entry->getName(true) == "default")
+			continue;
 
 		// Read entry data into tokenizer
 		Tokenizer tz;

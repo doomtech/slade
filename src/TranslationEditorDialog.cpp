@@ -282,7 +282,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 
 	// --- Translation string ---
 	hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add(hbox, wxGBPosition(3, 0), wxGBSpan(1, 2), wxEXPAND);
+	sizer->Add(hbox, wxGBPosition(3, 0), wxGBSpan(1, 2), wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	text_string = new wxTextCtrl(this, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
 	hbox->Add(new wxStaticText(this, -1, "Translation String:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);

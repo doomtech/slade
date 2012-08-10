@@ -103,6 +103,7 @@ public:
 		// Setup dialog size
 		SetInitialSize(wxSize(-1, -1));
 		SetMinSize(GetSize());
+		CenterOnParent();
 	}
 
 	Palette8bit * getFinalPalette() {
@@ -202,6 +203,7 @@ public:
 		// Setup dialog size
 		SetInitialSize(wxSize(-1, -1));
 		SetMinSize(GetSize());
+		CenterOnParent();
 
 		// Set values
 		label_amount->SetLabel("50% ");
@@ -334,6 +336,7 @@ public:
 		// Setup dialog size
 		SetInitialSize(wxSize(-1, -1));
 		SetMinSize(GetSize());
+		CenterOnParent();
 
 		// Set values
 		label_hue->SetLabel("0.000 ");
@@ -437,6 +440,7 @@ public:
 		// Setup dialog size
 		SetInitialSize(wxSize(-1, -1));
 		SetMinSize(GetSize());
+		CenterOnParent();
 	}
 
 	Palette8bit * getFinalPalette() {
@@ -500,6 +504,7 @@ public:
 		// Setup dialog size
 		SetInitialSize(wxSize(-1, -1));
 		SetMinSize(GetSize());
+		CenterOnParent();
 	}
 
 	int getChoice() {
@@ -856,7 +861,7 @@ bool PaletteEntryPanel::tint() {
 	Palette8bit * pal = new Palette8bit;
 	if (pal == NULL) return false;
 	pal->copyPalette(palettes[cur_palette]);
-	PaletteTintDialog ptd(this, pal);
+	PaletteTintDialog ptd(theMainWindow, pal);
 	if (ptd.ShowModal() == wxID_OK) {
 		palettes[cur_palette]->copyPalette(ptd.getFinalPalette());
 		showPalette(cur_palette);
@@ -873,7 +878,7 @@ bool PaletteEntryPanel::colourise() {
 	Palette8bit * pal = new Palette8bit;
 	if (pal == NULL) return false;
 	pal->copyPalette(palettes[cur_palette]);
-	PaletteColouriseDialog pcd(this, pal);
+	PaletteColouriseDialog pcd(theMainWindow, pal);
 	if (pcd.ShowModal() == wxID_OK) {
 		palettes[cur_palette]->copyPalette(pcd.getFinalPalette());
 		showPalette(cur_palette);
@@ -890,7 +895,7 @@ bool PaletteEntryPanel::tweak() {
 	Palette8bit * pal = new Palette8bit;
 	if (pal == NULL) return false;
 	pal->copyPalette(palettes[cur_palette]);
-	PaletteColourTweakDialog pctd(this, pal);
+	PaletteColourTweakDialog pctd(theMainWindow, pal);
 	if (pctd.ShowModal() == wxID_OK) {
 		palettes[cur_palette]->copyPalette(pctd.getFinalPalette());
 		showPalette(cur_palette);
@@ -907,7 +912,7 @@ bool PaletteEntryPanel::invert() {
 	Palette8bit * pal = new Palette8bit;
 	if (pal == NULL) return false;
 	pal->copyPalette(palettes[cur_palette]);
-	PaletteInvertDialog pid(this, pal);
+	PaletteInvertDialog pid(theMainWindow, pal);
 	if (pid.ShowModal() == wxID_OK) {
 		palettes[cur_palette]->copyPalette(pid.getFinalPalette());
 		showPalette(cur_palette);
@@ -1029,7 +1034,7 @@ void PaletteEntryPanel::generatePalette(int r, int g, int b, int shift, int step
  * Generates the full complement of palettes needed by the game
  *******************************************************************/
 bool PaletteEntryPanel::generatePalettes() {
-	GeneratePalettesDialog gpd(this);
+	GeneratePalettesDialog gpd(theMainWindow);
 	if (gpd.ShowModal() == wxID_OK) {
 		// Get choice
 		int choice = gpd.getChoice();
