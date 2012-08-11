@@ -2,9 +2,17 @@
 
 entry_types
 {
+	map_base
+	{
+		icon = "e_map_data";
+		category = "Maps";
+		colour = 60, 255, 100;
+		detectable = 0;
+	}
+	
 	// Doom-format element is ten bytes, Hexen-format is twenty,
 	// Doom64-format uses uses 14 bytes.
-	map_things
+	map_things : map_base
 	{
 		name = "Map Things";
 		match_name = "THINGS";
@@ -16,7 +24,7 @@ entry_types
 
 	// Doom-format element is fourteen bytes, Hexen-format is sixteen,
 	// Doom64-format uses sixteen bytes like Hexen.
-	map_linedefs
+	map_linedefs : map_base
 	{
 		name = "Map Lines";
 		match_name = "LINEDEFS";
@@ -29,7 +37,7 @@ entry_types
 	// Doom64 sidedef_t is 12-byte long; "normal" sidedefs are 30-byte long.
 	// The reduced size in D64 is because the textures are referenced by a
 	// two-byte index rather than by their eight-byte name. 
-	map_sidedefs
+	map_sidedefs : map_base
 	{
 		name = "Map Sides";
 		match_name = "SIDEDEFS";
@@ -43,7 +51,7 @@ entry_types
 	// While it contains more information, the reduced size in D64 is
 	// because it represents the floor and ceiling textures by a two-byte
 	// index rather than by their eight-byte names.
-	map_sectors
+	map_sectors : map_base
 	{
 		name = "Map Sectors";
 		match_name = "SECTORS";
@@ -53,7 +61,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_vertexes
+	map_vertexes : map_base
 	{
 		name = "Map Vertices";
 		match_name = "VERTEXES";
@@ -66,7 +74,7 @@ entry_types
 	// ZDBSP compressed nodes listed before normal nodes since they
 	// use the same name. If they fail the header check, they are
 	// normal lumps; but they can't fail a test of normalcy...
-	map_znodes
+	map_znodes : map_base
 	{
 		name = "Map Nodes (Compressed)";
 		match_name = "NODES";
@@ -76,7 +84,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_zglnodes
+	map_zglnodes : map_base
 	{
 		name = "Map GLNodes (Compressed)";
 		match_name = "SSECTORS", "ZNODES";
@@ -86,7 +94,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_zglnodes2
+	map_zglnodes2 : map_base
 	{
 		name = "Map GLNodes+ (Compressed)";
 		match_name = "SSECTORS", "ZNODES";
@@ -96,7 +104,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_znodes
+	map_znodes : map_base
 	{
 		name = "Map Nodes (Compressed)";
 		match_name = "NODES";
@@ -106,7 +114,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_xglnodes
+	map_xglnodes : map_base
 	{
 		name = "Map GLNodes (Extended)";
 		match_name = "SSECTORS", "ZNODES";
@@ -116,7 +124,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_xglnodes2
+	map_xglnodes2 : map_base
 	{
 		name = "Map GLNodes+ (Extended)";
 		match_name = "SSECTORS", "ZNODES";
@@ -126,7 +134,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_nodes
+	map_nodes : map_base
 	{
 		name = "Map Nodes";
 		match_name = "NODES";
@@ -135,7 +143,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_ssectors
+	map_ssectors : map_base
 	{
 		name = "Map Subsectors";
 		match_name = "SSECTORS";
@@ -144,7 +152,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_segs
+	map_segs : map_base
 	{
 		name = "Map Segments";
 		match_name = "SEGS";
@@ -153,7 +161,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_reject
+	map_reject : map_base
 	{
 		name = "Map Reject Table";
 		match_name = "REJECT";
@@ -162,7 +170,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_blockmap
+	map_blockmap : map_base
 	{
 		name = "Map Blockmap";
 		match_name = BLOCKMAP;
@@ -171,7 +179,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_behavior_h
+	map_behavior_h : map_base
 	{
 		name = "Compiled ACS (Hexen)";
 		match_name = "BEHAVIOR";
@@ -181,7 +189,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_behavior_l
+	map_behavior_l : map_base
 	{
 		name = "Compiled ACS (ZDoom)";
 		match_name = "BEHAVIOR";
@@ -191,7 +199,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_behavior_e
+	map_behavior_e : map_base
 	{
 		name = "Compiled ACS (Enhanced)";
 		match_name = "BEHAVIOR";
@@ -201,7 +209,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_dialog
+	map_dialog : map_base
 	{
 		name = "Map Conversation";
 		match_name = "dialogue", "script??";
@@ -211,7 +219,7 @@ entry_types
 	}
 
 	// The following four lumps are used by OpenGL ports (including EDGE, GZDoom, and others)
-	map_gl_vert
+	map_gl_vert : map_base
 	{
 		name = "Map GL Vertices";
 		match_name = "gl_vert";
@@ -220,7 +228,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_gl_segs
+	map_gl_segs : map_base
 	{
 		name = "Map GL Segments";
 		match_name = "gl_segs";
@@ -229,7 +237,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_gl_ssect
+	map_gl_ssect : map_base
 	{
 		name = "Map GL Subsectors";
 		match_name = "gl_ssect";
@@ -238,7 +246,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_gl_nodes
+	map_gl_nodes : map_base
 	{
 		name = "Map GL Nodes";
 		match_name = "gl_nodes";
@@ -248,7 +256,7 @@ entry_types
 	}
 
 	// The following three lumps are used by Doom64Ex:
-	map_leafs
+	map_leafs : map_base
 	{
 		name = "Map Node Leaves";
 		match_name = "leafs";
@@ -257,7 +265,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_lights
+	map_lights : map_base
 	{
 		name = "Map Light Colors";
 		match_name = "lights";
@@ -267,7 +275,7 @@ entry_types
 		category = "Maps";
 	}
 
-	map_macros
+	map_macros : map_base
 	{
 		name = "Map Macros";
 		match_name = "macros";

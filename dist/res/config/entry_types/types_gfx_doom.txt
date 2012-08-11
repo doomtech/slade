@@ -13,6 +13,7 @@ entry_types
 		extra = image;
 		category = "Graphics";
 		image_format = "raw";
+		colour = 0, 0, 255;
 	}
 
 	gfx_flat : gfx_raw
@@ -52,122 +53,112 @@ entry_types
 		extra = image;
 		image_format = "raw_flat";
 	}
+	
+	gfx_base
+	{
+		icon = "e_gfx";
+		colour = 0, 0, 255;
+		category = "Graphics";
+		detectable = 0;
+	}
 
-	gfx_doom
+	gfx_doom : gfx_base
 	{
 		name = "Graphic (Doom)";
 		format = img_doom;
 		editor = gfx;
-		icon = "e_gfx";
 		reliability = 230;
 		extra = image, patch;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "doom";
 	}
 
-	gfx_doom_beta
+	gfx_doom_beta : gfx_base
 	{
 		name = "Graphic (Beta)";
 		format = img_doom_beta;
 		editor = gfx;
-		icon = "e_gfx";
 		reliability = 160;
 		extra = image, patch;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "doom_beta";
 	}
 
-	gfx_doom_snea
+	gfx_doom_snea : gfx_base
 	{
 		name = "Graphic (Snea)";
 		format = img_doom_snea;
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "doom_snea";
 	}
 
-	gfx_doom_gnum
+	gfx_doom_gnum : gfx_base
 	{
 		name = "Graphic (Gnum)";
 		format = img_raw;
 		size = 120;
 		match_name = "gnum?";
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
-		category = "Graphics";
 		image_format = "raw";
 	}
 
-	gfx_doom_arah
+	gfx_doom_arah : gfx_base
 	{
 		name = "Graphic (Arah)";
 		format = img_doom_arah;
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
 		reliability = 100;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "doom_arah";
 	}
 
-	gfx_doom_alpha
+	gfx_doom_alpha : gfx_base
 	{
 		name = "Graphic (Alpha)";
 		format = img_doom_alpha;
 		editor = gfx;
-		icon = "e_gfx";
 		reliability = 100;
 		extra = image, patch;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "doom_alpha";
 	}
 
-	gfx_4bitchunk
+	gfx_4bitchunk : gfx_base
 	{
 		name = "Graphic (4-bit)";
 		size = 32, 184;
 		match_name = "notch", "netnotch";
 		format = img_4bitchunk;
 		editor = gfx;
-		icon = "e_gfx";
 		reliability = 80;
 		extra = image;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "4bitchunk";
 	}
 
-	gfx_planar
+	gfx_planar : gfx_base
 	{
 		name = "Graphic (Planar)";
 		size = 153648;
 		editor = gfx;
 		format = img_planar;
-		icon = "e_gfx";
 		match_name = "startup";
 		reliability = 240;
 		extra = image;
-		category = "Graphics";
 		image_format = "planar";
 	}
 
-	imgz
+	imgz : gfx_base
 	{
 		name = "Graphic (IMGZ)";
 		format = img_imgz;
 		export_ext = "imgz";
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
-		category = "Graphics";
 		image_format = "imgz";
 	}
 }

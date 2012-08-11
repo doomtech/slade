@@ -516,7 +516,8 @@ fpoint2_t Drawing::textExtents(string text, int font) {
  *******************************************************************/
 void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int alignment, frect_t* bounds) {
 	// Setup SFML string
-	sf::Text sf_str(CHR(text));
+	sf::Text sf_str;
+	sf_str.setString(CHR(text));
 	sf_str.setPosition(x, y);
 	sf_str.setColor(sf::Color(colour.r, colour.g, colour.b, colour.a));
 
@@ -575,7 +576,8 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
  *******************************************************************/
 fpoint2_t Drawing::textExtents(string text, int font) {
 	// Setup SFML string
-	sf::Text sf_str(CHR(text));
+	sf::Text sf_str;
+	sf_str.setString(CHR(text));
 
 	// Set font
 	switch (font) {

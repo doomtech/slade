@@ -2,234 +2,207 @@
 
 entry_types
 {
-	mus
+	music
+	{
+		icon = "e_music";
+		category = "Audio";
+		colour = 255, 0, 255;
+		detectable = 0;
+	}
+
+	mus : music
 	{
 		name = "Music (MUS)";
 		format = mus;
 		export_ext = "mus";
-		icon = "e_music";
-		category = "Audio";
 		editor = audio;
 	}
 
-	midi
+	midi : music
 	{
 		name = "Music (MIDI)";
 		format = midi;
 		export_ext = "mid";
-		icon = "e_music";
-		category = "Audio";
 		editor = audio;
 	}
 
-	xmi
+	xmi : music
 	{
 		name = "Music (XMI)";
 		format = xmi;
 		export_ext = "xmi";
-		icon = "e_music";
 		reliability = 100;
-		category = "Audio";
 		editor = audio;
 	}
 
-	hmi
+	hmi : music
 	{
 		name = "Music (HMI)";
 		format = hmi;
 		export_ext = "hmi";
-		icon = "e_music";
 		reliability = 100;
-		category = "Audio";
 		editor = audio;
 	}
 
-	hmp
+	hmp : music
 	{
 		name = "Music (HMP)";
 		format = hmp;
 		export_ext = "hmp";
-		icon = "e_music";
 		reliability = 100;
-		category = "Audio";
 		editor = audio;
 	}
 
-	gmid
+	gmid : music
 	{
 		name = "Music (GMID)";
 		format = gmid;
 		export_ext = "gmd";
-		icon = "e_music";
 		reliability = 75;
-		category = "Audio";
 		editor = audio;
 	}
 
-	mod_it
+	mod_it : music
 	{
 		name = "Music (IT Module)";
 		format = mod_it;
 		export_ext = "it";
-		icon = "e_music";
-		category = "Audio";
 		editor = audio;
 	}
 
-	mod_xm
+	mod_xm : music
 	{
 		name = "Music (XM Module)";
 		format = mod_xm;
 		export_ext = "xm";
-		icon = "e_music";
-		category = "Audio";
 		editor = audio;
 	}
 
-	mod_s3m
+	mod_s3m : music
 	{
 		name = "Music (S3M Module)";
 		format = mod_s3m;
 		export_ext = "s3m";
-		icon = "e_music";
-		category = "Audio";
 		editor = audio;
 	}
 
-	mod_mod
+	mod_mod : music
 	{
 		name = "Music (MOD Module)";
 		format = mod_mod;
 		export_ext = "mod";
-		icon = "e_music";
-		category = "Audio";
 		editor = audio;
 	}
 
-	snd_doom
+	
+	sound
+	{
+		icon = "e_sound";
+		category = "Audio";
+		colour = 255, 0, 0;
+		detectable = 0;
+	}
+	
+	snd_doom : sound
 	{
 		name = "Sound (Doom Format)";
 		format = snd_doom;
-		icon = "e_sound";
 		reliability = 200;
 		export_ext = "lmp";
-		category = "Audio";
 		editor = audio;
 	}
 	
-	imf
+	imf : sound
 	{
 		name = "IMF OPL File";
 		format = imf;
-		icon = "e_sound";
 		reliability = 120;
 		export_ext = "imf";
-		category = "Audio";
 		editor = audio;
 	}
 	
-	snd_wolf
+	snd_wolf : sound
 	{
 		name = "Sound (Wolf3D Format)";
 		format = snd_wolf;
-		icon = "e_sound";
 		match_name = "SND0*";
 		match_archive = "archive_wolf";
 		reliability = 10;
 		export_ext = "swp";
-		category = "Audio";
 		editor = audio;
 	}
 	
 	// This is used to interpret a raw sample
-	snd_bloodsfx
+	snd_bloodsfx : sound
 	{
 		name = "Sound (Blood Format)";
 		format = snd_bloodsfx;
 		match_ext = "SFX";
-		icon = "e_sound";
 		export_ext = "sfx";
-		category = "Audio";
 		editor = audio;
 	}
 
-	snd_speaker
+	snd_speaker : sound
 	{
 		name = "Sound (PC Speaker)";
 		format = snd_speaker;
-		icon = "e_sound";
 		export_ext = "lmp";
-		category = "Audio";
 		reliability = 100;
 	}
 
-	snd_wav
+	snd_wav : sound
 	{
 		name = "Sound (Wav Format)";
 		format = snd_wav;
 		export_ext = "wav";
-		icon = "e_sound";
-		category = "Audio";
 		editor = audio;
 	}
 
-	snd_voc
+	snd_voc : sound
 	{
 		name = "Sound (Creative)";
 		format = snd_voc;
 		export_ext = "voc";
-		icon = "e_sound";
-		category = "Audio";
 		editor = audio;
 	}
 
-	snd_ogg
+	snd_ogg : sound
 	{
 		name = "Sound (Ogg Vorbis)";
 		format = snd_ogg;
 		export_ext = "ogg";
-		icon = "e_sound";
-		category = "Audio";
 		editor = audio;
 	}
 
-	snd_flac
+	snd_flac : sound
 	{
 		name = "Sound (FLAC)";
 		format = snd_flac;
 		export_ext = "flac";
-		icon = "e_sound";
-		category = "Audio";
 		editor = audio;
 	}
 
-	snd_mp2
+	snd_mp2 : sound
 	{
 		name = "Sound (MP2)";
 		format = snd_mp2;
 		export_ext = "mp2";
-		icon = "e_sound";
-		category = "Audio";
 		editor = audio;
 	}
 
-	snd_mp3
+	snd_mp3 : sound
 	{
 		name = "Sound (MP3)";
 		format = snd_mp3;
 		export_ext = "mp3";
-		icon = "e_sound";
-		category = "Audio";
 		editor = audio;
 	}
 
-	snd_spc
+	snd_spc : sound
 	{
 		name = "Sound (SPC)";
 		format = snd_spc;
 		export_ext = "spc";
-		icon = "e_sound";
-		category = "Audio";
 		//editor = audio;
 	}
 }

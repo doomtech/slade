@@ -47,6 +47,8 @@ CVAR(Bool, elist_coltype_show, true, CVAR_SAVE)
 CVAR(Bool, elist_hrules, false, CVAR_SAVE)
 CVAR(Bool, elist_vrules, false, CVAR_SAVE)
 CVAR(Bool, elist_filter_dirs, false, CVAR_SAVE)
+CVAR(Bool, elist_type_bgcol, false, CVAR_SAVE)
+CVAR(Float, elist_type_bgcol_intensity, 0.18, CVAR_SAVE)
 wxDEFINE_EVENT(EVT_AEL_DIR_CHANGED, wxCommandEvent);
 
 
@@ -171,11 +173,25 @@ void ArchiveEntryList::updateItemAttr(long item) const {
 	ArchiveEntry* entry = getEntry(item);
 
 	// Init attributes
+	wxColour col_bg = wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOX);
 	item_attr->SetTextColour(WXCOL(ColourConfiguration::getColour("error")));
+	item_attr->SetBackgroundColour(col_bg);
 
 	// If entry doesn't exist, return error colour
 	if (!entry)
 		return;
+
+	// Set background colour defined in entry type (if any)
+	rgba_t col = entry->getType()->getColour();
+	if ((col.r != 255 || col.g != 255 || col.b != 255) && elist_type_bgcol) {
+		rgba_t bcol;
+
+		bcol.r = (col.r * elist_type_bgcol_intensity) + (col_bg.Red() * (1.0 - elist_type_bgcol_intensity));
+		bcol.g = (col.g * elist_type_bgcol_intensity) + (col_bg.Green() * (1.0 - elist_type_bgcol_intensity));
+		bcol.b = (col.b * elist_type_bgcol_intensity) + (col_bg.Blue() * (1.0 - elist_type_bgcol_intensity));
+
+		item_attr->SetBackgroundColour(WXCOL(bcol));
+	}
 
 	// Set colour depending on entry state
 	switch (entry->getState()) {

@@ -2,7 +2,15 @@
 
 entry_types
 {
-	png
+	gfx_std
+	{
+		category = "Graphics";
+		icon = "e_gfx";
+		colour = 0, 100, 255;
+		detectable = 0;
+	}
+	
+	png : gfx_std
 	{
 		name = "Graphic (PNG)";
 		format = img_png;
@@ -10,11 +18,10 @@ entry_types
 		editor = gfx;
 		icon = "e_png";
 		extra = image, patch;
-		category = "Graphics";
 		image_format = "png";
 	}
 
-	bmp
+	bmp : gfx_std
 	{
 		name = "Graphic (BMP)";
 		format = img_bmp;
@@ -22,79 +29,66 @@ entry_types
 		editor = gfx;
 		icon = "e_bmp";
 		extra = image;
-		category = "Graphics";
 		image_format = "image";
 	}
 
-	gif
+	gif : gfx_std
 	{
 		name = "Graphic (GIF)";
 		format = img_gif;
 		export_ext = "gif";
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
-		category = "Graphics";
 		image_format = "image";
 	}
 
-	pcx
+	pcx : gfx_std
 	{
 		name = "Graphic (PCX)";
 		format = img_pcx;
 		export_ext = "pcx";
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
-		category = "Graphics";
 		image_format = "image";
 	}
 
-	tga
+	tga : gfx_std
 	{
 		name = "Graphic (TGA)";
 		format = img_tga;
 		export_ext = "tga";
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
 		reliability = 225;
-		category = "Graphics";
 		image_format = "image";
 	}
 
-	tiff
+	tiff : gfx_std
 	{
 		name = "Graphic (TIFF)";
 		format = img_tiff;
 		export_ext = "tif";
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
-		category = "Graphics";
 		image_format = "image";
 	}
 
-	jpeg
+	jpeg : gfx_std
 	{
 		name = "Graphic (JPEG)";
 		format = img_jpeg;
 		export_ext = "jpg";
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
-		category = "Graphics";
 		image_format = "image";
 	}
 
-	icon
+	icon : gfx_std
 	{
 		name = "Graphic (ICO)";
 		match_ext = "ico";
 		editor = "gfx";
-		icon = "e_gfx";
 		extra = image;
-		category = "Graphics";
 		image_format = "image";
 	}
 

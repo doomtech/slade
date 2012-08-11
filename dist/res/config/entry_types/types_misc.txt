@@ -9,6 +9,7 @@ entry_types
 		match_name = "demo?", "demo?lmp";
 		reliability = 120;
 		export_ext = "lmp";
+		colour = 255, 180, 0;
 	}
 
 	texturex
@@ -20,6 +21,7 @@ entry_types
 		extra = textures;
 		export_ext = "lmp";
 		min_size = 4;
+		colour = 255, 180, 0;
 	}
 
 	pnames
@@ -30,6 +32,7 @@ entry_types
 		export_ext = "lmp";
 		min_size = 4;
 		icon = "e_pnames";
+		colour = 255, 180, 0;
 	}
 
 	// Use the same format as PNames, but can't use the texture editor
@@ -76,6 +79,7 @@ entry_types
 		match_name = "*pal*", "shadowpage+1";
 		export_ext = "pal";
 		icon = "e_palette";
+		colour = 255, 180, 0;
 	}
 
 	colormap : gfx_raw
@@ -90,6 +94,7 @@ entry_types
 		export_ext = "lmp";
 		category = "Data";
 		icon = "e_colormap";
+		colour = 255, 180, 0;
 	}
 
 	transtable : colormap
@@ -111,6 +116,7 @@ entry_types
 		export_ext = "bin";
 		icon = "e_gfx";
 		editor = ansi;
+		colour = 255, 180, 0;
 	}
 
 	animated

@@ -16,6 +16,7 @@ private:
 	string		editor;			// The in-program editor to use (hardcoded ids, see *EntryPanel constructors)
 	string		category;		// The type 'category', used for type filtering
 	int			index;
+	rgba_t		colour;
 	bool		detectable;		// False only for special types that should be set not detected
 	uint8_t		reliability;	// How 'reliable' this type's detection is. A higher value means it's less
 								// likely this type can be detected erroneously. 0-255 (default is 255)
@@ -53,6 +54,7 @@ public:
 	int				getIndex()			{ return index; }
 	uint8_t			getReliability()	{ return reliability; }
 	PropertyList&	extraProps()		{ return extra; }
+	rgba_t			getColour()			{ return colour; }
 
 	// Misc
 	void	addToList();

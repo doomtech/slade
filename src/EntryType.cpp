@@ -70,6 +70,7 @@ EntryType::EntryType(string id) {
 	editor = "default";
 	reliability = 255;
 	category = "Data";
+	colour = COL_WHITE;
 
 	// Init match criteria
 	format = EntryDataFormat::anyFormat();
@@ -134,6 +135,7 @@ void EntryType::copyToType(EntryType* target) {
 	target->name = name;
 	target->reliability = reliability;
 	target->category = category;
+	target->colour = colour;
 
 	// Copy type match criteria
 	target->format = format;
@@ -419,6 +421,12 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			}
 			else if (S_CMPNOCASE(fieldnode->getName(), "image_format"))		// Image format hint
 				ntype->extra["image_format"] = fieldnode->getStringValue(0);
+			else if (S_CMPNOCASE(fieldnode->getName(), "colour")) {			// Colour
+				if (fieldnode->nValues() >= 3)
+					ntype->colour = rgba_t(fieldnode->getIntValue(0), fieldnode->getIntValue(1), fieldnode->getIntValue(2));
+				else
+					wxLogMessage("Not enough colour components defined for entry type %s", CHR(ntype->getId()));
+			}
 			else {
 				// Unhandled properties can go into 'extra', only their first value is kept
 				ntype->extra[fieldnode->getName()] = fieldnode->getStringValue();
@@ -466,6 +474,7 @@ bool EntryType::loadEntryTypes() {
 	etype_map.name = "Map Marker";
 	etype_map.category = "Maps";	// Should appear with maps
 	etype_map.detectable = false;
+	etype_map.colour = rgba_t(0, 255, 0);
 	etype_map.addToList();
 
 	// -------- READ BUILT-IN TYPES ---------

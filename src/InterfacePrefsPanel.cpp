@@ -41,6 +41,7 @@ EXTERN_CVAR(Bool, show_start_page)
 EXTERN_CVAR(Bool, swap_epanel_bars)
 EXTERN_CVAR(Bool, context_submenus)
 EXTERN_CVAR(Bool, list_font_monospace)
+EXTERN_CVAR(Bool, elist_type_bgcol)
 
 
 /*******************************************************************
@@ -71,6 +72,10 @@ InterfacePrefsPanel::InterfacePrefsPanel(wxWindow* parent) : PrefsPanelBase(pare
 	// Monospace list font
 	cb_list_monospace = new wxCheckBox(this, -1, "Use monospaced font for lists");
 	sizer->Add(cb_list_monospace, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Entry list background colour by type
+	cb_elist_bgcol = new wxCheckBox(this, -1, "Colour entry list item background by entry type");
+	sizer->Add(cb_elist_bgcol, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Context menu submenus
 	cb_context_submenus = new wxCheckBox(this, -1, "Group related entry context menu items into submenus");

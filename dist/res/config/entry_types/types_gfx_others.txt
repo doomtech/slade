@@ -2,323 +2,283 @@
 
 entry_types
 {
-	quakegfx
+	gfx_other_base
+	{
+		icon = "e_gfx";
+		category = "Graphics";
+		colour = 0, 0, 255;
+		detectable = 0;
+	}
+	
+	quakegfx : gfx_other_base
 	{
 		name = "Graphic (Quake Gfx)";
 		format = img_quake;
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "quake";
 	}
 
-	quakespr
+	quakespr : gfx_other_base
 	{
 		name = "Graphic (Quake Sprite)";
 		format = img_qspr;
 		editor = gfx;
-		icon = "e_gfx";
 		extra = image;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "qspr";
 	}
 
-	quaketex
+	quaketex : gfx_other_base
 	{
 		name = "Graphic (Quake Texture)";
 		format = img_quaketex;
 		editor = gfx;
 		reliability = 11;
-		icon = "e_gfx";
 		extra = image;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "quaketex";
 	}
 
-	quake2wal
+	quake2wal : gfx_other_base
 	{
 		name = "Graphic (Quake II)";
 		format = img_quake2wal;
 		editor = gfx;
 		reliability = 21;
-		icon = "e_gfx";
 		extra = image;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "quake2wal";
 	}
 
-	scsprite
+	scsprite : gfx_other_base
 	{
 		name = "Graphic (SC Sprite)";
 		format = img_scsprite;
 		editor = "gfx";
-		icon = "e_gfx";
 		reliability = 110;
 		extra = image;
-		category = "Graphics";
 		match_archive = "archive_dat";
 		image_format = "scsprite";
 	}
 
-	scwall
+	scwall : gfx_other_base
 	{
 		name = "Graphic (SC Wall)";
 		format = img_scwall;
 		editor = "gfx";
-		icon = "e_gfx";
 		reliability = 101;	// Just above anamip
 		extra = image;
 		section = "textures";
 		min_size = 4226;	// Corresponds to 64x64
 		max_size = 12930;	// Corresponds to 64x200
-		category = "Graphics";
 		match_archive = "archive_dat";
 		image_format = "scwall";
 	}
 
-	scgfx
+	scgfx : gfx_other_base
 	{
 		name = "Graphic (SC Gfx)";
 		editor = gfx;
-		icon = "e_gfx";
 		reliability = 105;
 		extra = image;
-		category = "Graphics";
 		match_archive = "archive_dat";
 		image_format = "scgfx";
 		format = img_scgfx;
 	}
 
-	anamip
+	anamip : gfx_other_base
 	{
 		name = "Graphic (A&A)";
 		format = img_mipimage;
 		editor = "gfx";
-		icon = "e_gfx";
 		reliability = 100;
 		extra = image;
 		match_archive = "archive_res";
-		category = "Graphics";
 		image_format = "mipimage";
 	}
 
-	arttile
+	arttile : gfx_other_base
 	{
 		name = "Graphic (Build)";
 		format = img_arttile;
 		export_ext = "art";
 		editor = "gfx";
-		icon = "e_gfx";
 		reliability = 180;
 		extra = image;
-		category = "Graphics";
 		image_format = "arttile";
 	}
 
-	heretic2m8
+	heretic2m8 : gfx_other_base
 	{
 		name = "Graphic (Heretic II P)";
 		format = img_m8;
 		export_ext = "m8";
 		editor = "gfx";
-		icon = "e_gfx";
 		reliability = 80;
 		extra = image;
-		category = "Graphics";
 		image_format = "m8";
 	}
 
-	heretic2m32
+	heretic2m32 : gfx_other_base
 	{
 		name = "Graphic (Heretic II C)";
 		format = img_m32;
 		export_ext = "m32";
 		editor = "gfx";
-		icon = "e_gfx";
 		reliability = 80;
 		extra = image;
-		category = "Graphics";
 		image_format = "m32";
 	}
 
-	halflifetex
+	halflifetex : gfx_other_base
 	{
 		name = "Graphic (Half-Life)";
 		format = img_hlt;
 		export_ext = "hlt";
 		editor = "gfx";
-		icon = "e_gfx";
 		reliability = 20;
 		extra = image;
-		category = "Graphics";
 		image_format = "hlt";
 	}
 
-	gfx_rott
+	gfx_rott : gfx_other_base
 	{
 		name = "Graphic (ROTT Patch)";
 		format = img_rott;
 		section = "rott";
 		editor = "gfx";
-		icon = "e_gfx";
 		reliability = 121;
 		extra = image;
-		category = "Graphics";
 		image_format = "rott";
 	}
 
-	gfx_rottmask
+	gfx_rottmask : gfx_other_base
 	{
 		name = "Graphic (ROTT Mask)";
 		format = img_rottmask;
 		section = "rott";
 		editor = "gfx";
-		icon = "e_gfx";
 		reliability = 120;
 		extra = image;
-		category = "Graphics";
 		image_format = "rottmask";
 	}
 
-	gfx_rottwall
+	gfx_rottwall : gfx_other_base
 	{
 		name = "Graphic (ROTT Flat)";
 		format = img_rottwall;
 		size = 4096, 51200;
 		section = "rott";
 		editor = "gfx";
-		icon = "e_gfx";
 		reliability = 119;
 		extra = image;
-		category = "Graphics";
 		image_format = "rottwall";
 	}
 
-	gfx_rottlbm
+	gfx_rottlbm : gfx_other_base
 	{
 		name = "Graphic (ROTT LBM)";
 		format = img_rottlbm;
 		editor = "gfx";
-		icon = "e_gfx";
 		section = "rott";
 		reliability = 80;
 		extra = image;
-		category = "Graphics";
 		image_format = "rottlbm";
 	}
 
-	gfx_rott_raw
+	gfx_rott_raw : gfx_other_base
 	{
 		name = "Graphic (ROTT Raw)";
 		format = img_rottraw;
 		editor = gfx;
 		section = "rott";
-		icon = "e_gfx";
 		extra = image;
 		reliability = 101; // Just one more than doom_arah
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "rottraw";
 	}
 
-	gfx_rott_pic
+	gfx_rott_pic : gfx_other_base
 	{
 		name = "Graphic (ROTT Pic)";
 		format = img_rottpic;
 		editor = gfx;
 		section = "rott";
-		icon = "e_gfx";
 		extra = image;
 		reliability = 60;
 		export_ext = "lmp";
-		category = "Graphics";
 		image_format = "rottpic";
 	}
 
-	gfx_wolfwall
+	gfx_wolfwall : gfx_other_base
 	{
 		name = "Graphic (Wolf3D Wall)";
 		format = img_rottwall;
 		size = 4096;
 		editor = "gfx";
-		icon = "e_gfx";
 		match_name = "wal0*";
 		match_archive = "archive_wolf";
 		reliability = 240;
 		extra = image;
-		category = "Graphics";
 		image_format = "rottwall";
 	}
 
-	gfx_wolfpic
+	gfx_wolfpic : gfx_other_base
 	{
 		name = "Graphic (Wolf3D Pic)";
 		format = img_wolfpic;
 		editor = "gfx";
-		icon = "e_gfx";
 		match_name = "pic0*", "tit0*", "end0*", "idg0*";
 		match_archive = "archive_wolf";
 		reliability = 200;
 		extra = image;
-		category = "Graphics";
 		image_format = "wolfpic";
 	}
 
-	gfx_wolfsprite
+	gfx_wolfsprite : gfx_other_base
 	{
 		name = "Graphic (Wolf3D Sprite)";
 		format = img_wolfsprite;
 		editor = "gfx";
-		icon = "e_gfx";
 		match_name = "spr0*";
 		match_archive = "archive_wolf";
 		reliability = 200;
 		extra = image;
-		category = "Graphics";
 		image_format = "wolfsprite";
 	}
 
-	gfx_jedi_bm
+	gfx_jedi_bm : gfx_other_base
 	{
 		name = "Graphic (Jedi BM)";
 		format = img_jedi_bm;
 		export_ext = "bm";
 		//editor = "gfx";
-		icon = "e_gfx";
 		reliability = 80;
 		extra = image;
-		category = "Graphics";
 		image_format = "jedi_bm";
 	}
 
-	gfx_jedi_fme
+	gfx_jedi_fme : gfx_other_base
 	{
 		name = "Graphic (Jedi FME)";
 		format = img_jedi_fme;
 		export_ext = "fme";
 		//editor = "gfx";
-		icon = "e_gfx";
 		reliability = 80;
 		extra = image;
-		category = "Graphics";
 		image_format = "jedi_fme";
 	}
 
-	gfx_jedi_wax
+	gfx_jedi_wax : gfx_other_base
 	{
 		name = "Graphic (Jedi WAX)";
 		format = img_jedi_wax;
 		export_ext = "wax";
 		//editor = "gfx";
-		icon = "e_gfx";
 		reliability = 60;
 		extra = image;
-		category = "Graphics";
 		image_format = "jedi_wax";
 	}
 
