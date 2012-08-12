@@ -30,10 +30,16 @@ void VertexInfoOverlay::draw(int bottom, int right, float alpha) {
 	if (alpha <= 0.0f)
 		return;
 
+	// Init GL stuff
+	glLineWidth(1.0f);
+	glDisable(GL_LINE_SMOOTH);
+
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
 	col_fg.a = col_fg.a*alpha;
+	col_bg.a = col_bg.a*alpha;
+	rgba_t col_border(0, 0, 0, 140);
 
 	// Slide in/out animation
 	float alpha_inv = 1.0f - alpha;
@@ -41,16 +47,11 @@ void VertexInfoOverlay::draw(int bottom, int right, float alpha) {
 
 	// Draw overlay background
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), col_bg.fa()*alpha);
-	Drawing::drawFilledRect(0, bottom - 16, right, bottom);
-	glBegin(GL_QUADS);
-	glVertex2d(0, bottom - 16);
-	glVertex2d(right, bottom - 16);
-	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), 0.0f);
-	glVertex2d(right, bottom - 32);
-	glVertex2d(0, bottom - 32);
-	glEnd();
+	Drawing::drawBorderedRect(0, bottom - 24, right, bottom + 2, col_bg, col_border);
 
 	// Draw text
-	Drawing::drawText(info, 2, bottom - 16, col_fg, Drawing::FONT_CONDENSED);
+	Drawing::drawText(info, 2, bottom - 20, col_fg, Drawing::FONT_CONDENSED);
+
+	// Done
+	glEnable(GL_LINE_SMOOTH);
 }

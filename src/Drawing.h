@@ -37,6 +37,8 @@ namespace Drawing {
 	void drawRect(double x1, double y1, double x2, double y2);
 	void drawFilledRect(fpoint2_t tl, fpoint2_t br);
 	void drawFilledRect(double x1, double y1, double x2, double y2);
+	void drawBorderedRect(fpoint2_t tl, fpoint2_t br, rgba_t colour, rgba_t border_colour);
+	void drawBorderedRect(double x1, double y1, double x2, double y2, rgba_t colour, rgba_t border_colour);
 
 	// Texture drawing
 	frect_t	fitTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, double max_scale = 1);

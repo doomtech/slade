@@ -46,8 +46,12 @@ void SectorInfoOverlay::draw(int bottom, int right, float alpha) {
 	if (alpha <= 0.0f)
 		return;
 
+	// Init GL stuff
+	glLineWidth(1.0f);
+	glDisable(GL_LINE_SMOOTH);
+
 	// Determine overlay height
-	int height = info.size() * 16;
+	int height = info.size() * 16 + 4;
 
 	// Slide in/out animation
 	float alpha_inv = 1.0f - alpha;
@@ -57,18 +61,13 @@ void SectorInfoOverlay::draw(int bottom, int right, float alpha) {
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
 	col_fg.a = col_fg.a*alpha;
+	col_bg.a = col_bg.a*alpha;
+	rgba_t col_border(0, 0, 0, 140);
 
 	// Draw overlay background
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), col_bg.fa()*alpha);
-	Drawing::drawFilledRect(0, bottom - height, right, bottom);
-	glBegin(GL_QUADS);
-	glVertex2d(0, bottom - height);
-	glVertex2d(right, bottom - height);
-	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), 0.0f);
-	glVertex2d(right, bottom - height - 16);
-	glVertex2d(0, bottom - height - 16);
-	glEnd();
+	Drawing::drawBorderedRect(0, bottom - height - 4, right - 190, bottom+2, col_bg, col_border);
+	Drawing::drawBorderedRect(right - 188, bottom - height - 4, right, bottom+2, col_bg, col_border);
 
 	// Draw info text lines
 	int y = height;
@@ -77,40 +76,14 @@ void SectorInfoOverlay::draw(int bottom, int right, float alpha) {
 		y -= 16;
 	}
 
-	/*
-	// Get colours
-	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
-	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
-	col_fg.a = col_fg.a*alpha;
-
-	// Slide in/out animation
-	float alpha_inv = 1.0f - alpha;
-	bottom += 64*alpha_inv*alpha_inv;
-
-	// Draw overlay background
-	rgba_t(col_bg.r, col_bg.g, col_bg.b, 80*alpha, 0).set_gl();
-	Drawing::drawFilledRect(0, bottom - 64, right, bottom);
-	Drawing::drawFilledRect(0, bottom - 66, right, bottom);
-	Drawing::drawFilledRect(0, bottom - 68, right, bottom);
-
-	// Sector index + type
-	Drawing::drawText(info, 2, bottom - 64, col_fg);
-
-	// Height
-	Drawing::drawText(height, 2, bottom - 48, col_fg);
-
-	// Brightness
-	Drawing::drawText(light, 2, bottom - 32, col_fg);
-
-	// Tag
-	Drawing::drawText(tag, 2, bottom - 16, col_fg);
-	*/
-
 	// Ceiling texture
 	drawTexture(alpha, right - 88, bottom - 4, ctex, "C");
-
+	
 	// Floor texture
 	drawTexture(alpha, right - 88 - 92, bottom - 4, ftex, "F");
+
+	// Done
+	glEnable(GL_LINE_SMOOTH);
 }
 
 void SectorInfoOverlay::drawTexture(float alpha, int x, int y, string texture, string pos) {

@@ -313,15 +313,21 @@ void InfoOverlay3D::draw(int bottom, int right, int middle, float alpha) {
 	if (info.size() == 0)
 		return;
 
+	// Init GL stuff
+	glLineWidth(1.0f);
+	glDisable(GL_LINE_SMOOTH);
+
 	// Determine overlay height
 	int nlines = MAX(info.size(), info2.size());
 	if (nlines < 4) nlines = 4;
-	int height = nlines * 16;
+	int height = nlines * 16 + 4;
 
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
 	col_fg.a = col_fg.a*alpha;
+	col_bg.a = col_bg.a*alpha;
+	rgba_t col_border(0, 0, 0, 140);
 
 	// Slide in/out animation
 	float alpha_inv = 1.0f - alpha;
@@ -330,15 +336,7 @@ void InfoOverlay3D::draw(int bottom, int right, int middle, float alpha) {
 
 	// Draw overlay background
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), col_bg.fa()*alpha);
-	Drawing::drawFilledRect(0, bottom - height, right, bottom);
-	glBegin(GL_QUADS);
-	glVertex2d(0, bottom - height);
-	glVertex2d(right, bottom - height);
-	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), 0.0f);
-	glVertex2d(right, bottom - height - 16);
-	glVertex2d(0, bottom - height - 16);
-	glEnd();
+	Drawing::drawBorderedRect(0, bottom - height - 4, right, bottom + 2, col_bg, col_border);
 
 	// Draw info text lines (left)
 	int y = height;
@@ -356,6 +354,9 @@ void InfoOverlay3D::draw(int bottom, int right, int middle, float alpha) {
 
 	// Draw texture if any
 	drawTexture(alpha, middle - 40, bottom);
+
+	// Done
+	glEnable(GL_LINE_SMOOTH);
 }
 
 void InfoOverlay3D::drawTexture(float alpha, int x, int y) {

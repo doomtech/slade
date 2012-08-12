@@ -360,6 +360,30 @@ void Drawing::drawFilledRect(double x1, double y1, double x2, double y2) {
 	glEnd();
 }
 
+void Drawing::drawBorderedRect(fpoint2_t tl, fpoint2_t br, rgba_t colour, rgba_t border_colour) {
+	drawBorderedRect(tl.x, tl.y, br.x, br.y, colour, border_colour);
+}
+
+void Drawing::drawBorderedRect(double x1, double y1, double x2, double y2, rgba_t colour, rgba_t border_colour) {
+	// Rect
+	colour.set_gl(false);
+	glBegin(GL_QUADS);
+	glVertex2d(x1, y1);
+	glVertex2d(x1, y2);
+	glVertex2d(x2, y2);
+	glVertex2d(x2, y1);
+	glEnd();
+
+	// Border
+	border_colour.set_gl(false);
+	glBegin(GL_LINE_LOOP);
+	glVertex2d(x1, y1);
+	glVertex2d(x1, y2-1);
+	glVertex2d(x2-1, y2-1);
+	glVertex2d(x2-1, y1);
+	glEnd();
+}
+
 /* Drawing::fitTextureWithin
  * Fits [tex] within the rectangle from [x1,y1] to [x2,y2], centered
  * and keeping the correct aspect ratio. If [upscale] is true the

@@ -106,6 +106,7 @@ void InterfacePrefsPanel::init() {
 	cb_start_page->SetValue(show_start_page);
 	cb_swap_epanel_bars->SetValue(swap_epanel_bars);
 	cb_context_submenus->SetValue(context_submenus);
+	cb_elist_bgcol->SetValue(elist_type_bgcol);
 }
 
 /* InterfacePrefsPanel::applyPreferences
@@ -118,4 +119,5 @@ void InterfacePrefsPanel::applyPreferences() {
 	show_start_page = cb_start_page->GetValue();
 	swap_epanel_bars = cb_swap_epanel_bars->GetValue();
 	context_submenus = cb_context_submenus->GetValue();
+	elist_type_bgcol = cb_elist_bgcol->GetValue();
 }
