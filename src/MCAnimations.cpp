@@ -345,13 +345,13 @@ void MCA3dWallSelection::draw() {
 	if (select)
 		col.set(255, 255, 255, 180*fade, 1);
 	else {
-		col = ColourConfiguration::getColour("map_selection");
+		col = ColourConfiguration::getColour("map_3d_selection");
 		col.a *= fade*0.75;
 	}
 	col.set_gl();
 
 	// Draw quad outline
-	glLineWidth(3.0f);
+	glLineWidth(2.0f);
 	glEnable(GL_LINE_SMOOTH);
 	glBegin(GL_LINE_LOOP);
 	for (unsigned a = 0; a < 4; a++)
@@ -359,7 +359,7 @@ void MCA3dWallSelection::draw() {
 	glEnd();
 
 	// Draw quad fill
-	col.a *= 0.6;
+	col.a *= 0.5;
 	col.set_gl(false);
 	glBegin(GL_QUADS);
 	for (unsigned a = 0; a < 4; a++)
@@ -401,8 +401,8 @@ void MCA3dFlatSelection::draw() {
 	if (select)
 		col.set(255, 255, 255, 180*fade, 1);
 	else {
-		col = ColourConfiguration::getColour("map_selection");
-		col.a *= fade*0.75;
+		col = ColourConfiguration::getColour("map_3d_selection");
+		col.a *= fade*0.75*0.5;
 	}
 	col.set_gl();
 	glDisable(GL_CULL_FACE);

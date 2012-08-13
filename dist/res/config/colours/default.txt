@@ -156,4 +156,18 @@ colours {
 		alpha = 255;
 		additive = true;
 	}
+	
+	map_3d_hilight {
+		name = "3D Hilight";
+		group = "Map Editor";
+		rgb = 255, 255, 140;
+		alpha = 170;
+	}
+	
+	map_3d_selection {
+		name = "3D Selection";
+		group = "Map Editor";
+		rgb = 30, 100, 255;
+		alpha = 180;
+	}
 }

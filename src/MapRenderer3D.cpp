@@ -780,7 +780,7 @@ void MapRenderer3D::renderFlats() {
 
 void MapRenderer3D::renderFlatSelection(vector<selection_3d_t>& selection, float alpha) {
 	// Setup gl stuff
-	glLineWidth(3.0f);
+	glLineWidth(2.0f);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_FOG);
 	glDisable(GL_DEPTH_TEST);
@@ -788,7 +788,7 @@ void MapRenderer3D::renderFlatSelection(vector<selection_3d_t>& selection, float
 	glEnable(GL_CULL_FACE);
 
 	// Setup colour
-	rgba_t col1 = ColourConfiguration::getColour("map_selection");
+	rgba_t col1 = ColourConfiguration::getColour("map_3d_selection");
 	col1.a *= alpha;
 	col1.set_gl();
 	rgba_t col2 = col1;
@@ -1281,7 +1281,7 @@ void MapRenderer3D::renderWalls() {
 
 void MapRenderer3D::renderWallSelection(vector<selection_3d_t>& selection, float alpha) {
 	// Setup gl stuff
-	glLineWidth(3.0f);
+	glLineWidth(2.0f);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_FOG);
 	glDisable(GL_DEPTH_TEST);
@@ -1290,7 +1290,7 @@ void MapRenderer3D::renderWallSelection(vector<selection_3d_t>& selection, float
 	glCullFace(GL_BACK);
 
 	// Setup colour
-	rgba_t col1 = ColourConfiguration::getColour("map_selection");
+	rgba_t col1 = ColourConfiguration::getColour("map_3d_selection");
 	col1.a *= alpha;
 	col1.set_gl();
 	rgba_t col2 = col1;
@@ -1500,14 +1500,14 @@ void MapRenderer3D::renderThingSelection(vector<selection_3d_t>& selection, floa
 		return;
 
 	// Setup gl stuff
-	glLineWidth(3.0f);
+	glLineWidth(2.0f);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_FOG);
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_LINE_SMOOTH);
 
 	// Setup colour
-	rgba_t col1 = ColourConfiguration::getColour("map_selection");
+	rgba_t col1 = ColourConfiguration::getColour("map_3d_selection");
 	col1.a *= alpha;
 	col1.set_gl();
 	rgba_t col2 = col1;
@@ -1972,7 +1972,7 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 	glDisable(GL_FOG);
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_LINE_SMOOTH);
-	rgba_t col_hilight = ColourConfiguration::getColour("map_hilight");
+	rgba_t col_hilight = ColourConfiguration::getColour("map_3d_hilight");
 	col_hilight.a *= alpha;
 	col_hilight.set_gl();
 
@@ -2024,7 +2024,7 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 		// Render fill (if needed)
 		if (render_3d_hilight > 1) {
 			glCullFace(GL_BACK);
-			col_hilight.a *= 0.5;
+			col_hilight.a *= 0.3;
 			col_hilight.set_gl(false);
 			glBegin(GL_QUADS);
 			for (unsigned a = 0; a < 4; a++)
@@ -2063,7 +2063,7 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 
 		// Render fill if needed
 		if (render_3d_hilight > 1) {
-			col_hilight.a *= 0.5;
+			col_hilight.a *= 0.3;
 			col_hilight.set_gl(false);
 			sector->getPolygon()->render();
 		}
@@ -2104,7 +2104,7 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 		// Render fill if needed
 		if (render_3d_hilight > 1) {
 			glCullFace(GL_BACK);
-			col_hilight.a *= 0.5;
+			col_hilight.a *= 0.3;
 			col_hilight.set_gl(false);
 			glBegin(GL_QUADS);
 			glVertex3f(x1, y1, z + theight);
@@ -2115,6 +2115,6 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 		}
 	}
 
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 	COL_WHITE.set_gl();
 }

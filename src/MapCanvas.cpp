@@ -809,15 +809,15 @@ void MapCanvas::drawMap3d() {
 	else
 		anim_info_show = false;
 
-	// Draw hilight if any
-	if (hl.index >= 0)
-		renderer_3d->renderHilight(hl, anim_flash_level);
-
 	// Draw selection if any
 	vector<selection_3d_t> selection = editor->get3dSelection();
 	renderer_3d->renderFlatSelection(selection);
 	renderer_3d->renderWallSelection(selection);
 	renderer_3d->renderThingSelection(selection);
+
+	// Draw hilight if any
+	if (hl.index >= 0)
+		renderer_3d->renderHilight(hl, anim_flash_level);
 
 	// Draw animations
 	for (unsigned a = 0; a < animations.size(); a++) {
