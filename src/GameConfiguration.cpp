@@ -61,6 +61,7 @@ void GameConfiguration::setDefaults() {
 	maps.clear();
 	sky_flat = "F_SKY1";
 	script_language = "";
+	light_levels.clear();
 }
 
 string GameConfiguration::udmfNamespace() {
@@ -68,6 +69,13 @@ string GameConfiguration::udmfNamespace() {
 		return "";
 	else
 		return udmf_namespace.Lower();
+}
+
+int GameConfiguration::lightLevelInterval() {
+	if (light_levels.size() == 0)
+		return 1;
+	else
+		return light_levels[1];
 }
 
 string GameConfiguration::readConfigName(MemChunk& mc) {
@@ -541,6 +549,10 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 		// Scripting language
 		else if (S_CMPNOCASE(node->getName(), "script_language"))
 			script_language = node->getStringValue().Lower();
+
+		// Light levels interval
+		else if (S_CMPNOCASE(node->getName(), "light_level_interval"))
+			setLightLevelInterval(node->getIntValue());
 	}
 
 	// Go through all other config sections
@@ -1480,6 +1492,45 @@ void GameConfiguration::applyDefaults(MapObject* object) {
 		else if (prop_vals[a].getType() == PROP_STRING)
 			object->setStringProperty(prop_names[a], prop_vals[a].getStringValue());
 	}
+}
+
+void GameConfiguration::setLightLevelInterval(int interval) {
+	// Clear current
+	light_levels.clear();
+
+	// Fill light levels array
+	int light = 0;
+	while (light < 255) {
+		light_levels.push_back(light);
+		light += interval;
+	}
+	light_levels.push_back(255);
+}
+
+int GameConfiguration::upLightLevel(int light_level) {
+	// No defined levels
+	if (light_levels.size() == 0)
+		return light_level;
+
+	for (int a = 0; a < (int)light_levels.size() - 1; a++) {
+		if (light_level >= light_levels[a] && light_level < light_levels[a+1])
+			return light_levels[a+1];
+	}
+
+	return light_levels.back();
+}
+
+int GameConfiguration::downLightLevel(int light_level) {
+	// No defined levels
+	if (light_levels.size() == 0)
+		return light_level;
+
+	for (int a = 0; a < (int)light_levels.size() - 1; a++) {
+		if (light_level > light_levels[a] && light_level <= light_levels[a+1])
+			return light_levels[a];
+	}
+
+	return 0;
 }
 
 

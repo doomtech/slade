@@ -78,6 +78,7 @@ private:
 	bool			tx_textures;
 	string			sky_flat;
 	string			script_language;
+	vector<int>		light_levels;
 
 	struct gconf_t {
 		string	title;
@@ -149,6 +150,7 @@ public:
 	string	udmfNamespace();
 	string	skyFlat() { return sky_flat; }
 	string	scriptLanguage() { return script_language; }
+	int		lightLevelInterval();
 
 	string			readConfigName(MemChunk& mc);
 	void			init();
@@ -218,6 +220,11 @@ public:
 	double	getDefaultFloat(int type, string property);
 	bool	getDefaultBool(int type, string property);
 	void	applyDefaults(MapObject* object);
+
+	// Misc
+	void	setLightLevelInterval(int interval);
+	int		upLightLevel(int light_level);
+	int		downLightLevel(int light_level);
 
 	// Testing
 	void	dumpActionSpecials();

@@ -1207,7 +1207,7 @@ void MapEditor::changeSectorHeight(int amount, bool floor, bool ceiling) {
 	updateDisplay();
 }
 
-void MapEditor::changeSectorLight(int amount) {
+void MapEditor::changeSectorLight(bool up, bool fine) {
 	// Do nothing if not in sectors mode
 	if (edit_mode != MODE_SECTORS)
 		return;
@@ -1222,29 +1222,23 @@ void MapEditor::changeSectorLight(int amount) {
 
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
-		// Get modified light value
+		// Get current light
 		int light = selection[a]->intProperty("lightlevel");
-		if (light == 255 && amount < -1)
-			light = 256;
-		light += amount;
 
-		// Clamp it 0-255
-		if (light > 255)
-			light = 255;
-		if (light < 0)
-			light = 0;
+		// Increment/decrement
+		if (up)
+			light = fine ? light+1 : theGameConfiguration->upLightLevel(light);
+		else
+			light = fine ? light-1 : theGameConfiguration->downLightLevel(light);
 
 		// Change light level
 		selection[a]->setIntProperty("lightlevel", light);
 	}
 
 	// Add editor message
-	if (amount < 0) {
-		amount = -amount;
-		addEditorMessage(S_FMT("Light level decreased by %d", amount));
-	}
-	else
-		addEditorMessage(S_FMT("Light level increased by %d", amount));
+	string dir = up ? "increased" : "decreased";
+	int amount = fine ? 1 : theGameConfiguration->lightLevelInterval();
+	addEditorMessage(S_FMT("Light level %s by %d", CHR(dir), amount));
 
 	// Update display
 	updateDisplay();
@@ -2778,10 +2772,10 @@ bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 		else if (key == "me2d_sector_height_down")	changeSectorHeight(-1, true, true);
 
 		// Light changes
-		else if (key == "me2d_sector_light_up16")	changeSectorLight(16);
-		else if (key == "me2d_sector_light_up")		changeSectorLight(1);
-		else if (key == "me2d_sector_light_down16")	changeSectorLight(-16);
-		else if (key == "me2d_sector_light_down")	changeSectorLight(-1);
+		else if (key == "me2d_sector_light_up16")	changeSectorLight(true, false);
+		else if (key == "me2d_sector_light_up")		changeSectorLight(true, true);
+		else if (key == "me2d_sector_light_down16")	changeSectorLight(false, false);
+		else if (key == "me2d_sector_light_down")	changeSectorLight(false, true);
 
 		// Join
 		else if (key == "me2d_sector_join")			joinSectors(true);
