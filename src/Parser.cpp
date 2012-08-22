@@ -52,8 +52,9 @@ wxRegEx re_float("^[+-]?[0-9]+'.'[0-9]*([eE][+-]?[0-9]+)?$", wxRE_DEFAULT|wxRE_N
 /* ParseTreeNode::ParseTreeNode
  * ParseTreeNode class constructor
  *******************************************************************/
-ParseTreeNode::ParseTreeNode(ParseTreeNode* parent) : STreeNode(parent) {
+ParseTreeNode::ParseTreeNode(ParseTreeNode* parent, Parser* parser) : STreeNode(parent) {
 	allowDup(true);
+	this->parser = parser;
 }
 
 /* ParseTreeNode::~ParseTreeNode
@@ -134,6 +135,48 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 
 	// Keep parsing until final } is reached (or end of file)
 	while (!(S_CMP(token, "}")) && !token.IsEmpty()) {
+		// Check for preprocessor stuff
+		if (parser) {
+			// #define
+			if (S_CMPNOCASE(token, "#define")) {
+				parser->define(tz.getToken());
+				token = tz.getToken();
+				continue;
+			}
+
+			// #if(n)def
+			if (S_CMPNOCASE(token, "#ifdef") || S_CMPNOCASE(token, "#ifndef")) {
+				bool test = true;
+				if (S_CMPNOCASE(token, "#ifndef"))
+					test = false;
+				string define = tz.getToken();
+				if (parser->defined(define) == test) {
+					// Continue
+					token = tz.getToken();
+					continue;
+				}
+				else {
+					// Skip section
+					int skip = 0;
+					while (true) {
+						token = tz.getToken();
+						if (S_CMPNOCASE(token, "#endif"))
+							skip--;
+						else if (S_CMPNOCASE(token, "#ifdef"))
+							skip++;
+						else if (S_CMPNOCASE(token, "#ifndef"))
+							skip++;
+
+						token = tz.getToken();
+						if (skip < 0 || token.IsEmpty())
+							break;
+					}
+
+					continue;
+				}
+			}
+		}
+
 		// If it's a special character (ie not a valid name), parsing fails
 		if (tz.isSpecialCharacter(token.at(0))) {
 			wxLogMessage("Parsing error: Unexpected special character '%s' in %s (line %d)", CHR(token), CHR(tz.getName()), tz.lineNo());
@@ -294,7 +337,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
  *******************************************************************/
 Parser::Parser() {
 	// Create parse tree root node
-	pt_root = new ParseTreeNode();
+	pt_root = new ParseTreeNode(NULL, this);
 }
 
 /* Parser::~Parser
@@ -357,6 +400,25 @@ bool Parser::parseText(string& text, string source) {
 
 	// Do parsing
 	return pt_root->parse(tz);
+}
+
+/* Parser::define
+ * Adds [def] to the defines list
+ *******************************************************************/
+void Parser::define(string def) {
+	defines.push_back(def);
+}
+
+/* Parser::defined
+ * Returns true if [def] is in the defines list
+ *******************************************************************/
+bool Parser::defined(string def) {
+	for (unsigned a = 0; a < defines.size(); a++) {
+		if (S_CMPNOCASE(defines[a], def))
+			return true;
+	}
+
+	return false;
 }
 
 

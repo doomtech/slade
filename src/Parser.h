@@ -6,18 +6,25 @@
 #include "Tokenizer.h"
 #include "Property.h"
 
+class Parser;
 class ParseTreeNode : public STreeNode {
 private:
 	string				name;
 	string				inherit;
 	string				type;
 	vector<Property>	values;
+	Parser*				parser;
 
 protected:
-	STreeNode*	createChild(string name) { ParseTreeNode* ret = new ParseTreeNode(); ret->setName(name); return ret; }
+	STreeNode*	createChild(string name) {
+		ParseTreeNode* ret = new ParseTreeNode();
+		ret->setName(name);
+		ret->parser = parser;
+		return ret;
+	}
 
 public:
-	ParseTreeNode(ParseTreeNode* parent = NULL);
+	ParseTreeNode(ParseTreeNode* parent = NULL, Parser* parser = NULL);
 	~ParseTreeNode();
 
 	string		getName() { return name; }
@@ -37,6 +44,7 @@ public:
 class Parser {
 private:
 	ParseTreeNode*	pt_root;
+	vector<string>	defines;
 
 public:
 	Parser();
@@ -46,6 +54,8 @@ public:
 
 	bool	parseText(MemChunk& mc, string source = "memory chunk");
 	bool	parseText(string& text, string source = "string");
+	void	define(string def);
+	bool	defined(string def);
 };
 
 #endif//__PARSER_H__

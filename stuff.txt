@@ -11,6 +11,7 @@ TODO List ---------------------------------------------------------------
 - Gfx doesn't update after being converted
 - No handling for when a line is moved to overlap another
 - Map editor should use PLAYPAL from resource chain on 'existing/global'
+- 3d mode textures need to update with MapTextureManager, somehow
 
 
 --- Map Editor ---
@@ -32,7 +33,7 @@ TODO List ---------------------------------------------------------------
 - Editing:
 	- Proper UDMF/Hexen/Doom64 Map saving (BEHAVIOR, SCRIPTS, DIALOGUE, LIGHTS, MACROS, etc.)
 	- Generalised sector and line specials
-	- Rotate/scale objects
+	- Rotate/scale objects ('edit' mode similar to db2 would be nice, perhaps not a mode though)
 	- Light increments should probably be defined in game configs (8 for zdoom, 16 for others)
 	- Copy+paste sectors/lines
 - Script editor
