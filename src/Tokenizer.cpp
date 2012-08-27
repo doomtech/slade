@@ -273,12 +273,11 @@ void Tokenizer::skipMultilineComment() {
 	incrementCurrent();
 }
 
-/* Tokenizer::getToken
- * Gets the next 'token' from the text & moves past it, returns
- * a blank string if we're at the end of the text
+/* Tokenizer::readToken
+ * Reads the next 'token' from the text & moves past it
  *******************************************************************/
-string Tokenizer::getToken() {
-	string ret_str = "";
+void Tokenizer::readToken() {
+	token_current.clear();
 	bool ready = false;
 	qstring = false;
 
@@ -290,7 +289,7 @@ string Tokenizer::getToken() {
 		while (isWhitespace(current[0])) {
 			// Return if end of text found
 			if (!incrementCurrent())
-				return ret_str;
+				return;
 		}
 
 		// Skip C-style comments
@@ -326,7 +325,7 @@ string Tokenizer::getToken() {
 
 		// Check for end of text
 		if (position == size)
-			return ret_str;
+			return;
 	}
 
 	// Init token delimiters
@@ -335,10 +334,10 @@ string Tokenizer::getToken() {
 
 	// If we're at a special character, it's our token
 	if (isSpecialCharacter(current[0])) {
-		ret_str += current[0];
+		token_current += current[0];
 		t_end = position + 1;
 		incrementCurrent();
-		return ret_str;
+		return;
 	}
 
 	// Now read the token
@@ -350,36 +349,65 @@ string Tokenizer::getToken() {
 
 		// Read literal string (include whitespace)
 		while (current[0] != '\"') {
-			ret_str += current[0];
+			token_current += current[0];
 
 			if (!incrementCurrent())
-				return ret_str;
+				return;
 		}
 
 		// Skip closing "
 		incrementCurrent();
-	} else {
+	}
+	else {
 		// Read token (don't include whitespace)
 		while (!isWhitespace(current[0])) {
 			// Return if special character found
 			if (isSpecialCharacter(current[0]))
-				return ret_str;
+				return;
 
 			// Add current character to the token
-			ret_str += current[0];
+			token_current += current[0];
 
 			// Return if end of text found
 			if (!incrementCurrent())
-				return ret_str;
+				return;
 		}
 	}
 
 	// Write token to log if debug mode enabled
 	if (debug)
-		wxLogMessage(ret_str);
+		wxLogMessage(token_current);
 
 	// Return the token
-	return ret_str;
+	return;
+}
+
+/* Tokenizer::skipToken
+ * Reads the next 'token' from the text & moves past it
+ *******************************************************************/
+void Tokenizer::skipToken() {
+	readToken();
+}
+
+/* Tokenizer::getToken
+ * Gets the next 'token' from the text & moves past it, returns
+ * a blank string if we're at the end of the text
+ *******************************************************************/
+string Tokenizer::getToken() {
+	readToken();
+	return token_current;
+}
+
+/* Tokenizer::getToken
+ * Gets the next 'token' from the text & moves past it, writes
+ * the result to [s]
+ *******************************************************************/
+void Tokenizer::getToken(string* s) {
+	// Read token
+	readToken();
+
+	// Set string value
+	*s = token_current;
 }
 
 /* Tokenizer::peekToken
@@ -391,43 +419,66 @@ string Tokenizer::peekToken() {
 	uint32_t p = position;
 
 	// Read the next token
-	string token = getToken();
+	readToken();
 
 	// Go back to original position
 	current = c;
 	position = p;
 
 	// Return the token
-	return token;
+	return token_current;
 }
 
 /* Tokenizer::checkToken
  * Compares the current token with a string
  *******************************************************************/
 bool Tokenizer::checkToken(string check) {
-	return !(getToken().Cmp(check));
+	readToken();
+	return !(token_current.Cmp(check));
 }
 
 /* Tokenizer::getInteger
  * Reads a token and returns its integer value
  *******************************************************************/
 int Tokenizer::getInteger() {
-	// Get token
-	string token = getToken();
+	// Read token
+	readToken();
 
 	// Return integer value
-	return atoi(CHR(token));
+	return atoi(CHR(token_current));
+}
+
+/* Tokenizer::getInteger
+ * Reads a token and writes its integer value to [i]
+ *******************************************************************/
+void Tokenizer::getInteger(int* i) {
+	// Read token
+	readToken();
+
+	// Set integer value
+	*i = atoi(CHR(token_current));
 }
 
 /* Tokenizer::getFloat
  * Reads a token and returns its floating point value
  *******************************************************************/
 float Tokenizer::getFloat() {
-	// Get token
-	string token = getToken();
+	// Read token
+	readToken();
 
 	// Return float value
-	return (float) atof(CHR(token));
+	return (float) atof(CHR(token_current));
+}
+
+/* Tokenizer::getFloat
+ * Reads a token and writes its float value to [f]
+ *******************************************************************/
+void Tokenizer::getFloat(float* f) {
+	// Read token
+	readToken();
+
+	// Set float value
+	*f = (float)atof(CHR(token_current));
 }
 
 /* Tokenizer::getDouble
@@ -435,11 +486,22 @@ float Tokenizer::getFloat() {
  * value
  *******************************************************************/
 double Tokenizer::getDouble() {
-	// Get token
-	string token = getToken();
+	// Read token
+	readToken();
 
 	// Return double value
-	return atof(CHR(token));
+	return atof(CHR(token_current));
+}
+
+/* Tokenizer::getDouble
+ * Reads a token and writes its double value to [d]
+ *******************************************************************/
+void Tokenizer::getDouble(double* d) {
+	// Read token
+	readToken();
+
+	// Set double value
+	*d = atof(CHR(token_current));
 }
 
 /* Tokenizer::getBool
@@ -447,13 +509,28 @@ double Tokenizer::getDouble() {
  * "0", "no", or "false" will return true
  *******************************************************************/
 bool Tokenizer::getBool() {
-	// Get token
-	string token = getToken();
+	// Read token
+	readToken();
 
 	// If the token is a string "no" or "false", the value is false
-	if (S_CMPNOCASE(token, "no") || S_CMPNOCASE(token, "false"))
+	if (S_CMPNOCASE(token_current, "no") || S_CMPNOCASE(token_current, "false"))
 		return false;
 
 	// Returns true ("1") or false ("0")
-	return !!atoi(CHR(token));
+	return !!atoi(CHR(token_current));
+}
+
+/* Tokenizer::getBool
+ * Reads a token and writes its boolean value to [b], same rules as
+ * getBool above
+ *******************************************************************/
+void Tokenizer::getBool(bool* b) {
+	// Read token
+	readToken();
+
+	// If the token is a string "no" or "false", the value is false
+	if (S_CMPNOCASE(token_current, "no") || S_CMPNOCASE(token_current, "false"))
+		*b = false;
+	else
+		*b = !!atoi(CHR(token_current));
 }
