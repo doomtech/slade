@@ -52,7 +52,7 @@ MapRenderer3D::~MapRenderer3D() {
 
 bool MapRenderer3D::init() {
 	// Check to enable zdoom udmf extensions
-	if (S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom") && theGameConfiguration->getMapFormat() == MAP_UDMF)
+	if (S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom") && map->currentFormat() == MAP_UDMF)
 		udmf_zdoom = true;
 
 	// Init camera
@@ -591,7 +591,7 @@ void MapRenderer3D::updateFlatTexCoords(unsigned index, bool floor) {
 	double rot = 0;
 
 	// Check for UDMF + ZDoom extensions
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+	if (theMapEditor->currentMapDesc().format == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
 		if (floor) {
 			ox = sector->floatProperty("xpanningfloor");
 			oy = sector->floatProperty("ypanningfloor");
@@ -894,8 +894,9 @@ void MapRenderer3D::updateLine(unsigned index) {
 		return;
 
 	// Get relevant line info
-	bool upeg = theGameConfiguration->lineBasicFlagSet("dontpegtop", line);
-	bool lpeg = theGameConfiguration->lineBasicFlagSet("dontpegbottom", line);
+	int map_format = theMapEditor->currentMapDesc().format;
+	bool upeg = theGameConfiguration->lineBasicFlagSet("dontpegtop", line, map_format);
+	bool lpeg = theGameConfiguration->lineBasicFlagSet("dontpegbottom", line, map_format);
 	double xoff, yoff, sx, sy;
 	bool mixed = theGameConfiguration->mixTexFlats();
 

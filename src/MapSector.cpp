@@ -4,7 +4,6 @@
 #include "MapLine.h"
 #include "MapSide.h"
 #include "MapVertex.h"
-#include "GameConfiguration.h"
 #include "MainApp.h"
 #include "SLADEMap.h"
 #include "MathStuff.h"
@@ -62,7 +61,7 @@ void MapSector::setStringProperty(string key, string value) {
 
 void MapSector::setFloatProperty(string key, double value) {
 	// Check if flat offset/scale/rotation is changing (if UDMF + ZDoom)
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+	if (parent_map->currentFormat() == MAP_UDMF && S_CMPNOCASE(parent_map->udmfNamespace(), "zdoom")) {
 		if (key == "xpanningfloor" || key == "ypanningfloor" ||
 			key == "xpanningceiling" || key == "ypanningceiling" ||
 			key == "xscalefloor" || key == "yscalefloor" ||
@@ -214,7 +213,7 @@ uint8_t MapSector::getLight(int where) {
 	int light = intProperty("lightlevel");
 
 	// Check for UDMF+ZDoom namespace
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+	if (parent_map->currentFormat() == MAP_UDMF && S_CMPNOCASE(parent_map->udmfNamespace(), "zdoom")) {
 		// Get specific light level
 		if (where == 1) {
 			// Floor
@@ -255,7 +254,7 @@ void MapSector::changeLight(int amount, int where) {
 
 	// Check for UDMF+ZDoom namespace
 	bool separate = false;
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom"))
+	if (parent_map->currentFormat() == MAP_UDMF && S_CMPNOCASE(parent_map->udmfNamespace(), "zdoom"))
 		separate = true;
 
 	// Change light level by amount
@@ -273,7 +272,7 @@ void MapSector::changeLight(int amount, int where) {
 
 rgba_t MapSector::getColour(int where, bool fullbright) {
 	// Check for UDMF+ZDoom namespace
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+	if (parent_map->currentFormat() == MAP_UDMF && S_CMPNOCASE(parent_map->udmfNamespace(), "zdoom")) {
 		// Get sector light colour
 		int intcol = intProperty("lightcolor");
 		wxColour wxcol(intcol);

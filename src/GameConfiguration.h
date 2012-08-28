@@ -7,17 +7,6 @@
 #include "UDMFProperty.h"
 #include "PropertyList.h"
 
-#ifndef __ARCHIVE_H__
-// Define map types
-enum MapTypes {
-	MAP_UNKNOWN,
-	MAP_DOOM,
-	MAP_HEXEN,
-	MAP_DOOM64,
-	MAP_UDMF,
-};
-#endif//__ARCHIVE_H__
-
 struct tt_t {
 	ThingType*	type;
 	int			number;
@@ -64,30 +53,53 @@ class MapThing;
 class MapObject;
 class GameConfiguration {
 private:
-	string			name;
-	int				map_format;
-	string			udmf_namespace;
-	bool			boom;
-	string			game_filter;
-	ASpecialMap		action_specials;
-	ActionSpecial	as_unknown;
-	ThingTypeMap	thing_types;
-	ThingType		ttype_unknown;
-	bool			any_map_name;
-	bool			mix_tex_flats;
-	bool			tx_textures;
-	string			sky_flat;
-	string			script_language;
-	vector<int>		light_levels;
+	//string			name;				// Game/port name
+	string			current_game;		// Current game name
+	string			current_port;		// Current port name (empty if none)
+	bool			map_formats[4];		// Supported map formats
+	string			udmf_namespace;		// Namespace to use for UDMF
+	bool			boom;				// Boom extensions enabled
+	ASpecialMap		action_specials;	// Action specials
+	ActionSpecial	as_unknown;			// Default action special
+	ThingTypeMap	thing_types;		// Thing types
+	ThingType		ttype_unknown;		// Default thing type
+	bool			any_map_name;		// Allow any map name
+	bool			mix_tex_flats;		// Allow mixed textures/flats
+	bool			tx_textures;		// Allow TX_ textures
+	string			sky_flat;			// Sky flat for 3d mode
+	string			script_language;	// Scripting language (should be extended to allow multiple)
+	vector<int>		light_levels;		// Light levels for up/down light in editor
 
+	// Basic game configuration info
 	struct gconf_t {
+		string	name;
 		string	title;
 		string	filename;
+		bool	supported_formats[4];
+		bool	user;
+		gconf_t() { for (int a = 0; a < 4; a++) supported_formats[a] = false; user = true; }
 		bool operator>(const gconf_t& right) const { return title > right.title; }
 		bool operator<(const gconf_t& right) const { return title < right.title; }
 	};
+	gconf_t			gconf_none;
 	vector<gconf_t>	game_configs;
-	size_t lastDefaultConfig;
+	size_t			lastDefaultConfig;
+
+	// Basic port configuration info
+	struct pconf_t {
+		string			name;
+		string			title;
+		string			filename;
+		bool			supported_formats[4];
+		vector<string>	supported_games;
+		bool			user;
+		pconf_t() { for (int a = 0; a < 4; a++) supported_formats[a] = false; user = true; }
+		bool operator>(const pconf_t& right) const { return title > right.title; }
+		bool operator<(const pconf_t& right) const { return title < right.title; }
+	};
+	pconf_t			pconf_none;
+	vector<pconf_t>	port_configs;
+	size_t			lastDefaultPort;
 
 	// Flags
 	struct flag_t {
@@ -141,8 +153,8 @@ public:
 	}
 
 	void	setDefaults();
-	string	getName() { return name; }
-	int		getMapFormat() { return map_format; }
+	string	currentGame() { return current_game; }
+	string	currentPort() { return current_port; }
 	bool	isBoom() { return boom; }
 	bool	anyMapName() { return any_map_name; }
 	bool	mixTexFlats() { return mix_tex_flats; }
@@ -153,10 +165,17 @@ public:
 	int		lightLevelInterval();
 
 	string			readConfigName(MemChunk& mc);
+	gconf_t			readBasicGameConfig(MemChunk& mc);
+	pconf_t			readBasicPortConfig(MemChunk& mc);
 	void			init();
-	unsigned		nConfigs() { return game_configs.size(); }
-	string			configTitle(unsigned index);
-	string			configName(unsigned index);
+	unsigned		nGameConfigs() { return game_configs.size(); }
+	unsigned		nPortConfigs() { return port_configs.size(); }
+	gconf_t			gameConfig(unsigned index);
+	gconf_t			gameConfig(string id);
+	pconf_t			portConfig(unsigned index);
+	pconf_t			portConfig(string id);
+	bool			portSupportsGame(unsigned port, string game);
+	bool			mapFormatSupported(int map_format, int game, int port = -1);
 	unsigned		nMapNames() { return maps.size(); }
 	string			mapName(unsigned index);
 	gc_mapinfo_t	mapInfo(string mapname);
@@ -169,10 +188,11 @@ public:
 	void	readActionSpecials(ParseTreeNode* node, ActionSpecial* group_defaults = NULL);
 	void	readThingTypes(ParseTreeNode* node, ThingType* group_defaults = NULL);
 	void	readUDMFProperties(ParseTreeNode* node, UDMFPropMap& plist);
+	void	readGameSection(ParseTreeNode* node_game, bool port_section = false);
 	bool	readConfiguration(string& cfg, string source = "");
-	bool 	open(string filename);
-	bool	open(ArchiveEntry* entry);
-	bool	openConfig(string name);
+	//bool 	open(string filename_game);
+	//bool	open(ArchiveEntry* entry);
+	bool	openConfig(string game, string port = "");
 	bool	openEmbeddedConfig(ArchiveEntry* entry);
 	bool	removeEmbeddedConfig(string name);
 
@@ -196,13 +216,13 @@ public:
 	int		nLineFlags() { return flags_line.size(); }
 	string	lineFlag(unsigned flag_index);
 	bool	lineFlagSet(unsigned flag_index, MapLine* line);
-	bool	lineBasicFlagSet(string flag, MapLine* line);
+	bool	lineBasicFlagSet(string flag, MapLine* line, int map_format);
 	string	lineFlagsString(MapLine* line);
 	void	setLineFlag(unsigned flag_index, MapLine* line, bool set = true);
-	void	setLineBasicFlag(string flag, MapLine* line, bool set = true);
+	void	setLineBasicFlag(string flag, MapLine* line, int map_format, bool set = true);
 
 	// Line action (SPAC) triggers
-	string			spacTriggerString(MapLine* line);
+	string			spacTriggerString(MapLine* line, int map_format);
 	wxArrayString	allSpacTriggers();
 	void			setLineSpacTrigger(unsigned trigger_index, MapLine* line);
 
@@ -212,7 +232,7 @@ public:
 	void			cleanObjectUDMFProps(MapObject* object);
 
 	// Sector types
-	string	sectorTypeName(int type);
+	string	sectorTypeName(int type, int map_format);
 
 	// Defaults
 	string	getDefaultString(int type, string property);

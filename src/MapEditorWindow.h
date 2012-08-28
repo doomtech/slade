@@ -41,6 +41,7 @@ public:
 
 	MapEditor&			mapEditor() { return editor; }
 	MapTextureManager&	textureManager() { return tex_man; }
+	Archive::mapdesc_t&	currentMapDesc() { return mdesc_current; }
 
 	// Layout save/load
 	void	loadLayout();

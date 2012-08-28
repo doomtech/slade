@@ -2326,6 +2326,7 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 		theMainWindow->openTextureEditor(archive);
 
 	// Map
+	// TODO: Needs to filter the game/port lists in the dialog by the map format
 	else if (entry->getType() == EntryType::mapMarkerType()) {
 		// Open map editor config dialog
 		MapEditorConfigDialog dlg(this, archive, false);

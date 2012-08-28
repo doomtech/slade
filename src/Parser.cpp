@@ -150,14 +150,17 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 				if (S_CMPNOCASE(token, "#ifndef"))
 					test = false;
 				string define = tz.getToken();
+				wxLogMessage("#if(n)def, %s", CHR(define));
 				if (parser->defined(define) == test) {
 					// Continue
+					wxLogMessage("passed");
 					token = tz.getToken();
 					continue;
 				}
 				else {
 					// Skip section
 					int skip = 0;
+					wxLogMessage("skipping");
 					while (true) {
 						token = tz.getToken();
 						if (S_CMPNOCASE(token, "#endif"))
@@ -167,13 +170,30 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 						else if (S_CMPNOCASE(token, "#ifndef"))
 							skip++;
 
-						token = tz.getToken();
-						if (skip < 0 || token.IsEmpty())
+						if (skip < 0)
 							break;
+						if (token.IsEmpty()) {
+							wxLogMessage("Error: found end of file within #if(n)def block");
+							break;
+						}
 					}
+					wxLogMessage("skipped");
 
 					continue;
 				}
+			}
+
+			// #include (ignore)
+			if (S_CMPNOCASE(token, "#include")) {
+				tz.skipToken();	// Skip include path
+				token = tz.getToken();
+				continue;
+			}
+
+			// #endif (ignore)
+			if (S_CMPNOCASE(token, "#endif")) {
+				token = tz.getToken();
+				continue;
 			}
 		}
 
@@ -200,7 +220,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		// Assignment
 		if (S_CMP(next, "=")) {
 			// Skip =
-			tz.getToken();
+			tz.skipToken();
 
 			// Create item node
 			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
@@ -255,7 +275,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 
 				// Check for ,
 				if (S_CMP(tz.peekToken(), ","))
-					tz.getToken();	// Skip it
+					tz.skipToken();	// Skip it
 				else if (!(S_CMP(tz.peekToken(), list_end))) {
 					string token = tz.getToken();
 					string name = tz.getName();
@@ -274,7 +294,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 			child->type = type;
 
 			// Skip {
-			tz.getToken();
+			tz.skipToken();
 
 			// Parse child node
 			if (!child->parse(tz))
@@ -288,13 +308,13 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 			child->type = type;
 
 			// Skip ;
-			tz.getToken();
+			tz.skipToken();
 		}
 
 		// Child node + inheritance
 		else if (S_CMP(next, ":")) {
 			// Skip :
-			tz.getToken();
+			tz.skipToken();
 
 			// Read inherited name
 			string inherit = tz.getToken();

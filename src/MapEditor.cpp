@@ -2527,11 +2527,11 @@ void MapEditor::toggleUnpegged3d(bool lower) {
 
 		// Toggle flag
 		if (lower) {
-			bool unpegged = theGameConfiguration->lineBasicFlagSet("dontpegbottom", line);
+			bool unpegged = theGameConfiguration->lineBasicFlagSet("dontpegbottom", line, theMapEditor->currentMapDesc().format);
 			theGameConfiguration->setLineBasicFlag("dontpegbottom", line, !unpegged);
 		}
 		else {
-			bool unpegged = theGameConfiguration->lineBasicFlagSet("dontpegtop", line);
+			bool unpegged = theGameConfiguration->lineBasicFlagSet("dontpegtop", line, theMapEditor->currentMapDesc().format);
 			theGameConfiguration->setLineBasicFlag("dontpegtop", line, !unpegged);
 		}
 	}
@@ -2789,7 +2789,7 @@ bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 	else if (key.StartsWith("me3d_") && edit_mode == MODE_3D) {
 		// Check for extended udmf properties
 		bool ext = false;
-		if (theGameConfiguration->getMapFormat() == MAP_UDMF &&
+		if (theMapEditor->currentMapDesc().format == MAP_UDMF &&
 			S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom"))
 			ext = true;
 

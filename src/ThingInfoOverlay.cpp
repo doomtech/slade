@@ -23,6 +23,7 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	translation = "";
 	palette = "";
 	icon = "";
+	int map_format = theMapEditor->currentMapDesc().format;
 
 	// Index + type
 	ThingType* tt = theGameConfiguration->thingType(thing->getType());
@@ -30,7 +31,7 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	info.push_back(S_FMT("Thing #%d: %s", thing->getIndex(), CHR(type)));
 
 	// Position
-	if (theGameConfiguration->getMapFormat() != MAP_DOOM)
+	if (map_format != MAP_DOOM)
 		info.push_back(S_FMT("Position: %d, %d, %d", (int)thing->xPos(), (int)thing->yPos(), (int)(thing->floatProperty("height"))));
 	else info.push_back(S_FMT("Position: %d, %d", (int)thing->xPos(), (int)thing->yPos()));
 
@@ -56,8 +57,8 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	info.push_back(S_FMT("Direction: %s", CHR(dir)));
 
 	// Special and Args (if in hexen format or udmf with thing args)
-	if (theGameConfiguration->getMapFormat() == MAP_HEXEN ||
-		(theGameConfiguration->getMapFormat() == MAP_UDMF && theGameConfiguration->getUDMFProperty("arg0", MOBJ_THING))) {
+	if (map_format == MAP_HEXEN ||
+		(map_format == MAP_UDMF && theGameConfiguration->getUDMFProperty("arg0", MOBJ_THING))) {
 		int as_id = thing->intProperty("special");
 		info.push_back(S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id))));
 		int args[5];
@@ -74,11 +75,11 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	}
 
 	// Flags
-	if (theGameConfiguration->getMapFormat() != MAP_UDMF)
+	if (map_format != MAP_UDMF)
 		info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->intProperty("flags")))));
 
 	// TID (if in doom64/hexen/udmf format)
-	if (theGameConfiguration->getMapFormat() != MAP_DOOM) {
+	if (map_format != MAP_DOOM) {
 		info.push_back(S_FMT("TID: %i", thing->intProperty("id")));
 	}
 

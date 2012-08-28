@@ -1298,7 +1298,7 @@ void MapRenderer2D::renderFlatsImmediate(int type, bool texture, float alpha) {
 			double sy = 1;
 			double rot = 0;
 			// Check for UDMF + ZDoom extensions
-			if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+			if (theMapEditor->currentMapDesc().format == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
 				// Floor
 				if (type <= 1) {
 					ox = sector->floatProperty("xpanningfloor");
@@ -1401,7 +1401,7 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 			double sy = 1;
 			double rot = 0;
 			// Check for UDMF + ZDoom extensions
-			if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+			if (theMapEditor->currentMapDesc().format == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
 				// Floor
 				if (type <= 1) {
 					ox = sector->floatProperty("xpanningfloor");
@@ -1993,7 +1993,7 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br) {
 
 		// Get thing type properties from game configuration
 		ThingType* tt = theGameConfiguration->thingType(map->getThing(a)->getType());
-		radius = scaledRadius(tt->getRadius());
+		radius = tt->getRadius() * 1.3;
 
 		// Ignore if outside of screen
 		if (x+radius < view_tl.x || x-radius > view_br.x || y+radius < view_tl.y || y-radius > view_br.y)

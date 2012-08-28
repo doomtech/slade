@@ -248,6 +248,50 @@ public:
 };
 
 
+class GfxCropDialog : public wxDialog {
+private:
+	class CropCanvas : public OGLCanvas {
+	public:
+		CropCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {}
+
+		void draw() {
+			drawCheckeredBackground();
+			SwapBuffers();
+		}
+	};
+
+	CropCanvas*	canvas_preview;
+
+public:
+	GfxCropDialog(wxWindow* parent, ArchiveEntry* entry, Palette8bit* pal)
+	: wxDialog(parent, -1, "Crop", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
+		// Set dialog icon
+		wxIcon icon;
+		icon.CopyFromBitmap(getIcon("t_settings"));
+		SetIcon(icon);
+
+		// Setup main sizer
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		SetSizer(sizer);
+
+		// Add preview
+		canvas_preview = new CropCanvas(this);
+		sizer->Add(canvas_preview, 1, wxEXPAND|wxALL, 4);
+
+		// Add buttons
+		sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		// Setup dialog size
+		SetInitialSize(wxSize(-1, -1));
+		SetMinSize(GetSize());
+		CenterOnParent();
+	}
+
+	~GfxCropDialog() {
+	}
+};
+
+
 /*******************************************************************
  * GFXENTRYPANEL CLASS FUNCTIONS
  *******************************************************************/
@@ -314,7 +358,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	custom_menu_name = "Graphic";
 
 	// Custom toolbar
-	custom_toolbar_actions = "pgfx_mirror;pgfx_flip;pgfx_rotate;pgfx_translate;pgfx_colourise;pgfx_tint";
+	custom_toolbar_actions = "pgfx_mirror;pgfx_flip;pgfx_rotate;pgfx_translate;pgfx_colourise;pgfx_tint;pgfx_crop";
 	/*
 	 * theApp->getAction("pgfx_mirror")->addToMenu(custom);
 	theApp->getAction("pgfx_flip")->addToMenu(custom);
@@ -807,6 +851,17 @@ bool GfxEntryPanel::handleAction(string id) {
 		}
 	}
 
+	// Crop
+	else if (id == "pgfx_crop") {
+		Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
+		GfxCropDialog gcd(theMainWindow, entry, pal);
+
+		// Show crop dialog
+		if (gcd.ShowModal() == wxID_OK) {
+			// stuff
+		}
+	}
+
 	// alPh/tRNS
 	else if (id == "pgfx_alph" || id == "pgfx_trns")
 		setModified();
@@ -838,6 +893,7 @@ bool GfxEntryPanel::fillCustomMenu(wxMenu * custom) {
 	theApp->getAction("pgfx_translate")->addToMenu(custom);
 	theApp->getAction("pgfx_colourise")->addToMenu(custom);
 	theApp->getAction("pgfx_tint")->addToMenu(custom);
+	theApp->getAction("pgfx_crop")->addToMenu(custom);
 	custom->AppendSeparator();
 	theApp->getAction("pgfx_alph")->addToMenu(custom);
 	theApp->getAction("pgfx_trns")->addToMenu(custom);

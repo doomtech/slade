@@ -24,6 +24,7 @@ void InfoOverlay3D::update(int item_index, int item_type, SLADEMap* map) {
 	texname = "";
 	texture = NULL;
 	thing_icon = false;
+	int map_format = theMapEditor->currentMapDesc().format;
 
 	// Wall
 	if (item_type == MapEditor::SEL_SIDE_BOTTOM || item_type == MapEditor::SEL_SIDE_MIDDLE || item_type == MapEditor::SEL_SIDE_TOP) {
@@ -42,11 +43,11 @@ void InfoOverlay3D::update(int item_index, int item_type, SLADEMap* map) {
 
 		// Relevant flags
 		string flags = "";
-		if (theGameConfiguration->lineBasicFlagSet("dontpegtop", line))
+		if (theGameConfiguration->lineBasicFlagSet("dontpegtop", line, map_format))
 			flags += "Upper Unpegged, ";
-		if (theGameConfiguration->lineBasicFlagSet("dontpegbottom", line))
+		if (theGameConfiguration->lineBasicFlagSet("dontpegbottom", line, map_format))
 			flags += "Lower Unpegged, ";
-		if (theGameConfiguration->lineBasicFlagSet("blocking", line))
+		if (theGameConfiguration->lineBasicFlagSet("blocking", line, map_format))
 			flags += "Blocking, ";
 		if (!flags.IsEmpty()) {
 			flags.RemoveLast(2);
@@ -255,7 +256,7 @@ void InfoOverlay3D::update(int item_index, int item_type, SLADEMap* map) {
 		info.push_back(S_FMT("Thing #%d", item_index));
 
 		// Position
-		if (theGameConfiguration->getMapFormat() == MAP_HEXEN || theGameConfiguration->getMapFormat() == MAP_UDMF)
+		if (theMapEditor->currentMapDesc().format == MAP_HEXEN || theMapEditor->currentMapDesc().format == MAP_UDMF)
 			info.push_back(S_FMT("Position: %d, %d, %d", (int)thing->xPos(), (int)thing->yPos(), (int)thing->floatProperty("height")));
 		else
 			info.push_back(S_FMT("Position: %d, %d", (int)thing->xPos(), (int)thing->yPos()));
@@ -269,8 +270,8 @@ void InfoOverlay3D::update(int item_index, int item_type, SLADEMap* map) {
 			info2.push_back(S_FMT("Type: %s", CHR(tt->getName())));
 
 		// Args
-		if (theGameConfiguration->getMapFormat() == MAP_HEXEN ||
-			(theGameConfiguration->getMapFormat() == MAP_UDMF && theGameConfiguration->getUDMFProperty("arg0", MOBJ_THING))) {
+		if (theMapEditor->currentMapDesc().format == MAP_HEXEN ||
+			(theMapEditor->currentMapDesc().format == MAP_UDMF && theGameConfiguration->getUDMFProperty("arg0", MOBJ_THING))) {
 			// Get thing args
 			int args[5];
 			args[0] = thing->intProperty("arg0");

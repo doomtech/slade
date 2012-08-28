@@ -723,11 +723,12 @@ void MOPGSPACTriggerProperty::openObjects(vector<MapObject*>& objects) {
 	}
 
 	// Get property of first object
-	string first = theGameConfiguration->spacTriggerString((MapLine*)objects[0]);
+	int map_format = theMapEditor->currentMapDesc().format;
+	string first = theGameConfiguration->spacTriggerString((MapLine*)objects[0], map_format);
 
 	// Check whether all objects share the same value
 	for (unsigned a = 1; a < objects.size(); a++) {
-		if (theGameConfiguration->spacTriggerString((MapLine*)objects[a]) != first) {
+		if (theGameConfiguration->spacTriggerString((MapLine*)objects[a], map_format) != first) {
 			// Different value found, set unspecified
 			SetValueToUnspecified();
 			return;

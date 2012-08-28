@@ -108,11 +108,16 @@ public:
 	}
 
 	void OnStackFrame(const wxStackFrame& frame) {
-		string location = wxEmptyString;
+		string location = "[unknown location] ";
 		if (frame.HasSourceLocation())
 			location = S_FMT("(%s:%d) ", frame.GetFileName().c_str(), frame.GetLine());
 
-		string parameters = wxEmptyString;
+		wxUIntPtr address = wxPtrToUInt(frame.GetAddress());
+		string func_name = frame.GetName();
+		if (func_name.IsEmpty())
+			func_name = S_FMT("[unknown:%d]", address);
+
+		//string parameters = wxEmptyString;
 		/*
 		for (size_t a = 0; a < frame.GetParamCount(); a++) {
 			string type = wxEmptyString;
@@ -127,7 +132,7 @@ public:
 		}
 		*/
 
-		stack_trace.Append(S_FMT("%d: %s%s(%s)\n", frame.GetLevel(), location.c_str(), frame.GetName().c_str(), parameters.c_str()));
+		stack_trace.Append(S_FMT("%d: %s%s\n", frame.GetLevel(), CHR(location), CHR(func_name)));
 	}
 };
 
@@ -434,6 +439,7 @@ void MainApp::initActions() {
 	new SAction("pgfx_alph", "alPh Chunk", "", "Add/Remove alPh chunk to/from the PNG", "", SAction::CHECK);
 	new SAction("pgfx_trns", "tRNS Chunk", "", "Add/Remove tRNS chunk to/from the PNG", "", SAction::CHECK);
 	new SAction("pgfx_extract", "Extract All", "", "Extract all images in this entry to separate PNGs");
+	new SAction("pgfx_crop", "Crop", "t_settings", "Crop the graphic");
 
 	// ArchiveEntryList
 	new SAction("aelt_sizecol", "Size", "", "Show the size column", "", SAction::CHECK);

@@ -90,4 +90,13 @@ string appPath(string filename, int dir);
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define DPrintf wxLogMessage
 
+// Define map types
+enum MapTypes {
+	MAP_DOOM = 0,
+	MAP_HEXEN,
+	MAP_DOOM64,
+	MAP_UDMF,
+	MAP_UNKNOWN,	// Needed for maps in zip archives
+};
+
 #endif //__MAIN_H__

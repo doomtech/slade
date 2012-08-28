@@ -22,7 +22,7 @@ void SectorInfoOverlay::update(MapSector* sector) {
 
 	// Info (index + type)
 	int t = sector->intProperty("special");
-	string type = S_FMT("%s (Type %d)", CHR(theGameConfiguration->sectorTypeName(t)), t);
+	string type = S_FMT("%s (Type %d)", CHR(theGameConfiguration->sectorTypeName(t, theMapEditor->currentMapDesc().format)), t);
 	info.push_back(S_FMT("Sector #%d: %s", sector->getIndex(), CHR(type)));
 
 	// Height

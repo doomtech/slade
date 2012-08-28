@@ -417,6 +417,7 @@ string Tokenizer::peekToken() {
 	// Backup current position
 	char* c = current;
 	uint32_t p = position;
+	int oline = line;
 
 	// Read the next token
 	readToken();
@@ -424,6 +425,7 @@ string Tokenizer::peekToken() {
 	// Go back to original position
 	current = c;
 	position = p;
+	line = oline;
 
 	// Return the token
 	return token_current;

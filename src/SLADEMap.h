@@ -23,6 +23,7 @@ private:
 	PropertyList		udmf_props;
 	bool				position_frac;
 	string				name;
+	int					current_format;
 
 	// The last time the map geometry was updated
 	long	geometry_updated;
@@ -96,6 +97,8 @@ public:
 	};
 
 	string		mapName() { return name; }
+	string		udmfNamespace() { return udmf_namespace; }
+	int			currentFormat() { return current_format; }
 	MapVertex*	getVertex(unsigned index);
 	MapSide*	getSide(unsigned index);
 	MapLine*	getLine(unsigned index);

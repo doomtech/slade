@@ -74,17 +74,6 @@ enum ArchiveTypes {
 	ARCHIVE_7Z,
 };
 
-#ifndef __GAME_CONFIGURATION_H__
-// Define map types
-enum MapTypes {
-	MAP_UNKNOWN,	// Needed for maps in zip archives
-	MAP_DOOM,
-	MAP_HEXEN,
-	MAP_DOOM64,
-	MAP_UDMF,
-};
-#endif
-
 class Archive : public Announcer {
 private:
 	bool				modified;

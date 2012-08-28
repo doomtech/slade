@@ -492,7 +492,7 @@ bool MapEditorWindow::saveMap() {
 	wad->addNewEntry("MAP01");
 	for (unsigned a = 0; a < map_data.size(); a++)
 		wad->addEntry(map_data[a]);
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF)
+	if (mdesc_current.format == MAP_UDMF)
 		wad->addNewEntry("ENDMAP");
 	if (behavior)
 		wad->addEntry(behavior, "", true);
@@ -571,7 +571,7 @@ bool MapEditorWindow::saveMapAs() {
 	WadArchive wad;
 	ArchiveEntry* head = wad.addNewEntry(mdesc_current.name);
 	ArchiveEntry* end = NULL;
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF) {
+	if (mdesc_current.format == MAP_UDMF) {
 		wad.addNewEntry("TEXTMAP");
 		end = wad.addNewEntry("ENDMAP");
 	}
@@ -587,7 +587,7 @@ bool MapEditorWindow::saveMapAs() {
 	mdesc_current.head = head;
 	mdesc_current.archive = false;
 	mdesc_current.end = end;
-	mdesc_current.format = theGameConfiguration->getMapFormat();
+	//mdesc_current.format = theGameConfiguration->getMapFormat();
 
 	// Save map data
 	saveMap();

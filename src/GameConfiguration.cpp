@@ -21,6 +21,7 @@
  *******************************************************************/
 GameConfiguration* GameConfiguration::instance = NULL;
 CVAR(String, game_configuration, "", CVAR_SAVE)
+CVAR(String, port_configuration, "", CVAR_SAVE)
 
 
 /*******************************************************************
@@ -47,7 +48,6 @@ GameConfiguration::~GameConfiguration() {
 }
 
 void GameConfiguration::setDefaults() {
-	game_filter = "";
 	udmf_namespace = "";
 	ttype_unknown.icon = "unknown";
 	ttype_unknown.shrink = true;
@@ -62,13 +62,12 @@ void GameConfiguration::setDefaults() {
 	sky_flat = "F_SKY1";
 	script_language = "";
 	light_levels.clear();
+	for (int a = 0; a < 4; a++)
+		map_formats[a] = false;
 }
 
 string GameConfiguration::udmfNamespace() {
-	if (map_format != MAP_UDMF)
-		return "";
-	else
-		return udmf_namespace.Lower();
+	return udmf_namespace.Lower();
 }
 
 int GameConfiguration::lightLevelInterval() {
@@ -108,26 +107,131 @@ string GameConfiguration::readConfigName(MemChunk& mc) {
 	return "";
 }
 
-void GameConfiguration::init() {
-	// Load last configuration if any
-	if (!string(game_configuration).IsEmpty())
-		openConfig(game_configuration);
+GameConfiguration::gconf_t GameConfiguration::readBasicGameConfig(MemChunk& mc) {
+	// Parse configuration
+	Parser parser;
+	parser.parseText(mc, "");
+	gconf_t conf;
 
+	// Check for game section
+	ParseTreeNode* node_game = NULL;
+	for (unsigned a = 0; a < parser.parseTreeRoot()->nChildren(); a++) {
+		ParseTreeNode* child = (ParseTreeNode*)parser.parseTreeRoot()->getChild(a);
+		if (child->getType() == "game") {
+			node_game = child;
+			break;
+		}
+	}
+	if (node_game) {
+		// Game id
+		conf.name = node_game->getName();
+
+		// Game name
+		ParseTreeNode* node_name = (ParseTreeNode*)node_game->getChild("name");
+		if (node_name)
+			conf.title = node_name->getStringValue();
+
+		// Supported map formats
+		ParseTreeNode* node_maps = (ParseTreeNode*)node_game->getChild("map_formats");
+		if (node_maps) {
+			for (unsigned a = 0; a < node_maps->nValues(); a++) {
+				if (S_CMPNOCASE(node_maps->getStringValue(a), "doom"))
+					conf.supported_formats[MAP_DOOM] = true;
+				else if (S_CMPNOCASE(node_maps->getStringValue(a), "hexen"))
+					conf.supported_formats[MAP_HEXEN] = true;
+				else if (S_CMPNOCASE(node_maps->getStringValue(a), "doom64"))
+					conf.supported_formats[MAP_DOOM64] = true;
+				else if (S_CMPNOCASE(node_maps->getStringValue(a), "udmf"))
+					conf.supported_formats[MAP_UDMF] = true;
+			}
+		}
+	}
+
+	return conf;
+}
+
+GameConfiguration::pconf_t GameConfiguration::readBasicPortConfig(MemChunk& mc) {
+	// Parse configuration
+	Parser parser;
+	parser.parseText(mc, "");
+	pconf_t conf;
+
+	// Check for port section
+	ParseTreeNode* node_port = NULL;
+	for (unsigned a = 0; a < parser.parseTreeRoot()->nChildren(); a++) {
+		ParseTreeNode* child = (ParseTreeNode*)parser.parseTreeRoot()->getChild(a);
+		if (child->getType() == "port") {
+			node_port = child;
+			break;
+		}
+	}
+	if (node_port) {
+		// Port id
+		conf.name = node_port->getName();
+
+		// Port name
+		ParseTreeNode* node_name = (ParseTreeNode*)node_port->getChild("name");
+		if (node_name)
+			conf.title = node_name->getStringValue();
+
+		// Supported games
+		ParseTreeNode* node_games = (ParseTreeNode*)node_port->getChild("games");
+		if (node_games) {
+			for (unsigned a = 0; a < node_games->nValues(); a++)
+				conf.supported_games.push_back(node_games->getStringValue(a));
+		}
+
+		// Supported map formats
+		ParseTreeNode* node_maps = (ParseTreeNode*)node_port->getChild("map_formats");
+		if (node_maps) {
+			for (unsigned a = 0; a < node_maps->nValues(); a++) {
+				if (S_CMPNOCASE(node_maps->getStringValue(a), "doom"))
+					conf.supported_formats[MAP_DOOM] = true;
+				else if (S_CMPNOCASE(node_maps->getStringValue(a), "hexen"))
+					conf.supported_formats[MAP_HEXEN] = true;
+				else if (S_CMPNOCASE(node_maps->getStringValue(a), "doom64"))
+					conf.supported_formats[MAP_DOOM64] = true;
+				else if (S_CMPNOCASE(node_maps->getStringValue(a), "udmf"))
+					conf.supported_formats[MAP_UDMF] = true;
+			}
+		}
+	}
+
+	return conf;
+}
+
+void GameConfiguration::init() {
 	// Add game configurations from user dir
 	wxArrayString allfiles;
 	wxDir::GetAllFiles(appPath("games", DIR_USER), &allfiles);
 	for (unsigned a = 0; a < allfiles.size(); a++) {
-		// Read config name
+		// Read config info
 		MemChunk mc;
 		mc.importFile(allfiles[a]);
-		string name = readConfigName(mc);
+		gconf_t conf = readBasicGameConfig(mc);
 
 		// Add to list if valid
-		if (!name.IsEmpty()) {
-			gconf_t gc;
-			gc.filename = wxFileName(allfiles[a]).GetName();
-			gc.title = name;
-			game_configs.push_back(gc);
+		if (!conf.name.IsEmpty()) {
+			conf.filename = wxFileName(allfiles[a]).GetName();
+			conf.user = true;
+			game_configs.push_back(conf);
+		}
+	}
+
+	// Add port configurations from user dir
+	allfiles.clear();
+	wxDir::GetAllFiles(appPath("ports", DIR_USER), &allfiles);
+	for (unsigned a = 0; a < allfiles.size(); a++) {
+		// Read config info
+		MemChunk mc;
+		mc.importFile(allfiles[a]);
+		pconf_t conf = readBasicPortConfig(mc);
+
+		// Add to list if valid
+		if (!conf.name.IsEmpty()) {
+			conf.filename = wxFileName(allfiles[a]).GetName();
+			conf.user = true;
+			port_configs.push_back(conf);
 		}
 	}
 
@@ -135,35 +239,64 @@ void GameConfiguration::init() {
 	ArchiveTreeNode* dir = theArchiveManager->programResourceArchive()->getDir("config/games");
 	if (dir) {
 		for (unsigned a = 0; a < dir->numEntries(); a++) {
-			// Check this game doesn't already exist
+			// Read config info
+			gconf_t conf = readBasicGameConfig(dir->getEntry(a)->getMCData());
+
+			// Ignore if invalid
+			if (conf.name.IsEmpty())
+				continue;
+
+			// Add to list if it doesn't already exist
 			bool exists = false;
-			string filename = dir->getEntry(a)->getName(true);
 			for (unsigned b = 0; b < game_configs.size(); b++) {
-				if (game_configs[b].filename == filename) {
+				if (game_configs[b].name == conf.name) {
 					exists = true;
 					break;
 				}
 			}
-
-			if (exists)
-				continue;
-
-			// Read config name
-			string name = readConfigName(dir->getEntry(a)->getMCData());
-
-			// Add to list if valid
-			if (!name.IsEmpty()) {
-				gconf_t gc;
-				gc.filename = dir->getEntry(a)->getName(true);
-				gc.title = name;
-				game_configs.push_back(gc);
+			if (!exists) {
+				conf.filename = dir->getEntry(a)->getName(true);
+				conf.user = false;
+				game_configs.push_back(conf);
 			}
 		}
 	}
 
-	// Sort game configurations list by title
+	// Add port configurations from program resource
+	dir = theArchiveManager->programResourceArchive()->getDir("config/ports");
+	if (dir) {
+		for (unsigned a = 0; a < dir->numEntries(); a++) {
+			// Read config info
+			pconf_t conf = readBasicPortConfig(dir->getEntry(a)->getMCData());
+
+			// Ignore if invalid
+			if (conf.name.IsEmpty())
+				continue;
+
+			// Add to list if it doesn't already exist
+			bool exists = false;
+			for (unsigned b = 0; b < port_configs.size(); b++) {
+				if (port_configs[b].name == conf.name) {
+					exists = true;
+					break;
+				}
+			}
+			if (!exists) {
+				conf.filename = dir->getEntry(a)->getName(true);
+				conf.user = false;
+				port_configs.push_back(conf);
+			}
+		}
+	}
+
+	// Sort configuration lists by title
 	std::sort(game_configs.begin(), game_configs.end());
+	std::sort(port_configs.begin(), port_configs.end());
 	lastDefaultConfig = game_configs.size();
+
+	// Load last configuration if any
+	if (game_configuration != "")
+		openConfig(game_configuration, port_configuration);
 }
 
 string GameConfiguration::mapName(unsigned index) {
@@ -186,18 +319,67 @@ gc_mapinfo_t GameConfiguration::mapInfo(string name) {
 		return gc_mapinfo_t();
 }
 
-string GameConfiguration::configTitle(unsigned index) {
+GameConfiguration::gconf_t GameConfiguration::gameConfig(unsigned index) {
 	if (index >= game_configs.size())
-		return "";
+		return gconf_none;
 	else
-		return game_configs[index].title;
+		return game_configs[index];
 }
 
-string GameConfiguration::configName(unsigned index) {
-	if (index >= game_configs.size())
-		return "";
+GameConfiguration::gconf_t GameConfiguration::gameConfig(string id) {
+	for (unsigned a = 0; a < game_configs.size(); a++) {
+		if (game_configs[a].name == id)
+			return game_configs[a];
+	}
+
+	return gconf_none;
+}
+
+GameConfiguration::pconf_t GameConfiguration::portConfig(unsigned index) {
+	if (index >= port_configs.size())
+		return pconf_none;
 	else
-		return game_configs[index].filename;
+		return port_configs[index];
+}
+
+GameConfiguration::pconf_t GameConfiguration::portConfig(string id) {
+	for (unsigned a = 0; a < port_configs.size(); a++) {
+		if (port_configs[a].name == id)
+			return port_configs[a];
+	}
+
+	return pconf_none;
+}
+
+bool GameConfiguration::portSupportsGame(unsigned port, string game) {
+	// Check index
+	if (port >= port_configs.size())
+		return false;
+
+	// Check if game is supported
+	for (unsigned b = 0; b < port_configs[port].supported_games.size(); b++) {
+		if (port_configs[port].supported_games[b] == game)
+			return true;
+	}
+
+	// Not supported
+	return false;
+}
+
+bool GameConfiguration::mapFormatSupported(int map_format, int game, int port) {
+	if (MAP_DOOM < 0 || MAP_UDMF > 3)
+		return false;
+
+	// Check port if one specified
+	if (port >= 0 && port <= port_configs.size())
+		return port_configs[port].supported_formats[map_format];
+
+	// Check game
+	if (game >= 0 && game <= game_configs.size())
+		return game_configs[game].supported_formats[map_format];
+
+	// Not supported
+	return false;
 }
 
 /* GameConfiguration::buildConfig
@@ -219,7 +401,7 @@ void GameConfiguration::buildConfig(string filename, string& out) {
 	string line = file.GetNextLine();
 	while (!file.Eof()) {
 		// Check for #include
-		if (line.StartsWith("#include")) {
+		if (line.Trim().StartsWith("#include")) {
 			// Get filename to include
 			Tokenizer tz;
 			tz.openString(line);
@@ -260,7 +442,7 @@ void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
 	string line = file.GetNextLine();
 	while (!file.Eof()) {
 		// Check for #include
-		if (line.StartsWith("#include")) {
+		if (line.Trim().StartsWith("#include")) {
 			// Get name of entry to include
 			Tokenizer tz;
 			tz.openString(line);
@@ -301,6 +483,10 @@ void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
 }
 
 void GameConfiguration::readActionSpecials(ParseTreeNode* node, ActionSpecial* group_defaults) {
+	// Check if we're clearing all existing specials
+	if (node->getChild("clearexisting"))
+		action_specials.clear();
+
 	// Determine current 'group'
 	ParseTreeNode* group = node;
 	string groupname = "";
@@ -455,12 +641,360 @@ void GameConfiguration::readUDMFProperties(ParseTreeNode* block, UDMFPropMap& pl
 	}
 }
 
-bool GameConfiguration::readConfiguration(string& cfg, string source) {
-	// Testing
-	/*MemChunk mc;
-	mc.write(CHR(cfg), cfg.Length());
-	mc.exportFile("gctest.txt");*/
+void GameConfiguration::readGameSection(ParseTreeNode* node_game, bool port_section) {
+	for (unsigned a = 0; a < node_game->nChildren(); a++) {
+		ParseTreeNode* node = (ParseTreeNode*)node_game->getChild(a);
 
+		//// Game name
+		//if (S_CMPNOCASE(node->getName(), "name"))
+		//	this->name = node->getStringValue();
+
+		// Allow any map name
+		if (S_CMPNOCASE(node->getName(), "map_name_any"))
+			any_map_name = node->getBoolValue();
+
+		// Map formats
+		else if (S_CMPNOCASE(node->getName(), "map_formats")) {
+			// Reset supported formats
+			for (unsigned f = 0; f < 4; f++)
+				map_formats[f] = false;
+
+			// Go through values
+			for (unsigned v = 0; v < node->nValues(); v++) {
+				if (S_CMPNOCASE(node->getStringValue(v), "doom")) {
+					map_formats[MAP_DOOM] = true;
+					wxLogMessage("doom format");
+				}
+				else if (S_CMPNOCASE(node->getStringValue(v), "hexen")) {
+					map_formats[MAP_HEXEN] = true;
+					wxLogMessage("hexen format");
+				}
+				else if (S_CMPNOCASE(node->getStringValue(v), "doom64")) {
+					map_formats[MAP_DOOM64] = true;
+					wxLogMessage("doom64 format");
+				}
+				else if (S_CMPNOCASE(node->getStringValue(v), "udmf")) {
+					map_formats[MAP_UDMF] = true;
+					wxLogMessage("udmf format");
+				}
+				else
+					wxLogMessage("Warning: Unknown/unsupported map format \"%s\"", CHR(node->getStringValue(v)));
+			}
+		}
+
+		// Boom extensions
+		else if (S_CMPNOCASE(node->getName(), "boom"))
+			boom = node->getBoolValue();
+
+		// UDMF namespace
+		else if (S_CMPNOCASE(node->getName(), "udmf_namespace"))
+			udmf_namespace = node->getStringValue();
+
+		// Mixed Textures and Flats
+		else if (S_CMPNOCASE(node->getName(), "mix_tex_flats"))
+			mix_tex_flats = node->getBoolValue();
+
+		// TX_/'textures' namespace enabled
+		else if (S_CMPNOCASE(node->getName(), "tx_textures"))
+			tx_textures = node->getBoolValue();
+
+		// Sky flat
+		else if (S_CMPNOCASE(node->getName(), "sky_flat"))
+			sky_flat = node->getStringValue();
+
+		// Scripting language
+		else if (S_CMPNOCASE(node->getName(), "script_language"))
+			script_language = node->getStringValue().Lower();
+
+		// Light levels interval
+		else if (S_CMPNOCASE(node->getName(), "light_level_interval"))
+			setLightLevelInterval(node->getIntValue());
+
+		// Defaults section
+		else if (S_CMPNOCASE(node->getName(), "defaults")) {
+			// Go through defaults blocks
+			for (unsigned b = 0; b < node->nChildren(); b++) {
+				ParseTreeNode* block = (ParseTreeNode*)node->getChild(b);
+
+				// Linedef defaults
+				if (S_CMPNOCASE(block->getName(), "linedef")) {
+					for (unsigned c = 0; c < block->nChildren(); c++) {
+						ParseTreeNode* def = (ParseTreeNode*)block->getChild(c);
+						defaults_line[def->getName()] = def->getValue();
+					}
+				}
+
+				// Sidedef defaults
+				else if (S_CMPNOCASE(block->getName(), "sidedef")) {
+					for (unsigned c = 0; c < block->nChildren(); c++) {
+						ParseTreeNode* def = (ParseTreeNode*)block->getChild(c);
+						defaults_side[def->getName()] = def->getValue();
+					}
+				}
+
+				// Sector defaults
+				else if (S_CMPNOCASE(block->getName(), "sector")) {
+					for (unsigned c = 0; c < block->nChildren(); c++) {
+						ParseTreeNode* def = (ParseTreeNode*)block->getChild(c);
+						defaults_sector[def->getName()] = def->getValue();
+					}
+				}
+
+				// Thing defaults
+				else if (S_CMPNOCASE(block->getName(), "thing")) {
+					for (unsigned c = 0; c < block->nChildren(); c++) {
+						ParseTreeNode* def = (ParseTreeNode*)block->getChild(c);
+						defaults_thing[def->getName()] = def->getValue();
+					}
+				}
+
+				else
+					wxLogMessage("Unknown defaults block \"%s\"", CHR(block->getName()));
+			}
+		}
+
+		// Maps section (game section only)
+		else if (S_CMPNOCASE(node->getName(), "maps") && !port_section) {
+			// Go through map blocks
+			for (unsigned b = 0; b < node->nChildren(); b++) {
+				ParseTreeNode* block = (ParseTreeNode*)node->getChild(b);
+
+				// Map definition
+				if (S_CMPNOCASE(block->getType(), "map")) {
+					gc_mapinfo_t map;
+					map.mapname = block->getName();
+
+					// Go through map properties
+					for (unsigned c = 0; c < block->nChildren(); c++) {
+						ParseTreeNode* prop = (ParseTreeNode*)block->getChild(c);
+
+						// Sky texture
+						if (S_CMPNOCASE(prop->getName(), "sky")) {
+							// Primary sky texture
+							map.sky1 = prop->getStringValue();
+
+							// Secondary sky texture
+							if (prop->nValues() > 1)
+								map.sky2 = prop->getStringValue(1);
+						}
+					}
+
+					maps.push_back(map);
+				}
+			}
+		}
+	}
+}
+
+bool GameConfiguration::readConfiguration(string& cfg, string source) {
+	// Clear current configuration
+	setDefaults();
+	action_specials.clear();
+	thing_types.clear();
+	flags_thing.clear();
+	flags_line.clear();
+	udmf_vertex_props.clear();
+	udmf_linedef_props.clear();
+	udmf_sidedef_props.clear();
+	udmf_sector_props.clear();
+	udmf_thing_props.clear();
+
+	// Parse the full configuration
+	Parser parser;
+	parser.parseText(cfg, source);
+
+	// Process parsed data
+	ParseTreeNode* base = parser.parseTreeRoot();
+
+	// 'Game' section (this is required for it to be a valid game configuration, shouldn't be missing)
+	ParseTreeNode* node_game = NULL;
+	for (unsigned a = 0; a < base->nChildren(); a++) {
+		ParseTreeNode* child = (ParseTreeNode*)base->getChild(a);
+		if (child->getType() == "game") {
+			node_game = child;
+			break;
+		}
+	}
+	if (!node_game) {
+		wxLogMessage("No game section found, something is pretty wrong.");
+		return false;
+	}
+	readGameSection(node_game, false);
+
+	// 'Port' section
+	ParseTreeNode* node_port = NULL;
+	for (unsigned a = 0; a < base->nChildren(); a++) {
+		ParseTreeNode* child = (ParseTreeNode*)base->getChild(a);
+		if (child->getType() == "port") {
+			node_port = child;
+			break;
+		}
+	}
+	if (node_port)
+		readGameSection(node_port, true);
+
+	// Go through all other config sections
+	ParseTreeNode* node = NULL;
+	for (unsigned a = 0; a < base->nChildren(); a++) {
+		node = (ParseTreeNode*)base->getChild(a);
+
+		// Skip game/port section
+		if (node == node_game || node == node_port)
+			continue;
+
+		// Action specials section
+		if (S_CMPNOCASE(node->getName(), "action_specials"))
+			readActionSpecials(node);
+
+		// Thing types section
+		else if (S_CMPNOCASE(node->getName(), "thing_types"))
+			readThingTypes(node);
+
+		// Line flags section
+		else if (S_CMPNOCASE(node->getName(), "line_flags")) {
+			for (unsigned c = 0; c < node->nChildren(); c++) {
+				ParseTreeNode* value = (ParseTreeNode*)node->getChild(c);
+
+				// Check for 'flag' type
+				if (!(S_CMPNOCASE(value->getType(), "flag")))
+					continue;
+
+				long flag_val;
+				value->getName().ToLong(&flag_val);
+
+				// Check if the flag value already exists
+				bool exists = false;
+				for (unsigned f = 0; f < flags_line.size(); f++) {
+					if (flags_line[f].flag == flag_val) {
+						exists = true;
+						flags_line[f].name = value->getStringValue();
+						break;
+					}
+				}
+
+				// Add flag otherwise
+				if (!exists)
+					flags_line.push_back(flag_t(flag_val, value->getStringValue()));
+			}
+		}
+
+		// Line triggers section
+		else if (S_CMPNOCASE(node->getName(), "line_triggers")) {
+			for (unsigned c = 0; c < node->nChildren(); c++) {
+				ParseTreeNode* value = (ParseTreeNode*)node->getChild(c);
+
+				// Check for 'trigger' type
+				if (!(S_CMPNOCASE(value->getType(), "trigger")))
+					continue;
+
+				long flag_val;
+				value->getName().ToLong(&flag_val);
+
+				// Check if the flag value already exists
+				bool exists = false;
+				for (unsigned f = 0; f < triggers_line.size(); f++) {
+					if (triggers_line[f].flag == flag_val) {
+						exists = true;
+						triggers_line[f].name = value->getStringValue();
+						break;
+					}
+				}
+
+				// Add flag otherwise
+				if (!exists)
+					triggers_line.push_back(flag_t(flag_val, value->getStringValue()));
+			}
+		}
+
+		// Thing flags section
+		else if (S_CMPNOCASE(node->getName(), "thing_flags")) {
+			for (unsigned c = 0; c < node->nChildren(); c++) {
+				ParseTreeNode* value = (ParseTreeNode*)node->getChild(c);
+
+				// Check for 'flag' type
+				if (!(S_CMPNOCASE(value->getType(), "flag")))
+					continue;
+
+				long flag_val;
+				value->getName().ToLong(&flag_val);
+
+				// Check if the flag value already exists
+				bool exists = false;
+				for (unsigned f = 0; f < flags_thing.size(); f++) {
+					if (flags_thing[f].flag == flag_val) {
+						exists = true;
+						flags_thing[f].name = value->getStringValue();
+						break;
+					}
+				}
+
+				// Add flag otherwise
+				if (!exists)
+					flags_thing.push_back(flag_t(flag_val, value->getStringValue()));
+			}
+		}
+
+		// Sector types section
+		else if (S_CMPNOCASE(node->getName(), "sector_types")) {
+			for (unsigned c = 0; c < node->nChildren(); c++) {
+				ParseTreeNode* value = (ParseTreeNode*)node->getChild(c);
+
+				// Check for 'type'
+				if (!(S_CMPNOCASE(value->getType(), "type")))
+					continue;
+
+				long type_val;
+				value->getName().ToLong(&type_val);
+
+				// Check if the sector type already exists
+				bool exists = false;
+				for (unsigned t = 0; t < sector_types.size(); t++) {
+					if (sector_types[t].type == type_val) {
+						exists = true;
+						sector_types[t].name = value->getStringValue();
+						break;
+					}
+				}
+
+				// Add type otherwise
+				if (!exists)
+					sector_types.push_back(sectype_t(type_val, value->getStringValue()));
+			}
+		}
+
+		// UDMF properties section
+		else if (S_CMPNOCASE(node->getName(), "udmf_properties")) {
+			// Parse vertex block properties (if any)
+			ParseTreeNode* block = (ParseTreeNode*)node->getChild("vertex");
+			if (block) readUDMFProperties(block, udmf_vertex_props);
+
+			// Parse linedef block properties (if any)
+			block = (ParseTreeNode*)node->getChild("linedef");
+			if (block) readUDMFProperties(block, udmf_linedef_props);
+
+			// Parse sidedef block properties (if any)
+			block = (ParseTreeNode*)node->getChild("sidedef");
+			if (block) readUDMFProperties(block, udmf_sidedef_props);
+
+			// Parse sector block properties (if any)
+			block = (ParseTreeNode*)node->getChild("sector");
+			if (block) readUDMFProperties(block, udmf_sector_props);
+
+			// Parse thing block properties (if any)
+			block = (ParseTreeNode*)node->getChild("thing");
+			if (block) readUDMFProperties(block, udmf_thing_props);
+		}
+
+		// Unknown/unexpected section
+		else
+			wxLogMessage("Warning: Unexpected game configuration section \"%s\", skipping", CHR(node->getName()));
+	}
+
+	return true;
+}
+
+/*
+bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	// Clear current configuration
 	setDefaults();
 	name = "Invalid Configuration";
@@ -494,14 +1028,6 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 		if (S_CMPNOCASE(node->getName(), "name"))
 			this->name = node->getStringValue();
 
-		// Valid map names
-		/*
-		else if (S_CMPNOCASE(node->getName(), "map_names")) {
-			for (unsigned n = 0; n < node->nValues(); n++)
-				map_names.push_back(node->getStringValue(n));
-		}
-		*/
-
 		// Allow any map name
 		else if (S_CMPNOCASE(node->getName(), "map_name_any"))
 			any_map_name = node->getBoolValue();
@@ -509,22 +1035,18 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 		// Map format
 		else if (S_CMPNOCASE(node->getName(), "map_format")) {
 			if (S_CMPNOCASE(node->getStringValue(), "doom"))
-				map_format = MAP_DOOM;
+				map_formats[MAP_DOOM] = true;
 			else if (S_CMPNOCASE(node->getStringValue(), "hexen"))
-				map_format = MAP_HEXEN;
+				map_formats[MAP_HEXEN] = true;
 			else if (S_CMPNOCASE(node->getStringValue(), "doom64"))
-				map_format = MAP_DOOM64;
+				map_formats[MAP_DOOM64] = true;
 			else if (S_CMPNOCASE(node->getStringValue(), "udmf"))
-				map_format = MAP_UDMF;
+				map_formats[MAP_UDMF] = true;
 			else {
 				wxLogMessage("Warning: Unknown/unsupported map format \"%s\", defaulting to doom format", CHR(node->getStringValue()));
-				map_format = MAP_DOOM;
+				//map_format = MAP_DOOM;
 			}
 		}
-
-		// Game filter
-		else if (S_CMPNOCASE(node->getName(), "game_filter"))
-			game_filter = node->getStringValue();
 
 		// Boom extensions
 		else if (S_CMPNOCASE(node->getName(), "boom"))
@@ -789,7 +1311,9 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	wxLogMessage("Read game configuration \"%s\"", CHR(this->name));
 	return true;
 }
+*/
 
+/*
 bool GameConfiguration::open(string filename) {
 	// Build configuration string from file (process #includes, etc)
 	string cfg;
@@ -809,6 +1333,7 @@ bool GameConfiguration::open(ArchiveEntry* entry) {
 
 	return readConfiguration(cfg, entry->getName());
 }
+*/
 
 bool GameConfiguration::openEmbeddedConfig(ArchiveEntry* entry) {
 	// Check entry was given
@@ -848,7 +1373,99 @@ bool GameConfiguration::removeEmbeddedConfig(string name) {
 	return false;
 }
 
-bool GameConfiguration::openConfig(string name) {
+bool GameConfiguration::openConfig(string game, string port) {
+	string full_config;
+
+	// Get game configuration as string
+	for (unsigned a = 0; a < game_configs.size(); a++) {
+		if (game_configs[a].name == game) {
+			if (game_configs[a].user) {
+				// Config is in user dir
+				string filename = appPath("games/", DIR_USER) + game_configs[a].filename + ".cfg";
+				if (wxFileExists(filename))
+					buildConfig(filename, full_config);
+				else {
+					wxLogMessage("Error: Game configuration file \"%s\" not found", CHR(filename));
+					return false;
+				}
+			}
+			else {
+				// Config is in program resource
+				string epath = S_FMT("config/games/%s.cfg", CHR(game_configs[a].filename));
+				Archive* archive = theArchiveManager->programResourceArchive();
+				ArchiveEntry* entry = archive->entryAtPath(epath);
+				if (entry)
+					buildConfig(entry, full_config);
+			}
+		}
+	}
+
+	// Append port configuration (if specified)
+	if (!port.IsEmpty()) {
+		full_config += "\n\n";
+
+		// Get port config
+		for (unsigned a = 0; a < port_configs.size(); a++) {
+			pconf_t& conf = port_configs[a];
+			if (conf.name == port) {
+				// Check the port supports this game
+				bool supported = false;
+				for (unsigned b = 0; b < conf.supported_games.size(); b++) {
+					if (conf.supported_games[b] == game) {
+						supported = true;
+						break;
+					}
+				}
+				if (!supported)
+					continue;
+
+				if (conf.user) {
+					// Config is in user dir
+					string filename = appPath("games/", DIR_USER) + conf.filename + ".cfg";
+					if (wxFileExists(filename))
+						buildConfig(filename, full_config);
+					else {
+						wxLogMessage("Error: Port configuration file \"%s\" not found", CHR(filename));
+						return false;
+					}
+				}
+				else {
+					// Config is in program resource
+					string epath = S_FMT("config/ports/%s.cfg", CHR(conf.filename));
+					Archive* archive = theArchiveManager->programResourceArchive();
+					ArchiveEntry* entry = archive->entryAtPath(epath);
+					if (entry)
+						buildConfig(entry, full_config);
+				}
+			}
+		}
+	}
+
+	wxFile test("full.cfg", wxFile::write);
+	test.Write(full_config);
+	test.Close();
+
+	// TODO: Embedded configs
+	// These should probably be handled a bit differently:
+	// just treat them as additional thingtype/aspecial/flag/etc definitions,
+	// rather than entirely new game configurations
+
+	// Read fully built configuration
+	if (readConfiguration(full_config)) {
+		current_game = game;
+		current_port = port;
+		game_configuration = game;
+		port_configuration = port;
+		wxLogMessage("Read game configuration \"%s\" + \"%s\"", CHR(current_game), CHR(current_port));
+		return true;
+	}
+	else {
+		wxLogMessage("Error reading game configuration, not loaded");
+		return false;
+	}
+
+
+	/*
 	// Check for file in user config directory
 	string fn = appPath("games/", DIR_USER) + name + ".cfg";
 	if (wxFileExists(fn)) {
@@ -884,6 +1501,7 @@ bool GameConfiguration::openConfig(string name) {
 
 	// Not found anywhere
 	return false;
+	*/
 }
 
 ActionSpecial* GameConfiguration::actionSpecial(unsigned id) {
@@ -1026,7 +1644,7 @@ bool GameConfiguration::lineFlagSet(unsigned index, MapLine* line) {
 		return false;
 }
 
-bool GameConfiguration::lineBasicFlagSet(string flag, MapLine* line) {
+bool GameConfiguration::lineBasicFlagSet(string flag, MapLine* line, int map_format) {
 	// If UDMF, just get the bool value
 	if (map_format == MAP_UDMF)
 		return line->boolProperty(flag);
@@ -1095,7 +1713,7 @@ void GameConfiguration::setLineFlag(unsigned index, MapLine* line, bool set) {
 	line->setIntProperty("flags", flags);
 }
 
-void GameConfiguration::setLineBasicFlag(string flag, MapLine* line, bool set) {
+void GameConfiguration::setLineBasicFlag(string flag, MapLine* line, int map_format, bool set) {
 	// If UDMF, just set the bool value
 	if (map_format == MAP_UDMF) {
 		line->setBoolProperty(flag, set);
@@ -1129,7 +1747,7 @@ void GameConfiguration::setLineBasicFlag(string flag, MapLine* line, bool set) {
 		line->setIntProperty("flags", flags & ~fval);
 }
 
-string GameConfiguration::spacTriggerString(MapLine* line) {
+string GameConfiguration::spacTriggerString(MapLine* line, int map_format) {
 	if (!line)
 		return "";
 
@@ -1307,7 +1925,7 @@ void GameConfiguration::cleanObjectUDMFProps(MapObject* object) {
 	}
 }
 
-string GameConfiguration::sectorTypeName(int type) {
+string GameConfiguration::sectorTypeName(int type, int map_format) {
 	// Check for zero type
 	if (type == 0)
 		return "Normal";

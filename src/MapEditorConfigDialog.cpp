@@ -16,6 +16,8 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	// Init variables
 	this->archive = archive;
 	canvas_preview = NULL;
+	game_current = theGameConfiguration->currentGame();
+	port_current = theGameConfiguration->currentPort();
 
 	// Setup main sizer
 	wxBoxSizer* mainsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -25,22 +27,21 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	mainsizer->Add(sizer, 0, wxEXPAND);
 
-	// Get list of game configuration titles
-	wxArrayString games;
-	int game_current = 0;
-	for (unsigned a = 0; a < theGameConfiguration->nConfigs(); a++) {
-		games.Add(theGameConfiguration->configTitle(a));
-		if (games.back() == theGameConfiguration->getName())
-			game_current = a;
-	}
-
 	// Game configuration dropdown
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
-	hbox->Add(new wxStaticText(this, -1, "Game Configuration:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	choice_game_config = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, games);
-	choice_game_config->SetSelection(game_current);
-	hbox->Add(choice_game_config, 1, wxEXPAND);
+	hbox->Add(new wxStaticText(this, -1, "Game:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	choice_game_config = new wxChoice(this, -1);
+	hbox->Add(choice_game_config, 1, wxEXPAND|wxRIGHT, 4);
+
+	// Port configuration dropdown
+	hbox->Add(new wxStaticText(this, -1, "Port:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	choice_port_config = new wxChoice(this, -1);
+	hbox->Add(choice_port_config, 1, wxEXPAND|wxRIGHT, 4);
+
+	// Populate game/port lists
+	populateGameList();
+	populatePortList();
 
 	wxStaticBox* frame;
 	wxStaticBoxSizer* framesizer;
@@ -131,6 +132,7 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 
 	// Bind events
 	choice_game_config->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &MapEditorConfigDialog::onChoiceGameConfigChanged, this);
+	choice_port_config->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &MapEditorConfigDialog::onChoicePortConfigChanged, this);
 	if (show_maplist) {
 		list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &MapEditorConfigDialog::onMapActivated, this);
 		list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MapEditorConfigDialog::onMapSelected, this);
@@ -150,6 +152,48 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 
 MapEditorConfigDialog::~MapEditorConfigDialog() {
 	delete img_list;
+}
+
+void MapEditorConfigDialog::populateGameList() {
+	// Clear current list
+	choice_game_config->Clear();
+
+	// Populate list
+	int selection = 0;
+	for (unsigned a = 0; a < theGameConfiguration->nGameConfigs(); a++) {
+		choice_game_config->Append(theGameConfiguration->gameConfig(a).title);
+		if (game_current == theGameConfiguration->gameConfig(a).name)
+			selection = a;
+	}
+
+	// Select current game (if any)
+	choice_game_config->SetSelection(selection);
+}
+
+void MapEditorConfigDialog::populatePortList() {
+	// Clear current list
+	choice_port_config->Clear();
+	ports_list.clear();
+
+	// Get currently selected game
+	string game = theGameConfiguration->gameConfig(choice_game_config->GetSelection()).name;
+
+	// Populate list
+	int selection = 0;
+	int index = 1;
+	choice_port_config->Append("None");
+	for (unsigned a = 0; a < theGameConfiguration->nPortConfigs(); a++) {
+		if (theGameConfiguration->portSupportsGame(a, game)) {
+			ports_list.push_back(a);
+			choice_port_config->Append(theGameConfiguration->portConfig(a).title);
+			if (port_current == theGameConfiguration->portConfig(a).name)
+				selection = index;
+			index++;
+		}
+	}
+	
+	// Select current port (if any)
+	choice_port_config->SetSelection(selection);
 }
 
 void MapEditorConfigDialog::populateMapList() {
@@ -173,6 +217,12 @@ void MapEditorConfigDialog::populateMapList() {
 	// Get all archive maps
 	maps = archive->detectMaps();
 
+	// Get currently selected game/port
+	int game = choice_game_config->GetSelection();
+	int port = -1;
+	if (choice_port_config->GetSelection() > 0)
+		port = ports_list[choice_port_config->GetSelection() - 1];
+
 	// Add maps matching the current game configuration
 	int index = 0;
 	for (unsigned a = 0; a < maps.size(); a++) {
@@ -187,10 +237,10 @@ void MapEditorConfigDialog::populateMapList() {
 		wxListItem li;
 		li.SetId(index++);
 		li.SetText(S_FMT("(%s) %s", CHR(fmt), CHR(maps[a].name)));
-		if (maps[a].format != theGameConfiguration->getMapFormat())
-			li.SetImage(1);
-		else
+		if (theGameConfiguration->mapFormatSupported(maps[a].format, game, port))
 			li.SetImage(0);
+		else
+			li.SetImage(1);
 
 		// Add to list
 		list_maps->InsertItem(li);
@@ -216,22 +266,48 @@ Archive::mapdesc_t MapEditorConfigDialog::selectedMap() {
 }
 
 bool MapEditorConfigDialog::configMatchesMap(Archive::mapdesc_t map) {
-	if (theGameConfiguration->getMapFormat() == map.format)
-		return true;
-	else
-		return false;
+	// Get currently selected game/port
+	int game = choice_game_config->GetSelection();
+	int port = -1;
+	if (choice_port_config->GetSelection() > 0)
+		port = ports_list[choice_port_config->GetSelection() - 1];
+
+	return theGameConfiguration->mapFormatSupported(map.format, game, port);
+}
+
+string MapEditorConfigDialog::selectedGame() {
+	if (choice_game_config->GetCount() == 0)
+		return "";
+
+	return theGameConfiguration->gameConfig(choice_game_config->GetSelection()).name;
+}
+
+string MapEditorConfigDialog::selectedPort() {
+	if (choice_port_config->GetSelection() == 0 || choice_port_config->GetCount() == 0)
+		return "";
+
+	return theGameConfiguration->portConfig(ports_list[choice_port_config->GetSelection()-1]).name;
 }
 
 
 
 void MapEditorConfigDialog::onChoiceGameConfigChanged(wxCommandEvent& e) {
-	// Load selected configuration
-	int selection = choice_game_config->GetSelection();
-	string name = theGameConfiguration->configName(selection);
-	theGameConfiguration->openConfig(name);
+	// Refresh ports combo box
+	populatePortList();
 
 	// Refresh map list
 	populateMapList();
+
+	game_current = selectedGame();
+	port_current = selectedPort();
+}
+
+void MapEditorConfigDialog::onChoicePortConfigChanged(wxCommandEvent& e) {
+	// Refresh map list
+	populateMapList();
+
+	game_current = selectedGame();
+	port_current = selectedPort();
 }
 
 void MapEditorConfigDialog::onMapActivated(wxListEvent& e) {
@@ -240,7 +316,7 @@ void MapEditorConfigDialog::onMapActivated(wxListEvent& e) {
 
 void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 	// Create simple dialog to select map name
-	wxDialog dlg(this, -1, "Enter Map Name");
+	wxDialog dlg(this, -1, "Create New Map");
 
 	// Setup dialog
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -252,9 +328,12 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 		flags = wxCB_READONLY;
 
 	// Create map name combo box
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
 	wxComboBox* cbo_mapname  = new wxComboBox(&dlg, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, flags);
 	cbo_mapname->SetMaxLength(8);
-	sizer->Add(cbo_mapname, 1, wxEXPAND|wxALL, 4);
+	hbox->Add(new wxStaticText(&dlg, -1, "Map Name:"), 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 4);
+	hbox->Add(cbo_mapname, 1, wxEXPAND);
 
 	// Add possible map names to the combo box
 	for (unsigned a = 0; a < theGameConfiguration->nMapNames(); a++) {
@@ -276,8 +355,41 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 	if (theGameConfiguration->nMapNames() > 0)
 		cbo_mapname->SetSelection(0);
 
+	// Create map format combo box
+	wxChoice* choice_mapformat = new wxChoice(&dlg, -1);
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	hbox->Add(new wxStaticText(&dlg, -1, "Map Format:"), 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 4);
+	hbox->Add(choice_mapformat, 1, wxEXPAND);
+
+	// Get selected game/port index
+	int sel_port = choice_port_config->GetSelection() - 1;
+	if (sel_port >= 0)
+		sel_port = ports_list[sel_port];
+	int sel_game = choice_game_config->GetSelection();
+
+	// Add possible map formats to the combo box
+	if (theGameConfiguration->mapFormatSupported(MAP_DOOM, sel_game, sel_port))
+		choice_mapformat->Append("Doom");
+	if (theGameConfiguration->mapFormatSupported(MAP_HEXEN, sel_game, sel_port))
+		choice_mapformat->Append("Hexen");
+	if (theGameConfiguration->mapFormatSupported(MAP_UDMF, sel_game, sel_port))
+		choice_mapformat->Append("UDMF");
+	if (theGameConfiguration->mapFormatSupported(MAP_DOOM64, sel_game, sel_port))
+		choice_mapformat->Append("Doom64");
+	choice_mapformat->SetSelection(0);
+
 	// Add dialog buttons
 	sizer->Add(dlg.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Get selected map format
+	int map_format = MAP_DOOM;
+	if (choice_mapformat->GetStringSelection() == "Hexen")
+		map_format = MAP_HEXEN;
+	else if (choice_mapformat->GetStringSelection() == "UDMF")
+		map_format = MAP_UDMF;
+	else if (choice_mapformat->GetStringSelection() == "Doom64")
+		map_format = MAP_DOOM64;
 
 	// Show it
 	dlg.SetInitialSize(wxSize(250, -1));
@@ -301,7 +413,7 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 			ArchiveEntry* head = archive->addNewEntry(mapname);
 			ArchiveEntry* end = NULL;
 
-			if (theGameConfiguration->getMapFormat() == MAP_UDMF) {
+			if (map_format == MAP_UDMF) {
 				// UDMF
 				archive->addNewEntry("TEXTMAP");
 				end = archive->addNewEntry("ENDMAP");
@@ -315,7 +427,7 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 				end = archive->addNewEntry("SECTORS");
 
 				// Hexen
-				if (theGameConfiguration->getMapFormat() == MAP_HEXEN)
+				if (map_format == MAP_HEXEN)
 					end = archive->addNewEntry("BEHAVIOR");
 			}
 
@@ -331,7 +443,7 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 			ArchiveEntry* head = wad->addNewEntry(mapname);
 			ArchiveEntry* end = NULL;
 
-			if (theGameConfiguration->getMapFormat() == MAP_UDMF) {
+			if (map_format == MAP_UDMF) {
 				// UDMF
 				wad->addNewEntry("TEXTMAP");
 				end = wad->addNewEntry("ENDMAP");
@@ -345,10 +457,10 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 				end = wad->addNewEntry("SECTORS");
 
 				// Hexen
-				if (theGameConfiguration->getMapFormat() == MAP_HEXEN)
+				if (map_format == MAP_HEXEN)
 					end = wad->addNewEntry("BEHAVIOR");
 				// Doom 64
-				else if (theGameConfiguration->getMapFormat() == MAP_DOOM64) {
+				else if (map_format == MAP_DOOM64) {
 					wad->addNewEntry("LIGHTS");
 					end = wad->addNewEntry("MACROS");
 				}

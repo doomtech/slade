@@ -276,6 +276,10 @@ bool SLADEMap::readMap(Archive::mapdesc_t map) {
 	// Set map name
 	name = map.name;
 
+	// Set map format
+	if (ok)
+		current_format = map.format;
+
 	return ok;
 }
 

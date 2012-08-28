@@ -281,7 +281,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		return;
 
 	// Get map format
-	int map_format = theGameConfiguration->getMapFormat();
+	int map_format = theMapEditor->currentMapDesc().format;
 
 	// Clear property grid
 	pg_properties->Clear();
@@ -491,13 +491,13 @@ void MapObjectPropsPanel::setupType(int objtype) {
 			addThingFlagProperty(g_flags, theGameConfiguration->thingFlag(a), S_FMT("flag%d", a), a);
 
 		// Hide hexen extras if in doom format
-		if (theGameConfiguration->getMapFormat() == MAP_DOOM) {
+		if (map_format == MAP_DOOM) {
 			pg_properties->GetProperty("height")->Hide(true);
 			pg_properties->GetProperty("id")->Hide(true);
 			g_args->Hide(true);
 			g_special->Hide(true);
 		// Doom 64 has TID and height, but not scripting stuff
-		} else if (theGameConfiguration->getMapFormat() == MAP_DOOM64) {
+		} else if (map_format == MAP_DOOM64) {
 			g_args->Hide(true);
 			g_special->Hide(true);
 		}
@@ -599,7 +599,7 @@ void MapObjectPropsPanel::openObject(MapObject* object) {
 
 void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	// Check any objects were given
-	if (objects.size() == 0) {
+	if (objects.size() == 0 || objects[0] == NULL) {
 		this->objects.clear();
 		pg_properties->DisableProperty(pg_properties->GetGrid()->GetRoot());
 		pg_properties->SetPropertyValueUnspecified(pg_properties->GetGrid()->GetRoot());
@@ -617,7 +617,7 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 		pg_properties->EnableProperty(pg_properties->GetGrid()->GetRoot());
 
 	// Setup property grid for the object type
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF)
+	if (theMapEditor->currentMapDesc().format == MAP_UDMF)
 		setupTypeUDMF(objects[0]->getObjType());
 	else
 		setupType(objects[0]->getObjType());
@@ -658,14 +658,14 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	if (objects[0]->getObjType() == MOBJ_LINE) {
 		// Enable/disable side properties
 		wxPGProperty* prop = pg_properties->GetProperty("sidefront");
-		if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
+		if (prop && (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified()))
 			pg_props_side1->EnableProperty(pg_props_side1->GetGrid()->GetRoot());
 		else {
 			pg_props_side1->DisableProperty(pg_props_side1->GetGrid()->GetRoot());
 			pg_props_side1->SetPropertyValueUnspecified(pg_props_side1->GetGrid()->GetRoot());
 		}
 		prop = pg_properties->GetProperty("sideback");
-		if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
+		if (prop && (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified()))
 			pg_props_side2->EnableProperty(pg_props_side2->GetGrid()->GetRoot());
 		else {
 			pg_props_side2->DisableProperty(pg_props_side2->GetGrid()->GetRoot());
