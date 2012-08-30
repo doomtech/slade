@@ -54,8 +54,10 @@ public:
 	TextEditor(wxWindow* parent, int id);
 	~TextEditor();
 
+	TextLanguage*	getLanguage() { return language; }
+	bool			setLanguage(TextLanguage* lang);
+
 	void	setup();
-	bool	setLanguage(TextLanguage* lang);
 	bool	applyStyleSet(StyleSet* style);
 	bool	loadEntry(ArchiveEntry* entry);
 	void	getRawText(MemChunk& mc);

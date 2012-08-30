@@ -382,15 +382,6 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 	// Add dialog buttons
 	sizer->Add(dlg.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
-	// Get selected map format
-	int map_format = MAP_DOOM;
-	if (choice_mapformat->GetStringSelection() == "Hexen")
-		map_format = MAP_HEXEN;
-	else if (choice_mapformat->GetStringSelection() == "UDMF")
-		map_format = MAP_UDMF;
-	else if (choice_mapformat->GetStringSelection() == "Doom64")
-		map_format = MAP_DOOM64;
-
 	// Show it
 	dlg.SetInitialSize(wxSize(250, -1));
 	dlg.CenterOnParent();
@@ -406,6 +397,15 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 				return;
 			}
 		}
+
+		// Get selected map format
+		int map_format = MAP_DOOM;
+		if (choice_mapformat->GetStringSelection() == "Hexen")
+			map_format = MAP_HEXEN;
+		else if (choice_mapformat->GetStringSelection() == "UDMF")
+			map_format = MAP_UDMF;
+		else if (choice_mapformat->GetStringSelection() == "Doom64")
+			map_format = MAP_DOOM64;
 
 		// Check archive type
 		if (archive->getType() == ARCHIVE_WAD) {

@@ -75,7 +75,11 @@ public:
 	string	getKeywordsList();
 	string	getConstantsList();
 	string	getFunctionsList();
-	string	getAutocompletionList();
+	string	getAutocompletionList(string start = "");
+
+	wxArrayString	getKeywordsSorted();
+	wxArrayString	getConstantsSorted();
+	wxArrayString	getFunctionsSorted();
 
 	string	getKeywordLink() { return k_lookup_url; }
 	string	getConstantLink() { return c_lookup_url; }

@@ -22,6 +22,7 @@ private:
 	wxImageList*				img_list;
 	string						game_current;
 	string						port_current;
+	int							map_format;
 
 	Archive*					archive;
 	vector<Archive::mapdesc_t>	maps;

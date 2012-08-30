@@ -645,8 +645,10 @@ void TextEditor::onKeyDown(wxKeyEvent& e) {
 		string word = GetTextRange(WordStartPosition(GetCurrentPos(), true), GetCurrentPos());
 
 		// If a language is loaded, bring up autocompletion list
-		if (language)
+		if (language) {
+			autocomp_list = language->getAutocompletionList(word);
 			AutoCompShow(word.size(), autocomp_list);
+		}
 	}
 
 	// Ctrl+F (find/replace)

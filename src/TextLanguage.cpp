@@ -290,15 +290,22 @@ string TextLanguage::getFunctionsList() {
  * Returns a string containing all keywords, constants and functions
  * that can be used directly in scintilla for an autocompletion list
  *******************************************************************/
-string TextLanguage::getAutocompletionList() {
+string TextLanguage::getAutocompletionList(string start) {
 	// Firstly, add all functions, constants and keywords to a wxArrayString
 	wxArrayString list;
-	for (unsigned a = 0; a < keywords.size(); a++)
-		list.Add(keywords[a] + "?1");
-	for (unsigned a = 0; a < constants.size(); a++)
-		list.Add(constants[a] + "?2");
-	for (unsigned a = 0; a < functions.size(); a++)
-		list.Add(functions[a]->getName() + "?3");
+	start = start.Lower();
+	for (unsigned a = 0; a < keywords.size(); a++) {
+		if (keywords[a].Lower().StartsWith(start))
+			list.Add(keywords[a] + "?1");
+	}
+	for (unsigned a = 0; a < constants.size(); a++) {
+		if (constants[a].Lower().StartsWith(start))
+			list.Add(constants[a] + "?2");
+	}
+	for (unsigned a = 0; a < functions.size(); a++) {
+		if (functions[a]->getName().Lower().StartsWith(start))
+			list.Add(functions[a]->getName() + "?3");
+	}
 
 	// Sort the list
 	list.Sort();
@@ -309,6 +316,42 @@ string TextLanguage::getAutocompletionList() {
 		ret += list[a] + " ";
 
 	return ret;
+}
+
+wxArrayString TextLanguage::getKeywordsSorted() {
+	// Get list
+	wxArrayString list;
+	for (unsigned a = 0; a < keywords.size(); a++)
+		list.Add(keywords[a]);
+
+	// Sort
+	list.Sort();
+
+	return list;
+}
+
+wxArrayString TextLanguage::getConstantsSorted() {
+	// Get list
+	wxArrayString list;
+	for (unsigned a = 0; a < constants.size(); a++)
+		list.Add(constants[a]);
+
+	// Sort
+	list.Sort();
+
+	return list;
+}
+
+wxArrayString TextLanguage::getFunctionsSorted() {
+	// Get list
+	wxArrayString list;
+	for (unsigned a = 0; a < functions.size(); a++)
+		list.Add(functions[a]->getName());
+
+	// Sort
+	list.Sort();
+
+	return list;
 }
 
 /* TextLanguage::isKeyword
