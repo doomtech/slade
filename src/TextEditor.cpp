@@ -34,6 +34,7 @@
 #include "TextEditor.h"
 #include "Icons.h"
 #include "TextStyle.h"
+#include "KeyBind.h"
 
 
 /*******************************************************************
@@ -626,6 +627,96 @@ void TextEditor::updateCalltip() {
 	}
 }
 
+void TextEditor::openJumpToDialog() {
+	// Can't do this without a language definition or defined blocks
+	if (!language || language->nJumpBlocks() == 0)
+		return;
+
+	// --- Scan for functions/scripts ---
+	Tokenizer tz;
+	vector<jp_t> jump_points;
+	tz.openString(GetText());
+
+	string token = tz.getToken();
+	while (!token.IsEmpty()) {
+		if (token == "{") {
+			// Skip block
+			while (!token.IsEmpty() && token != "}")
+				token = tz.getToken();
+		}
+
+		for (unsigned a = 0; a < language->nJumpBlocks(); a++) {
+			// Get jump block keyword
+			string block = language->jumpBlock(a);
+			long skip = 0;
+			if (block.Contains(":")) {
+				wxArrayString sp = wxSplit(block, ':');
+				sp.back().ToLong(&skip);
+				block = sp[0];
+			}
+
+			if (S_CMPNOCASE(token, block)) {
+				string name = tz.getToken();
+				for (int s = 0; s < skip; s++)
+					name = tz.getToken();
+
+				// Numbered block, add block name
+				if (name.IsNumber())
+					name = S_FMT("%s %s", CHR(language->jumpBlock(a)), CHR(name));
+				// Unnamed block, use block name
+				if (name == "{" || name == ";")
+					name = language->jumpBlock(a);
+
+				// Create jump point
+				jp_t jp;
+				jp.name = name;
+				jp.line = tz.lineNo() - 1;
+				jump_points.push_back(jp);
+			}
+		}
+
+		token = tz.getToken();
+	}
+
+	// Do nothing if no jump points
+	if (jump_points.size() == 0)
+		return;
+
+	
+	// --- Setup/show dialog ---
+	wxDialog dlg(this, -1, "Jump To...");
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	dlg.SetSizer(sizer);
+
+	// Add Jump to dropdown
+	wxChoice* choice_jump_to = new wxChoice(&dlg, -1);
+	sizer->Add(choice_jump_to, 0, wxEXPAND|wxALL, 4);
+	for (unsigned a = 0; a < jump_points.size(); a++)
+		choice_jump_to->Append(jump_points[a].name);
+	choice_jump_to->SetSelection(0);
+
+	// Add dialog buttons
+	sizer->Add(dlg.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Show dialog
+	dlg.SetInitialSize(wxSize(250, -1));
+	dlg.CenterOnParent();
+	if (dlg.ShowModal() == wxID_OK) {
+		int selection = choice_jump_to->GetSelection();
+		if (selection >= 0 && selection < (int)jump_points.size()) {
+			// Get line number
+			int line = jump_points[selection].line;
+
+			// Move to line
+			int pos = GetLineEndPosition(line);
+			SetCurrentPos(pos);
+			SetSelection(pos, pos);
+			SetFirstVisibleLine(line);
+			SetFocus();
+		}
+	}
+}
+
 
 /*******************************************************************
  * TEXTEDITOR CLASS EVENTS
@@ -635,33 +726,55 @@ void TextEditor::updateCalltip() {
  * Called when a key is pressed
  *******************************************************************/
 void TextEditor::onKeyDown(wxKeyEvent& e) {
-	// Check for Ctrl+Shift+Space (invoke calltip)
-	if ((e.GetModifiers() == (wxMOD_SHIFT|wxMOD_CMD)) && (e.GetKeyCode() == WXK_SPACE))
-		updateCalltip();
+	// Check if keypress matches any keybinds
+	wxArrayString binds = KeyBind::getBinds(KeyBind::asKeyPress(e.GetKeyCode(), e.GetModifiers()));
 
-	// Check for Ctrl+Space
-	else if ((e.GetModifiers() == wxMOD_CMD) && (e.GetKeyCode() == WXK_SPACE)) {
-		// Get word before cursor
-		string word = GetTextRange(WordStartPosition(GetCurrentPos(), true), GetCurrentPos());
+	// Go through matching binds
+	bool handled = false;
+	for (unsigned a = 0; a < binds.size(); a++) {
+		string name = binds[a];
 
-		// If a language is loaded, bring up autocompletion list
-		if (language) {
-			autocomp_list = language->getAutocompletionList(word);
-			AutoCompShow(word.size(), autocomp_list);
+		// Open/update calltip
+		if (name == "ted_calltip") {
+			updateCalltip();
+			handled = true;
+		}
+
+		// Autocomplete
+		else if (name == "ted_autocomplete") {
+			// Get word before cursor
+			string word = GetTextRange(WordStartPosition(GetCurrentPos(), true), GetCurrentPos());
+
+			// If a language is loaded, bring up autocompletion list
+			if (language) {
+				autocomp_list = language->getAutocompletionList(word);
+				AutoCompShow(word.size(), autocomp_list);
+			}
+
+			handled = true;
+		}
+
+		// Find/replace
+		else if (name == "ted_findreplace") {
+			showFindReplaceDialog();
+			handled = true;
+		}
+
+		// Find next
+		else if (name == "ted_findnext") {
+			wxCommandEvent e;
+			onFRDBtnFindNext(e);
+			handled = true;
+		}
+
+		// Jump to
+		else if (name == "ted_jumpto") {
+			openJumpToDialog();
+			handled = true;
 		}
 	}
 
-	// Ctrl+F (find/replace)
-	else if ((e.GetModifiers() == wxMOD_CMD) && (e.GetKeyCode() == 'F'))
-		showFindReplaceDialog();
-
-	// F3 (repeat last find operation)
-	else if (e.GetKeyCode() == WXK_F3) {
-		wxCommandEvent e;
-		onFRDBtnFindNext(e);
-	}
-
-	else
+	if (!handled)
 		e.Skip();
 }
 

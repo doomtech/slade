@@ -66,6 +66,10 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	cb_wordwrap = new wxCheckBox(this, -1, "Word Wrapping");
 	sizer_top->Add(cb_wordwrap, 0, wxEXPAND, 0);
 
+	// Add 'Jump To' button to top sizer
+	btn_jump_to = new wxButton(this, -1, "Jump To");
+	sizer_top->Add(btn_jump_to, 0, wxEXPAND|wxRIGHT, 4);
+
 	// Add 'Find/Replace' button to top sizer
 	btn_find_replace = new wxButton(this, -1, "Find + Replace");
 	sizer_top->Add(btn_find_replace, 0, wxEXPAND, 0);
@@ -76,6 +80,7 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	btn_find_replace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEntryPanel::onBtnFindReplace, this);
 	text_area->Bind(wxEVT_STC_UPDATEUI, &TextEntryPanel::onUpdateUI, this);
 	cb_wordwrap->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextEntryPanel::onWordWrapChanged, this);
+	btn_jump_to->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEntryPanel::onBtnJumpTo, this);
 
 	// Custom toolbar
 	custom_menu_name = "Text";
@@ -277,4 +282,11 @@ void TextEntryPanel::onWordWrapChanged(wxCommandEvent& e) {
 void TextEntryPanel::onUpdateUI(wxStyledTextEvent& e) {
 	updateStatus();
 	e.Skip();
+}
+
+/* TextEntryPanel::onBtnJumpTo
+ * Called when the 'Jump To' button is clicked
+ *******************************************************************/
+void TextEntryPanel::onBtnJumpTo(wxCommandEvent& e) {
+	text_area->openJumpToDialog();
 }

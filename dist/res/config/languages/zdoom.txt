@@ -24,6 +24,7 @@ z_decaldef {
 	keyword_link = "http://zdoom.org/wiki/DECALDEF";
 	constant_link = "http://zdoom.org/wiki/DECALDEF";
 	function_link = "http://zdoom.org/wiki/DECALDEF";
+	blocks = "decal";
 
 	keywords = {
 		pic, shade, x-scale, y-scale, flipx, flipy, randomflipx, randomflipy, solid,
@@ -118,6 +119,7 @@ z_mapinfo {
 	keyword_link = "http://zdoom.org/wiki/MAPINFO";
 	constant_link = "http://zdoom.org/wiki/MAPINFO";
 	function_link = "http://zdoom.org/wiki/MAPINFO";
+	blocks = "gameinfo", "skill", "map", "episode", "cluster";
 
 	keywords = {
 		Episode, ClearEpisodes, Map, ClusterDef,

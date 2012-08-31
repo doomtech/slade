@@ -18,12 +18,6 @@ private:
 	wxButton*		btn_compile;
 	wxTreeListCtrl*	list_words;
 
-	// Jump To stuff
-	struct jp_t {
-		string	name;
-		int		line;
-	};
-
 public:
 	ScriptEditorPanel(wxWindow* parent);
 	~ScriptEditorPanel();
@@ -33,7 +27,6 @@ public:
 
 	bool	openScripts(ArchiveEntry* entry);
 	void	populateWordList();
-	void	openJumpToDialog();
 
 	bool	handleAction(string name);
 

@@ -12,6 +12,7 @@ private:
 	wxButton*	btn_find_replace;
 	wxChoice*	choice_text_language;
 	wxCheckBox*	cb_wordwrap;
+	wxButton*	btn_jump_to;
 
 public:
 	TextEntryPanel(wxWindow* parent);
@@ -29,6 +30,7 @@ public:
 	void	onChoiceLanguageChanged(wxCommandEvent& e);
 	void	onUpdateUI(wxStyledTextEvent& e);
 	void	onWordWrapChanged(wxCommandEvent& e);
+	void	onBtnJumpTo(wxCommandEvent& e);
 };
 
 

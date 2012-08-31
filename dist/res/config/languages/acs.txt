@@ -5,6 +5,7 @@ acs : cstyle {
 	keyword_link = "http://zdoom.org/wiki/Special:Search/%s";
 	constant_link = "http://zdoom.org/wiki/Special:Search/%s";
 	function_link = "http://zdoom.org/wiki/%s";
+	blocks = "Script";
 
 	keywords = {
 		open, restart, script, special, str, suspend, terminate, world
@@ -155,6 +156,7 @@ acs : cstyle {
 acs_z : acs {
 	name = "ACS (ZDoom)";
 	case_sensitive = false;
+	blocks = "Script", "Function:1";
 
 	keywords = {
 		function, enter, respawn, death, lightning, unloading, disconnect,

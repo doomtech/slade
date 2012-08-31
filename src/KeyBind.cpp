@@ -346,6 +346,53 @@ void KeyBind::initBinds() {
 	addBind("paste", keypress_t("V", KPM_CTRL), "Paste", group);
 	addBind("select_all", keypress_t("A", KPM_CTRL), "Select All", group);
 
+	// Entry List (el*)
+	group = "Entry List";
+	addBind("el_new", keypress_t("N", KPM_CTRL), "New Entry", group);
+	addBind("el_delete", keypress_t("delete"), "Delete Entry", group);
+	addBind("el_move_up", keypress_t("U", KPM_CTRL), "Move Entry up", group);
+	addBind("el_move_down", keypress_t("D", KPM_CTRL), "Move Entry down", group);
+	addBind("el_rename", keypress_t("R", KPM_CTRL), "Rename Entry", group);
+	addBind("el_rename", keypress_t("f2"));
+	addBind("el_import", keypress_t("I", KPM_CTRL), "Import to Entry", group);
+	addBind("el_import_files", keypress_t("I", KPM_CTRL|KPM_SHIFT), "Import Files", group);
+	addBind("el_export", keypress_t("E", KPM_CTRL), "Export Entry", group);
+	addBind("el_up_dir", keypress_t("backspace"), "Up one directory", group);
+
+	// Text editor (ted*)
+	group = "Text Editor";
+	addBind("ted_autocomplete", keypress_t("space", KPM_CTRL), "Open Autocompletion list", group);
+	addBind("ted_calltip", keypress_t("space", KPM_CTRL|KPM_SHIFT), "Open CallTip", group);
+	addBind("ted_findreplace", keypress_t("F", KPM_CTRL), "Find/Replace", group);
+	addBind("ted_findnext", keypress_t("f3"), "Find next", group);
+	addBind("ted_jumpto", keypress_t("J", KPM_CTRL), "Jump to", group);
+
+	// Texture editor (txed*)
+	group = "Texture Editor";
+	addBind("txed_patch_left", keypress_t("left", KPM_CTRL), "Move Patch left", group);
+	addBind("txed_patch_left8", keypress_t("left"), "Move Patch left 8", group);
+	addBind("txed_patch_up", keypress_t("up", KPM_CTRL), "Move Patch up", group);
+	addBind("txed_patch_up8", keypress_t("up"), "Move Patch up 8", group);
+	addBind("txed_patch_right", keypress_t("right", KPM_CTRL), "Move Patch right", group);
+	addBind("txed_patch_right8", keypress_t("right"), "Move Patch right 8", group);
+	addBind("txed_patch_down", keypress_t("down", KPM_CTRL), "Move Patch down", group);
+	addBind("txed_patch_down8", keypress_t("down"), "Move Patch down 8", group);
+	addBind("txed_patch_add", keypress_t("insert"), "Add Patch", group);
+	addBind("txed_patch_delete", keypress_t("delete"), "Delete Patch", group);
+	addBind("txed_patch_replace", keypress_t("f2"), "Replace Patch", group);
+	addBind("txed_patch_replace", keypress_t("R", KPM_CTRL));
+	addBind("txed_patch_duplicate", keypress_t("D", KPM_CTRL), "Duplicate Patch", group);
+	addBind("txed_patch_forward", keypress_t("]"), "Bring Patch forward", group);
+	addBind("txed_patch_back", keypress_t("["), "Send Patch back", group);
+	addBind("txed_tex_up", keypress_t("up", KPM_CTRL), "Move Texture up", group);
+	addBind("txed_tex_up", keypress_t("U", KPM_CTRL));
+	addBind("txed_tex_down", keypress_t("down", KPM_CTRL), "Move Texture down", group);
+	addBind("txed_tex_down", keypress_t("D", KPM_CTRL));
+	addBind("txed_tex_new", keypress_t("N", KPM_CTRL), "New Texture", group);
+	addBind("txed_tex_new_patch", keypress_t("N", KPM_CTRL|KPM_SHIFT), "New Texture from Patch", group);
+	addBind("txed_tex_new_file", keypress_t("N", KPM_CTRL|KPM_ALT), "New Texture from File", group);
+	addBind("txed_tex_delete", keypress_t("delete"), "Delete Texture", group);
+
 	// Map Editor (map*)
 	group = "Map Editor General";
 	addBind("map_edit_accept", keypress_t("return"), "Accept edit", group);
@@ -479,46 +526,6 @@ void KeyBind::initBinds() {
 	addBind("me3d_flat_height_down8", keypress_t("mwheeldown"));
 	addBind("me3d_flat_height_down", keypress_t("num_minus", KPM_SHIFT), "Height down 1", group);
 	addBind("me3d_flat_height_down", keypress_t("mwheeldown", KPM_SHIFT));
-
-	// Entry List (el*)
-	group = "Entry List";
-	addBind("el_new", keypress_t("N", KPM_CTRL), "New Entry", group);
-	addBind("el_delete", keypress_t("delete"), "Delete Entry", group);
-	addBind("el_move_up", keypress_t("U", KPM_CTRL), "Move Entry up", group);
-	addBind("el_move_down", keypress_t("D", KPM_CTRL), "Move Entry down", group);
-	addBind("el_rename", keypress_t("R", KPM_CTRL), "Rename Entry", group);
-	addBind("el_rename", keypress_t("f2"));
-	addBind("el_import", keypress_t("I", KPM_CTRL), "Import to Entry", group);
-	addBind("el_import_files", keypress_t("I", KPM_CTRL|KPM_SHIFT), "Import Files", group);
-	addBind("el_export", keypress_t("E", KPM_CTRL), "Export Entry", group);
-	addBind("el_up_dir", keypress_t("backspace"), "Up one directory", group);
-
-	// Texture editor (txed*)
-	group = "Texture Editor";
-	addBind("txed_patch_left", keypress_t("left", KPM_CTRL), "Move Patch left", group);
-	addBind("txed_patch_left8", keypress_t("left"), "Move Patch left 8", group);
-	addBind("txed_patch_up", keypress_t("up", KPM_CTRL), "Move Patch up", group);
-	addBind("txed_patch_up8", keypress_t("up"), "Move Patch up 8", group);
-	addBind("txed_patch_right", keypress_t("right", KPM_CTRL), "Move Patch right", group);
-	addBind("txed_patch_right8", keypress_t("right"), "Move Patch right 8", group);
-	addBind("txed_patch_down", keypress_t("down", KPM_CTRL), "Move Patch down", group);
-	addBind("txed_patch_down8", keypress_t("down"), "Move Patch down 8", group);
-	addBind("txed_patch_add", keypress_t("insert"), "Add Patch", group);
-	addBind("txed_patch_delete", keypress_t("delete"), "Delete Patch", group);
-	addBind("txed_patch_replace", keypress_t("f2"), "Replace Patch", group);
-	addBind("txed_patch_replace", keypress_t("R", KPM_CTRL));
-	addBind("txed_patch_duplicate", keypress_t("D", KPM_CTRL), "Duplicate Patch", group);
-	addBind("txed_patch_forward", keypress_t("]"), "Bring Patch forward", group);
-	addBind("txed_patch_back", keypress_t("["), "Send Patch back", group);
-	addBind("txed_tex_up", keypress_t("up", KPM_CTRL), "Move Texture up", group);
-	addBind("txed_tex_up", keypress_t("U", KPM_CTRL));
-	addBind("txed_tex_down", keypress_t("down", KPM_CTRL), "Move Texture down", group);
-	addBind("txed_tex_down", keypress_t("D", KPM_CTRL));
-	addBind("txed_tex_new", keypress_t("N", KPM_CTRL), "New Texture", group);
-	addBind("txed_tex_new_patch", keypress_t("N", KPM_CTRL|KPM_SHIFT), "New Texture from Patch", group);
-	addBind("txed_tex_new_file", keypress_t("N", KPM_CTRL|KPM_ALT), "New Texture from File", group);
-	addBind("txed_tex_delete", keypress_t("delete"), "Delete Texture", group);
-
 
 	// Set above keys as defaults
 	for (unsigned a = 0; a < keybinds.size(); a++) {

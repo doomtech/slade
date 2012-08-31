@@ -526,11 +526,13 @@ void MainApp::initActions() {
 	new SAction("mapw_thing_changetype", "Change Type", "", "Change the currently selected or hilighted thing type(s)");
 	new SAction("mapw_sector_changetexture", "Change Texture", "", "Change the currently selected or hilighted sector texture(s)");
 	new SAction("mapw_item_properties", "Properties", "t_properties", "Edit the currently selected item's properties");
+	new SAction("mapw_camera_set", "Move 3d Camera Here", "", "Set the current position of the 3d mode camera to the cursor position");
+	new SAction("mapw_clear_selection", "Clear Selection", "", "Clear the current selection, if any");
+
+	// Script editor
 	new SAction("mapw_script_save", "Save", "t_save", "Save changes to scripts");
 	new SAction("mapw_script_compile", "Compile", "t_compile", "Compile scripts");
 	new SAction("mapw_script_jumpto", "Jump To...", "t_up", "Jump to a specific script/function");
-	new SAction("mapw_camera_set", "Move 3d Camera Here", "", "Set the current position of the 3d mode camera to the cursor position");
-	new SAction("mapw_clear_selection", "Clear Selection", "", "Clear the current selection, if any");
 }
 
 /* MainApp::OnInit

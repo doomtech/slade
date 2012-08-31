@@ -5,6 +5,7 @@ decorate : cstyle {
 	constant_link = "http://zdoom.org/wiki/Special:Search/%s";
 	function_link = "http://zdoom.org/wiki/%s";
 	case_sensitive = false;
+	blocks = "Actor";
 
 	keywords = {
 		$override,

@@ -90,83 +90,6 @@ void ScriptEditorPanel::populateWordList() {
 	}
 }
 
-void ScriptEditorPanel::openJumpToDialog() {
-	// --- Scan for functions/scripts ---
-	Tokenizer tz;
-	vector<jp_t> jump_points;
-	tz.openString(text_editor->GetText());
-
-	string token = tz.getToken();
-	while (!token.IsEmpty()) {
-		if (token == "{") {
-			// Skip block
-			while (!token.IsEmpty() && token != "}")
-				token = tz.getToken();
-		}
-
-		else if (S_CMPNOCASE(token, "script")) {
-			// Create jump point
-			jp_t jp;
-			jp.name = tz.getToken();
-			jp.line = tz.lineNo() - 1;
-
-			// Numbered script, add 'Script' to name
-			if (jp.name.IsNumber())
-				jp.name = S_FMT("Script %s", CHR(jp.name));
-
-			jump_points.push_back(jp);
-		}
-
-		else if (S_CMPNOCASE(token, "function")) {
-			// Create jump point
-			jp_t jp;
-			jp.name = tz.getToken();
-			jp.line = tz.lineNo() - 1;
-			jump_points.push_back(jp);
-		}
-
-		token = tz.getToken();
-	}
-
-	// Do nothing if no jump points
-	if (jump_points.size() == 0)
-		return;
-
-	
-	// --- Setup/show dialog ---
-	wxDialog dlg(this, -1, "Jump To...");
-	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	dlg.SetSizer(sizer);
-
-	// Add Jump to dropdown
-	wxChoice* choice_jump_to = new wxChoice(&dlg, -1);
-	sizer->Add(choice_jump_to, 0, wxEXPAND|wxALL, 4);
-	for (unsigned a = 0; a < jump_points.size(); a++)
-		choice_jump_to->Append(jump_points[a].name);
-	choice_jump_to->SetSelection(0);
-
-	// Add dialog buttons
-	sizer->Add(dlg.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
-	// Show dialog
-	dlg.SetInitialSize(wxSize(250, -1));
-	dlg.CenterOnParent();
-	if (dlg.ShowModal() == wxID_OK) {
-		int selection = choice_jump_to->GetSelection();
-		if (selection >= 0 && selection < (int)jump_points.size()) {
-			// Get line number
-			int line = jump_points[selection].line;
-
-			// Move to line
-			int pos = text_editor->GetLineEndPosition(line);
-			text_editor->SetCurrentPos(pos);
-			text_editor->SetSelection(pos, pos);
-			text_editor->SetFirstVisibleLine(line);
-			text_editor->SetFocus();
-		}
-	}
-}
-
 bool ScriptEditorPanel::handleAction(string name) {
 	// Compile Script
 	if (name == "mapw_script_compile") {
@@ -184,7 +107,7 @@ bool ScriptEditorPanel::handleAction(string name) {
 
 	// Jump To
 	else if (name == "mapw_script_jumpto")
-		openJumpToDialog();
+		text_editor->openJumpToDialog();
 
 	return false;
 }
@@ -233,21 +156,3 @@ void ScriptEditorPanel::onWordListActivate(wxCommandEvent& e) {
 		text_editor->SetFocus();
 	}
 }
-
-/*
-void ScriptEditorPanel::onJumpListSelected(wxCommandEvent& e) {
-	// Check valid selection
-	int selection = choice_jump_to->GetSelection();
-	if (selection >= 0 && selection < jump_points.size()) {
-		// Get line number
-		int line = jump_points[selection].line;
-
-		// Move to line
-		int pos = text_editor->GetLineEndPosition(line);
-		text_editor->SetCurrentPos(pos);
-		text_editor->SetSelection(pos, pos);
-		text_editor->SetFirstVisibleLine(line);
-		text_editor->SetFocus();
-	}
-}
-*/

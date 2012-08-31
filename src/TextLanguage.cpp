@@ -495,6 +495,12 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc, string source) {
 			else if (S_CMPNOCASE(child->getName(), "function_link"))
 				lang->f_lookup_url = child->getStringValue();
 
+			// Jump blocks
+			else if (S_CMPNOCASE(child->getName(), "blocks")) {
+				for (unsigned v = 0; v < child->nValues(); v++)
+					lang->jump_blocks.push_back(child->getStringValue(v));
+			}
+
 			// Keywords
 			else if (S_CMPNOCASE(child->getName(), "keywords")) {
 				// Go through values
