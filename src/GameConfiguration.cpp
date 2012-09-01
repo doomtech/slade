@@ -663,19 +663,15 @@ void GameConfiguration::readGameSection(ParseTreeNode* node_game, bool port_sect
 			for (unsigned v = 0; v < node->nValues(); v++) {
 				if (S_CMPNOCASE(node->getStringValue(v), "doom")) {
 					map_formats[MAP_DOOM] = true;
-					wxLogMessage("doom format");
 				}
 				else if (S_CMPNOCASE(node->getStringValue(v), "hexen")) {
 					map_formats[MAP_HEXEN] = true;
-					wxLogMessage("hexen format");
 				}
 				else if (S_CMPNOCASE(node->getStringValue(v), "doom64")) {
 					map_formats[MAP_DOOM64] = true;
-					wxLogMessage("doom64 format");
 				}
 				else if (S_CMPNOCASE(node->getStringValue(v), "udmf")) {
 					map_formats[MAP_UDMF] = true;
-					wxLogMessage("udmf format");
 				}
 				else
 					wxLogMessage("Warning: Unknown/unsupported map format \"%s\"", CHR(node->getStringValue(v)));
@@ -786,18 +782,20 @@ void GameConfiguration::readGameSection(ParseTreeNode* node_game, bool port_sect
 	}
 }
 
-bool GameConfiguration::readConfiguration(string& cfg, string source) {
+bool GameConfiguration::readConfiguration(string& cfg, string source, bool ignore_game, bool clear) {
 	// Clear current configuration
-	setDefaults();
-	action_specials.clear();
-	thing_types.clear();
-	flags_thing.clear();
-	flags_line.clear();
-	udmf_vertex_props.clear();
-	udmf_linedef_props.clear();
-	udmf_sidedef_props.clear();
-	udmf_sector_props.clear();
-	udmf_thing_props.clear();
+	if (clear) {
+		setDefaults();
+		action_specials.clear();
+		thing_types.clear();
+		flags_thing.clear();
+		flags_line.clear();
+		udmf_vertex_props.clear();
+		udmf_linedef_props.clear();
+		udmf_sidedef_props.clear();
+		udmf_sector_props.clear();
+		udmf_thing_props.clear();
+	}
 
 	// Parse the full configuration
 	Parser parser;
@@ -806,32 +804,35 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	// Process parsed data
 	ParseTreeNode* base = parser.parseTreeRoot();
 
-	// 'Game' section (this is required for it to be a valid game configuration, shouldn't be missing)
+	// Read game/port section(s) if needed
 	ParseTreeNode* node_game = NULL;
-	for (unsigned a = 0; a < base->nChildren(); a++) {
-		ParseTreeNode* child = (ParseTreeNode*)base->getChild(a);
-		if (child->getType() == "game") {
-			node_game = child;
-			break;
-		}
-	}
-	if (!node_game) {
-		wxLogMessage("No game section found, something is pretty wrong.");
-		return false;
-	}
-	readGameSection(node_game, false);
-
-	// 'Port' section
 	ParseTreeNode* node_port = NULL;
-	for (unsigned a = 0; a < base->nChildren(); a++) {
-		ParseTreeNode* child = (ParseTreeNode*)base->getChild(a);
-		if (child->getType() == "port") {
-			node_port = child;
-			break;
+	if (!ignore_game) {
+		// 'Game' section (this is required for it to be a valid game configuration, shouldn't be missing)
+		for (unsigned a = 0; a < base->nChildren(); a++) {
+			ParseTreeNode* child = (ParseTreeNode*)base->getChild(a);
+			if (child->getType() == "game") {
+				node_game = child;
+				break;
+			}
 		}
+		if (!node_game) {
+			wxLogMessage("No game section found, something is pretty wrong.");
+			return false;
+		}
+		readGameSection(node_game, false);
+
+		// 'Port' section
+		for (unsigned a = 0; a < base->nChildren(); a++) {
+			ParseTreeNode* child = (ParseTreeNode*)base->getChild(a);
+			if (child->getType() == "port") {
+				node_port = child;
+				break;
+			}
+		}
+		if (node_port)
+			readGameSection(node_port, true);
 	}
-	if (node_port)
-		readGameSection(node_port, true);
 
 	// Go through all other config sections
 	ParseTreeNode* node = NULL;
@@ -1313,28 +1314,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 }
 */
 
-/*
-bool GameConfiguration::open(string filename) {
-	// Build configuration string from file (process #includes, etc)
-	string cfg;
-	buildConfig(filename, cfg);
-
-	return readConfiguration(cfg, filename);
-}
-
-bool GameConfiguration::open(ArchiveEntry* entry) {
-	// Check entry was given
-	if (!entry)
-		return false;
-
-	// Build configuration string from entry (process #includes, etc)
-	string cfg;
-	buildConfig(entry, cfg);
-
-	return readConfiguration(cfg, entry->getName());
-}
-*/
-
+	/*
 bool GameConfiguration::openEmbeddedConfig(ArchiveEntry* entry) {
 	// Check entry was given
 	if (!entry)
@@ -1372,6 +1352,7 @@ bool GameConfiguration::removeEmbeddedConfig(string name) {
 	}
 	return false;
 }
+*/
 
 bool GameConfiguration::openConfig(string game, string port) {
 	string full_config;
@@ -1445,63 +1426,37 @@ bool GameConfiguration::openConfig(string game, string port) {
 	test.Write(full_config);
 	test.Close();
 
-	// TODO: Embedded configs
-	// These should probably be handled a bit differently:
-	// just treat them as additional thingtype/aspecial/flag/etc definitions,
-	// rather than entirely new game configurations
-
 	// Read fully built configuration
+	bool ok = true;
 	if (readConfiguration(full_config)) {
 		current_game = game;
 		current_port = port;
 		game_configuration = game;
 		port_configuration = port;
 		wxLogMessage("Read game configuration \"%s\" + \"%s\"", CHR(current_game), CHR(current_port));
-		return true;
 	}
 	else {
 		wxLogMessage("Error reading game configuration, not loaded");
-		return false;
+		ok = false;
 	}
 
+	// Read any embedded configurations in resource archives
+	Archive::search_options_t opt;
+	opt.match_name = "sladecfg";
+	vector<ArchiveEntry*> cfg_entries = theArchiveManager->findAllResourceEntries(opt);
+	for (unsigned a = 0; a < cfg_entries.size(); a++) {
+		// Log message
+		Archive* parent = cfg_entries[a]->getParent();
+		if (parent)
+			wxLogMessage("Reading SLADECFG in %s", parent->getFilename());
 
-	/*
-	// Check for file in user config directory
-	string fn = appPath("games/", DIR_USER) + name + ".cfg";
-	if (wxFileExists(fn)) {
-		if (open(fn)) {
-			game_configuration = name;
-			return true;
-		}
-		else
-			return false;
+		// Read embedded config
+		string config = wxString::FromAscii(cfg_entries[a]->getData(), cfg_entries[a]->getSize());
+		if (!readConfiguration(config, cfg_entries[a]->getName(), true, false))
+			wxLogMessage("Error reading embedded game configuration, not loaded");
 	}
 
-	// No user config exists, check embedded archives
-	ArchiveEntry* entry = NULL;
-	Archive* archive = theArchiveManager->getArchive(name);
-	if (archive) {
-		Archive::search_options_t search;
-		search.match_name = "sladecfg";
-		entry = archive->findLast(search);
-	}
-
-	// Still not found, check slade.pk3
-	if (!entry) {
-		string epath = S_FMT("config/games/%s.cfg", CHR(name));
-
-		archive = theArchiveManager->programResourceArchive();
-		entry = archive->entryAtPath(epath);
-	}
-
-	if (open(entry)) {
-		game_configuration = name;
-		return true;
-	}
-
-	// Not found anywhere
-	return false;
-	*/
+	return ok;
 }
 
 ActionSpecial* GameConfiguration::actionSpecial(unsigned id) {

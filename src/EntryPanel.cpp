@@ -80,8 +80,8 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	}
 
 	// Create generic EntryPanel buttons
-	btn_save = new wxButton(this, -1, "Save Changes");
-	btn_revert = new wxButton(this, -1, "Revert Changes");
+	btn_save = new wxButton(this, -1, "Save");
+	btn_revert = new wxButton(this, -1, "Revert");
 	btn_edit_ext = new wxButton(this, -1, "Edit Externally");
 
 	sizer_top->Add(btn_save, 0, wxEXPAND|wxRIGHT, 4);

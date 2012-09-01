@@ -189,12 +189,10 @@ public:
 	void	readThingTypes(ParseTreeNode* node, ThingType* group_defaults = NULL);
 	void	readUDMFProperties(ParseTreeNode* node, UDMFPropMap& plist);
 	void	readGameSection(ParseTreeNode* node_game, bool port_section = false);
-	bool	readConfiguration(string& cfg, string source = "");
-	//bool 	open(string filename_game);
-	//bool	open(ArchiveEntry* entry);
+	bool	readConfiguration(string& cfg, string source = "", bool ignore_game = false, bool clear = true);
 	bool	openConfig(string game, string port = "");
-	bool	openEmbeddedConfig(ArchiveEntry* entry);
-	bool	removeEmbeddedConfig(string name);
+	//bool	openEmbeddedConfig(ArchiveEntry* entry);
+	//bool	removeEmbeddedConfig(string name);
 
 	// Action specials
 	ActionSpecial*	actionSpecial(unsigned id);

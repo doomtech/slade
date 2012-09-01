@@ -341,16 +341,18 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	// Offsets
 	spin_xoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
 	spin_yoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
+	spin_xoffset->SetMinSize(wxSize(64, -1));
+	spin_yoffset->SetMinSize(wxSize(64, -1));
 	sizer_top->AddStretchSpacer();
 	sizer_top->Add(new wxStaticText(this, -1, "Offsets:"), 0, wxALIGN_CENTER_VERTICAL, 0);
-	sizer_top->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	sizer_top->Add(spin_yoffset, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_top->Add(spin_xoffset, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
+	sizer_top->Add(spin_yoffset, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 
 	// Gfx (offset) type
 	string offset_types[] = { "Auto", "Graphic", "Sprite", "HUD" };
 	choice_offset_type = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 4, offset_types);
 	choice_offset_type->SetSelection(0);
-	sizer_top->Add(choice_offset_type, 0, wxEXPAND, 0);
+	sizer_top->Add(choice_offset_type, 0, wxALIGN_CENTER_VERTICAL, 0);
 
 	// Custom menu
 	menu_custom = new wxMenu();
@@ -358,25 +360,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	custom_menu_name = "Graphic";
 
 	// Custom toolbar
-	custom_toolbar_actions = "pgfx_mirror;pgfx_flip;pgfx_rotate;pgfx_translate;pgfx_colourise;pgfx_tint;pgfx_crop";
-	/*
-	 * theApp->getAction("pgfx_mirror")->addToMenu(custom);
-	theApp->getAction("pgfx_flip")->addToMenu(custom);
-	theApp->getAction("pgfx_rotate")->addToMenu(custom);
-	custom->AppendSeparator();
-	theApp->getAction("pgfx_translate")->addToMenu(custom);
-	theApp->getAction("pgfx_colourise")->addToMenu(custom);
-	theApp->getAction("pgfx_tint")->addToMenu(custom);
-	custom->AppendSeparator();
-	theApp->getAction("pgfx_alph")->addToMenu(custom);
-	theApp->getAction("pgfx_trns")->addToMenu(custom);
-	custom->AppendSeparator();
-	theApp->getAction("arch_gfx_exportpng")->addToMenu(custom);
-	theApp->getAction("pgfx_extract")->addToMenu(custom);
-	custom->AppendSeparator();
-	theApp->getAction("arch_gfx_addptable")->addToMenu(custom);
-	theApp->getAction("arch_gfx_addtexturex")->addToMenu(custom);
-	 */
+	custom_toolbar_actions = "pgfx_mirror;pgfx_flip;pgfx_rotate;pgfx_translate;pgfx_colourise;pgfx_tint";
 
 	// Bind Events
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);

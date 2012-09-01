@@ -150,17 +150,14 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 				if (S_CMPNOCASE(token, "#ifndef"))
 					test = false;
 				string define = tz.getToken();
-				wxLogMessage("#if(n)def, %s", CHR(define));
 				if (parser->defined(define) == test) {
 					// Continue
-					wxLogMessage("passed");
 					token = tz.getToken();
 					continue;
 				}
 				else {
 					// Skip section
 					int skip = 0;
-					wxLogMessage("skipping");
 					while (true) {
 						token = tz.getToken();
 						if (S_CMPNOCASE(token, "#endif"))
@@ -177,7 +174,6 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 							break;
 						}
 					}
-					wxLogMessage("skipped");
 
 					continue;
 				}
