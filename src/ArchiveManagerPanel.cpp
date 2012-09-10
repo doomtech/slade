@@ -759,6 +759,40 @@ void ArchiveManagerPanel::openFiles(wxArrayString& files) {
 	}
 }
 
+/* ArchiveManagerPanel::undo
+ * Performs an undo operation on the currently selected tab, returns
+ * true if the tab supports undo, false otherwise
+ *******************************************************************/
+bool ArchiveManagerPanel::undo() {
+	// Get current tab page
+	wxWindow* page_current = currentPanel();
+
+	// Archive panel
+	if (S_CMPNOCASE(page_current->GetName(), "archive")) {
+		((ArchivePanel*)page_current)->undo();
+		return true;
+	}
+
+	return false;
+}
+
+/* ArchiveManagerPanel::redo
+ * Performs an redo operation on the currently selected tab, returns
+ * true if the tab supports redo, false otherwise
+ *******************************************************************/
+bool ArchiveManagerPanel::redo() {
+	// Get current tab page
+	wxWindow* page_current = currentPanel();
+
+	// Archive panel
+	if (S_CMPNOCASE(page_current->GetName(), "archive")) {
+		((ArchivePanel*)page_current)->redo();
+		return true;
+	}
+
+	return false;
+}
+
 /* ArchiveManagerPanel::closeAll
  * Closes all currently open archives
  *******************************************************************/

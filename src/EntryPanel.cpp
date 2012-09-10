@@ -32,6 +32,7 @@
 #include "WxStuff.h"
 #include "EntryPanel.h"
 #include "MainWindow.h"
+#include "ArchivePanel.h"
 
 
 /*******************************************************************
@@ -54,6 +55,7 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	entry = NULL;
 	this->id = id;
 	menu_custom = NULL;
+	undo_manager = NULL;
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(sizer);
@@ -127,8 +129,11 @@ void EntryPanel::setModified(bool c) {
  *******************************************************************/
 bool EntryPanel::openEntry(ArchiveEntry* entry) {
 	// Check entry was given
-	if (!entry)
+	if (!entry) {
+		entry_data.clear();
+		this->entry = NULL;
 		return false;
+	}
 
 	// Copy current entry content
 	entry_data.clear();
@@ -273,8 +278,18 @@ bool EntryPanel::isActivePanel() {
  *******************************************************************/
 void EntryPanel::onBtnSave(wxCommandEvent& e) {
 	if (modified) {
-		if (saveEntry())
+		if (undo_manager) {
+			undo_manager->beginRecord("Save Entry Modifications");
+			undo_manager->recordUndoStep(new EntryDataUS(entry));
+		}
+
+		if (saveEntry()) {
 			modified = false;
+			if (undo_manager)
+				undo_manager->endRecord(true);
+		}
+		else if (undo_manager)
+			undo_manager->endRecord(false);
 	}
 }
 

@@ -4,6 +4,7 @@
 
 #include "ArchiveEntry.h"
 #include "ListenerAnnouncer.h"
+#include "UndoRedo.h"
 
 class EntryPanel : public wxPanel, public Listener {
 private:
@@ -14,6 +15,7 @@ private:
 
 protected:
 	ArchiveEntry*	entry;
+	UndoManager*	undo_manager;
 
 	wxSizer*		sizer_main;
 	wxSizer*		sizer_top;
@@ -36,6 +38,7 @@ public:
 	ArchiveEntry*	getEntry() { return entry; }
 	bool			isModified() { return modified; }
 	bool			isActivePanel();
+	void			setUndoManager(UndoManager* manager) { undo_manager = manager; }
 
 	bool			openEntry(ArchiveEntry* entry);
 	virtual bool	loadEntry(ArchiveEntry* entry);

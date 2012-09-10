@@ -241,11 +241,14 @@ void MainWindow::setupLayout() {
 	theApp->getAction("main_exit")->addToMenu(fileMenu);
 	menu->Append(fileMenu, "&File");
 
-	// Editor menu
+	// Edit menu
 	wxMenu* editorMenu = new wxMenu("");
+	theApp->getAction("main_undo")->addToMenu(editorMenu);
+	theApp->getAction("main_redo")->addToMenu(editorMenu);
+	editorMenu->AppendSeparator();
 	theApp->getAction("main_setbra")->addToMenu(editorMenu);
 	theApp->getAction("main_preferences")->addToMenu(editorMenu);
-	menu->Append(editorMenu, "E&ditor");
+	menu->Append(editorMenu, "E&dit");
 
 	// View menu
 	wxMenu* viewMenu = new wxMenu("");
@@ -509,10 +512,24 @@ bool MainWindow::handleAction(string id) {
 		return false;
 
 	// File->Exit
-	if (id == "main_exit")
+	if (id == "main_exit") {
 		Close();
+		return true;
+	}
 
-	// Editor->Set Base Resource Archive
+	// Edit->Undo
+	if (id == "main_undo") {
+		panel_archivemanager->undo();
+		return true;
+	}
+
+	// Edit->Redo
+	if (id == "main_redo") {
+		panel_archivemanager->redo();
+		return true;
+	}
+
+	// Edit->Set Base Resource Archive
 	if (id == "main_setbra") {
 		wxDialog dialog_ebr(this, -1, "Edit Base Resource Archives", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 		BaseResourceArchivesPanel brap(&dialog_ebr);
@@ -532,7 +549,7 @@ bool MainWindow::handleAction(string id) {
 		return true;
 	}
 
-	// Editor->Preferences
+	// Edit->Preferences
 	if (id == "main_preferences") {
 		PreferencesDialog::openPreferences(this);
 

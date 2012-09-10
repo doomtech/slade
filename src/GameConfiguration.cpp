@@ -371,11 +371,11 @@ bool GameConfiguration::mapFormatSupported(int map_format, int game, int port) {
 		return false;
 
 	// Check port if one specified
-	if (port >= 0 && port <= port_configs.size())
+	if (port >= 0 && port <= (int)port_configs.size())
 		return port_configs[port].supported_formats[map_format];
 
 	// Check game
-	if (game >= 0 && game <= game_configs.size())
+	if (game >= 0 && game <= (int)game_configs.size())
 		return game_configs[game].supported_formats[map_format];
 
 	// Not supported

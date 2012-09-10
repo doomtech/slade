@@ -957,6 +957,9 @@
     <ClCompile Include="src\lua\lzio.c">
       <Filter>External\Lua</Filter>
     </ClCompile>
+    <ClCompile Include="src\UndoRedo.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1784,6 +1787,9 @@
     </ClInclude>
     <ClInclude Include="src\ColorimetryPrefsPanel.h">
       <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UndoRedo.h">
+      <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

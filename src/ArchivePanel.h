@@ -7,6 +7,7 @@
 #include "ListenerAnnouncer.h"
 #include "ArchiveEntryList.h"
 #include "MainApp.h"
+#include "UndoRedo.h"
 #include <wx/textctrl.h>
 #include <wx/choice.h>
 
@@ -19,6 +20,7 @@ protected:
 	wxStaticText*		label_path;
 	wxBitmapButton*		btn_updir;
 	wxSizer*			sizer_path_controls;
+	UndoManager*		undo_manager;
 
 	// Entry panels
 	EntryPanel*	cur_area;
@@ -53,6 +55,10 @@ public:
 	void		removeMenus();
 
 	// Editing actions - return success
+
+	// General actions
+	void	undo();
+	void	redo();
 
 	// Archive manipulation actions
 	bool	save();
@@ -132,6 +138,32 @@ public:
 	void			onChoiceCategoryChanged(wxCommandEvent& e);
 	void			onDirChanged(wxCommandEvent& e);
 	void			onBtnUpDir(wxCommandEvent& e);
+};
+
+class EntryDataUS : public UndoStep {
+private:
+	MemChunk	data;
+	string		path;
+	unsigned	index;
+	Archive*	archive;
+
+public:
+	EntryDataUS(ArchiveEntry* entry) {
+		archive = entry->getParent();
+		path = entry->getPath();
+		index = entry->getParentDir()->entryIndex(entry);
+		data.importMem(entry->getData(), entry->getSize());
+	}
+
+	bool swapData();
+
+	bool doUndo() {
+		return swapData();
+	}
+
+	bool doRedo() {
+		return swapData();
+	}
 };
 
 #endif //__ARCHIVEPANEL_H__

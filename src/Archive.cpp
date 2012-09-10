@@ -31,6 +31,7 @@
 #include "Archive.h"
 #include "MainApp.h"
 #include "Misc.h"
+#include "UndoRedo.h"
 #include <wx/filename.h>
 #include <wx/dir.h>
 
@@ -335,6 +336,134 @@ bool ArchiveTreeNode::merge(ArchiveTreeNode* node, unsigned position) {
 
 	return true;
 }
+
+
+
+class EntryRenameUS : public UndoStep {
+private:
+	Archive*	archive;
+	string		entry_path;
+	int			entry_index;
+	string		old_name;
+	string		new_name;
+
+public:
+	EntryRenameUS(ArchiveEntry* entry, string new_name) : UndoStep() {
+		archive = entry->getParent();
+		entry_path = entry->getPath();
+		entry_index = entry->getParentDir()->entryIndex(entry);
+		old_name = entry->getName();
+		this->new_name = new_name;
+	}
+
+	bool doUndo() {
+		// Get entry parent dir
+		ArchiveTreeNode* dir = archive->getDir(entry_path);
+		if (dir) {
+			// Rename entry
+			ArchiveEntry* entry = dir->getEntry(entry_index);
+			return archive->renameEntry(entry, old_name);
+		}
+
+		return false;
+	}
+
+	bool doRedo() {
+		// Get entry parent dir
+		ArchiveTreeNode* dir = archive->getDir(entry_path);
+		if (dir) {
+			// Rename entry
+			ArchiveEntry* entry = dir->getEntry(entry_index);
+			return archive->renameEntry(entry, new_name);
+		}
+
+		return false;
+	}
+};
+
+class EntrySwapUS : public UndoStep {
+private:
+	Archive*	archive;
+	string		path;
+	unsigned	index1;
+	unsigned	index2;
+
+public:
+	EntrySwapUS(ArchiveTreeNode* dir, unsigned index1, unsigned index2) {
+		archive = dir->getArchive();
+		path = dir->getPath();
+		this->index1 = index1;
+		this->index2 = index2;
+	}
+
+	bool doSwap() {
+		// Get parent dir
+		ArchiveTreeNode* dir = archive->getDir(path);
+		if (dir)
+			return dir->swapEntries(index1, index2);
+		return false;
+	}
+
+	bool doUndo() { return doSwap(); }
+	bool doRedo() { return doSwap(); }
+};
+
+class EntryCreateDeleteUS : public UndoStep {
+private:
+	bool			created;
+	Archive*		archive;
+	ArchiveEntry*	entry_copy;
+	string			path;
+	unsigned		index;
+
+public:
+	EntryCreateDeleteUS(bool created, ArchiveEntry* entry) {
+		this->created = created;
+		archive = entry->getParent();
+		entry_copy = new ArchiveEntry(*entry);
+		path = entry->getPath();
+		index = entry->getParentDir()->entryIndex(entry);
+	}
+
+	~EntryCreateDeleteUS() {
+		if (entry_copy)
+			delete entry_copy;
+	}
+
+	bool deleteEntry() {
+		// Get parent dir
+		ArchiveTreeNode* dir = archive->getDir(path);
+		if (dir)
+			return archive->removeEntry(dir->getEntry(index));
+		else
+			return false;
+	}
+
+	bool createEntry() {
+		// Get parent dir
+		ArchiveTreeNode* dir = archive->getDir(path);
+		if (dir) {
+			archive->addEntry(entry_copy, index, dir, true);
+			return true;
+		}
+		else
+			return false;
+	}
+
+	bool doUndo() {
+		if (created)
+			return deleteEntry();
+		else
+			return createEntry();
+	}
+
+	bool doRedo() {
+		if (!created)
+			return deleteEntry();
+		else
+			return createEntry();
+	}
+};
 
 
 /*******************************************************************
@@ -843,6 +972,10 @@ ArchiveEntry* Archive::addEntry(ArchiveEntry* entry, unsigned position, ArchiveT
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce("entry_added", mc);
 
+	// Create undo step
+	if (UndoRedo::currentlyRecording())
+		UndoRedo::currentManager()->recordUndoStep(new EntryCreateDeleteUS(true, entry));
+
 	return entry;
 }
 
@@ -891,6 +1024,10 @@ bool Archive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	if (!dir)
 		return false;
 
+	// Create undo step
+	if (UndoRedo::currentlyRecording())
+		UndoRedo::currentManager()->recordUndoStep(new EntryCreateDeleteUS(false, entry));
+
 	// Get the entry index
 	int index = dir->entryIndex(entry);
 
@@ -933,6 +1070,10 @@ bool Archive::swapEntries(unsigned index1, unsigned index2, ArchiveTreeNode* dir
 	// Check if either entry is locked
 	if (dir->getEntry(index1)->isLocked() || dir->getEntry(index2)->isLocked())
 		return false;
+	
+	// Create undo step
+	if (UndoRedo::currentlyRecording())
+		UndoRedo::currentManager()->recordUndoStep(new EntrySwapUS(dir, index1, index2));
 
 	// Do swap
 	if (dir->swapEntries(index1, index2)) {
@@ -986,6 +1127,10 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	// Check indices
 	if (i1 < 0 || i2 < 0)
 		return false;
+
+	// Create undo step
+	if (UndoRedo::currentlyRecording())
+		UndoRedo::currentManager()->recordUndoStep(new EntrySwapUS(dir, i1, i2));
 
 	// Swap entries
 	dir->swapEntries(i1, i2);
@@ -1066,6 +1211,10 @@ bool Archive::renameEntry(ArchiveEntry* entry, string name) {
 	mc.write(&index, sizeof(int));
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce("entry_renaming", mc);
+
+	// Create undo step
+	if (UndoRedo::currentlyRecording())
+		UndoRedo::currentManager()->recordUndoStep(new EntryRenameUS(entry, name));
 
 	// Rename the entry
 	entry->rename(name);

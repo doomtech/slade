@@ -177,6 +177,9 @@ public:
  *******************************************************************/
 ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 : wxPanel(parent, -1) {
+	// Init variables
+	undo_manager = new UndoManager();
+
 	// Set archive
 	this->archive = archive;
 	listenTo(archive);
@@ -255,6 +258,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	cur_area = entry_area;
 	m_hbox->Add(cur_area, 1, wxEXPAND);
 	cur_area->Show(true);
+	cur_area->setUndoManager(undo_manager);
 
 	// Bind events
 	entry_list->Bind(EVT_VLV_SELECTION_CHANGED, &ArchivePanel::onEntryListSelectionChange, this);
@@ -283,6 +287,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
  * ArchivePanel class destructor
  *******************************************************************/
 ArchivePanel::~ArchivePanel() {
+	delete undo_manager;
 }
 
 /* ArchivePanel::saveEntryChanges
@@ -385,6 +390,28 @@ void ArchivePanel::removeMenus() {
 	// Also disable the related toolbars
 	theMainWindow->enableToolBar("_archive", false);
 	theMainWindow->enableToolBar("_entry", false);
+}
+
+/* ArchivePanel::undo
+ * Performs an undo operation
+ *******************************************************************/
+void ArchivePanel::undo() {
+	// Undo
+	undo_manager->undo();
+
+	// Refresh entry list
+	entry_list->updateList();
+}
+
+/* ArchivePanel::redo
+ * Performs a redo operation
+ *******************************************************************/
+void ArchivePanel::redo() {
+	// Redo
+	undo_manager->redo();
+
+	// Refresh entry list
+	entry_list->updateList();
 }
 
 /* ArchivePanel::save
@@ -494,7 +521,9 @@ bool ArchivePanel::newEntry(int type) {
 		index = -1;	// If not add to the end of the list
 
 	// Add the entry to the archive
+	undo_manager->beginRecord("Add Entry");
 	ArchiveEntry* new_entry = archive->addNewEntry(name, index, entry_list->getCurrentDir());
+	undo_manager->endRecord(true);
 
 	// Deal with specific entry type that we may want created
 	if (type && new_entry) {
@@ -584,6 +613,9 @@ bool ArchivePanel::importFiles() {
 		else
 			index = -1;	// If not add to the end of the list
 
+		// Begin recording undo level
+		undo_manager->beginRecord("Import Files");
+
 		// Go through the list of files
 		bool ok = false;
 		entry_list->Show(false);
@@ -610,6 +642,9 @@ bool ArchivePanel::importFiles() {
 		}
 		theSplashWindow->hide();
 		entry_list->Show(true);
+
+		// End recording undo level
+		undo_manager->endRecord(true);
 
 		return ok;
 	}
@@ -640,6 +675,9 @@ bool ArchivePanel::cleanupArchive() {
 bool ArchivePanel::renameEntry(bool each) {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Begin recording undo level
+	undo_manager->beginRecord("Rename Entry");
 
 	// Check any are selected
 	if (each || selection.size() == 1) {
@@ -714,6 +752,9 @@ bool ArchivePanel::renameEntry(bool each) {
 			archive->renameDir(selected_dirs[a], new_name);
 	}
 
+	// Finish recording undo level
+	undo_manager->endRecord(true);
+
 	return true;
 }
 
@@ -747,6 +788,9 @@ bool ArchivePanel::deleteEntry(bool confirm) {
 	// Clear the selection
 	entry_list->clearSelection();
 
+	// Begin recording undo level
+	undo_manager->beginRecord("Delete Entry");
+
 	// Go through the selected entries
 	for (int a = selected_entries.size() - 1; a >= 0; a--) {
 		// Remove the current selected entry if it isn't a directory
@@ -759,6 +803,9 @@ bool ArchivePanel::deleteEntry(bool confirm) {
 		// Remove the selected directory from the archive
 		archive->removeDir(selected_dirs[a]->getName(), entry_list->getCurrentDir());
 	}
+	
+	// Finish recording undo level
+	undo_manager->endRecord(true);
 
 	// Switch to blank entry panel
 	wxSizer* sizer = GetSizer();
@@ -779,9 +826,17 @@ bool ArchivePanel::revertEntry() {
 	// Get selected entries
 	vector<ArchiveEntry*> selected_entries = entry_list->getSelectedEntries();
 
+	// Begin recording undo level
+	undo_manager->beginRecord("Revert Entry");
+
 	// Go through selection
-	for (unsigned a = 0; a < selected_entries.size(); a++)
+	for (unsigned a = 0; a < selected_entries.size(); a++) {
+		undo_manager->recordUndoStep(new EntryDataUS(selected_entries[a]));
 		archive->revertEntry(selected_entries[a]);
+	}
+
+	// Finish recording undo level
+	undo_manager->endRecord(true);
 
 	// If the entries reverted were the only modified entries in the
 	// archive, the archive is no longer modified.
@@ -812,8 +867,10 @@ bool ArchivePanel::moveUp() {
 		return false;
 
 	// Move each one up by swapping it with the entry above it
+	undo_manager->beginRecord("Move Up");
 	for (size_t a = 0; a < selection.size(); a++)
 		archive->swapEntries(entry_list->getEntryIndex(selection[a]), entry_list->getEntryIndex(selection[a]-1), entry_list->getCurrentDir());
+	undo_manager->endRecord(true);
 
 	// Update selection
 	entry_list->clearSelection();
@@ -844,8 +901,10 @@ bool ArchivePanel::moveDown() {
 		return false;
 
 	// Move each one down by swapping it with the entry below it
+	undo_manager->beginRecord("Move Down");
 	for (int a = selection.size()-1; a >= 0; a--)
 		archive->swapEntries(entry_list->getEntryIndex(selection[a]), entry_list->getEntryIndex(selection[a]+1), entry_list->getCurrentDir());
+	undo_manager->endRecord(true);
 
 	// Update selection
 	entry_list->clearSelection();
@@ -922,6 +981,9 @@ bool ArchivePanel::importEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
+	// Begin recording undo level
+	undo_manager->beginRecord("Import Entry");
+
 	// Go through the list
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Run open file dialog
@@ -936,6 +998,9 @@ bool ArchivePanel::importEntry() {
 				si.open(selection[a]->getMCData());
 				offset = si.offset();
 			}
+
+			// Create undo step
+			undo_manager->recordUndoStep(new EntryDataUS(selection[a]));
 
 			// If a file was selected, import it
 			selection[a]->importFile(info.filenames[0]);
@@ -978,6 +1043,9 @@ bool ArchivePanel::importEntry() {
 				openEntry(selection[a], true);
 		}
 	}
+
+	// Finish recording undo level
+	undo_manager->endRecord(true);
 
 	return true;
 }
@@ -1129,6 +1197,9 @@ bool ArchivePanel::gfxConvert() {
 	// Show splash window
 	theSplashWindow->show("Writing converted image data...", true);
 
+	// Begin recording undo level
+	undo_manager->beginRecord("Gfx Format Conversion");
+
 	// Write any changes
 	for (unsigned a = 0; a < selection.size(); a++) {
 		// Update splash window
@@ -1151,13 +1222,16 @@ bool ArchivePanel::gfxConvert() {
 		selection[a]->setExtensionByType();
 	}
 
+	// Finish recording undo level
+	undo_manager->endRecord(true);
+
 	// Hide splash window
 	theSplashWindow->hide();
 
 	return true;
 }
 
-/* ArchivePanel::gfxModifyOffsets
+/* ArchivePanel::gfxRemap
  * Opens the Translation editor dialog to remap colours on selected
  * gfx entries
  *******************************************************************/
@@ -1176,6 +1250,9 @@ bool ArchivePanel::gfxRemap() {
 
 	// Run dialog
 	if (ted.ShowModal() == wxID_OK) {
+		// Begin recording undo level
+		undo_manager->beginRecord("Gfx Colour Remap");
+
 		// Apply translation to all entry images
 		SImage temp;
 		MemChunk mc;
@@ -1184,6 +1261,9 @@ bool ArchivePanel::gfxRemap() {
 			if (Misc::loadImageFromEntry(&temp, entry)) {
 				// Apply translation
 				temp.applyTranslation(&ted.getTranslation(), pal);
+
+				// Create undo step
+				undo_manager->recordUndoStep(new EntryDataUS(entry));
 
 				// Write modified image data
 				if (!temp.getFormat()->saveImage(temp, mc, pal))
@@ -1195,6 +1275,9 @@ bool ArchivePanel::gfxRemap() {
 
 		// Update variables
 		((GfxEntryPanel*)gfx_area)->prevTranslation().copy(ted.getTranslation());
+
+		// Finish recording undo level
+		undo_manager->endRecord(true);
 	}
 
 	return true;
@@ -1212,10 +1295,18 @@ bool ArchivePanel::gfxModifyOffsets() {
 	if (mod.ShowModal() == wxID_CANCEL)
 		return false;
 
+	// Begin recording undo level
+	undo_manager->beginRecord("Gfx Modify Offsets");
+
 	// Go through selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
-	for (uint32_t a = 0; a < selection.size(); a++)
+	for (uint32_t a = 0; a < selection.size(); a++) {
+		undo_manager->recordUndoStep(new EntryDataUS(selection[a]));
 		EntryOperations::modifyGfxOffsets(selection[a], mod.getAlignType(), mod.getOffset(), mod.xOffChange(), mod.yOffChange(), mod.relativeOffset());
+	}
+
+	// Finish recording undo level
+	undo_manager->endRecord(true);
 
 	return true;
 }
@@ -1304,9 +1395,15 @@ bool ArchivePanel::basConvert() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
+	// Begin recording undo level
+	undo_manager->beginRecord("Convert to ANIMDEFS");
+
 	// Create new entry
 	ArchiveEntry * animdef = archive->addNewEntry((archive->getType() == ARCHIVE_WAD ?
 		"ANIMDEFS" : "animdefs.txt"), index, entry_list->getCurrentDir());
+
+	// Finish recording undo level
+	undo_manager->endRecord(true);
 
 	if (animdef) {
 		// Create the memory buffer
@@ -1361,6 +1458,9 @@ bool ArchivePanel::wavDSndConvert() {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
+	// Begin recording undo level
+	undo_manager->beginRecord("Convert Wav -> Doom Sound");
+
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
 		// Convert WAV -> Doom Sound if the entry is WAV format
@@ -1371,11 +1471,15 @@ bool ArchivePanel::wavDSndConvert() {
 				wxLogMessage("Error: Unable to convert entry %s: %s", CHR(selection[a]->getName()), CHR(Global::error));
 				continue;
 			}
-			selection[a]->importMemChunk(dsnd);							// Load doom sound data
-			EntryType::detectEntryType(selection[a]);					// Update entry type
-			selection[a]->setExtensionByType();							// Update extension if necessary
+			undo_manager->recordUndoStep(new EntryDataUS(selection[a]));	// Create undo step
+			selection[a]->importMemChunk(dsnd);								// Load doom sound data
+			EntryType::detectEntryType(selection[a]);						// Update entry type
+			selection[a]->setExtensionByType();								// Update extension if necessary
 		}
 	}
+
+	// Finish recording undo level
+	undo_manager->endRecord(true);
 
 	return true;
 }
@@ -1386,6 +1490,9 @@ bool ArchivePanel::wavDSndConvert() {
 bool ArchivePanel::dSndWavConvert() {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Begin recording undo level
+	undo_manager->beginRecord("Convert Doom Sound -> Wav");
 
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
@@ -1405,14 +1512,18 @@ bool ArchivePanel::dSndWavConvert() {
 			worked = Conversions::bloodToWav(selection[a], wav);
 		// If successfully converted, update the entry
 		if (worked) {
-			selection[a]->importMemChunk(wav);			// Load wav data
-			EntryType::detectEntryType(selection[a]);	// Update entry type
-			selection[a]->setExtensionByType();			// Update extension if necessary
+			undo_manager->recordUndoStep(new EntryDataUS(selection[a]));	// Create undo step
+			selection[a]->importMemChunk(wav);								// Load wav data
+			EntryType::detectEntryType(selection[a]);						// Update entry type
+			selection[a]->setExtensionByType();								// Update extension if necessary
 		} else {
 			wxLogMessage("Error: Unable to convert entry %s: %s", CHR(selection[a]->getName()), CHR(Global::error));
 			continue;
 		}
 	}
+
+	// Finish recording undo level
+	undo_manager->endRecord(true);
 
 	return true;
 }
@@ -1424,17 +1535,24 @@ bool ArchivePanel::musMidiConvert() {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
+	// Begin recording undo level
+	undo_manager->beginRecord("Convert Mus -> Midi");
+
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
 		// Convert MUS -> MIDI if the entry is Doom MUS format
 		if (selection[a]->getType()->getFormat() == "mus") {
 			MemChunk midi;
-			Conversions::musToMidi(selection[a]->getMCData(), midi);	// Convert
-			selection[a]->importMemChunk(midi);							// Load midi data
-			EntryType::detectEntryType(selection[a]);					// Update entry type
-			selection[a]->setExtensionByType();							// Update extension if necessary
+			undo_manager->recordUndoStep(new EntryDataUS(selection[a]));	// Create undo step
+			Conversions::musToMidi(selection[a]->getMCData(), midi);		// Convert
+			selection[a]->importMemChunk(midi);								// Load midi data
+			EntryType::detectEntryType(selection[a]);						// Update entry type
+			selection[a]->setExtensionByType();								// Update extension if necessary
 		}
 	}
+
+	// Finish recording undo level
+	undo_manager->endRecord(true);
 
 	return true;
 }
@@ -1464,16 +1582,24 @@ bool ArchivePanel::optimizePNG() {
 
 	theSplashWindow->show("Running external programs, please wait...", true);
 
+	// Begin recording undo level
+	undo_manager->beginRecord("Optimize PNG");
+
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
 		theSplashWindow->Raise();
 		theSplashWindow->setProgressMessage(selection[a]->getName(true));
 		theSplashWindow->setProgress(float(a) / float(selection.size()));
-		if (selection[a]->getType()->getFormat() == "img_png")
+		if (selection[a]->getType()->getFormat() == "img_png") {
+			undo_manager->recordUndoStep(new EntryDataUS(selection[a]));
 			EntryOperations::optimizePNG(selection[a]);
+		}
 	}
 	theSplashWindow->hide();
 	theMainWindow->Raise();
+
+	// Finish recording undo level
+	undo_manager->endRecord(true);
 
 	return true;
 }
@@ -1486,14 +1612,23 @@ bool ArchivePanel::convertTextures() {
 	long index = entry_list->getSelection()[0];
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
+	// Begin recording undo level
+	undo_manager->beginRecord("Convert TEXTUREx -> TEXTURES");
+
 	// Do conversion
 	if (EntryOperations::convertTextures(selection)) {
 		// Select new TEXTURES entry
 		entry_list->clearSelection();
 		entry_list->selectItem(index);
 
+		// Finish recording undo level
+		undo_manager->endRecord(true);
+
 		return true;
 	}
+
+	// Finish recording undo level
+	undo_manager->endRecord(false);
 
 	return false;
 }
@@ -1680,11 +1815,18 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 		cur_area->addCustomMenu();
 		cur_area->addCustomToolBar();
 
+		// Set panel undo manager
+		cur_area->setUndoManager(undo_manager);
+
 		// Update panel layout
 		Layout();
 		theMainWindow->Update();
 		theMainWindow->Refresh();
 		theMainWindow->Update();
+	}
+	else if (!cur_area->IsShown()) {
+		// Show current
+		cur_area->Show();
 	}
 
 	return true;
@@ -1916,6 +2058,22 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 		if (!GetSizer()->IsShown(sizer_path_controls)) {
 			sizer_path_controls->Show(true);
 			Layout();
+		}
+	}
+
+	// If an entry was removed
+	if (announcer == archive && event_name == "entry_removing") {
+		// Get entry pointer
+		wxUIntPtr ptr;
+		event_data.seek(sizeof(int), 0);
+		event_data.read(&ptr, sizeof(wxUIntPtr));
+		ArchiveEntry* entry = (ArchiveEntry*)wxUIntToPtr(ptr);
+
+		// Close current entry panel if it's entry was removed
+		if (currentArea()->getEntry() == entry) {
+			currentArea()->closeEntry();
+			currentArea()->openEntry(NULL);
+			currentArea()->Show(false);
 		}
 	}
 }
@@ -2450,6 +2608,50 @@ void ArchivePanel::onDirChanged(wxCommandEvent& e) {
 void ArchivePanel::onBtnUpDir(wxCommandEvent& e) {
 	// Go up a directory in the entry list
 	entry_list->goUpDir();
+}
+
+
+/*******************************************************************
+ * ENTRYDATAUS CLASS FUNCTIONS
+ *******************************************************************/
+
+/* EntryDataUS::swapData
+ * Swaps data between the entry and the undo step
+ *******************************************************************/
+bool EntryDataUS::swapData() {
+	//wxLogMessage("Entry data swap...");
+
+	// Get parent dir
+	ArchiveTreeNode* dir = archive->getDir(path);
+	if (dir) {
+		// Get entry
+		ArchiveEntry* entry = dir->getEntry(index);
+
+		// Backup data
+		MemChunk temp_data;
+		temp_data.importMem(entry->getData(), entry->getSize());
+		//wxLogMessage("Backup current data, size %d", entry->getSize());
+
+		// Restore entry data
+		if (data.getSize() == 0) {
+			entry->clearData();
+			//wxLogMessage("Clear entry data");
+		}
+		else {
+			entry->importMemChunk(data);
+			//wxLogMessage("Restored entry data, size %d", data.getSize());
+		}
+
+		// Store previous entry data
+		if (temp_data.getSize() > 0)
+			data.importMem(temp_data.getData(), temp_data.getSize());
+		else
+			data.clear();
+
+		return true;
+	}
+
+	return false;
 }
 
 

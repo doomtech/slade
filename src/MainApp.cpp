@@ -347,6 +347,8 @@ void MainApp::initLogFile() {
 void MainApp::initActions() {
 	// MainWindow
 	new SAction("main_exit", "E&xit", "t_exit", "Quit SLADE", "", 0, wxID_EXIT);
+	new SAction("main_undo", "Undo", "t_undo", "Undo", "Ctrl+Z");
+	new SAction("main_redo", "Redo", "t_redo", "Redo", "Ctrl+Y");
 	new SAction("main_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
 	new SAction("main_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences", "", NORMAL, wxID_PREFERENCES);
 	new SAction("main_showam", "&Archive Manager", "e_archive", "Toggle the Archive Manager window", "Ctrl+1");

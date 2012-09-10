@@ -85,6 +85,10 @@ public:
 	void			openFile(string filename);
 	void			openFiles(wxArrayString& files);
 
+	// General actions
+	bool	undo();
+	bool	redo();
+
 	// Single archive actions
 	bool	saveEntryChanges(Archive* archive);
 	bool	saveArchive(Archive* archive);
