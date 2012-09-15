@@ -127,6 +127,9 @@ public:
 	bool	loadJediFNT(const uint8_t* gfx_data, int size);
 	bool	loadJediFONT(const uint8_t* gfx_data, int size);
 
+	bool	loadJaguarSprite(const uint8_t* header, int hdr_size, const uint8_t* gfx_data, int size);
+	bool	loadJaguarTexture(const uint8_t* gfx_data, int size, int i_width, int i_height);
+
 	/*
 	bool	loadImage(const uint8_t* data, int size);
 	bool	loadDoomGfx(const uint8_t* data, int size, uint8_t version = 0);

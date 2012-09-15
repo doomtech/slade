@@ -234,6 +234,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 		wxLogMessage("Error: TEXTUREx entry is corrupt (can't read texture count)");
 		return false;
 	}
+	n_tex = wxINT32_SWAP_ON_BE(n_tex);
 
 	// If it's an empty TEXTUREx entry, stop here
 	if (n_tex == 0)
@@ -247,7 +248,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 	}
 
 	// Read the first texture definition to try to identify the format
-	if (!texturex->seek(offsets[0], SEEK_SET)) {
+	if (!texturex->seek(wxINT32_SWAP_ON_BE(offsets[0]), SEEK_SET)) {
 		wxLogMessage("Error: TEXTUREx entry is corrupt (can't read first definition)");
 		return false;
 	}
@@ -265,12 +266,20 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 		if (a > 0 && tempname[a] == 0)
 			// We found a null-terminator for the string, so we can assume it's okay.
 			break;
-		if (!((tempname[a] >= 'A' && tempname[a] <= '[') ||
+		if (tempname[a] >= 'a' && tempname[a] <= 'z') {
+			txformat = TXF_JAGUAR;
+			//wxLogMessage("Jaguar texture");
+			break;
+		}
+		else if (!((tempname[a] >= 'A' && tempname[a] <= '[') ||
 			  (tempname[a] >= '0' && tempname[a] <= '9') ||
 			   tempname[a] == ']' || tempname[a] == '-' || tempname[a] == '_'))
 			// We're out of character range, so this is probably not a texture name.
-		{txformat = TXF_NAMELESS;
-		wxLogMessage("Nameless texture");}
+		{
+			txformat = TXF_NAMELESS;
+			//wxLogMessage("Nameless texture");
+			break;
+		}
 	}
 
 	// Now let's see if it is the abridged Strife format or not.
@@ -338,8 +347,8 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 		// Create texture
 		CTexture* tex = new CTexture();
 		tex->name = wxString::FromAscii(tdef.name, 8);
-		tex->width = tdef.width;
-		tex->height = tdef.height;
+		tex->width = wxINT16_SWAP_ON_BE(tdef.width);
+		tex->height = wxINT16_SWAP_ON_BE(tdef.height);
 		tex->scale_x = tdef.scale[0]/8.0;
 		tex->scale_y = tdef.scale[1]/8.0;
 
@@ -373,8 +382,14 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 				}
 			}
 
+
 			// Add it to the texture
-			string patch = patch_table.patchName(pdef.patch);
+			string patch;
+			if (txformat == TXF_JAGUAR) {
+				patch = tex->name.Upper();
+			} else {
+				patch = patch_table.patchName(pdef.patch);
+			}
 			if (patch.IsEmpty()) {
 				//wxLogMessage("Warning: Texture %s contains patch %d which is invalid - may be incorrect PNAMES entry", CHR(tex->getName()), pdef.patch);
 				patch = S_FMT("INVPATCH%04d", pdef.patch);

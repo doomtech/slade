@@ -761,3 +761,114 @@ bool SImage::loadJediFONT(const uint8_t* gfx_data, int size) {
 	announce("image_changed");
 	return true;
 }
+
+/* SImage::loadJaguarSprite
+ * Loads a Jaguar Doom sprite. This needs manual handling because
+ * the data is split in two separate lumps, one with the header and
+ * the other with raw pixel data. So we need to have access to both.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadJaguarSprite(const uint8_t* header, int hdr_size, const uint8_t* gfx_data, int size) {
+	if (header == NULL || gfx_data == NULL || hdr_size < 16 || size == 0) {
+		Global::error = "Invalid Jaguar sprite";
+		return false;
+	}
+
+	// Setup variables
+	int16_t ofsx, ofsy;
+	width	 = READ_B16(header, 0);
+	height	 = READ_B16(header, 2);
+	ofsx	 = READ_B16(header, 4);
+	ofsy	 = READ_B16(header, 6);
+	offset_x = ofsx; offset_y = ofsy;
+	has_palette = false;
+	type = PALMASK;
+	format = NULL;
+	numimages = 1;
+	imgindex = 0;
+
+	// reset data
+	clearData();
+	data = new uint8_t[width*height];
+	memset(data, 0x00, width*height);
+	mask = new uint8_t[width*height];
+	memset(mask, 0x00, width*height);
+
+	// Read column offsets
+	if (hdr_size < (8 + (width * 6))) {
+		Global::error = S_FMT("Invalid Jaguar sprite: header too small (%d) for column offsets (%d)", hdr_size, (8 + (width * 6)));
+		return false;
+	}
+	uint16_t * col_offsets = new uint16_t[width];
+	for (int w = 0; w < width; ++w) {
+		col_offsets[w] = READ_B16(header, 8+2*w);
+	}
+	if (hdr_size < (4 + col_offsets[width - 1])) {
+		Global::error = S_FMT("Invalid Jaguar sprite: header too small (%d) for post offsets (%d)", hdr_size, 4 + col_offsets[width - 1]);
+		return false;
+	}
+
+	// Okay, so it's finally time to read some pixel data
+	for (int w = 0; w < width; ++w) {
+		int post_p = col_offsets[w];
+		// Process all posts in the column
+		while (READ_B32(header, post_p) != 0xFFFFFFFF) {
+			int top = header[post_p];
+			int len = header[post_p + 1];
+			int pixel_p = READ_B16(header, post_p + 2);
+			if (pixel_p + len > size) {
+				Global::error = S_FMT("Invalid Jaguar sprite: body too small (%d) for pixel data (%d)", size, pixel_p + len);
+				return false;
+			}
+			// Copy pixels
+			for (int p = 0; p < len; ++p) {
+				size_t pos = w + width * (top + p);
+				data[pos] = gfx_data[pixel_p + p];
+				mask[pos] = 0xFF;
+			}
+			post_p +=4;
+		}
+	}
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
+/* SImage::loadJaguarTexture
+ * Loads a Jaguar Doom texture. This needs manual handling because
+ * the dimensions are contained in the TEXTURE1 lump instead.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadJaguarTexture(const uint8_t* gfx_data, int size, int i_width, int i_height) {
+	// Check data
+	if (i_width * i_height == 0 || size < i_width*i_height + 320) {
+		Global::error = S_FMT("Size is %d, expected %d", size, i_width*i_height + 320);
+		return false;
+	}
+
+	// Setup variables
+	offset_x = offset_y = 0;
+	width = i_height;	// Format is column-major
+	height = i_width;	// We'll rotate them afterwards
+	has_palette = false;
+	type = PALMASK;
+	format = NULL;
+	numimages = 1;
+	imgindex = 0;
+
+	// reset data
+	clearData();
+	data = new uint8_t[width*height];
+	memcpy(data, gfx_data, width*height);
+	mask = new uint8_t[width*height];
+	memset(mask, 0xFF, width*height);
+
+	// rotate and mirror image
+	rotate(90);
+	mirror(false);
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}

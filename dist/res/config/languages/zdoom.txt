@@ -41,7 +41,7 @@ z_fontdefs {
 	function_link = "http://zdoom.org/wiki/FONTDEFS";
 
 	keywords = {
-		Template, NOTRANSLATION
+		Template, NOTRANSLATION, SPACEWIDTH
 	}
 
 	constants = {

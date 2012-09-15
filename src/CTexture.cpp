@@ -131,6 +131,9 @@ ArchiveEntry* CTPatch::getPatchEntry(Archive* parent) {
 	// Not found in patches, check in graphics namespace
 	if (!entry) entry = theResourceManager->getPatchEntry(name, "graphics", parent);
 
+	// Not found in patches, check in stand-alone texture namespace
+	if (!entry) entry = theResourceManager->getPatchEntry(name, "textures", parent);
+
 	return entry;
 }
 

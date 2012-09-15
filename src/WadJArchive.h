@@ -22,6 +22,8 @@ public:
 	bool	open(MemChunk& mc);							// Open from MemChunk
 	bool	write(MemChunk& mc, bool update = true);	// Write to MemChunk
 
+	string	detectNamespace(ArchiveEntry* entry);
+
 	static bool isWadJArchive(MemChunk& mc);
 	static bool isWadJArchive(string filename);
 };

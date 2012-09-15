@@ -60,6 +60,16 @@ struct dsnd_header_t {
 	uint32_t samples;
 };
 
+// For Jaguar doom sound conversion
+struct jsnd_header_t {
+	uint32_t samples;
+	uint32_t loopstart;
+	uint32_t loopend;
+	uint32_t flags;
+	uint32_t unity;
+	uint32_t pitch;
+	uint32_t decay;
+};
 
 /*******************************************************************
  * FUNCTIONS
@@ -481,6 +491,73 @@ bool Conversions::wolfSndToWav(MemChunk& in, MemChunk& out) {
 
 	// Ensure data ends on even byte boundary
 	if (numsamples % 2 != 0)
+		out.write('\0', 1);
+
+	return true;
+}
+
+/* Conversions::jagSndToWav
+ * Converts Jaguar Doom sound data [in] to wav format, written to [out]
+ *******************************************************************/
+bool Conversions::jagSndToWav(MemChunk& in, MemChunk& out) {
+	// --- Read Jaguar Doom sound ---
+
+	// Read Jaguar doom sound header
+	jsnd_header_t header;
+	in.seek(0, SEEK_SET);
+	in.read(&header, 28);
+
+	// Correct endianness for the one value we actually use
+	// (The rest of the header is in big endian format too, but we
+	//  don't use these values so we don't need to correct them.)
+	header.samples = wxINT32_SWAP_ON_LE(header.samples);
+
+	// Format checks
+	if (header.samples > (in.getSize() - 28) || header.samples <= 4) {	// Check for sane values
+		Global::error = "Invalid Jaguar Doom Sound";
+		return false;
+	}
+
+	// Read samples
+	uint8_t* samples = new uint8_t[header.samples];
+	in.read(samples, header.samples);
+
+
+	// --- Write WAV ---
+
+	wav_chunk_t whdr, wdhdr;
+	wav_fmtchunk_t fmtchunk;
+
+	// Setup data header
+	char did[4] = { 'd', 'a', 't', 'a' };
+	memcpy(&wdhdr.id, &did, 4);
+	wdhdr.size = header.samples;
+
+	// Setup fmt chunk
+	char fid[4] = { 'f', 'm', 't', ' ' };
+	memcpy(&fmtchunk.header.id, &fid, 4);
+	fmtchunk.header.size = 16;
+	fmtchunk.tag = 1;
+	fmtchunk.channels = 1;
+	fmtchunk.samplerate = 11025;
+	fmtchunk.datarate = 11025;
+	fmtchunk.blocksize = 1;
+	fmtchunk.bps = 8;
+
+	// Setup main header
+	char wid[4] = { 'R', 'I', 'F', 'F' };
+	memcpy(&whdr.id, &wid, 4);
+	whdr.size = wdhdr.size + fmtchunk.header.size + 8;
+
+	// Write chunks
+	out.write(&whdr, 8);
+	out.write("WAVE", 4);
+	out.write(&fmtchunk, sizeof(wav_fmtchunk_t));
+	out.write(&wdhdr, 8);
+	out.write(samples, header.samples);
+
+	// Ensure data ends on even byte boundary
+	if (header.samples % 2 != 0)
 		out.write('\0', 1);
 
 	return true;

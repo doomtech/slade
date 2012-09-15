@@ -192,6 +192,9 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DoomGfxBetaDataFormat();
 	new DoomSneaDataFormat();
 	new DoomArahDataFormat();
+	new DoomJaguarDataFormat();
+	new DoomJagTexDataFormat();
+	new DoomJagSpriteDataFormat();
 	new ShadowCasterSpriteFormat();
 	new ShadowCasterWallFormat();
 	new ShadowCasterGfxFormat();
@@ -252,6 +255,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DoomSoundDataFormat();
 	new WolfSoundDataFormat();
 	new DoomPCSpeakerDataFormat();
+	new JaguarDoomSoundDataFormat();
 	new VocDataFormat();
 	new SPDCDataFormat();
 	new BloodSFXDataFormat();

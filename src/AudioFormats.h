@@ -267,7 +267,34 @@ public:
 			mc.read(&samplerate, 2);
 			mc.read(&samples, 4);
 
-			if (head == 3 && samples == (mc.getSize() - 8) && samples > 4)
+			if (head == 3 && samples <= (mc.getSize() - 8) && samples > 4)
+				return EDF_TRUE;
+		}
+
+		return EDF_FALSE;
+	}
+};
+
+class JaguarDoomSoundDataFormat : public EntryDataFormat {
+public:
+	JaguarDoomSoundDataFormat() : EntryDataFormat("snd_jaguar") {};
+	~JaguarDoomSoundDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 28) {
+			// Check header
+			uint32_t samples = READ_B32(mc, 0);
+			uint32_t loopstr = READ_B32(mc, 4);
+			uint32_t loopend = READ_B32(mc, 8);
+
+			if ((samples == (mc.getSize() - 28) && samples > 4) &&
+				// Normal sounds typically have loopstart = 0, loopend = samples
+				(loopstr < samples && loopend <= samples && loopstr <= loopend)
+				// Percussion instruments have deliberately invalid loop start/loop end values
+				|| (loopstr == 0xFFFFFFFF && (loopend == samples + 1 || loopend == 0)))
+
+
 				return EDF_TRUE;
 		}
 

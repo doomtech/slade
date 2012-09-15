@@ -197,6 +197,8 @@ bool AudioEntryPanel::open() {
 		Conversions::wolfSndToWav(mcdata, convdata);
 	else if (entry->getType()->getFormat() == "snd_voc")		// Creative Voice File -> WAV
 		Conversions::vocToWav(mcdata, convdata);
+	else if (entry->getType()->getFormat() == "snd_jaguar")		// Jaguar Doom Sound -> WAV
+		Conversions::jagSndToWav(mcdata, convdata);
 	else if (entry->getType()->getFormat() == "snd_bloodsfx")	// Blood Sound -> WAV
 		Conversions::bloodToWav(entry, convdata);
 	else if (entry->getType()->getFormat() == "mus") {			// MUS -> MIDI

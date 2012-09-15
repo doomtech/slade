@@ -69,10 +69,7 @@ GLTexture* MapTextureManager::getTexture(string name, bool mixed) {
 	if (etex) {
 		SImage image;
 		// Get image format hint from type, if any
-		string format_hint = "";
-		if (etex->getType()->extraProps().propertyExists("image_format"))
-			format_hint = etex->getType()->extraProps()["image_format"].getStringValue();
-		if (image.open(etex->getMCData(), 0, format_hint)) {
+		if (Misc::loadImageFromEntry(&image, etex)) {
 			mtex.texture = new GLTexture(false);
 			mtex.texture->setFilter(filter);
 			mtex.texture->loadImage(&image, pal);

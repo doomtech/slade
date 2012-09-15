@@ -34,6 +34,7 @@ namespace Misc {
 	hsl_t		rgbToHsl(rgba_t rgba);
 	rgba_t		hslToRgb(hsl_t hsl);
 	lab_t		rgbToLab(rgba_t);
+	point2_t	findJaguarTextureDimensions(ArchiveEntry* entry, string name);
 
 	// Mass Rename
 	string	massRenameFilter(wxArrayString& names);

@@ -59,18 +59,20 @@ bool JaguarDecode(MemChunk& mc)
 	uint8_t *source;
 
 	// Get data
+	size_t isize = mc.getSize();
 	const uint8_t *istart = mc.getData();
 	const uint8_t *input = istart;
-	size_t isize = mc.getSize();
+	const uint8_t *iend = input + isize;
 	
 	// It seems that encoded lumps are given their actual uncompressed size in the directory.
 	uint8_t *ostart = new uint8_t[isize + 1];
 	uint8_t *output = ostart;
+	uint8_t *oend = output + isize + 1;
 	uint8_t idbyte = 0;
 
 	size_t length = 0;
 
-	while (1)//((unsigned)(input - istart) < isize)&&((unsigned)(output - ostart) < 64000))
+	while ((input < iend) && (output < oend))
 	{
 		/* get a new idbyte if necessary */
 		if (!getidbyte) idbyte = *input++;
@@ -88,6 +90,9 @@ bool JaguarDecode(MemChunk& mc)
 				break;
 			}
 			length += len;
+			if (output + len > oend)
+				break;
+
 			for (i=0 ; i<len ; i++)
 				*output++ = *source++;
 		} else {
@@ -98,8 +103,7 @@ bool JaguarDecode(MemChunk& mc)
 	}
 	// Finalize stuff
 	size_t osize = output - ostart;
-	wxLogMessage("Input size = %d, used input = %d, computed length = %d, output size = %d",
-		isize, input - istart, length, osize);
+	//wxLogMessage("Input size = %d, used input = %d, computed length = %d, output size = %d", isize, input - istart, length, osize);
 	mc.importMem(ostart, osize);
 	delete[] ostart;
 	return okay;
@@ -193,18 +197,20 @@ bool WadJArchive::open(MemChunk& mc) {
 		if (jaguarencrypt) {
 			if (d < num_lumps - 1) {
 				size_t pos = mc.currentPos();
-				uint32_t nextoffset;
-				mc.read(&nextoffset, 4);
+				uint32_t nextoffset = 0;
+				for (int i = 0; i + d < num_lumps; ++i) {
+					mc.read(&nextoffset, 4);
+					if (nextoffset != 0) break;
+					mc.seek(12, SEEK_CUR);
+				}
+				nextoffset = wxINT32_SWAP_ON_LE(nextoffset);
+				if (nextoffset == 0) nextoffset = dir_offset;
 				mc.seek(pos, SEEK_SET);
-				actualsize = wxINT32_SWAP_ON_LE(nextoffset) - offset;
+				actualsize = nextoffset - offset;
 			} else {
 				// We're kinda assuming here that the directory
 				// comes after the entries, which is not guaranteed.
 				actualsize = dir_offset - offset;
-			}
-			if (actualsize > size) {
-				wxLogMessage("Not sure what's wrong about entry %i (%s) here", d, name);
-				actualsize = size;
 			}
 		}
 
@@ -230,7 +236,6 @@ bool WadJArchive::open(MemChunk& mc) {
 
 	// Detect all entry types
 	MemChunk edata;
-	string previousname = "start of file";
 	theSplashWindow->setProgressMessage("Detecting entry types");
 	for (size_t a = 0; a < numEntries(); a++) {
 		// Update splash window progress
@@ -248,11 +253,11 @@ bool WadJArchive::open(MemChunk& mc) {
 				if (entry->exProps().propertyExists("FullSize")
 					&& (unsigned)(int)(entry->exProp("FullSize")) >  entry->getSize())
 					edata.reSize((int)(entry->exProp("FullSize")), true);
-				if (!JaguarDecode(edata)) wxLogMessage("%s is screwed up", CHR(entry->getName()));
+				if (!JaguarDecode(edata)) 
+					wxLogMessage("%i: %s (following %s), did not decode properly", a, CHR(entry->getName()), a>0?CHR(getEntry(a-1)->getName()):"nothing");
 			}
 			entry->importMemChunk(edata);
 		}
-		previousname = entry->getName();
 
 		// Detect entry type
 		EntryType::detectEntryType(entry);
@@ -341,6 +346,17 @@ bool WadJArchive::write(MemChunk& mc, bool update) {
 	}
 
 	return true;
+}
+
+/* WadJArchive::detectNamespace
+ * Hack to account for Jaguar Doom's silly sprite scheme
+ *******************************************************************/
+string WadJArchive::detectNamespace(ArchiveEntry* entry) {
+	ArchiveEntry* nextentry = getEntry(entryIndex(entry) + 1);
+	if (nextentry && S_CMPNOCASE(nextentry->getName(), "."))
+		return "sprites";
+	return WadArchive::detectNamespace(entry);
+
 }
 
 /* WadJArchive::isWadJArchive

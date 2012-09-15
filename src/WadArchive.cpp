@@ -68,13 +68,13 @@ ns_special_t special_namespaces[] = {
 	{ "sprites",	"s"		},
 	{ "flats",		"f"		},
 	{ "textures",	"tx"	},
-	{ "textures",	"t"		},	// alias for Doom 64
+	{ "textures",	"t"		},	// alias for Jaguar Doom & Doom 64
 	{ "hires",		"hi"	},
 	{ "colormaps",	"c"		},
 	{ "acs",		"a"		},
 	{ "voices",		"v"		},
 	{ "voxels",		"vx"	},
-	{ "music",		"ds"	}, // Doom 64 puts music and sound effects here
+	{ "sounds",		"ds"	}, // Jaguar Doom and Doom 64 use it
 };
 const int n_special_namespaces = 11;
 

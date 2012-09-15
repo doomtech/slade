@@ -12,6 +12,7 @@ enum TextureXFormat {
     TXF_STRIFE11,
     TXF_NAMELESS,
 	TXF_TEXTURES,
+	TXF_JAGUAR,
 };
 
 // Texture flags

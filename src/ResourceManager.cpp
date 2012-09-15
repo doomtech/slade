@@ -503,6 +503,10 @@ ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archiv
 	if (!nspace.CmpNoCase("flats"))
 		return getFlatEntry(patch, priority);
 
+	// Are we wanting to use a stand-alone texture as a patch?
+	if (!nspace.CmpNoCase("textures"))
+		return getTextureEntry(patch, "textures", priority);
+
 	// Check resource with matching name exists
 	EntryResource& res = patches[patch.Upper()];
 	if (res.entries.size() == 0)

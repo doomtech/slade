@@ -1501,6 +1501,9 @@ bool ArchivePanel::dSndWavConvert() {
 		// Convert Doom Sound -> WAV if the entry is Doom Sound format
 		if (selection[a]->getType()->getFormat() == "snd_doom")
 			worked = Conversions::doomSndToWav(selection[a]->getMCData(), wav);
+		// Or Jaguar Doom sound format
+		else if (selection[a]->getType()->getFormat() == "snd_jaguar")
+			worked = Conversions::jagSndToWav(selection[a]->getMCData(), wav);
 		// Or Wolfenstein 3D sound format
 		else if (selection[a]->getType()->getFormat() == "snd_wolf")
 			worked = Conversions::wolfSndToWav(selection[a]->getMCData(), wav);
@@ -2207,6 +2210,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		if (!dsnd_selected) {
 			if (selection[a]->getType()->getFormat() == "snd_doom" ||
 				selection[a]->getType()->getFormat() == "snd_wolf" ||
+				selection[a]->getType()->getFormat() == "snd_jaguar" ||
 				selection[a]->getType()->getFormat() == "snd_bloodsfx" ||
 				selection[a]->getType()->getFormat() == "snd_voc")
 				dsnd_selected = true;

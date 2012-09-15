@@ -94,6 +94,21 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadJediFNT(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "font_jedi_font"))
 		return image->loadJediFONT(entry->getData(), entry->getSize());
+	// Jaguar Doom sprite and texture formats are a bit complicated, so
+	// they need manual loading as well rather than the SIFormat system
+	else if (S_CMPNOCASE(format, "img_jaguar_sprite")) {
+		Archive * parent = entry->getParent(); if (parent == NULL) return false;
+		ArchiveEntry * data = parent->getEntry(parent->entryIndex(entry) + 1);
+		if (data && S_CMPNOCASE(data->getName(), "."))
+			return image->loadJaguarSprite(entry->getData(), entry->getSize(), data->getData(), data->getSize());
+		else return false;
+	}
+	else if (S_CMPNOCASE(format, "img_jaguar_texture")) {
+		Archive * parent = entry->getParent(); if (parent == NULL) return false;
+		ArchiveEntry * texture1 = parent->getEntry("TEXTURE1"); if (texture1 == NULL) return false;
+		point2_t dimensions = findJaguarTextureDimensions(texture1, entry->getName(true));
+		return image->loadJaguarTexture(entry->getData(), entry->getSize(), dimensions.x, dimensions.y);
+	}
 
 	// Firstly try SIFormat system
 	if (image->open(entry->getMCData(), index, format_hint))
@@ -576,3 +591,44 @@ uint32_t Misc::crc(const uint8_t *buf, uint32_t len) {
 }
 
 
+/* Misc::findJaguarTextureDimensions
+ * Find the given name in a texture lump and returns a point2_t
+ * which contains the dimensions. In case the texture is not found,
+ * the dimensions returned are null.
+ *******************************************************************/
+point2_t Misc::findJaguarTextureDimensions(ArchiveEntry* entry, string name) {
+	point2_t dimensions;
+	dimensions.x = 0;
+	dimensions.y = 0;
+
+	// Theoretical minimum size for a Jaguar TEXTURE1 lump
+	if (entry->getSize() < 40)
+		return dimensions;
+
+	const uint8_t* data = entry->getData();
+	size_t numtex = READ_L32(data, 0);
+
+	// 4 bytes for the offset, plus 32 byte for the texture definition itself 
+	// so a total of 36 bytes per texture; plus four for the texture count
+	if (entry->getSize() < 36 * numtex + 4)
+		return dimensions;
+
+	// Check that the offset to the first texture comes right after the offset block
+	int offset = READ_L32(data, 4);
+	if (offset != 4 * numtex + 4)
+		return dimensions;
+
+	char texture[9]; texture[8] = 0;
+
+	for (size_t t = 0; t < numtex; ++t, offset+=32) {
+		memcpy(texture, data+offset, 8);
+		if (S_CMPNOCASE(name, texture)) {
+			// We have our texture! Let's get the width and heigth and get out of here
+			dimensions.x = READ_L16(data, offset + 12);
+			dimensions.y = READ_L16(data, offset + 14);
+			return dimensions;
+		}
+	}
+	// We didn't find the texture
+	return dimensions;
+}

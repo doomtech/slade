@@ -255,6 +255,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 
 	// If any TEXTURE1/2 entries were found, setup patch table stuff
 	if (tx_entries.size() > 0) {
+		// Todo: Jaguar textures don't use PNAMES, so skip following checks if all texture entries are in Jaguar mode
 		// TODO: Probably a better idea here to get the user to select an archive to import the patch table from
 		// If no PNAMES entry was found, search resource archives
 		if (!entry_pnames) {
@@ -659,6 +660,8 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 	// If both exist, we're done
 	if (entry_tx && entry_pnames)
 		return true;
+
+	// Todo: accept entry_tx without pnames if the textures are in Jaguar mode
 
 	// If no TEXTUREx entry exists
 	if (!entry_tx) {

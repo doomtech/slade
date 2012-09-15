@@ -127,6 +127,40 @@ entry_types
 		image_format = "doom_alpha";
 	}
 
+	gfx_doom_jaguar : gfx_base
+	{
+		name = "Graphic (Jaguar)";
+		format = img_doom_jaguar;
+		editor = gfx;
+		extra = image;
+		export_ext = "lmp";
+		image_format = "doom_jaguar";
+		reliability = 65;
+	}
+
+	img_jaguar_texture : gfx_base
+	{
+		name = "Graphic (Jaguar Tx)";
+		format = img_jaguar_texture;
+		editor = gfx;
+		extra = image;
+		export_ext = "raw";
+		//image_format = "doom_jagtex";
+		reliability = 75;
+	}
+
+	img_jaguar_sprite : gfx_base
+	{
+		name = "Graphic (Jaguar Sp)";
+		format = img_jaguar_sprite;
+		editor = gfx;
+		extra = image, patch;
+		export_ext = "hdr";
+		//image_format = "doom_jagsprite";
+		reliability = 70;
+		section = "sprites";
+	}
+
 	gfx_4bitchunk : gfx_base
 	{
 		name = "Graphic (4-bit)";

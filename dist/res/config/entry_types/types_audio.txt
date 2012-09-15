@@ -112,6 +112,15 @@ entry_types
 		editor = audio;
 	}
 	
+	snd_jaguar : sound
+	{
+		name = "Sound (Jaguar Format)";
+		format = snd_jaguar;
+		reliability = 100;
+		export_ext = "lmp";
+		editor = audio;
+	}
+	
 	imf : sound
 	{
 		name = "IMF OPL File";

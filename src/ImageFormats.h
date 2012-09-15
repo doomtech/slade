@@ -450,6 +450,93 @@ public:
 	}
 };
 
+class DoomJaguarDataFormat : public EntryDataFormat {
+public:
+	DoomJaguarDataFormat() : EntryDataFormat("img_doom_jaguar") {};
+	~DoomJaguarDataFormat() {}
+
+	/* This format is used in the Jaguar Doom IWAD.
+	 */
+	int isThisFormat(MemChunk& mc) {
+		if (mc.getSize() < sizeof(jagpic_header_t))
+			return EDF_FALSE;
+
+		const uint8_t* data = mc.getData();
+		const jagpic_header_t *header = (const jagpic_header_t *)data;
+		int width, height, depth, size;
+		width = wxINT16_SWAP_ON_LE(header->width);
+		height = wxINT16_SWAP_ON_LE(header->height);
+		depth = wxINT16_SWAP_ON_LE(header->depth);
+
+		// Check header values are 'sane'
+		if (!(height > 0 && height < 4096 && width > 0 && width < 4096 && (depth == 2 || depth == 3)))
+			return EDF_FALSE;
+
+		// Check the size matches
+		size = width * height;
+		if (depth == 2) size >>= 1;
+		if (mc.getSize() < (sizeof(jagpic_header_t) + size))
+			return EDF_FALSE;
+
+		return EDF_TRUE;
+	}
+};
+
+class DoomJagTexDataFormat : public EntryDataFormat {
+public:
+	DoomJagTexDataFormat() : EntryDataFormat("img_jaguar_texture") {};
+	~DoomJagTexDataFormat() {}
+
+	/* This format is used in the Jaguar Doom IWAD. It can be recognized by the fact the last 320 bytes are a copy of the first.
+	 */
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 640 || size % 32)
+			return EDF_FALSE;
+
+		// Verify duplication of content
+		const uint8_t* data = mc.getData();
+		size_t dupe = size - 320;
+		for (size_t p = 0; p < 320; ++p) {
+			if (data[p] != data[dupe + p])
+				return EDF_FALSE;
+		}
+		return EDF_TRUE;
+	}
+};
+
+class DoomJagSpriteDataFormat : public EntryDataFormat {
+public:
+	DoomJagSpriteDataFormat() : EntryDataFormat("img_jaguar_sprite") {};
+	~DoomJagSpriteDataFormat() {}
+
+	/* This format is used in the Jaguar Doom IWAD. It is an annoying format.
+	 */
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 16)
+			return EDF_FALSE;
+
+		// Validate content
+		size_t width = READ_B16(mc, 0);
+		size_t height= READ_B16(mc, 2);
+		int offset_x = READ_B16(mc, 4);
+		int offset_y = READ_B16(mc, 6);
+
+		// Read column offsets
+		if (size < (8 + (width * 6)))
+			return EDF_FALSE;
+		uint16_t * col_offsets = new uint16_t[width];
+		for (size_t w = 0; w < width; ++w)
+			col_offsets[w] = READ_B16(mc, 8+2*w);
+		if (size < unsigned(4 + col_offsets[width - 1]))
+			return EDF_FALSE;
+
+		// We can't test validity of pixel data here
+		return EDF_TRUE;
+	}
+};
+
 class IMGZDataFormat : public EntryDataFormat {
 public:
 	IMGZDataFormat() : EntryDataFormat("img_imgz") {};

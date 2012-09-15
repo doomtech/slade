@@ -574,3 +574,78 @@ public:
 		return info;
 	}
 };
+
+
+class SIFDoomJaguar : public SIFormat {
+protected:
+	bool readImage(SImage& image, MemChunk& data, int index) {
+		// Setup variables
+		jagpic_header_t header;
+		data.read(&header, 16, 0);
+		int width = wxINT16_SWAP_ON_LE(header.width);
+		int height = wxINT16_SWAP_ON_LE(header.height);
+		int depth = wxINT16_SWAP_ON_LE(header.depth);
+		int shift = wxINT16_SWAP_ON_LE(header.palshift);
+
+		// Create image
+		image.create(width, height, PALMASK);
+		uint8_t* img_data = imageData(image);
+		uint8_t* img_mask = imageMask(image);
+
+		// Create mask (all opaque)
+		image.fillAlpha(255);
+
+		// Read raw pixel data
+		if (depth == 3) {
+			data.read(img_data, width*height);
+		} else if (depth == 2) {
+			if (shift == 0) shift = 40;
+			for (int p = 0; p < width*height/2; ++p) {
+				img_data[p*2] = ((data[16+p] & 0xF0)>>4) + (shift<<1);
+				img_data[p*2+1] = (data[16+p] & 0x0F)    + (shift<<1);
+			}
+		} else return false;
+
+		// Mark palette index 0 as transparent
+		for (int p = 0; p < width*height; ++p) {
+			if (img_data[p] == 0)
+				img_mask[p] = 0;
+		}
+
+		return true;
+	}
+
+public:
+	SIFDoomJaguar() : SIFormat("doom_jaguar") {
+		name = "Doom Jaguar";
+		extension = "lmp";
+		reliability = 85;
+	}
+	~SIFDoomJaguar() {}
+
+	bool isThisFormat(MemChunk& mc) {
+		if (EntryDataFormat::getFormat("img_doom_jaguar")->isThisFormat(mc))
+			return true;
+		else
+			return false;
+	}
+
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
+
+		// Read header
+		jagpic_header_t header;
+		mc.read(&header, 16, 0);
+
+		// Set info
+		info.width = wxINT16_SWAP_ON_LE(header.width);
+		info.height = wxINT16_SWAP_ON_LE(header.height);
+		info.offset_x = 0;
+		info.offset_y = 0;
+		info.colformat = PALMASK;
+		info.format = id;
+
+		return info;
+	}
+};
+

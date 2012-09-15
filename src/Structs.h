@@ -648,6 +648,15 @@ struct oldpatch_header_t {
 	int8_t top;
 };
 
+// jagpic_header_t: The header of a Jaguar Doom-format gfx image
+struct jagpic_header_t {
+	short	width;
+	short	height;
+	short	depth;
+	short	palshift;
+	char	padding[8];
+};
+
 // rottpatch_header_t: The header of a rott-format gfx image
 struct rottpatch_header_t {
 	short	origsize;

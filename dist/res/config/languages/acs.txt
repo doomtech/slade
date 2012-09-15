@@ -8,7 +8,7 @@ acs : cstyle {
 	blocks = "Script";
 
 	keywords = {
-		open, restart, script, special, str, suspend, terminate, world
+		open, restart, script, special, str, suspend, terminate, world, 
 	}
 
 	constants = {
@@ -54,7 +54,6 @@ acs : cstyle {
 		ACS_LockedExecute = "script, map, arg1, arg2, lock";
 		ACS_Suspend = "script, map";
 		ACS_Terminate = "script, map";
-		AmbientSound = "name, volume";
 		Ceiling_CrushAndRaise = "tag, speed, crush";
 		Ceiling_CrushRaiseAndStay = "tag, speed, crush";
 		Ceiling_CrushStop = "tag";
@@ -160,7 +159,11 @@ acs_z : acs {
 
 	keywords = {
 		function, enter, respawn, death, lightning, unloading, disconnect,
-		fixed, global
+		fixed, global, net, import, libdefine, library, nocompact, nowadauthor,
+		EncryptStrings, static, wadauthor,
+		
+		// Skulltag script types
+		BlueReturn, RedReturn, WhiteReturn, Pickup, ClientSide
 	}
 
 	constants = {
@@ -212,7 +215,9 @@ acs_z : acs {
 		CR_PURPLE, CR_DARKGRAY, CR_DARKGREY, CR_CYAN, 
 
 		HUDMSG_PLAIN, HUDMSG_FADEOUT, HUDMSG_TYPEON, HUDMSG_FADEINOUT, HUDMSG_LOG, 
-		HUDMSG_COLORSTRING, 
+		HUDMSG_COLORSTRING, HUDMSG_ADDBLEND, HUDMSG_LAYER_OVERHUD, 
+		HUDMSG_LAYER_OVERMAP, HUDMSG_LAYER_UNDERHUD, HUDMSG_LOG, HUDMSG_LOG,
+		HUDMSG_NOTWITH3DVIEW, HUDMSG_NOTWITHFULLMAP, HUDMSG_NOTWITHOVERLAYMAP,
 
 		MARINEWEAPON_Dummy, MARINEWEAPON_Fist, MARINEWEAPON_BerserkFist, 
 		MARINEWEAPON_Chainsaw, MARINEWEAPON_Pistol, MARINEWEAPON_Shotgun, 
@@ -568,14 +573,15 @@ acs_z : acs {
 
 
 		// Native ACS functions
-		ACS_ExecuteWait = "(int script, int unused, int arg1, int arg2, int arg3";
-		ACS_NamedExecute = "int script, [int mapnum], [int s_arg1], [int s_arg2], [int s_arg3]";
-		ACS_NamedExecuteAlways = "int script, [int mapnum], [int arg1], [int arg2], [int arg3]";
-		ACS_NamedExecuteWithResult = "int script, [int s_arg1], [int s_arg2], [int s_arg3]";
-		ACS_NamedLockedExecute = "int script, [int mapnum], [int arg1], [int arg2], [int lock]";
-		ACS_NamedLockedExecuteDoor = "int script, [int mapnum], [int arg1], [int arg2], [int lock]";
-		ACS_NamedSuspend = "int script, [int mapnum]";
-		ACS_NamedTerminate = "int script, [int mapnum]";
+		ACS_ExecuteWait = "int script, int unused, int arg1, int arg2, int arg3";
+		ACS_NamedExecute = "str script, [int mapnum], [int s_arg1], [int s_arg2], [int s_arg3]";
+		ACS_NamedExecuteAlways = "str script, [int mapnum], [int arg1], [int arg2], [int arg3]";
+		ACS_NamedExecuteWait = "str script, int unused, int arg1, int arg2, int arg3";
+		ACS_NamedExecuteWithResult = "str script, [int s_arg1], [int s_arg2], [int s_arg3]";
+		ACS_NamedLockedExecute = "str script, [int mapnum], [int arg1], [int arg2], [int lock]";
+		ACS_NamedLockedExecuteDoor = "str script, [int mapnum], [int arg1], [int arg2], [int lock]";
+		ACS_NamedSuspend = "str script, [int mapnum]";
+		ACS_NamedTerminate = "str script, [int mapnum]";
 		ActivatorSound = "str sound, int volume";
 		ActivatorTID;
 		AmbientSound = "str sound, int volume";
@@ -641,14 +647,15 @@ acs_z : acs {
 		GetSectorUDMFInt = "int tag, string key";
 		GetSideUDMFFixed = "int lineid, bool back, string key";
 		GetSideUDMFInt = "int lineid, bool back, string key";
+		GetSigilPieces;
 		GetThingUDMFFixed = "int tid, string key";
 		GetThingUDMFInt = "int tid, string key";
 		GetUserArray = "int tid, str name, int pos";
 		GetUserVariable = "int tid, str name";
 		GiveActorInventory = "int tid, str inventory_item, int amount";
 		GiveInventory = "str inventory_item, int amount";
-		HudMessage = "text; int type, int id, int color, fixed x, fixed y, fixed holdTime", "text; HUDMSG_FADEOUT, int id, int color, fixed x, fixed y, fixed holdTime, fixed fadetime", "text; HUDMSG_TYPEON, int id, int color, fixed x, fixed y, fixed holdTime, fixed typetime, fixed fadetime", "text; HUDMSG_FADEINOUT, int id, int color, fixed x, fixed y, fixed holdTime, fixed inTime, fixed outTime";
-		HudMessageBold = "text; int type, int id, int color, fixed x, fixed y, fixed holdTime", "text; HUDMSG_FADEOUT, int id, int color, fixed x, fixed y, fixed holdTime, fixed fadetime", "text; HUDMSG_TYPEON, int id, int color, fixed x, fixed y, fixed holdTime, fixed typetime, fixed fadetime", "text; HUDMSG_FADEINOUT, int id, int color, fixed x, fixed y, fixed holdTime, fixed inTime, fixed outTime";
+		HudMessage = "text; int type, int id, int color, fixed x, fixed y, fixed holdTime, alpha", "text; HUDMSG_FADEOUT, int id, int color, fixed x, fixed y, fixed holdTime, fixed fadetime, alpha", "text; HUDMSG_TYPEON, int id, int color, fixed x, fixed y, fixed holdTime, fixed typetime, fixed fadetime, alpha", "text; HUDMSG_FADEINOUT, int id, int color, fixed x, fixed y, fixed holdTime, fixed inTime, fixed outTime, alpha";
+		HudMessageBold = "text; int type, int id, int color, fixed x, fixed y, fixed holdTime, alpha", "text; HUDMSG_FADEOUT, int id, int color, fixed x, fixed y, fixed holdTime, fixed fadetime, alpha", "text; HUDMSG_TYPEON, int id, int color, fixed x, fixed y, fixed holdTime, fixed typetime, fixed fadetime, alpha", "text; HUDMSG_FADEINOUT, int id, int color, fixed x, fixed y, fixed holdTime, fixed inTime, fixed outTime, alpha";
 		LineSide;
 		LocalAmbientSound = "str sound, int volume";
 		LocalSetMusic = "str song, [int order]";
@@ -660,6 +667,7 @@ acs_z : acs {
 		PlayerInGame = "int playernumber";
 		PlayerIsBot = "int playernumber";
 		PlayerNumber;
+		PlayMovie = "str moviename - but this function does not work anyway";
 		PolyWait = "int polynum";
 		Print = "type:expression";
 		PrintBold = "type:expression";
@@ -685,7 +693,7 @@ acs_z : acs {
 		SetFloorTrigger = "int tag, int height, int special [, int arg1 [, int arg2 [, int arg3 [, int arg4 [, int arg5]]]]]";
 		SetFont = "str fontlump";
 		SetGravity = "fixed amount";
-		SetHudSize
+		SetHudSize = "int width, int height, bool statusbar";
 		SetLineBlocking = "int lineid, int setting";
 		SetLineMonsterBlocking = "int lineid, int setting";
 		SetLineSpecial = "int lineid, int special [, int arg0 [, int arg1 [, int arg2 [, int arg3 [, int arg4]]]]]";
@@ -731,5 +739,20 @@ acs_z : acs {
 		UseActorInventory = "int TID, str classname";
 		UseInventory = "str classname";
 		VectorAngle = "int x, int y";
+		
+		// Skulltag functions
+		BlueCount;
+		BlueScore;
+		ConsoleCommand = "str command";
+		GetInvasionState;
+		GetInvasionWave;
+		IsOneFlagCTF;
+		Music_Change = "str music, int pattern";
+		PlayerArmorPoints;
+		PlayerHealth;
+		PlayerTeam;
+		RedCount;
+		RedScore;
+		SinglePlayer;
 	}
 }
