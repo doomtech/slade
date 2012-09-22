@@ -107,8 +107,14 @@ string ArchiveEntry::getName(bool cut_ext) {
 	if (!cut_ext)
 		return name;
 
-	wxFileName fn(name);
-	return fn.GetName();
+	// Sanitize name if it contains the \ character (possible in WAD).
+	string saname = Misc::lumpNameToFileName(name);
+
+	// cut extension through wx function
+	wxFileName fn(saname);
+
+	// Perform reverse operation and return
+	return Misc::fileNameToLumpName(fn.GetName());
 }
 
 /* ArchiveEntry::getParent

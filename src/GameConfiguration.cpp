@@ -1422,9 +1422,9 @@ bool GameConfiguration::openConfig(string game, string port) {
 		}
 	}
 
-	wxFile test("full.cfg", wxFile::write);
+	/*wxFile test("full.cfg", wxFile::write);
 	test.Write(full_config);
-	test.Close();
+	test.Close();*/
 
 	// Read fully built configuration
 	bool ok = true;

@@ -318,7 +318,7 @@ string Misc::fileNameToLumpName(string file) {
 		return lump;
 	} else {
 		// ZDoom
-		if (file.Len() > 5 && file[4] == '^') file[4] = '\\';
+		file.Replace("^", "\\");
 	}
 	return file;
 }
