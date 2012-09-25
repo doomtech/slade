@@ -353,6 +353,7 @@ void MainApp::initActions() {
 	new SAction("main_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences", "", NORMAL, wxID_PREFERENCES);
 	new SAction("main_showam", "&Archive Manager", "e_archive", "Toggle the Archive Manager window", "Ctrl+1");
 	new SAction("main_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
+	new SAction("main_showundohistory", "&Undo History", "t_undo", "Toggle the Undo History window", "Ctrl+3");
 	new SAction("main_onlinedocs", "Online &Documentation", "t_wiki", "View SLADE documentation online");
 	new SAction("main_about", "&About", "i_logo", "Informaton about SLADE", "", 0, wxID_ABOUT);
 
@@ -504,6 +505,8 @@ void MainApp::initActions() {
 	new SAction("mapw_save", "&Save Map Changes", "t_save", "Save any changes to the current map", "Ctrl+S");
 	new SAction("mapw_saveas", "Save Map &As", "t_saveas", "Save the map to a new wad archive", "Ctrl+Shift+S");
 	new SAction("mapw_rename", "&Rename Map", "t_rename", "Rename the current map");
+	new SAction("mapw_undo", "Undo", "t_undo", "Undo", "Ctrl+Z");
+	new SAction("mapw_redo", "Redo", "t_redo", "Redo", "Ctrl+Y");
 	new SAction("mapw_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
 	new SAction("mapw_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences");
 	int group_mode = SAction::newGroup();

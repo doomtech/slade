@@ -527,10 +527,10 @@ void ArchiveManagerPanel::openTab(Archive* archive) {
 		else if (archive->getType() == ARCHIVE_ZIP)
 			icon = "e_zip";
 
+		wp->SetName("archive");
 		notebook_archives->AddPage(wp, archive->getFilename(false), false);
 		notebook_archives->SetSelection(notebook_archives->GetPageCount() - 1);
 		notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon(icon));
-		wp->SetName("archive");
 		wp->addMenus();
 		wp->Show(true);
 		wp->SetFocus();
@@ -1202,7 +1202,7 @@ void ArchiveManagerPanel::openSelection() {
 		theArchiveManager->openArchive(selected_archives[a]);
 }
 
-/* ArchiveManagerPanel::openSelection
+/* ArchiveManagerPanel::removeSelection
  * Remove the currently selected archive(s) from the recent file list
  *******************************************************************/
 void ArchiveManagerPanel::removeSelection() {

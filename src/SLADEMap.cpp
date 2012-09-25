@@ -40,13 +40,6 @@
 
 SLADEMap::SLADEMap() {
 	// Init variables
-	/*
-	this->i_lines = false;
-	this->i_sides = false;
-	this->i_sectors = false;
-	this->i_vertices = false;
-	this->i_things = false;
-	*/
 	this->geometry_updated = 0;
 	this->position_frac = false;
 }
@@ -2034,8 +2027,8 @@ bool SLADEMap::removeSide(unsigned index) {
 		l->side2 = NULL;
 
 	// Set appropriate line flags
-	theGameConfiguration->setLineBasicFlag("blocking", l, true);
-	theGameConfiguration->setLineBasicFlag("twosided", l, false);
+	theGameConfiguration->setLineBasicFlag("blocking", l, current_format, true);
+	theGameConfiguration->setLineBasicFlag("twosided", l, current_format, false);
 
 	// Remove the side
 	delete sides[index];
@@ -2606,6 +2599,43 @@ string SLADEMap::getAdjacentLineTexture(MapVertex* vertex, int tex_part) {
 	return tex;
 }
 
+MapSector* SLADEMap::getLineSideSector(MapLine* line, bool front) {
+	// Get mid and direction points
+	fpoint2_t mid = line->midPoint();
+	fpoint2_t dir = line->frontVector();
+	if (front)
+		dir = mid - dir;
+	else
+		dir = mid + dir;
+
+	// Find closest line intersecting front/back vector
+	double dist;
+	double min_dist = 99999999;
+	int index = -1;
+	for (unsigned a = 0; a < lines.size(); a++) {
+		if (lines[a] == line)
+			continue;
+
+		dist = MathStuff::distanceRayLine(mid, dir, lines[a]->x1(), lines[a]->y1(), lines[a]->x2(), lines[a]->y2());
+		if (dist < min_dist && dist > 0) {
+			min_dist = dist;
+			index = a;
+		}
+	}
+
+	// If any intersection found, check what side of the intersected line this is on
+	// and return the appropriate sector
+	if (index >= 0) {
+		MapLine* l = lines[index];
+		if (MathStuff::lineSide(mid.x, mid.y, l->x1(), l->y1(), l->x2(), l->y2()) >= 0)
+			return l->frontSector();
+		else
+			return l->backSector();
+	}
+
+	return NULL;
+}
+
 MapVertex* SLADEMap::createVertex(double x, double y, double split_dist) {
 	// Round position to integral if fractional positions are disabled
 	if (!position_frac) {
@@ -2948,8 +2978,8 @@ bool SLADEMap::setLineSector(unsigned line, unsigned sector, bool front) {
 
 		// Set appropriate line flags
 		bool twosided = (lines[line]->side1 && lines[line]->side2);
-		theGameConfiguration->setLineBasicFlag("blocking", lines[line], !twosided);
-		theGameConfiguration->setLineBasicFlag("twosided", lines[line], twosided);
+		theGameConfiguration->setLineBasicFlag("blocking", lines[line], current_format, !twosided);
+		theGameConfiguration->setLineBasicFlag("twosided", lines[line], current_format, twosided);
 
 		return true;
 	}
@@ -2958,6 +2988,24 @@ bool SLADEMap::setLineSector(unsigned line, unsigned sector, bool front) {
 		side->setSector(sectors[sector]);
 
 		return false;
+	}
+}
+
+void SLADEMap::splitLinesByLine(MapLine* split_line) {
+	double ix, iy;
+	double x1 = split_line->x1();
+	double y1 = split_line->y1();
+	double x2 = split_line->x2();
+	double y2 = split_line->y2();
+
+	for (unsigned a = 0; a < lines.size(); a++) {
+		if (lines[a] == split_line)
+			continue;
+
+		if (MathStuff::linesIntersect(x1, y1, x2, y2, lines[a]->x1(), lines[a]->y1(), lines[a]->x2(), lines[a]->y2(), ix, iy)) {
+			MapVertex* v = createVertex(ix, iy, 0.9);
+			//splitLine(a, v->getIndex());
+		}
 	}
 }
 

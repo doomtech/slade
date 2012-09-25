@@ -173,6 +173,8 @@ void UndoManager::endRecord(bool success) {
 
 	// Clear current undo manager
 	current_undo_manager = NULL;
+
+	announce("level_recorded");
 }
 
 /* UndoManager::currentlyRecording
@@ -214,6 +216,8 @@ void UndoManager::undo() {
 	undo_levels[current_level_index]->doUndo();
 	undo_running = false;
 	current_level_index--;
+
+	announce("undo");
 }
 
 /* UndoManager::redo
@@ -233,6 +237,13 @@ void UndoManager::redo() {
 	undo_running = true;
 	undo_levels[current_level_index]->doRedo();
 	undo_running = false;
+
+	announce("redo");
+}
+
+void UndoManager::getAllLevels(vector<string>& list) {
+	for (unsigned a = 0; a < undo_levels.size(); a++)
+		list.push_back(undo_levels[a]->getName());
 }
 
 

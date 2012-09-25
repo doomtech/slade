@@ -16,10 +16,12 @@ struct selection_3d_t {
 };
 
 class MapCanvas;
+class UndoManager;
 class MapEditor {
 private:
 	SLADEMap			map;
 	MapCanvas*			canvas;
+	UndoManager*		undo_manager;
 
 	// Editor state
 	uint8_t		edit_mode;
@@ -199,6 +201,10 @@ public:
 	void		setShapeDrawOrigin(fpoint2_t point, bool nearest = false);
 	void		updateShapeDraw(fpoint2_t point);
 	void		endLineDraw(bool apply = true);
+
+	// Copy/paste
+	void	copy();
+	void	paste(fpoint2_t mouse_pos);
 
 	// 3d mode
 	void	selectAdjacent3d(selection_3d_t item);

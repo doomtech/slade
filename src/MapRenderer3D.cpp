@@ -15,6 +15,7 @@ CVAR(Bool, render_max_dist_adaptive, true, CVAR_SAVE)
 CVAR(Int, render_adaptive_ms, 15, CVAR_SAVE)
 CVAR(Bool, render_3d_sky, true, CVAR_SAVE)
 CVAR(Int, render_3d_things, 1, CVAR_SAVE)
+CVAR(Int, render_3d_things_style, 1, CVAR_SAVE)
 CVAR(Int, render_3d_hilight, 1, CVAR_SAVE)
 
 
@@ -1424,6 +1425,7 @@ void MapRenderer3D::renderThings() {
 	fpoint2_t strafe(cam_position.x + cam_strafe.x, cam_position.y + cam_strafe.y);
 	for (unsigned a = 0; a < map->nThings(); a++) {
 		MapThing* thing = map->getThing(a);
+		things[a].flags = things[a].flags & ~DRAWN;
 
 		// Check side of camera
 		if (MathStuff::lineSide(thing->xPos(), thing->yPos(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0)
@@ -1445,6 +1447,10 @@ void MapRenderer3D::renderThings() {
 				break;
 		}
 
+		// Skip if not shown
+		if (!things[a].type->isDecoration() && render_3d_things == 2)
+			continue;
+
 		// Get thing sprite
 		tex = things[a].sprite;
 
@@ -1465,6 +1471,7 @@ void MapRenderer3D::renderThings() {
 		y1 = thing->yPos() - cam_strafe.y * halfwidth;
 		x2 = thing->xPos() + cam_strafe.x * halfwidth;
 		y2 = thing->yPos() + cam_strafe.y * halfwidth;
+		things[a].height = theight;
 
 		// Set colour/brightness
 		light = 255;
@@ -1492,6 +1499,117 @@ void MapRenderer3D::renderThings() {
 		glTexCoord2f(1.0f, 1.0f);	glVertex3f(x2, y2, things[a].z);
 		glTexCoord2f(1.0f, 0.0f);	glVertex3f(x2, y2, things[a].z + theight);
 		glEnd();
+
+		things[a].flags |= DRAWN;
+	}
+
+	// Draw thing borders if needed
+	if (render_3d_things_style >= 1) {
+		glDisable(GL_TEXTURE_2D);
+		glDepthMask(GL_FALSE);
+		glAlphaFunc(GL_GREATER, 0.2f);
+		glDisable(GL_CULL_FACE);
+		glLineWidth(3.5f);
+
+		for (unsigned a = 0; a < map->nThings(); a++) {
+			// Skip if hidden
+			if (!(things[a].flags & DRAWN))
+				continue;
+
+			MapThing* thing = map->getThing(a);
+			col.set(things[a].type->getColour());
+			float radius = things[a].type->getRadius();
+			float bottom = things[a].z + 0.5f;
+			float top = things[a].z;
+			if (things[a].type->getHeight() < 0)
+				top += things[a].height;
+			else
+				top += things[a].type->getHeight();
+
+			// Fill
+			glColor4f(col.fr(), col.fg(), col.fb(), 0.21f);
+			glBegin(GL_QUADS);
+			// Bottom
+			glVertex3f(thing->xPos() - radius, thing->yPos() - radius, bottom);
+			glVertex3f(thing->xPos() + radius, thing->yPos() - radius, bottom);
+			glVertex3f(thing->xPos() + radius, thing->yPos() + radius, bottom);
+			glVertex3f(thing->xPos() - radius, thing->yPos() + radius, bottom);
+			if (render_3d_things_style == 2) {
+				// Top
+				glVertex3f(thing->xPos() + radius, thing->yPos() - radius, top);
+				glVertex3f(thing->xPos() - radius, thing->yPos() - radius, top);
+				glVertex3f(thing->xPos() - radius, thing->yPos() + radius, top);
+				glVertex3f(thing->xPos() + radius, thing->yPos() + radius, top);
+				// North
+				glVertex3f(thing->xPos() - radius, thing->yPos() - radius, top);
+				glVertex3f(thing->xPos() - radius, thing->yPos() - radius, bottom);
+				glVertex3f(thing->xPos() + radius, thing->yPos() - radius, bottom);
+				glVertex3f(thing->xPos() + radius, thing->yPos() - radius, top);
+				// South
+				glVertex3f(thing->xPos() + radius, thing->yPos() + radius, top);
+				glVertex3f(thing->xPos() + radius, thing->yPos() + radius, bottom);
+				glVertex3f(thing->xPos() - radius, thing->yPos() + radius, bottom);
+				glVertex3f(thing->xPos() - radius, thing->yPos() + radius, top);
+				// East
+				glVertex3f(thing->xPos() + radius, thing->yPos() - radius, top);
+				glVertex3f(thing->xPos() + radius, thing->yPos() - radius, bottom);
+				glVertex3f(thing->xPos() + radius, thing->yPos() + radius, bottom);
+				glVertex3f(thing->xPos() + radius, thing->yPos() + radius, top);
+				// West
+				glVertex3f(thing->xPos() - radius, thing->yPos() + radius, top);
+				glVertex3f(thing->xPos() - radius, thing->yPos() + radius, bottom);
+				glVertex3f(thing->xPos() - radius, thing->yPos() - radius, bottom);
+				glVertex3f(thing->xPos() - radius, thing->yPos() - radius, top);
+			}
+			glEnd();
+
+			// Outline
+			glColor4f(col.fr(), col.fg(), col.fb(), 0.6f);
+			// Bottom
+			glBegin(GL_LINE_LOOP);
+			glVertex3f(thing->xPos() - radius, thing->yPos() - radius, bottom);
+			glVertex3f(thing->xPos() + radius, thing->yPos() - radius, bottom);
+			glVertex3f(thing->xPos() + radius, thing->yPos() + radius, bottom);
+			glVertex3f(thing->xPos() - radius, thing->yPos() + radius, bottom);
+			glEnd();
+			if (render_3d_things_style == 2) {
+				// Top
+				glBegin(GL_LINE_LOOP);
+				glVertex3f(thing->xPos() - radius, thing->yPos() - radius, top);
+				glVertex3f(thing->xPos() + radius, thing->yPos() - radius, top);
+				glVertex3f(thing->xPos() + radius, thing->yPos() + radius, top);
+				glVertex3f(thing->xPos() - radius, thing->yPos() + radius, top);
+				glEnd();
+				// Corners
+				glBegin(GL_LINES);
+				glVertex3f(thing->xPos() - radius, thing->yPos() - radius, bottom);
+				glVertex3f(thing->xPos() - radius, thing->yPos() - radius, top);
+				glVertex3f(thing->xPos() + radius, thing->yPos() - radius, bottom);
+				glVertex3f(thing->xPos() + radius, thing->yPos() - radius, top);
+				glVertex3f(thing->xPos() + radius, thing->yPos() + radius, bottom);
+				glVertex3f(thing->xPos() + radius, thing->yPos() + radius, top);
+				glVertex3f(thing->xPos() - radius, thing->yPos() + radius, bottom);
+				glVertex3f(thing->xPos() - radius, thing->yPos() + radius, top);
+				glEnd();
+			}
+
+			// Direction
+			glPushMatrix();
+			glTranslatef(thing->xPos(), thing->yPos(), bottom);
+			glRotated(thing->intProperty("angle"), 0, 0, 1);
+			glBegin(GL_LINES);
+			glVertex3f(0.0f, 0.0f, 0.0f);
+			glVertex3f(radius, 0.0f, 0.0f);
+			glVertex3f(radius, 0.0f, 0.0f);
+			glVertex3f(radius - (radius*0.2f), -radius * 0.2f, 0.0f);
+			glVertex3f(radius, 0.0f, 0.0f);
+			glVertex3f(radius - (radius*0.2f), radius * 0.2f, 0.0f);
+			glEnd();
+			glPopMatrix();
+		}
+
+		glDepthMask(GL_TRUE);
+		glEnable(GL_CULL_FACE);
 	}
 }
 
@@ -1526,6 +1644,10 @@ void MapRenderer3D::renderThingSelection(vector<selection_3d_t>& selection, floa
 		MapThing* thing = map->getThing(selection[a].index);
 		if (!thing)
 			return;
+
+		// Skip if not shown
+		if (!things[selection[a].index].type->isDecoration() && render_3d_things == 2)
+			continue;
 
 		// Determine coordinates
 		halfwidth = things[selection[a].index].sprite->getWidth() * 0.5;
@@ -1926,6 +2048,10 @@ selection_3d_t MapRenderer3D::determineHilight() {
 		// Ignore if not visible
 		MapThing* thing = map->getThing(a);
 		if (MathStuff::lineSide(thing->xPos(), thing->yPos(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0)
+			continue;
+
+		// Ignore if not shown
+		if (!things[a].type->isDecoration() && render_3d_things == 2)
 			continue;
 
 		// Find distance to thing sprite

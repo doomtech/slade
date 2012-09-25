@@ -27,6 +27,7 @@ public:
 
 		// Thing flags
 		ICON	= 4,
+		DRAWN	= 8,
 	};
 	struct gl_vertex_t {
 		float x, y, z;
@@ -58,6 +59,7 @@ public:
 		ThingType*	type;
 		MapSector*	sector;
 		float		z;
+		float		height;
 		GLTexture*	sprite;
 		long		updated_time;
 

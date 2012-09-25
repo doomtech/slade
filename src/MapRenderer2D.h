@@ -107,6 +107,9 @@ public:
 	void	renderMovingSectors(vector<int>& sectors, fpoint2_t move_vec);
 	void	renderMovingThings(vector<int>& things, fpoint2_t move_vec);
 
+	// Paste
+	void	renderPasteThings(vector<MapThing*>& things, fpoint2_t pos);
+
 
 	// VBOs
 	void	updateVerticesVBO();

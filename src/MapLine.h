@@ -61,7 +61,7 @@ private:
 	double		length;
 	double		ca;	// Used for intersection calculations
 	double		sa;	// ^^
-	fpoint2_t	tab_point;
+	fpoint2_t	front_vec;
 
 public:
 	MapLine(SLADEMap* parent = NULL);
@@ -97,9 +97,13 @@ public:
 	void	setFloatProperty(string key, double value);
 	void	setStringProperty(string key, string value);
 
+	void	setS1(MapSide* side);
+	void	setS2(MapSide* side);
+
 	fpoint2_t	midPoint();
 	double		getLength();
 	bool		doubleSector();
+	fpoint2_t	frontVector();
 	fpoint2_t	dirTabPoint();
 	double		distanceTo(double x, double y);
 	int			needsTexture();

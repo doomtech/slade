@@ -43,6 +43,7 @@ private:
 		MSTATE_THING_ANGLE,
 		MSTATE_LINE_DRAW,
 		MSTATE_EDIT,
+		MSTATE_PASTE,
 
 		DSTATE_LINE = 0,
 		DSTATE_SHAPE_ORIGIN,
@@ -118,6 +119,7 @@ public:
 	void	drawSelectionNumbers();
 	void	drawThingQuickAngleLines();
 	void	drawLineDrawLines();
+	void	drawPasteLines();
 	void	drawMap2d();
 	void	drawMap3d();
 	void	draw();

@@ -1835,6 +1835,76 @@ void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) 
 	}
 }
 
+void MapRenderer2D::renderPasteThings(vector<MapThing*>& things, fpoint2_t pos) {
+	// Enable textures
+	glEnable(GL_TEXTURE_2D);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	tex_last = NULL;
+
+	// Draw things
+	MapThing* thing = NULL;
+	double x, y, angle;
+	for (unsigned a = 0; a < things.size(); a++) {
+		// Get thing info
+		thing = things[a];
+		x = thing->xPos() + pos.x;
+		y = thing->yPos() + pos.y;
+		angle = thing->intProperty("angle");
+
+		// Get thing type properties from game configuration
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+
+		// Draw thing depending on 'things_drawtype' cvar
+		if (thing_drawtype == TDT_SPRITE)		// Drawtype 2: Sprites
+			renderSpriteThing(x, y, angle, tt, 1.0f);
+		else if (thing_drawtype == TDT_ROUND)	// Drawtype 1: Round
+			renderRoundThing(x, y, angle, tt, 1.0f);
+		else							// Drawtype 0 (or other): Square
+			renderSquareThing(x, y, angle, tt, 1.0f, thing_drawtype < TDT_SQUARESPRITE, thing_drawtype == TDT_FRAMEDSPRITE);
+	}
+
+	// Draw thing sprites within squares if that drawtype is set
+	if (thing_drawtype > TDT_SPRITE) {
+		glEnable(GL_TEXTURE_2D);
+
+		for (unsigned a = 0; a < things.size(); a++) {
+			// Get thing info
+			thing = things[a];
+			ThingType* tt = theGameConfiguration->thingType(thing->getType());
+			x = thing->xPos() + pos.x;
+			y = thing->yPos() + pos.y;
+			angle = thing->intProperty("angle");
+
+			renderSpriteThing(x, y, angle, tt, 1.0f, true);
+		}
+	}
+
+	// Set 'drawing' colour
+	ColourConfiguration::getColour("map_linedraw").set_gl();
+
+	// Draw moving thing overlays
+	bool point = setupThingOverlay();
+	for (unsigned a = 0; a < things.size(); a++) {
+		MapThing* thing = things[a];
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+		double radius = tt->getRadius();
+		if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
+
+		// Adjust radius if the overlay isn't square
+		if (!thing_overlay_square)
+			radius += 8;
+
+		renderThingOverlay(thing->xPos() + pos.x, thing->yPos() + pos.y, radius, point);
+	}
+
+	// Clean up gl state
+	if (point) {
+		glDisable(GL_POINT_SPRITE);
+		glDisable(GL_TEXTURE_2D);
+	}
+}
+
 void MapRenderer2D::updateVerticesVBO() {
 	// Create VBO if needed
 	if (vbo_vertices == 0)

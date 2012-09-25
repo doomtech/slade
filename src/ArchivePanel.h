@@ -49,10 +49,11 @@ public:
 	ArchivePanel(wxWindow *parent, Archive* archive);
 	~ArchivePanel();
 
-	Archive*	getArchive() { return archive; }
-	bool		saveEntryChanges();
-	void		addMenus();
-	void		removeMenus();
+	Archive*		getArchive() { return archive; }
+	UndoManager*	getUndoManager() { return undo_manager; }
+	bool			saveEntryChanges();
+	void			addMenus();
+	void			removeMenus();
 
 	// Editing actions - return success
 

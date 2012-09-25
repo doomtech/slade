@@ -11,14 +11,16 @@
 #include "STopWindow.h"
 
 class SToolBar;
+class UndoManagerHistoryPanel;
 class MainWindow : public STopWindow, SActionHandler {
 private:
-	ArchiveManagerPanel*	panel_archivemanager;
-	wxAuiNotebook*			notebook_tabs;
-	wxHtmlWindow*			html_startpage;
-	wxAuiManager*			m_mgr;
-	int						lasttipindex;
-	PaletteChooser*			palette_chooser;
+	ArchiveManagerPanel*		panel_archivemanager;
+	UndoManagerHistoryPanel*	panel_undo_history;
+	wxAuiNotebook*				notebook_tabs;
+	wxHtmlWindow*				html_startpage;
+	wxAuiManager*				m_mgr;
+	int							lasttipindex;
+	PaletteChooser*				palette_chooser;
 
 	// Singleton instance
 	static MainWindow*		instance;

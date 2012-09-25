@@ -8,6 +8,8 @@ enum ClipboardType {
 	CLIPBOARD_ENTRY_TREE,
 	CLIPBOARD_COMPOSITE_TEXTURE,
 	CLIPBOARD_PATCH,
+	CLIPBOARD_MAP_ARCH,
+	CLIPBOARD_MAP_THINGS,
 
 	CLIPBOARD_UNKNOWN,
 };
@@ -46,6 +48,43 @@ public:
 
 	CTexture*		getTexture() { return texture; }
 	ArchiveEntry*	getPatchEntry(string patch);
+};
+
+class MapVertex;
+class MapSide;
+class MapLine;
+class MapSector;
+class SLADEMap;
+class MapArchClipboardItem : public ClipboardItem {
+private:
+	vector<MapVertex*>	vertices;
+	vector<MapSide*>	sides;
+	vector<MapLine*>	lines;
+	vector<MapSector*>	sectors;
+
+public:
+	MapArchClipboardItem();
+	~MapArchClipboardItem();
+
+	void	addLines(vector<MapLine*> lines);
+	string	getInfo();
+	void	pasteToMap(SLADEMap* map, fpoint2_t position);
+	void	getLines(vector<MapLine*>& list);
+};
+
+class MapThing;
+class MapThingsClipboardItem : public ClipboardItem {
+private:
+	vector<MapThing*>	things;
+
+public:
+	MapThingsClipboardItem();
+	~MapThingsClipboardItem();
+
+	void	addThings(vector<MapThing*>& things);
+	string	getInfo();
+	void	pasteToMap(SLADEMap* map, fpoint2_t position);
+	void	getThings(vector<MapThing*>& list);
 };
 
 class Clipboard {

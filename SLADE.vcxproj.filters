@@ -960,6 +960,9 @@
     <ClCompile Include="src\UndoRedo.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="src\UndoManagerHistoryPanel.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1790,6 +1793,9 @@
     </ClInclude>
     <ClInclude Include="src\UndoRedo.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UndoManagerHistoryPanel.h">
+      <Filter>UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

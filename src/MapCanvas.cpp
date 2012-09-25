@@ -49,6 +49,7 @@
 #include "LineTextureOverlay.h"
 #include "SectorBuilder.h"
 #include "ActionSpecialTreeView.h"
+#include "Clipboard.h"
 
 
 /*******************************************************************
@@ -82,6 +83,7 @@ EXTERN_CVAR(Int, vertex_size)
 EXTERN_CVAR(Bool, vertex_round)
 EXTERN_CVAR(Float, render_max_dist)
 EXTERN_CVAR(Int, render_3d_things)
+EXTERN_CVAR(Int, render_3d_things_style)
 EXTERN_CVAR(Int, render_3d_hilight)
 
 
@@ -590,6 +592,40 @@ void MapCanvas::drawLineDrawLines() {	// Best function name ever
 	glEnd();
 }
 
+void MapCanvas::drawPasteLines() {
+	// Get clipboard item
+	MapArchClipboardItem* c = NULL;
+	for (unsigned a = 0; a < theClipboard->nItems(); a++) {
+		if (theClipboard->getItem(a)->getType() == CLIPBOARD_MAP_ARCH) {
+			c = (MapArchClipboardItem*)theClipboard->getItem(a);
+			break;
+		}
+	}
+
+	if (!c)
+		return;
+
+	// Get lines
+	vector<MapLine*> lines;
+	c->getLines(lines);
+
+	// Get line draw colour
+	rgba_t col = ColourConfiguration::getColour("map_linedraw");
+	col.set_gl();
+
+	// Draw
+	fpoint2_t pos = mouse_pos_m;
+	pos.x = editor->snapToGrid(pos.x);
+	pos.y = editor->snapToGrid(pos.y);
+	glLineWidth(2.0f);
+	glBegin(GL_LINES);
+	for (unsigned a = 0; a < lines.size(); a++) {
+		glVertex2d(pos.x + lines[a]->x1(), pos.y + lines[a]->y1());
+		glVertex2d(pos.x + lines[a]->x2(), pos.y + lines[a]->y2());
+	}
+	glEnd();
+}
+
 /* MapCanvas::draw
  * Draw the 2d map
  *******************************************************************/
@@ -772,6 +808,25 @@ void MapCanvas::drawMap2d() {
 	for (unsigned a = 0; a < animations.size(); a++) {
 		if (!animations[a]->mode3d())
 			animations[a]->draw();
+	}
+
+	// Draw paste objects if needed
+	if (mouse_state == MSTATE_PASTE) {
+
+		if (editor->editMode() == MapEditor::MODE_THINGS) {
+			// Get clipboard item
+			for (unsigned a = 0; a < theClipboard->nItems(); a++) {
+				ClipboardItem* item = theClipboard->getItem(a);
+				if (item->getType() == CLIPBOARD_MAP_THINGS) {
+					vector<MapThing*> things;
+					((MapThingsClipboardItem*)item)->getThings(things);
+					fpoint2_t pos(editor->snapToGrid(mouse_pos_m.x), editor->snapToGrid(mouse_pos_m.y));
+					renderer_2d->renderPasteThings(things, pos);
+				}
+			}
+		}
+		else
+			drawPasteLines();
 	}
 
 	// Draw moving stuff if needed
@@ -1741,6 +1796,20 @@ void MapCanvas::keyBinds2d(string name) {
 		}
 	}
 
+	// Check if paste mode is active
+	if (mouse_state == MSTATE_PASTE) {
+		// Accept paste
+		if (name == "map_edit_accept") {
+			mouse_state = MSTATE_NORMAL;
+			fpoint2_t pos(editor->snapToGrid(mouse_pos_m.x), editor->snapToGrid(mouse_pos_m.y));
+			editor->paste(pos);
+		}
+
+		// Cancel paste
+		else if (name == "map_edit_cancel")
+			mouse_state = MSTATE_NORMAL;
+	}
+
 	// Vertices mode
 	if (name == "me2d_mode_vertices" && mouse_state == MSTATE_NORMAL)
 		changeEditMode(MapEditor::MODE_VERTICES);
@@ -1907,6 +1976,23 @@ void MapCanvas::keyBinds2d(string name) {
 	else if (name == "me2d_paste_properties" && mouse_state == MSTATE_NORMAL)
 		editor->pasteProperties();
 
+	// Paste object(s)
+	else if (name == "paste" && mouse_state == MSTATE_NORMAL) {
+		// Check if any data is copied
+		ClipboardItem* item = NULL;
+		for (unsigned a = 0; a < theClipboard->nItems(); a++) {
+			if (theClipboard->getItem(a)->getType() == CLIPBOARD_MAP_ARCH ||
+				theClipboard->getItem(a)->getType() == CLIPBOARD_MAP_THINGS) {
+				item = theClipboard->getItem(a);
+				break;
+			}
+		}
+
+		// Begin paste if appropriate data exists
+		if (item)
+			mouse_state = MSTATE_PASTE;
+	}
+
 
 	// --- Things mode keys ---
 
@@ -1988,14 +2074,32 @@ void MapCanvas::keyBinds3d(string name) {
 	else if (name == "me3d_toggle_things") {
 		// Change thing display type
 		render_3d_things = render_3d_things + 1;
-		if (render_3d_things > 1)
+		if (render_3d_things > 2)
 			render_3d_things = 0;
 
 		// Editor message
 		if (render_3d_things == 0)
 			editor->addEditorMessage("Things disabled");
+		else if (render_3d_things == 1)
+			editor->addEditorMessage("Things enabled: All");
 		else
-			editor->addEditorMessage("Things enabled: Sprites");
+			editor->addEditorMessage("Things enabled: Decorations only");
+	}
+
+	// Change thing render style
+	else if (name == "me3d_thing_style") {
+		// Change thing display style
+		render_3d_things_style = render_3d_things_style + 1;
+		if (render_3d_things_style > 2)
+			render_3d_things_style = 0;
+
+		// Editor message
+		if (render_3d_things_style == 0)
+			editor->addEditorMessage("Thing render style: Sprites only");
+		else if (render_3d_things_style == 1)
+			editor->addEditorMessage("Thing render style: Sprites + Ground boxes");
+		else
+			editor->addEditorMessage("Thing render style: Sprites + Full boxes");
 	}
 
 	// Toggle hilight
@@ -2264,6 +2368,21 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 				sbuilder.traceSector(&(editor->getMap()), line, false);
 		}
 	}
+	if (e.GetKeyCode() == WXK_F5) {
+		// Get nearest line
+		int nearest = editor->getMap().nearestLine(mouse_pos_m.x, mouse_pos_m.y, 999999);
+		MapLine* line = editor->getMap().getLine(nearest);
+
+		// Get sectors
+		MapSector* sec1 = editor->getMap().getLineSideSector(line, true);
+		MapSector* sec2 = editor->getMap().getLineSideSector(line, false);
+		int i1 = -1;
+		int i2 = -1;
+		if (sec1) i1 = sec1->getIndex();
+		if (sec2) i2 = sec2->getIndex();
+
+		editor->addEditorMessage(S_FMT("Front %d Back %d", i1, i2));
+	}
 
 	if (e.GetKeyCode() == WXK_F5 && editor->editMode() == MapEditor::MODE_SECTORS) {
 		splitter.setVerbose(true);
@@ -2352,6 +2471,14 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 				}
 			}
 		}
+
+		// Paste state, accept paste
+		else if (mouse_state == MSTATE_PASTE) {
+			fpoint2_t pos(editor->snapToGrid(mouse_pos_m.x), editor->snapToGrid(mouse_pos_m.y));
+			editor->paste(pos);
+			mouse_state = MSTATE_NORMAL;
+		}
+
 		else if (mouse_state == MSTATE_NORMAL) {
 			// Begin box selection if shift is held down, otherwise toggle selection on hilighted object
 			if (e.ShiftDown())
@@ -2445,6 +2572,11 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 			editor->endMove();
 			mouse_state = MSTATE_NORMAL;
 			renderer_2d->forceUpdate();
+		}
+
+		// Paste state, cancel paste
+		else if (mouse_state == MSTATE_PASTE) {
+			mouse_state = MSTATE_NORMAL;
 		}
 
 		else if (mouse_state == MSTATE_NORMAL) {

@@ -16,9 +16,13 @@ TODO List ---------------------------------------------------------------
 
 --- Map Editor ---
 - Checks:
+	- When error is found, zoom/scroll to the error in question and bring up fullscreen overlay
+		asking whether to fix or not (and possibly fix options)
 	- Missing textures
 	- Specials with 0 tag that require a tag
 	- Invalid sector references (maybe not, shouldn't really happen)
+	- Intersecting lines
+	- Overlapping lines
 - Non-power-of-two textures (where simply expanding the texture canvas to 128x128 won't work)
 	- Will probably have to implement some kind of resize for this (perhaps FreeImage can do it nicely?)
 - 3d mode

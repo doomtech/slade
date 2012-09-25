@@ -10,6 +10,7 @@ enum {
 	LV_STATUS_NEW,
 	LV_STATUS_LOCKED,
 	LV_STATUS_ERROR,
+	LV_STATUS_DISABLED,
 };
 
 class ListView : public wxListCtrl {
@@ -31,6 +32,7 @@ public:
 
 	bool	deleteItems(wxArrayInt items);
 
+	rgba_t	getDisabledColour();
 	bool	setItemStatus(int item, int status);
 	bool	setItemText(int item, int column, string text);
 

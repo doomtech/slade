@@ -304,6 +304,7 @@
     <ClCompile Include="src\TranslationEditorDialog.cpp" />
     <ClCompile Include="src\Tree.cpp" />
     <ClCompile Include="src\UDMFProperty.cpp" />
+    <ClCompile Include="src\UndoManagerHistoryPanel.cpp" />
     <ClCompile Include="src\UndoRedo.cpp" />
     <ClCompile Include="src\VertexInfoOverlay.cpp" />
     <ClCompile Include="src\VirtualListView.cpp" />
@@ -578,6 +579,7 @@
     <ClInclude Include="src\TranslationEditorDialog.h" />
     <ClInclude Include="src\Tree.h" />
     <ClInclude Include="src\UDMFProperty.h" />
+    <ClInclude Include="src\UndoManagerHistoryPanel.h" />
     <ClInclude Include="src\UndoRedo.h" />
     <ClInclude Include="src\VertexInfoOverlay.h" />
     <ClInclude Include="src\VirtualListView.h" />

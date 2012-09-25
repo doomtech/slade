@@ -180,21 +180,14 @@ void MapEditorWindow::setupLayout() {
 	theApp->getAction("mapw_rename")->addToMenu(menu_map);
 	menu->Append(menu_map, "&Map");
 
-	// Editor menu
+	// Edit menu
 	wxMenu* menu_editor = new wxMenu("");
+	theApp->getAction("mapw_undo")->addToMenu(menu_editor);
+	theApp->getAction("mapw_redo")->addToMenu(menu_editor);
+	menu_editor->AppendSeparator();
 	theApp->getAction("mapw_preferences")->addToMenu(menu_editor);
 	theApp->getAction("mapw_setbra")->addToMenu(menu_editor);
-	menu->Append(menu_editor, "&Editor");
-
-	// Mode menu
-	/*
-	wxMenu* menu_mode = new wxMenu("");
-	theApp->getAction("mapw_mode_vertices")->addToMenu(menu_mode);
-	theApp->getAction("mapw_mode_lines")->addToMenu(menu_mode);
-	theApp->getAction("mapw_mode_sectors")->addToMenu(menu_mode);
-	theApp->getAction("mapw_mode_things")->addToMenu(menu_mode);
-	menu->Append(menu_mode, "Mode");
-	*/
+	menu->Append(menu_editor, "&Edit");
 
 	// View menu
 	wxMenu* menu_view = new wxMenu("");
@@ -216,6 +209,14 @@ void MapEditorWindow::setupLayout() {
 	tbg_map->addActionButton("mapw_saveas");
 	tbg_map->addActionButton("mapw_rename");
 	toolbar->addGroup(tbg_map);
+
+	// Edit toolbar
+	/*
+	SToolBarGroup* tbg_edit = new SToolBarGroup(toolbar, "_Edit");
+	tbg_edit->addActionButton("mapw_undo");
+	tbg_edit->addActionButton("mapw_redo");
+	toolbar->addGroup(tbg_edit);
+	*/
 
 	// Mode toolbar
 	SToolBarGroup* tbg_mode = new SToolBarGroup(toolbar, "_Mode");

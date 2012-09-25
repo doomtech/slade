@@ -11,6 +11,8 @@
 #include "MapCanvas.h"
 #include "MapObjectPropsPanel.h"
 #include "SectorBuilder.h"
+#include "Clipboard.h"
+#include "UndoRedo.h"
 
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
@@ -18,6 +20,7 @@ EXTERN_CVAR(Int, shapedraw_sides)
 EXTERN_CVAR(Int, shapedraw_shape)
 EXTERN_CVAR(Bool, shapedraw_centered)
 EXTERN_CVAR(Bool, shapedraw_lockratio)
+
 
 MapEditor::MapEditor() {
 	// Init variables
@@ -32,11 +35,13 @@ MapEditor::MapEditor() {
 	copy_sector = NULL;
 	link_3d_light = true;
 	link_3d_offset = true;
+	undo_manager = new UndoManager();
 }
 
 MapEditor::~MapEditor() {
 	if (copy_thing) delete copy_thing;
 	if (copy_sector) delete copy_sector;
+	delete undo_manager;
 }
 
 double MapEditor::gridSize() {
@@ -685,22 +690,36 @@ void MapEditor::getSelectedVertices(vector<MapVertex*>& list) {
 }
 
 void MapEditor::getSelectedLines(vector<MapLine*>& list) {
-	if (edit_mode != MODE_LINES)
-		return;
+	if (edit_mode == MODE_LINES) {
+		// Multiple selection
+		if (selection.size() > 1) {
+			for (unsigned a = 0; a < selection.size(); a++)
+				list.push_back(map.getLine(selection[a]));
+		}
 
-	// Multiple selection
-	if (selection.size() > 1) {
-		for (unsigned a = 0; a < selection.size(); a++)
-			list.push_back(map.getLine(selection[a]));
+		// Single selection
+		else if (selection.size() == 1)
+			list.push_back(map.getLine(selection[0]));
+
+		// No selection (use hilight)
+		else if (hilight_item >= 0)
+			list.push_back(map.getLine(hilight_item));
 	}
+	else if (edit_mode == MODE_SECTORS) {
+		// Get selected sectors
+		vector<MapSector*> sectors;
+		getSelectedSectors(sectors);
 
-	// Single selection
-	else if (selection.size() == 1)
-		list.push_back(map.getLine(selection[0]));
-
-	// No selection (use hilight)
-	else if (hilight_item >= 0)
-		list.push_back(map.getLine(hilight_item));
+		// Add lines of selected sectors
+		for (unsigned a = 0; a < sectors.size(); a++) {
+			vector<MapLine*> seclines;
+			sectors[a]->getLines(seclines);
+			for (unsigned b = 0; b < seclines.size(); b++) {
+				if (std::find(list.begin(), list.end(), seclines[b]) == list.end())
+					list.push_back(seclines[b]);
+			}
+		}
+	}
 }
 
 void MapEditor::getSelectedSectors(vector<MapSector*>& list) {
@@ -954,13 +973,16 @@ void MapEditor::endMove(bool accept) {
 	// Move depending on edit mode
 	if (edit_mode == MODE_THINGS && accept) {
 		// Move things
+		undo_manager->beginRecord("Move Things");
 		for (unsigned a = 0; a < move_items.size(); a++) {
 			MapThing* t = map.getThing(move_items[a]);
 			map.moveThing(move_items[a], t->xPos() + move_vec.x, t->yPos() + move_vec.y);
 		}
+		undo_manager->endRecord(true);
 	}
 	else if (accept) {
 		// Any other edit mode we're technically moving vertices
+		undo_manager->beginRecord("Move Vertices");
 
 		// Get list of vertices being moved
 		bool* move_verts = new bool[map.nVertices()];
@@ -1001,6 +1023,11 @@ void MapEditor::endMove(bool accept) {
 			MapVertex* v = map.mergeVerticesPoint(merge_points[a].x, merge_points[a].y);
 			if (v) map.splitLinesAt(v, 1);
 		}
+
+		// Remove any resulting zero-length lines
+		map.removeZeroLengthLines();
+
+		undo_manager->endRecord(true);
 	}
 
 	// Un-filter objects
@@ -1011,9 +1038,6 @@ void MapEditor::endMove(bool accept) {
 
 	// Clear moving items
 	move_items.clear();
-
-	// Remove any resulting zero-length lines
-	map.removeZeroLengthLines();
 
 	// Update map item indices
 	map.refreshIndices();
@@ -1919,6 +1943,63 @@ void MapEditor::endLineDraw(bool apply) {
 	draw_points.clear();
 }
 
+void MapEditor::copy() {
+	// Can't copy/paste vertices (no point)
+	if (edit_mode == MODE_VERTICES) {
+		addEditorMessage("Copy/Paste not supported for vertices");
+		return;
+	}
+
+	// Clear current clipboard contents
+	theClipboard->clear();
+
+	// Copy lines
+	if (edit_mode == MODE_LINES || edit_mode == MODE_SECTORS) {
+		// Get selected lines
+		vector<MapLine*> lines;
+		getSelectedLines(lines);
+
+		// Add to clipboard
+		MapArchClipboardItem* c = new MapArchClipboardItem();
+		c->addLines(lines);
+		theClipboard->addItem(c);
+
+		// Editor message
+		addEditorMessage(S_FMT("Copied %s", CHR(c->getInfo())));
+	}
+
+	// Copy things
+	else if (edit_mode == MODE_THINGS) {
+		// Get selected things
+		vector<MapThing*> things;
+		getSelectedThings(things);
+
+		// Add to clipboard
+		MapThingsClipboardItem* c = new MapThingsClipboardItem();
+		c->addThings(things);
+		theClipboard->addItem(c);
+
+		// Editor message
+		addEditorMessage(S_FMT("Copied %s", CHR(c->getInfo())));
+	}
+}
+
+void MapEditor::paste(fpoint2_t mouse_pos) {
+	for (unsigned a = 0; a < theClipboard->nItems(); a++) {
+		if (theClipboard->getItem(a)->getType() == CLIPBOARD_MAP_ARCH) {
+			MapArchClipboardItem* p = (MapArchClipboardItem*)theClipboard->getItem(a);
+			p->pasteToMap(&map, mouse_pos);
+			addEditorMessage(S_FMT("Pasted %s", CHR(p->getInfo())));
+		}
+
+		else if (theClipboard->getItem(a)->getType() == CLIPBOARD_MAP_THINGS) {
+			MapThingsClipboardItem* p = (MapThingsClipboardItem*)theClipboard->getItem(a);
+			p->pasteToMap(&map, mouse_pos);
+			addEditorMessage(S_FMT("Pasted %s", CHR(p->getInfo())));
+		}
+	}
+}
+
 bool MapEditor::wallMatches(MapSide* side, uint8_t part, string tex) {
 	// Check for blank texture where it isn't needed
 	if (tex == "-") {
@@ -2528,11 +2609,11 @@ void MapEditor::toggleUnpegged3d(bool lower) {
 		// Toggle flag
 		if (lower) {
 			bool unpegged = theGameConfiguration->lineBasicFlagSet("dontpegbottom", line, theMapEditor->currentMapDesc().format);
-			theGameConfiguration->setLineBasicFlag("dontpegbottom", line, !unpegged);
+			theGameConfiguration->setLineBasicFlag("dontpegbottom", line, map.currentFormat(), !unpegged);
 		}
 		else {
 			bool unpegged = theGameConfiguration->lineBasicFlagSet("dontpegtop", line, theMapEditor->currentMapDesc().format);
-			theGameConfiguration->setLineBasicFlag("dontpegtop", line, !unpegged);
+			theGameConfiguration->setLineBasicFlag("dontpegtop", line, map.currentFormat(), !unpegged);
 		}
 	}
 
@@ -2745,6 +2826,14 @@ bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 			else
 				addEditorMessage("Unlocked hilight");
 		}
+
+		// Copy
+		else if (key == "copy")
+			copy();
+
+		// Paste
+		//else if (key == "paste")
+		//	paste();
 	}
 
 	// --- Line mode keybinds ---

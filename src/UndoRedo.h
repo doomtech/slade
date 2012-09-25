@@ -2,6 +2,8 @@
 #ifndef __UNDO_REDO_H__
 #define __UNDO_REDO_H__
 
+#include "ListenerAnnouncer.h"
+
 class UndoStep {
 private:
 
@@ -33,7 +35,7 @@ public:
 	bool	readFile(string filename);
 };
 
-class UndoManager {
+class UndoManager : public Announcer {
 private:
 	vector<UndoLevel*>	undo_levels;
 	UndoLevel*			current_level;
@@ -43,6 +45,9 @@ private:
 public:
 	UndoManager();
 	~UndoManager();
+
+	void	getAllLevels(vector<string>& list);
+	int		getCurrentIndex() { return current_level_index; }
 
 	void	beginRecord(string name);
 	void	endRecord(bool success);

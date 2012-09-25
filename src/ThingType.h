@@ -17,6 +17,7 @@ private:
 	bool	hanging;
 	bool	shrink;
 	bool	fullbright;
+	bool	decoration;
 	string	sprite;
 	string	icon;
 	string	translation;
@@ -33,10 +34,12 @@ public:
 	string	getGroup() { return group; }
 	rgba_t	getColour() { return colour; }
 	int		getRadius() { return radius; }
+	int		getHeight() { return height; }
 	bool	isAngled() { return angled; }
 	bool	isHanging() { return hanging; }
 	bool	isFullbright() { return fullbright; }
 	bool	shrinkOnZoom() { return shrink; }
+	bool	isDecoration() { return decoration; }
 	string	getSprite() { return sprite; }
 	string	getIcon() { return icon; }
 	string	getTranslation() { return translation; }

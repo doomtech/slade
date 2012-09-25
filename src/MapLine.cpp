@@ -212,6 +212,20 @@ void MapLine::setStringProperty(string key, string value) {
 		MapObject::setStringProperty(key, value);
 }
 
+void MapLine::setS1(MapSide* side) {
+	if (!side1) {
+		side1 = side;
+		side->parent = this;
+	}
+}
+
+void MapLine::setS2(MapSide* side) {
+	if (!side2) {
+		side2 = side;
+		side->parent = this;
+	}
+}
+
 fpoint2_t MapLine::midPoint() {
 	return fpoint2_t(x1() + ((x2() - x1()) * 0.5), y1() + ((y2() - y1()) * 0.5));
 }
@@ -237,6 +251,16 @@ bool MapLine::doubleSector() {
 	return (side1->getSector() == side2->getSector());
 }
 
+fpoint2_t MapLine::frontVector() {
+	// Check if vector needs to be recalculated
+	if (front_vec.x == 0 && front_vec.y == 0) {
+		front_vec.set(-(vertex2->yPos() - vertex1->yPos()), vertex2->xPos() - vertex1->xPos());
+		front_vec.normalize();
+	}
+
+	return front_vec;
+}
+
 fpoint2_t MapLine::dirTabPoint() {
 	// Calculate midpoint
 	fpoint2_t mid = midPoint();
@@ -247,9 +271,8 @@ fpoint2_t MapLine::dirTabPoint() {
 	if (tablen < 2) tablen = 2;
 
 	// Calculate tab endpoint
-	fpoint2_t invdir(-(vertex2->yPos() - vertex1->yPos()), vertex2->xPos() - vertex1->xPos());
-	invdir.normalize();
-	return fpoint2_t(mid.x - invdir.x*tablen, mid.y - invdir.y*tablen);
+	if (front_vec.x == 0 && front_vec.y == 0) frontVector();
+	return fpoint2_t(mid.x - front_vec.x*tablen, mid.y - front_vec.y*tablen);
 }
 
 double MapLine::distanceTo(double x, double y) {
@@ -333,6 +356,7 @@ void MapLine::clearUnneededTextures() {
 void MapLine::resetInternals() {
 	// Reset line internals
 	length = -1;
+	front_vec.set(0, 0);
 
 	// Reset front sector internals
 	MapSector* s1 = frontSector();

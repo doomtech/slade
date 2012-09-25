@@ -123,6 +123,16 @@ bool ListView::deleteItems(wxArrayInt items) {
 	return true;
 }
 
+rgba_t ListView::getDisabledColour() {
+	wxColour fg = wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT);
+	wxColour bg = wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOX);
+
+	int red = fg.Red()*0.5 + bg.Red()*0.5;
+	int green = fg.Green()*0.5 + bg.Green()*0.5;
+	int blue = fg.Blue()*0.5 + bg.Blue()*0.5;
+	return rgba_t(red, green, blue);
+}
+
 /* ListView::setItemStatus
  * Sets the 'status' of [item], changing its text colour. Currently
  * there are 5 statuses:
@@ -161,6 +171,8 @@ bool ListView::setItemStatus(int item, int status) {
 			break;
 		case LV_STATUS_ERROR:
 			SetItemTextColour(item, WXCOL(ColourConfiguration::getColour("error")));
+		case LV_STATUS_DISABLED:
+			SetItemTextColour(item, WXCOL(getDisabledColour()));
 	}
 
 	return true;

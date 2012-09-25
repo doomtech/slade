@@ -42,6 +42,8 @@
 #include "MapEditorWindow.h"
 #include "MapEditorConfigDialog.h"
 #include "SToolBar.h"
+#include "UndoManagerHistoryPanel.h"
+#include "ArchivePanel.h"
 #include "cl_notebook_art/cl_aui_notebook_art.h"
 #include <wx/aboutdlg.h>
 #include <wx/dnd.h>
@@ -149,6 +151,11 @@ void MainWindow::saveLayout() {
 	pinf = m_mgr->SavePaneInfo(m_mgr->GetPane("archive_manager"));
 	file.Write(S_FMT("\"%s\"\n", CHR(pinf)));
 
+	// Undo History pane
+	file.Write("\"undo_history\" ");
+	pinf = m_mgr->SavePaneInfo(m_mgr->GetPane("undo_history"));
+	file.Write(S_FMT("\"%s\"\n", CHR(pinf)));
+
 	// Close file
 	file.Close();
 }
@@ -219,6 +226,20 @@ void MainWindow::setupLayout() {
 	m_mgr->AddPane(panel_archivemanager, p_inf);
 
 
+	// -- Undo History Panel --
+	panel_undo_history = new UndoManagerHistoryPanel(this, NULL);
+
+	// Setup panel info & add panel
+	p_inf.DefaultPane();
+	p_inf.Right();
+	p_inf.BestSize(128, 480);
+	p_inf.Caption("Undo History");
+	p_inf.Name("undo_history");
+	p_inf.Show(false);
+	p_inf.Dock();
+	m_mgr->AddPane(panel_undo_history, p_inf);
+
+
 	// -- Menu bar --
 	wxMenuBar *menu = new wxMenuBar();
 
@@ -254,6 +275,7 @@ void MainWindow::setupLayout() {
 	wxMenu* viewMenu = new wxMenu("");
 	theApp->getAction("main_showam")->addToMenu(viewMenu);
 	theApp->getAction("main_showconsole")->addToMenu(viewMenu);
+	theApp->getAction("main_showundohistory")->addToMenu(viewMenu);
 	menu->Append(viewMenu, "&View");
 
 	// Help menu
@@ -575,6 +597,15 @@ bool MainWindow::handleAction(string id) {
 		return true;
 	}
 
+	// View->Undo History
+	if (id == "main_showundohistory") {
+		wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_archivemanager);
+		wxAuiPaneInfo& p_inf = m_mgr->GetPane("undo_history");
+		p_inf.Show(!p_inf.IsShown());
+		m_mgr->Update();
+		return true;
+	}
+
 	// Help->About
 	if (id == "main_about") {
 		wxAboutDialogInfo info;
@@ -666,6 +697,10 @@ void MainWindow::onTabChanged(wxAuiNotebookEvent& e) {
 		SetStatusText("", 1);
 		SetStatusText("", 2);
 	}
+
+	// Archive tab, update undo history panel
+	else if (page->GetName() == "archive")
+		panel_undo_history->setManager(((ArchivePanel*)page)->getUndoManager());
 
 	// Continue
 	e.Skip();
