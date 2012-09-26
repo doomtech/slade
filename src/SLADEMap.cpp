@@ -2787,12 +2787,16 @@ void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
 	MapVertex* v = vertices[vertex];
 	v->x = nx;
 	v->y = ny;
+	long time = theApp->runTimer();
+	v->modified_time = time;
 
 	// Reset all attached lines' geometry info
-	for (unsigned a = 0; a < v->connected_lines.size(); a++)
+	for (unsigned a = 0; a < v->connected_lines.size(); a++) {
 		v->connected_lines[a]->resetInternals();
+		v->connected_lines[a]->modified_time = time;
+	}
 
-	geometry_updated = theApp->runTimer();
+	geometry_updated = time;
 }
 
 void SLADEMap::mergeVertices(unsigned vertex1, unsigned vertex2) {
@@ -2914,6 +2918,7 @@ void SLADEMap::splitLine(unsigned line, unsigned vertex) {
 	MapLine* nl = new MapLine(v, v2, s1, s2, this);
 	nl->copy(l);
 	nl->index = lines.size();
+	nl->modified_time = theApp->runTimer();
 	lines.push_back(nl);
 
 	// Update x-offsets
@@ -3007,6 +3012,56 @@ void SLADEMap::splitLinesByLine(MapLine* split_line) {
 			//splitLine(a, v->getIndex());
 		}
 	}
+}
+
+int SLADEMap::mergeLine(unsigned line) {
+	// Check index
+	if (line >= lines.size())
+		return 0;
+
+	MapLine* ml = lines[line];
+	MapVertex* v1 = lines[line]->vertex1;
+	MapVertex* v2 = lines[line]->vertex2;
+
+	// Go through lines connected to first vertex
+	int merged = 0;
+	for (unsigned a = 0; a < v1->connected_lines.size(); a++) {
+		MapLine* l = v1->connected_lines[a];
+		if (l == ml)
+			continue;
+
+		// Check overlap
+		if ((l->vertex1 == v1 && l->vertex2 == v2) ||
+			(l->vertex2 == v1 && l->vertex1 == v2)) {
+			// Remove line
+			removeLine(l);
+			a--;
+			merged++;
+		}
+	}
+
+	// Correct sector references
+	if (merged > 0) {
+		// Front side
+		MapSector* s1 = getLineSideSector(ml, true);
+		if (s1)
+			setLineSector(ml->getIndex(), s1->getIndex(), true);
+		else if (ml->s1())
+			removeSide(ml->s1());
+
+		// Back side
+		MapSector* s2 = getLineSideSector(ml, false);
+		if (s2)
+			setLineSector(ml->getIndex(), s2->getIndex(), false);
+		else if (ml->s2())
+			removeSide(ml->s2());
+
+		// Flip if needed
+		if (!ml->s1() && ml->s2())
+			ml->flip();
+	}
+
+	return merged;
 }
 
 void SLADEMap::mapOpenChecks() {

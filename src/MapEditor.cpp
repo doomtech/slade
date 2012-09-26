@@ -970,6 +970,8 @@ void MapEditor::doMove(fpoint2_t mouse_pos) {
 }
 
 void MapEditor::endMove(bool accept) {
+	long move_time = theApp->runTimer();
+
 	// Move depending on edit mode
 	if (edit_mode == MODE_THINGS && accept) {
 		// Move things
@@ -1010,6 +1012,7 @@ void MapEditor::endMove(bool accept) {
 
 		// Move vertices
 		vector<fpoint2_t> merge_points;
+		vector<unsigned> moved_lines;
 		for (unsigned a = 0; a < map.nVertices(); a++) {
 			if (!move_verts[a])
 				continue;
@@ -1022,6 +1025,28 @@ void MapEditor::endMove(bool accept) {
 		for (unsigned a = 0; a < merge_points.size(); a++) {
 			MapVertex* v = map.mergeVerticesPoint(merge_points[a].x, merge_points[a].y);
 			if (v) map.splitLinesAt(v, 1);
+		}
+
+		// Split lines overlapping vertices
+		for (unsigned a = 0; a < map.nLines(); a++) {
+			MapLine* line = map.getLine(a);
+			if (line->modifiedTime() >= move_time) {
+				MapVertex* split = map.lineCrossVertex(line->x1(), line->y1(), line->x2(), line->y2());
+				if (split) {
+					map.splitLine(a, split->getIndex());
+					a = 0;
+				}
+			}
+		}
+
+		// Merge lines
+		for (unsigned a = 0; a < map.nLines(); a++) {
+			if (map.getLine(a)->modifiedTime() >= move_time) {
+				if (map.mergeLine(a) > 0) {
+					map.getLine(a)->clearUnneededTextures();
+					a = 0;
+				}
+			}
 		}
 
 		// Remove any resulting zero-length lines
@@ -1985,13 +2010,16 @@ void MapEditor::copy() {
 }
 
 void MapEditor::paste(fpoint2_t mouse_pos) {
+	// Go through clipboard items
 	for (unsigned a = 0; a < theClipboard->nItems(); a++) {
+		// Map architecture
 		if (theClipboard->getItem(a)->getType() == CLIPBOARD_MAP_ARCH) {
 			MapArchClipboardItem* p = (MapArchClipboardItem*)theClipboard->getItem(a);
 			p->pasteToMap(&map, mouse_pos);
 			addEditorMessage(S_FMT("Pasted %s", CHR(p->getInfo())));
 		}
 
+		// Things
 		else if (theClipboard->getItem(a)->getType() == CLIPBOARD_MAP_THINGS) {
 			MapThingsClipboardItem* p = (MapThingsClipboardItem*)theClipboard->getItem(a);
 			p->pasteToMap(&map, mouse_pos);

@@ -9,7 +9,6 @@ TODO List ---------------------------------------------------------------
 
 --- Bugs ---
 - Gfx doesn't update after being converted
-- No handling for when a line is moved to overlap another
 - Map editor should use PLAYPAL from resource chain on 'existing/global'
 - 3d mode textures need to update with MapTextureManager, somehow
 
@@ -32,19 +31,19 @@ TODO List ---------------------------------------------------------------
 	- Flat offset/scale editing (udmf+zdoom)
 	- Better vis checking
 	- (Z)MAPINFO parsing for sky texture
-	- Thing boxes (might not bother with full boxes unless I add game-accurate 'height' property to thing configurations)
-	- Preferences dialog page
 - Editing:
 	- Proper UDMF/Hexen/Doom64 Map saving (BEHAVIOR, SCRIPTS, DIALOGUE, LIGHTS, MACROS, etc.)
 	- Generalised sector and line specials
 	- Rotate/scale objects ('edit' mode similar to db2 would be nice, perhaps not a mode though)
-	- Light increments should probably be defined in game configs (8 for zdoom, 16 for others)
-	- Copy+paste sectors/lines
+	- Proper split/merge checks on paste lines
+	- Sector specials selection dialog for property list
+	- Find new tag (/ use last tag)
 - Script editor
 - Better UDMF property handling, proper support for unknown properties read with the map
 - (Possibly) better line/thing flag handling
 - 'Tag edit' mode
 - Optimise Polygon2D splitting somehow, it creates many unneeded splits
+- Undo/Redo for map editor stuff
 
 
 --- Minor Problems/Annoyances ---

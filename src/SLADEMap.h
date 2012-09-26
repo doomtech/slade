@@ -188,6 +188,7 @@ public:
 	void		splitLinesAt(MapVertex* vertex, double split_dist = 0);
 	bool		setLineSector(unsigned line, unsigned sector, bool front = true);
 	void		splitLinesByLine(MapLine* split_line);
+	int			mergeLine(unsigned line);
 
 	// Checks
 	void	mapOpenChecks();
