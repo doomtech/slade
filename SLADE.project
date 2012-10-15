@@ -126,6 +126,8 @@
     <File Name="src/KeyBind.h"/>
     <File Name="src/Lua.cpp"/>
     <File Name="src/Lua.h"/>
+    <File Name="src/UndoRedo.cpp"/>
+    <File Name="src/UndoRedo.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">
@@ -440,6 +442,8 @@
     <File Name="src/MapPreviewCanvas.h"/>
     <File Name="src/STopWindow.cpp"/>
     <File Name="src/STopWindow.h"/>
+    <File Name="src/UndoManagerHistoryPanel.cpp"/>
+    <File Name="src/UndoManagerHistoryPanel.h"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -655,6 +659,9 @@
       
       
       
+      
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -709,6 +716,9 @@
       
       
       
+      
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -747,6 +757,7 @@
       <Compiler Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no);`pkg-config --cflags gtk+-2.0`" C_Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
+        <Preprocessor Value="USEGTK3"/>
       </Compiler>
       <Linker Options="$(shell wx-config --debug=no --libs std,gl,stc,aui,propgrid,media --unicode=yes)" Required="yes">
         <Library Value="sfml-system"/>
@@ -758,12 +769,6 @@
       <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
-      
-      
-      
-      
-      
-      
       
       ]]>
       </Environment>
@@ -806,6 +811,9 @@
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
       
+      
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -845,6 +853,9 @@
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
+      
+      
       
       
       
