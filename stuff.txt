@@ -10,7 +10,6 @@ TODO List ---------------------------------------------------------------
 --- Bugs ---
 - Gfx doesn't update after being converted
 - Map editor should use PLAYPAL from resource chain on 'existing/global'
-- 3d mode textures need to update with MapTextureManager, somehow
 
 
 --- Map Editor ---
@@ -22,8 +21,6 @@ TODO List ---------------------------------------------------------------
 	- Invalid sector references (maybe not, shouldn't really happen)
 	- Intersecting lines
 	- Overlapping lines
-- Non-power-of-two textures (where simply expanding the texture canvas to 128x128 won't work)
-	- Will probably have to implement some kind of resize for this (perhaps FreeImage can do it nicely?)
 - 3d mode
 	- Auto-align Y
 	- Thing z height editing

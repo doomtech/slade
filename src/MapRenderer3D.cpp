@@ -6,6 +6,8 @@
 #include "MathStuff.h"
 #include "MapEditorWindow.h"
 #include "ColourConfiguration.h"
+#include "ResourceManager.h"
+#include "MainWindow.h"
 
 CVAR(Float, render_max_dist, -1, CVAR_SAVE)
 CVAR(Float, render_max_thing_dist, 3000, CVAR_SAVE)
@@ -42,6 +44,10 @@ MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 
 	// Init other
 	init();
+
+	// Listen to stuff
+	listenTo(thePaletteChooser);
+	listenTo(theResourceManager);
 }
 
 MapRenderer3D::~MapRenderer3D() {
@@ -2244,4 +2250,35 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 
 	//glEnable(GL_DEPTH_TEST);
 	COL_WHITE.set_gl();
+}
+
+void MapRenderer3D::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	if (announcer != thePaletteChooser || announcer != theResourceManager)
+		return;
+
+	if (event_name == "resources_updated" || event_name == "main_palette_changed") {
+		// Refresh lines
+		for (unsigned a = 0; a < lines.size(); a++) {
+			for (unsigned q = 0; q < lines[a].quads.size(); q++)
+				lines[a].quads[q].texture = NULL;
+
+			lines[a].updated_time = 0;
+		}
+
+		// Refresh flats
+		for (unsigned a = 0; a < floors.size(); a++) {
+			floors[a].texture = NULL;
+			floors[a].updated_time = 0;
+		}
+		for (unsigned a = 0; a < ceilings.size(); a++) {
+			ceilings[a].texture = NULL;
+			ceilings[a].updated_time = 0;
+		}
+
+		// Refresh things
+		for (unsigned a = 0; a < things.size(); a++) {
+			things[a].sprite = NULL;
+			things[a].updated_time = 0;
+		}
+	}
 }
