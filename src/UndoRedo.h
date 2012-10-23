@@ -46,8 +46,10 @@ public:
 	UndoManager();
 	~UndoManager();
 
-	void	getAllLevels(vector<string>& list);
-	int		getCurrentIndex() { return current_level_index; }
+	void		getAllLevels(vector<string>& list);
+	int			getCurrentIndex() { return current_level_index; }
+	unsigned	nUndoLevels() { return undo_levels.size(); }
+	UndoLevel*	undoLevel(unsigned index) { return undo_levels[index]; }
 
 	void	beginRecord(string name);
 	void	endRecord(bool success);

@@ -4,6 +4,70 @@
 #include "UndoManagerHistoryPanel.h"
 #include "UndoRedo.h"
 
+
+UndoListView::UndoListView(wxWindow* parent, UndoManager* manager) : VirtualListView(parent) {
+	this->manager = manager;
+
+	if (manager) {
+		SetItemCount(manager->nUndoLevels());
+		listenTo(manager);
+	}
+}
+
+UndoListView::~UndoListView() {
+}
+
+string UndoListView::getItemText(long item, long column) const {
+	if (!manager)
+		return "";
+
+	int max = manager->nUndoLevels();
+	if (item < max) {
+		int index = max - item - 1;
+		string name = manager->undoLevel(index)->getName();
+		return S_FMT("%d. %s", index+1, CHR(name));
+	}
+	else
+		return "Invalid Index";
+}
+
+int UndoListView::getItemIcon(long item) const {
+	return -1;
+}
+
+void UndoListView::updateItemAttr(long item) const {
+	if (!manager)
+		return;
+
+	item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
+
+	int index = manager->nUndoLevels() - item - 1;
+	if (index == manager->getCurrentIndex())
+		item_attr->SetTextColour(WXCOL(rgba_t(0, 170, 0)));
+	else if (index > manager->getCurrentIndex())
+		item_attr->SetTextColour(WXCOL(rgba_t(150, 150, 150)));
+}
+
+void UndoListView::setManager(UndoManager* manager) {
+	if (this->manager)
+		stopListening(this->manager);
+
+	this->manager = manager;
+	listenTo(manager);
+
+	SetItemCount(manager->nUndoLevels());
+}
+
+void UndoListView::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	if (announcer != manager)
+		return;
+
+	SetItemCount(manager->nUndoLevels());
+	Refresh();
+}
+
+
+
 UndoManagerHistoryPanel::UndoManagerHistoryPanel(wxWindow* parent, UndoManager* manager) : wxPanel(parent, -1) {
 	// Init variables
 	this->manager = manager;
@@ -13,7 +77,7 @@ UndoManagerHistoryPanel::UndoManagerHistoryPanel(wxWindow* parent, UndoManager* 
 	SetSizer(sizer);
 
 	// Add undo levels list
-	list_levels = new ListView(this, -1);
+	list_levels = new UndoListView(this, manager);
 	sizer->Add(list_levels, 1, wxEXPAND|wxALL, 4);
 
 	list_levels->AppendColumn("Action", 0, 160);
@@ -25,13 +89,11 @@ UndoManagerHistoryPanel::~UndoManagerHistoryPanel() {
 }
 
 void UndoManagerHistoryPanel::setManager(UndoManager* manager) {
-	if (this->manager)
-		stopListening(this->manager);
-
 	this->manager = manager;
-	listenTo(manager);
+	list_levels->setManager(manager);
 }
 
+/*
 void UndoManagerHistoryPanel::populateList() {
 	vector<string> levels;
 	manager->getAllLevels(levels);
@@ -60,16 +122,7 @@ void UndoManagerHistoryPanel::updateList() {
 			list_levels->setItemStatus(a, LV_STATUS_NORMAL);
 	}
 }
-
-void UndoManagerHistoryPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer != manager)
-		return;
-
-	if (event_name == "level_recorded")
-		populateList();
-	else if (event_name == "undo" || event_name == "redo")
-		updateList();
-}
+*/
 
 void UndoManagerHistoryPanel::onItemRightClick(wxCommandEvent& e) {
 	int index = e.GetInt();
