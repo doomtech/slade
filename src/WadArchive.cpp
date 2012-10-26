@@ -316,11 +316,15 @@ bool WadArchive::open(MemChunk& mc) {
 		offset = wxINT32_SWAP_ON_BE(offset);
 		size = wxINT32_SWAP_ON_BE(size);
 
+		// Hack to open Operation: Rheingold WAD files
+		if (size == 0 && offset > mc.getSize())
+			offset = 0;
+
 		// If the lump data goes past the end of the file,
 		// the wadfile is invalid
 		if (offset + size > mc.getSize()) {
 			wxLogMessage("WadArchive::open: Wad archive is invalid or corrupt");
-			Global::error = "Archive is invalid and/or corrupt";
+			Global::error = S_FMT("Archive is invalid and/or corrupt (lump %d: %s data goes past end of file)", d, name);
 			setMuted(false);
 			return false;
 		}

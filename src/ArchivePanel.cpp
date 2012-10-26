@@ -1227,6 +1227,7 @@ bool ArchivePanel::gfxConvert() {
 
 	// Hide splash window
 	theSplashWindow->hide();
+	theActivePanel->callRefresh();
 
 	return true;
 }
@@ -1279,6 +1280,7 @@ bool ArchivePanel::gfxRemap() {
 		// Finish recording undo level
 		undo_manager->endRecord(true);
 	}
+	theActivePanel->callRefresh();
 
 	return true;
 }
@@ -1304,6 +1306,7 @@ bool ArchivePanel::gfxModifyOffsets() {
 		undo_manager->recordUndoStep(new EntryDataUS(selection[a]));
 		EntryOperations::modifyGfxOffsets(selection[a], mod.getAlignType(), mod.getOffset(), mod.xOffChange(), mod.yOffChange(), mod.relativeOffset());
 	}
+	theActivePanel->callRefresh();
 
 	// Finish recording undo level
 	undo_manager->endRecord(true);
@@ -1447,6 +1450,7 @@ bool ArchivePanel::palConvert() {
 		dest[i] = ((dest[i] << 2) | (dest[i] >> 4));
 	}
 	pal6bit->importMem(dest, pal6bit->getSize());
+	theActivePanel->callRefresh();
 	delete[] dest;
 	return true;
 }
@@ -1499,7 +1503,8 @@ bool ArchivePanel::dSndWavConvert() {
 		bool worked = false;
 		MemChunk wav;
 		// Convert Doom Sound -> WAV if the entry is Doom Sound format
-		if (selection[a]->getType()->getFormat() == "snd_doom")
+		if (selection[a]->getType()->getFormat() == "snd_doom" ||
+			selection[a]->getType()->getFormat() == "snd_doom_mac")
 			worked = Conversions::doomSndToWav(selection[a]->getMCData(), wav);
 		// Or Jaguar Doom sound format
 		else if (selection[a]->getType()->getFormat() == "snd_jaguar")
@@ -2210,6 +2215,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		if (!dsnd_selected) {
 			if (selection[a]->getType()->getFormat() == "snd_doom" ||
 				selection[a]->getType()->getFormat() == "snd_wolf" ||
+				selection[a]->getType()->getFormat() == "snd_doom_mac" ||
 				selection[a]->getType()->getFormat() == "snd_jaguar" ||
 				selection[a]->getType()->getFormat() == "snd_bloodsfx" ||
 				selection[a]->getType()->getFormat() == "snd_voc")

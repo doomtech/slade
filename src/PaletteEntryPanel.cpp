@@ -672,7 +672,7 @@ bool PaletteEntryPanel::showPalette(uint32_t index) {
 void PaletteEntryPanel::refreshPanel() {
 	if (entry) {
 		uint32_t our_palette = cur_palette;
-		loadEntry(entry);
+		//loadEntry(entry);
 		if (our_palette > 0 && our_palette < palettes.size())
 			showPalette(our_palette);
 	}

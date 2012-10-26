@@ -1096,6 +1096,14 @@
 					RelativePath=".\src\ThingTypeTreeView.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\UndoManagerHistoryPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\UndoManagerHistoryPanel.h"
+					>
+				</File>
 				<Filter
 					Name="Overlays"
 					>

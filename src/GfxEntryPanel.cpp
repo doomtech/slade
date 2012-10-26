@@ -606,7 +606,7 @@ string GfxEntryPanel::statusString() {
  * Redraws the panel
  *******************************************************************/
 void GfxEntryPanel::refreshPanel() {
-	if (entry && getImage())
+	if (entry && getImage() && !image_data_modified)
 		loadEntry(entry, getImage()->getIndex());
 	Update();
 	Refresh();
@@ -790,6 +790,7 @@ bool GfxEntryPanel::handleAction(string id) {
 
 			// Update variables
 			image_data_modified = true;
+			gfx_canvas->updateImageTexture();
 			setModified();
 			prev_translation.copy(ted.getTranslation());
 		}
@@ -811,6 +812,7 @@ bool GfxEntryPanel::handleAction(string id) {
 
 			// Update variables
 			image_data_modified = true;
+			Refresh();
 			setModified();
 		}
 	}
@@ -831,6 +833,7 @@ bool GfxEntryPanel::handleAction(string id) {
 
 			// Update variables
 			image_data_modified = true;
+			Refresh();
 			setModified();
 		}
 	}
@@ -847,8 +850,10 @@ bool GfxEntryPanel::handleAction(string id) {
 	}
 
 	// alPh/tRNS
-	else if (id == "pgfx_alph" || id == "pgfx_trns")
+	else if (id == "pgfx_alph" || id == "pgfx_trns") {
 		setModified();
+		Refresh();
+	}
 
 	// Extract all
 	else if (id == "pgfx_extract") {

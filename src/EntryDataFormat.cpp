@@ -254,6 +254,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new IMFDataFormat();
 	new DoomSoundDataFormat();
 	new WolfSoundDataFormat();
+	new DoomMacSoundDataFormat();
 	new DoomPCSpeakerDataFormat();
 	new JaguarDoomSoundDataFormat();
 	new VocDataFormat();
