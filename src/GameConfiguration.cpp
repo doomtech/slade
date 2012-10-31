@@ -367,7 +367,7 @@ bool GameConfiguration::portSupportsGame(unsigned port, string game) {
 }
 
 bool GameConfiguration::mapFormatSupported(int map_format, int game, int port) {
-	if (MAP_DOOM < 0 || MAP_UDMF > 3)
+	if (map_format < 0 || map_format > 3)
 		return false;
 
 	// Check port if one specified

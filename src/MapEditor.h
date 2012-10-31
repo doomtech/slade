@@ -33,6 +33,7 @@ private:
 	bool		grid_snap;
 	bool		link_3d_light;
 	bool		link_3d_offset;
+	int			current_tag;
 
 	// Tagged items
 	vector<MapSector*>	tagged_sectors;
@@ -144,6 +145,7 @@ public:
 	// Selection/hilight
 	void		clearHilight() { if (!hilight_locked) hilight_item = -1; }
 	bool		updateHilight(fpoint2_t mouse_pos, double dist_scale = 1.0);
+	void		updateTagged();
 	void		selectionUpdated();
 	void		clearSelection();
 	void		selectAll();
@@ -185,6 +187,11 @@ public:
 	void	joinSectors(bool remove_lines);
 	void	changeThingType(int newtype);
 	void	thingQuickAngle(fpoint2_t mouse_pos);
+
+	// Tag edit
+	int		beginTagEdit();
+	void	tagSectorAt(double x, double y);
+	void	endTagEdit(bool accept = true);
 	
 	// Object creation/deletion
 	void	createObject(double x, double y);
@@ -216,6 +223,8 @@ public:
 	void	toggleUnpegged3d(bool lower);
 	void	copy3d(int type);
 	void	paste3d(int type);
+	void	changeThingZ3d(int amount);
+	void	deleteThing3d();
 
 	// Editor messages
 	unsigned	numEditorMessages();

@@ -354,8 +354,13 @@ void MapObjectPropsPanel::setupType(int objtype) {
 				if (map_format == MAP_HEXEN) prop_as->addArgProperty(prop, a);
 			}
 		}
-		else // Sector tag otherwise
-			addIntProperty(g_special, "Sector Tag", "arg0");
+		else { // Sector tag otherwise
+			//addIntProperty(g_special, "Sector Tag", "arg0");
+			MOPGTagProperty* prop_tag = new MOPGTagProperty("Sector Tag", "arg0");
+			prop_tag->setParent(this);
+			properties.push_back(prop_tag);
+			pg_properties->AppendIn(g_special, prop_tag);
+		}
 
 		// Add SPAC
 		if (map_format == MAP_HEXEN) {
@@ -422,7 +427,11 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		addIntProperty(g_basic, "Ceiling Height", "heightceiling");
 
 		// Add tag
-		addIntProperty(g_basic, "Tag/ID", "id");
+		//addIntProperty(g_basic, "Tag/ID", "id");
+		MOPGTagProperty* prop_tag = new MOPGTagProperty("Tag/ID", "id");
+		prop_tag->setParent(this);
+		properties.push_back(prop_tag);
+		pg_properties->AppendIn(g_basic, prop_tag);
 
 		// Add 'Lighting' group
 		wxPGProperty* g_light = pg_properties->Append(new wxPropertyCategory("Lighting"));

@@ -528,8 +528,8 @@ bool PolygonSplitter::tracePolyOutline(int edge_start) {
 
 		// Abort if no next edge was found
 		if (next < 0) {
-			for (unsigned a = 0; a < poly.edges.size(); a++)
-				edges[poly.edges[a]].inpoly = false;
+			for (unsigned b = 0; b < poly.edges.size(); b++)
+				edges[poly.edges[b]].inpoly = false;
 
 			polygon_outlines.pop_back();
 			return false;

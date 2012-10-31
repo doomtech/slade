@@ -231,9 +231,9 @@ void WadArchive::updateNamespaces() {
 		}
 
 		// Check namespace name for special cases
-		for (int a = 0; a < n_special_namespaces; a++) {
-			if (S_CMP(ns.name, special_namespaces[a].letter))
-				ns.name = special_namespaces[a].name;
+		for (int n = 0; n < n_special_namespaces; n++) {
+			if (S_CMP(ns.name, special_namespaces[n].letter))
+				ns.name = special_namespaces[n].name;
 		}
 
 		ns.start_index = entryIndex(ns.start);

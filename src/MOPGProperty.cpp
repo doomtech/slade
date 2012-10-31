@@ -775,3 +775,69 @@ void MOPGSPACTriggerProperty::applyValue() {
 		theGameConfiguration->setLineSpacTrigger(GetChoiceSelection(), (MapLine*)objects[a]);
 		//objects[a]->setIntProperty(GetName(), m_value.GetInteger());
 }
+
+
+
+MOPGTagProperty::MOPGTagProperty(const wxString& label, const wxString& name)
+: wxIntProperty(label, name, 0), MOPGProperty(MOPGProperty::TYPE_ASPECIAL) {
+	// Set to text+button editor
+	SetEditor(wxPGEditor_TextCtrlAndButton);
+}
+
+void MOPGTagProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
+		SetValueToUnspecified();
+		return;
+	}
+
+	// Get property of first object
+	int first = objects[0]->intProperty(GetName());
+
+	// Check whether all objects share the same value
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (objects[a]->intProperty(GetName()) != first) {
+			// Different value found, set unspecified
+			SetValueToUnspecified();
+			return;
+		}
+	}
+
+	// Set to common value
+	noupdate = true;
+	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
+		Hide(true);
+	else
+		Hide(false);
+	noupdate = false;
+}
+
+void MOPGTagProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		objects[a]->setIntProperty(GetName(), m_value.GetInteger());
+}
+
+bool MOPGTagProperty::OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) {
+	if (e.GetEventType() == wxEVT_COMMAND_BUTTON_CLICKED) {
+		vector<MapObject*>& objects = parent->getObjects();
+		if (objects.size() == 0)
+			return false;
+		if (!objects[0]->getParentMap())
+			return false;
+		int tag = objects[0]->getParentMap()->findUnusedSectorTag();
+		SetValue(tag);
+		return true;
+	}
+
+	return wxIntProperty::OnEvent(propgrid, window, e);
+}

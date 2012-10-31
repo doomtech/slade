@@ -273,9 +273,9 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 				if (S_CMP(tz.peekToken(), ","))
 					tz.skipToken();	// Skip it
 				else if (!(S_CMP(tz.peekToken(), list_end))) {
-					string token = tz.getToken();
-					string name = tz.getName();
-					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\" in %s (line %d)", CHR(list_end), CHR(token), CHR(name), tz.lineNo());
+					string t = tz.getToken();
+					string n = tz.getName();
+					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\" in %s (line %d)", CHR(list_end), CHR(t), CHR(n), tz.lineNo());
 					return false;
 				}
 

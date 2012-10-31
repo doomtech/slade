@@ -753,7 +753,7 @@ void MapCanvas::drawMap2d() {
 
 
 	// Draw tagged sectors/lines/things if needed
-	if (!overlayActive() && mouse_state == MSTATE_NORMAL) {
+	if (!overlayActive() && mouse_state == MSTATE_NORMAL || mouse_state == MSTATE_TAG_SECTORS || mouse_state == MSTATE_TAG_THINGS) {
 		if (editor->taggedSectors().size() > 0)
 			renderer_2d->renderTaggedFlats(editor->taggedSectors(), anim_flash_level);
 		if (editor->taggedLines().size() > 0)
@@ -1875,12 +1875,29 @@ void MapCanvas::keyBinds2d(string name) {
 	// --- Tag edit ---
 	else if (mouse_state == MSTATE_TAG_SECTORS) {
 		// Accept
-		if (name == "map_edit_accept")
+		if (name == "map_edit_accept") {
 			mouse_state = MSTATE_NORMAL;
+			editor->endTagEdit(true);
+		}
 		
 		// Cancel
-		else if (name == "map_edit_cancel")
+		else if (name == "map_edit_cancel") {
 			mouse_state = MSTATE_NORMAL;
+			editor->endTagEdit(false);
+		}
+	}
+	else if (mouse_state == MSTATE_TAG_THINGS) {
+		// Accept
+		if (name == "map_edit_accept") {
+			mouse_state = MSTATE_NORMAL;
+			editor->endTagEdit(true);
+		}
+		
+		// Cancel
+		else if (name == "map_edit_cancel") {
+			mouse_state = MSTATE_NORMAL;
+			editor->endTagEdit(false);
+		}
 	}
 
 	// --- Moving ---
@@ -2040,8 +2057,10 @@ void MapCanvas::keyBinds2d(string name) {
 				editor->flipLines(false);
 
 			// Edit line tags
-			else if (name == "me2d_line_tag_edit")
-				mouse_state = MSTATE_TAG_SECTORS;
+			else if (name == "me2d_line_tag_edit") {
+				if (editor->beginTagEdit() > 0)
+					mouse_state = MSTATE_TAG_SECTORS;
+			}
 		}
 
 
@@ -2331,6 +2350,16 @@ bool MapCanvas::handleAction(string id) {
 				renderer_2d->forceUpdate();
 			}
 		}
+
+		return true;
+	}
+
+	// Tag to
+	else if (id == "mapw_line_tagedit") {
+		int type = editor->beginTagEdit();
+		if (type > 0)
+			mouse_state = MSTATE_TAG_SECTORS;
+		return true;
 	}
 
 	// --- Thing context menu ---
@@ -2520,6 +2549,11 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 			mouse_state = MSTATE_NORMAL;
 		}
 
+		// Sector tagging state
+		else if (mouse_state == MSTATE_TAG_SECTORS) {
+			editor->tagSectorAt(mouse_pos_m.x, mouse_pos_m.y);
+		}
+
 		else if (mouse_state == MSTATE_NORMAL) {
 			// Begin box selection if shift is held down, otherwise toggle selection on hilighted object
 			if (e.ShiftDown())
@@ -2634,6 +2668,7 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 					menu_context.AppendSeparator();
 					theApp->getAction("mapw_line_changetexture")->addToMenu(&menu_context);
 					theApp->getAction("mapw_line_changespecial")->addToMenu(&menu_context);
+					theApp->getAction("mapw_line_tagedit")->addToMenu(&menu_context);
 				}
 			}
 			else if (editor->editMode() == MapEditor::MODE_THINGS) {
