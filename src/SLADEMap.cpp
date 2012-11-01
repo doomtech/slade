@@ -3146,6 +3146,7 @@ bool SLADEMap::convertToHexen() {
 	// Already hexen format
 	if (current_format == MAP_HEXEN)
 		return true;
+	return false;
 }
 
 bool SLADEMap::convertToUDMF() {
@@ -3153,12 +3154,12 @@ bool SLADEMap::convertToUDMF() {
 	if (current_format == MAP_UDMF)
 		return true;
 
-	// Line_SetIdentification special, set line id
-	for (unsigned a = 0; a < lines.size(); a++) {
-		if (lines[a]->intProperty("special") == 121) {
-			int id = lines[a]->intProperty("arg0");
-			
-			if (current_format == MAP_HEXEN) {
+	if (current_format == MAP_HEXEN) {
+		// Line_SetIdentification special, set line id
+		for (unsigned a = 0; a < lines.size(); a++) {
+			if (lines[a]->intProperty("special") == 121) {
+				int id = lines[a]->intProperty("arg0");
+
 				// id high byte
 				int hi = lines[a]->intProperty("arg4");
 				id = (hi*256) + id;
@@ -3172,16 +3173,18 @@ bool SLADEMap::convertToUDMF() {
 				if (flags & 16) lines[a]->setBoolProperty("wrapmidtex", true);
 				if (flags & 32) lines[a]->setBoolProperty("midtex3d", true);
 				if (flags & 64) lines[a]->setBoolProperty("checkswitchrange", true);
-			}
 
-			lines[a]->setIntProperty("special", 0);
-			lines[a]->setIntProperty("id", id);
-			lines[a]->setIntProperty("arg0", 0);
+				lines[a]->setIntProperty("special", 0);
+				lines[a]->setIntProperty("id", id);
+				lines[a]->setIntProperty("arg0", 0);
+			}
 		}
 	}
+	else return false;
 
 	// flags
 
 	// Set format
 	current_format = MAP_UDMF;
+	return true;
 }

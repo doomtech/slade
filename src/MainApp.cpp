@@ -639,10 +639,12 @@ bool MainApp::OnInit() {
 
 	// Init actions
 	initActions();
+	theMainWindow;
 
 	// Init base resource
 	wxLogMessage("Loading base resource");
 	theArchiveManager->initBaseResource();
+	wxLogMessage("Base resource loaded");
 
 	// Show the main window
 	theMainWindow->Show(true);

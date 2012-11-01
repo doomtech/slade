@@ -192,6 +192,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DoomGfxBetaDataFormat();
 	new DoomSneaDataFormat();
 	new DoomArahDataFormat();
+	new DoomPSXDataFormat();
 	new DoomJaguarDataFormat();
 	new DoomJagTexDataFormat();
 	new DoomJagSpriteDataFormat();
@@ -241,6 +242,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new GZipDataFormat();
 	new BZip2DataFormat();
 	new TarDataFormat();
+	new DiskDataFormat();
 	new MUSDataFormat();
 	new MIDIDataFormat();
 	new XMIDataFormat();

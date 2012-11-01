@@ -5,8 +5,8 @@
  *
  * Email:       sirjuddington@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    PakArchive.cpp
- * Description: PakArchive, archive class to handle the Quake pak format
+ * Filename:    DiskArchive.cpp
+ * Description: DiskArchive, archive class to handle Nerve files
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,15 +23,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *******************************************************************/
 
+/*******************************************************************
+ * Note: specifications and snippets of code were taken from the
+ * Eternity Engine, by James Haley (a.k.a. Quasar).
+ *******************************************************************/
+
 
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
-#include "PakArchive.h"
+#include "DiskArchive.h"
 #include "SplashWindow.h"
 #include <wx/filename.h>
 
+struct diskentry_t
+{
+   char name[64];
+   size_t offset;
+   size_t length;
+};
 
 /*******************************************************************
  * EXTERNAL VARIABLES
@@ -40,100 +51,97 @@ EXTERN_CVAR(Bool, archive_load_data)
 
 
 /*******************************************************************
- * PAKARCHIVE CLASS FUNCTIONS
+ * DISKARCHIVE CLASS FUNCTIONS
  *******************************************************************/
 
-/* PakArchive::PakArchive
- * PakArchive class constructor
+/* DiskArchive::DiskArchive
+ * DiskArchive class constructor
  *******************************************************************/
-PakArchive::PakArchive() : Archive(ARCHIVE_PAK) {
+DiskArchive::DiskArchive() : Archive(ARCHIVE_DISK) {
 }
 
-/* PakArchive::~PakArchive
- * PakArchive class destructor
+/* DiskArchive::~DiskArchive
+ * DiskArchive class destructor
  *******************************************************************/
-PakArchive::~PakArchive() {
+DiskArchive::~DiskArchive() {
 }
 
-/* PakArchive::getFileExtensionString
+/* DiskArchive::getFileExtensionString
  * Returns the file extension string to use in the file open dialog
  *******************************************************************/
-string PakArchive::getFileExtensionString() {
-	return "Pak Files (*.pak)|*.pak";
+string DiskArchive::getFileExtensionString() {
+	return "Nerve Disk Files (*.disk)|*.disk";
 }
 
-/* PakArchive::getFormat
- * Returns the string id for the pak EntryDataFormat
+/* DiskArchive::getFormat
+ * Returns the string id for the disk EntryDataFormat
  *******************************************************************/
-string PakArchive::getFormat() {
-	return "archive_pak";
+string DiskArchive::getFormat() {
+	return "archive_disk";
 }
 
-/* PakArchive::open
- * Reads pak format data from a MemChunk
+/* DiskArchive::open
+ * Reads disk format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool PakArchive::open(MemChunk& mc) {
+bool DiskArchive::open(MemChunk& mc) {
+	size_t mcsize = mc.getSize();
+
 	// Check given data is valid
-	if (mc.getSize() < 12)
+	if (mcsize < 80)
 		return false;
 
-	// Read pak header
-	char pack[4];
-	long dir_offset;
-	long dir_size;
+	// Read disk header
+	uint32_t num_entries;
 	mc.seek(0, SEEK_SET);
-	mc.read(pack, 4);
-	mc.read(&dir_offset, 4);
-	mc.read(&dir_size, 4);
+	mc.read(&num_entries, 4);
+	num_entries = wxUINT32_SWAP_ON_LE(num_entries);
 
-	// Check it
-	if (pack[0] != 'P' || pack[1] != 'A' || pack[2] != 'C' || pack[3] != 'K') {
-		wxLogMessage("PakArchive::open: Opening failed, invalid header");
-		Global::error = "Invalid pak header";
+	size_t start_offset = (72 * num_entries) + 8;
+
+	if (mcsize < start_offset)
 		return false;
-	}
 
 	// Stop announcements (don't want to be announcing modification due to entries being added etc)
 	setMuted(true);
 
 	// Read the directory
-	size_t num_entries = dir_size / 64;
-	mc.seek(dir_offset, SEEK_SET);
-	theSplashWindow->setProgressMessage("Reading pak archive data");
+	theSplashWindow->setProgressMessage("Reading disk archive data");
 	for (uint32_t d = 0; d < num_entries; d++) {
 		// Update splash window progress
 		theSplashWindow->setProgress(((float)d / (float)num_entries));
 
 		// Read entry info
-		char name[56];
-		long offset;
-		long size;
-		mc.read(name, 56);
-		mc.read(&offset, 4);
-		mc.read(&size, 4);
+		diskentry_t dent;
+		mc.read(&dent, 72);
 
 		// Byteswap if needed
-		offset = wxINT32_SWAP_ON_BE(offset);
-		size = wxINT32_SWAP_ON_BE(size);
+		dent.length = wxUINT32_SWAP_ON_LE(dent.length);
+		dent.offset = wxUINT32_SWAP_ON_LE(dent.offset);
+
+		// Increase offset to make it relative to start of archive
+		dent.offset += start_offset;
 
 		// Check offset+size
-		if ((unsigned)(offset + size) > mc.getSize()) {
-			wxLogMessage("PakArchive::open: Pak archive is invalid or corrupt (entry goes past end of file)");
+		if (dent.offset + dent.length > mcsize) {
+			wxLogMessage("DiskArchive::open: Disk archive is invalid or corrupt (entry goes past end of file)");
 			Global::error = "Archive is invalid and/or corrupt";
 			setMuted(false);
 			return false;
 		}
 
 		// Parse name
-		wxFileName fn(wxString::FromAscii(name, 56));
+		string name = wxString::FromAscii(dent.name, 64);
+		name.Replace("\\", "/");
+		name.Replace("GAME:/", "");
+		wxFileName fn(name);
 
 		// Create directory if needed
 		ArchiveTreeNode* dir = createDir(fn.GetPath(true, wxPATH_UNIX));
 
 		// Create entry
-		ArchiveEntry* entry = new ArchiveEntry(fn.GetFullName(), size);
-		entry->exProp("Offset") = (int)offset;
+		ArchiveEntry* entry = new ArchiveEntry(fn.GetFullName(), dent.length);
+		entry->exProp("Offset") = (int)dent.offset;
 		entry->setLoaded(false);
 		entry->setState(0);
 
@@ -181,11 +189,11 @@ bool PakArchive::open(MemChunk& mc) {
 	return true;
 }
 
-/* PakArchive::write
- * Writes the pak archive to a MemChunk
+/* DiskArchive::write
+ * Writes the disk archive to a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool PakArchive::write(MemChunk& mc, bool update) {
+bool DiskArchive::write(MemChunk& mc, bool update) {
 	// Clear current data
 	mc.clear();
 
@@ -194,31 +202,29 @@ bool PakArchive::write(MemChunk& mc, bool update) {
 	getEntryTreeAsList(entries);
 
 	// Process entry list
-	long dir_offset = 12;
-	long dir_size = 0;
+	uint32_t num_entries = 0;
+	uint32_t size_entries = 0;
 	for (unsigned a = 0; a < entries.size(); a++) {
 		// Ignore folder entries
 		if (entries[a]->getType() == EntryType::folderType())
 			continue;
 
 		// Increment directory offset and size
-		dir_offset += entries[a]->getSize();
-		dir_size += 64;
+		size_entries += entries[a]->getSize();
+		++num_entries;
 	}
 
 	// Init data size
-	mc.reSize(dir_offset + dir_size, false);
+	uint32_t start_offset = 8 + (num_entries * 72);
+	uint32_t offset = start_offset;
+	mc.reSize(size_entries + start_offset, false);
 
 	// Write header
-	char pack[4] = { 'P', 'A', 'C', 'K' };
+	num_entries = wxUINT32_SWAP_ON_LE(num_entries);
 	mc.seek(0, SEEK_SET);
-	mc.write(pack, 4);
-	mc.write(&dir_offset, 4);
-	mc.write(&dir_size, 4);
+	mc.write(&num_entries, 4);
 
 	// Write directory
-	mc.seek(dir_offset, SEEK_SET);
-	long offset = 12;
 	for (unsigned a = 0; a < entries.size(); a++) {
 		// Skip folders
 		if (entries[a]->getType() == EntryType::folderType())
@@ -232,34 +238,47 @@ bool PakArchive::write(MemChunk& mc, bool update) {
 
 		// Check entry name
 		string name = entries[a]->getPath(true);
-		name.Remove(0, 1);	// Remove leading /
-		if (name.Len() > 56) {
-			wxLogMessage("Warning: Entry %s path is too long (> 56 characters), putting it in the root directory", CHR(name));
+		name.Replace("/", "\\");
+		// The leading "GAME:\" part of the name means there is only 58 usable characters for path
+		if (name.Len() > 58) {
+			wxLogMessage("Warning: Entry %s path is too long (> 58 characters), putting it in the root directory", CHR(name));
 			wxFileName fn(name);
 			name = fn.GetFullName();
-			if (name.Len() > 56)
-				name.Truncate(56);
+			if (name.Len() > 57)
+				name.Truncate(57);
+			// Add leading "\"
+			name = "\\" + name;
+
 		}
+		name = "GAME:" + name;
+
+		diskentry_t dent;
 
 		// Write entry name
-		char name_data[56];
-		memset(name_data, 0, 56);
-		memcpy(name_data, CHR(name), name.Length());
-		mc.write(name_data, 56);
+		// The names field are padded with FD for doom.disk, FE for doom2.disk. No idea whether
+		// a non-null padding is actually required, though. It probably should work with anything.
+		memset(dent.name, 0xFE, 64);
+		memcpy(dent.name, CHR(name), name.Length());
+		dent.name[name.Length()] = 0;
 
 		// Write entry offset
-		mc.write(&offset, 4);
+		dent.offset = wxUINT32_SWAP_ON_LE(offset - start_offset);
 
 		// Write entry size
-		long size = entries[a]->getSize();
-		mc.write(&size, 4);
+		dent.length = wxUINT32_SWAP_ON_LE(entries[a]->getSize());
+
+		// Actually write stuff
+		mc.write(&dent, 72);
 
 		// Increment/update offset
-		offset += size;
+		offset += wxUINT32_SWAP_ON_LE(dent.length);
 	}
 
+	// Finish writing header
+	size_entries = wxUINT32_SWAP_ON_LE(size_entries);
+	mc.write(&size_entries, 4);
+
 	// Write entry data
-	mc.seek(12, SEEK_SET);
 	for (unsigned a = 0; a < entries.size(); a++) {
 		// Skip folders
 		if (entries[a]->getType() == EntryType::folderType())
@@ -272,11 +291,11 @@ bool PakArchive::write(MemChunk& mc, bool update) {
 	return true;
 }
 
-/* PakArchive::loadEntryData
- * Loads an entry's data from the pak file
+/* DiskArchive::loadEntryData
+ * Loads an entry's data from the disk file
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool PakArchive::loadEntryData(ArchiveEntry* entry) {
+bool DiskArchive::loadEntryData(ArchiveEntry* entry) {
 	// Check entry is ok
 	if (!checkEntry(entry))
 		return false;
@@ -293,7 +312,7 @@ bool PakArchive::loadEntryData(ArchiveEntry* entry) {
 	
 	// Check it opened
 	if (!file.IsOpened()) {
-		wxLogMessage("PakArchive::loadEntryData: Unable to open archive file %s", CHR(filename));
+		wxLogMessage("DiskArchive::loadEntryData: Unable to open archive file %s", CHR(filename));
 		return false;
 	}
 
@@ -307,10 +326,10 @@ bool PakArchive::loadEntryData(ArchiveEntry* entry) {
 	return true;
 }
 
-/* PakArchive::detectNamespace
+/* DiskArchive::detectNamespace
  * Returns the namespace that [entry] is within
  *******************************************************************/
-string PakArchive::detectNamespace(ArchiveEntry* entry) {
+string DiskArchive::detectNamespace(ArchiveEntry* entry) {
 	// Check entry
 	if (!checkEntry(entry))
 		return "global";
@@ -332,72 +351,103 @@ string PakArchive::detectNamespace(ArchiveEntry* entry) {
 }
 
 /*******************************************************************
- * PAKARCHIVE CLASS STATIC FUNCTIONS
+ * DISKARCHIVE CLASS STATIC FUNCTIONS
  *******************************************************************/
 
-/* PakArchive::isPakArchive
- * Checks if the given data is a valid Quake pak archive
+/* DiskArchive::isDiskArchive
+ * Checks if the given data is a valid Nerve disk archive
  *******************************************************************/
-bool PakArchive::isPakArchive(MemChunk& mc) {
+bool DiskArchive::isDiskArchive(MemChunk& mc) {
 	// Check given data is valid
-	if (mc.getSize() < 12)
+	size_t mcsize = mc.getSize();
+	if (mcsize < 80)
 		return false;
 
-	// Read pak header
-	char pack[4];
-	long dir_offset;
-	long dir_size;
+	// Read disk header
+	uint32_t num_entries;
+	uint32_t size_entries;
 	mc.seek(0, SEEK_SET);
-	mc.read(pack, 4);
-	mc.read(&dir_offset, 4);
-	mc.read(&dir_size, 4);
+	mc.read(&num_entries, 4);
+	num_entries = wxUINT32_SWAP_ON_LE(num_entries);
 
-	// Byteswap values for big endian if needed
-	dir_size = wxINT32_SWAP_ON_BE(dir_size);
-	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
+	size_t start_offset = (72 * num_entries) + 8;
 
-	// Check header
-	if (pack[0] != 'P' || pack[1] != 'A' || pack[2] != 'C' || pack[3] != 'K')
+	if (mcsize < start_offset)
 		return false;
 
-	// Check directory is sane
-	if (dir_offset < 12 || (unsigned)(dir_offset + dir_size) > mc.getSize())
+	// Read the directory
+	for (uint32_t d = 0; d < num_entries; d++) {
+		// Read entry info
+		diskentry_t entry;
+		mc.read(&entry, 72);
+
+		// Byteswap if needed
+		entry.length = wxUINT32_SWAP_ON_LE(entry.length);
+		entry.offset = wxUINT32_SWAP_ON_LE(entry.offset);
+
+		// Increase offset to make it relative to start of archive
+		entry.offset += start_offset;
+
+		// Check offset+size
+		if (entry.offset + entry.length > mcsize)
+			return false;
+	}
+	mc.read(&size_entries, 4);
+	size_entries = wxUINT32_SWAP_ON_LE(size_entries);
+	if (size_entries + start_offset != mcsize)
 		return false;
 
 	// That'll do
 	return true;
 }
 
-/* PakArchive::isPakArchive
- * Checks if the file at [filename] is a valid Quake pak archive
+/* DiskArchive::isDiskArchive
+ * Checks if the file at [filename] is a valid Quake disk archive
  *******************************************************************/
-bool PakArchive::isPakArchive(string filename) {
+bool DiskArchive::isDiskArchive(string filename) {
 	// Open file for reading
 	wxFile file(filename);
 
 	// Check it opened ok
-	if (!file.IsOpened() || file.Length() < 12)
+	if (!file.IsOpened() || file.Length() < 4)
+		return false;
+	// Check given data is valid
+	size_t mcsize = file.Length();
+	if (mcsize < 80)
 		return false;
 
-	// Read pak header
-	char pack[4];
-	long dir_offset;
-	long dir_size;
+	// Read disk header
+	uint32_t num_entries;
+	uint32_t size_entries;
 	file.Seek(0, wxFromStart);
-	file.Read(pack, 4);
-	file.Read(&dir_offset, 4);
-	file.Read(&dir_size, 4);
+	file.Read(&num_entries, 4);
+	num_entries = wxUINT32_SWAP_ON_LE(num_entries);
 
-	// Byteswap values for big endian if needed
-	dir_size = wxINT32_SWAP_ON_BE(dir_size);
-	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
+	size_t start_offset = (72 * num_entries) + 8;
 
-	// Check header
-	if (pack[0] != 'P' || pack[1] != 'A' || pack[2] != 'C' || pack[3] != 'K')
+	if (mcsize < start_offset)
 		return false;
 
-	// Check directory is sane
-	if (dir_offset < 12 || dir_offset + dir_size > file.Length())
+	// Read the directory
+	for (uint32_t d = 0; d < num_entries; d++) {
+		// Read entry info
+		diskentry_t entry;
+		file.Read(&entry, 72);
+
+		// Byteswap if needed
+		entry.length = wxUINT32_SWAP_ON_LE(entry.length);
+		entry.offset = wxUINT32_SWAP_ON_LE(entry.offset);
+
+		// Increase offset to make it relative to start of archive
+		entry.offset += start_offset;
+
+		// Check offset+size
+		if (entry.offset + entry.length > mcsize)
+			return false;
+	}
+	file.Read(&size_entries, 4);
+	size_entries = wxUINT32_SWAP_ON_LE(size_entries);
+	if (size_entries + start_offset != mcsize)
 		return false;
 
 	// That'll do

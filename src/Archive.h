@@ -72,6 +72,7 @@ enum ArchiveTypes {
 	ARCHIVE_GZIP,
 	ARCHIVE_BZ2,
 	ARCHIVE_7Z,
+	ARCHIVE_DISK,
 };
 
 class Archive : public Announcer {

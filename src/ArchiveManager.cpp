@@ -229,6 +229,8 @@ Archive* ArchiveManager::openArchive(string filename, bool manage, bool silent) 
 		new_archive = new BZip2Archive();
 	else if (TarArchive::isTarArchive(filename))
 		new_archive = new TarArchive();
+	else if (DiskArchive::isDiskArchive(filename))
+		new_archive = new DiskArchive();
 	else {
 		// Unsupported format
 		Global::error = "Unsupported or invalid Archive format";
@@ -325,6 +327,8 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage, bool sile
 		new_archive = new BZip2Archive();
 	else if (TarArchive::isTarArchive(entry->getMCData()))
 		new_archive = new TarArchive();
+	else if (DiskArchive::isDiskArchive(entry->getMCData()))
+		new_archive = new DiskArchive();
 	else {
 		// Unsupported format
 		Global::error = "Unsupported or invalid Archive format";
@@ -520,6 +524,7 @@ string ArchiveManager::getArchiveExtensionsString() {
 	string ext_hog = "*.hob;*.HOG;*.Hog";						extensions += ext_hog + ";";
 	string ext_grp = "*.grp;*.GRP;*.Grp;*.prg;*.PRG;*.Prg";		extensions += ext_grp + ";";
 	string ext_rff = "*.rff;*.RFF;*.Rff";						extensions += ext_rff + ";";
+	string ext_disk = "*.disk;*.DISK;*.Disk";					extensions += ext_disk+ ";";
 	string ext_wolf =	"vswap.*;VSWAP.*Vswap.*;"
 						"audiot.*;AUDIOT.*;Audiot.*;"
 						"audiohed.*;AUDIOHED.*;Audiohed.*;"
@@ -544,6 +549,7 @@ string ArchiveManager::getArchiveExtensionsString() {
 	extensions += S_FMT("|Descent Hog files (*.hog)|%s",		CHR(ext_hog));
 	extensions += S_FMT("|Blood Rff files (*.rff)|%s",			CHR(ext_rff));
 	extensions += S_FMT("|Wolfenstein 3D files|%s",				CHR(ext_wolf));
+	extensions += S_FMT("|Nerve Software Disk files|%s",		CHR(ext_disk));
 
 	return extensions;
 }
@@ -666,13 +672,11 @@ bool ArchiveManager::openBaseResource(int index) {
 		announce("base_resource_changed");
 		return true;
 	}
-	else {
-		delete base_resource_archive;
-		base_resource_archive = NULL;
-		theSplashWindow->hide();
-		announce("base_resource_changed");
-		return false;
-	}
+	delete base_resource_archive;
+	base_resource_archive = NULL;
+	theSplashWindow->hide();
+	announce("base_resource_changed");
+	return false;
 }
 
 /* ArchiveManager::getResourceEntry

@@ -133,8 +133,13 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	refreshRecentFileList();
 
 	// Create/setup file browser tab
-	file_browser = new WMFileBrowser(notebook_tabs, this, -1);
-	notebook_tabs->AddPage(file_browser, _("File Browser"));
+	// I'm commenting this out for the moment because it suddenly started making
+	// SLADE freeze for me before initialization could complete. It might explain
+	// some of the weird bug reports I've seen, with the application starting then 
+	// seemingly disappearing silently (though still running if you look at the 
+	// task manager). Since it calls wx components, it'll be hard to investigate.
+	//file_browser = new WMFileBrowser(notebook_tabs, this, -1);
+	//notebook_tabs->AddPage(file_browser, _("File Browser"));
 
 	// Create/setup bookmarks tab
 	wxPanel *panel_bm = new wxPanel(notebook_tabs);

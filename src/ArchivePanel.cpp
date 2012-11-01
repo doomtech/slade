@@ -2706,3 +2706,77 @@ CONSOLE_COMMAND(palconv, 0) {
 		meep->reloadCurrentPanel();
 	}
 }
+
+CONSOLE_COMMAND(palconv64, 0) {
+	ArchivePanel * meep = CH::getCurrentArchivePanel();
+	if (meep)
+	{
+		// Get the entry index of the last selected list item
+		ArchiveEntry* pal = meep->currentEntry();
+		const uint8_t * source = pal->getData(true);
+		uint8_t * dest = new uint8_t[(pal->getSize() / 2) * 3];
+		for (size_t i = 0; i < pal->getSize() / 2; ++i)
+		{
+			uint8_t r, g, b;
+			uint16_t col = READ_B16(source, 2*i);
+			r = (col & 0xF800) >> 8;
+			g = (col & 0x07C0) >> 3;
+			b = (col & 0x003E) << 2;
+			dest[(3*i)+0] = r;
+			dest[(3*i)+1] = g;
+			dest[(3*i)+2] = b;
+		}
+		pal->importMem(dest, (pal->getSize()/2)*3);
+		theActivePanel->callRefresh();
+		delete[] dest;
+	}
+}
+
+CONSOLE_COMMAND(vertex32x, 0) {
+	ArchivePanel * meep = CH::getCurrentArchivePanel();
+	if (meep)
+	{
+		// Get the entry index of the last selected list item
+		ArchiveEntry* v32x = meep->currentEntry();
+		const uint8_t * source = v32x->getData(true);
+		uint8_t * dest = new uint8_t[v32x->getSize() / 2];
+		for (size_t i = 0; i < v32x->getSize() / 4; ++i)
+		{
+			dest[2*i+0] = source[4*i+1];
+			dest[2*i+1] = source[4*i+0];
+		}
+		v32x->importMem(dest, v32x->getSize()/2);
+		theActivePanel->callRefresh();
+		delete[] dest;
+	}
+}
+
+CONSOLE_COMMAND(palconvpsx, 0) {
+	ArchivePanel * meep = CH::getCurrentArchivePanel();
+	if (meep)
+	{
+		// Get the entry index of the last selected list item
+		ArchiveEntry* pal = meep->currentEntry();
+		const uint8_t * source = pal->getData(true);
+		uint8_t * dest = new uint8_t[(pal->getSize() / 2) * 3];
+		for (size_t i = 0; i < pal->getSize() / 2; ++i)
+		{
+			// A1 B5 G5 R5, LE
+			uint8_t a, r, g, b;
+			uint16_t col = READ_L16(source, 2*i);
+			a = (col & 0x8000) >> 15;
+			b = (col & 0x7C00) >> 10;
+			g = (col & 0x03E0) >>  5;
+			r = (col & 0x001F);
+			r = (r << 3) | (r >> 2);
+			g = (g << 3) | (g >> 2);
+			b = (b << 3) | (b >> 2);
+			dest[(3*i)+0] = r;
+			dest[(3*i)+1] = g;
+			dest[(3*i)+2] = b;
+		}
+		pal->importMem(dest, (pal->getSize()/2)*3);
+		theActivePanel->callRefresh();
+		delete[] dest;
+	}
+}

@@ -1609,6 +1609,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\DiskArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\DiskArchive.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\GobArchive.cpp"
 					>
 				</File>
