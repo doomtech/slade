@@ -1775,6 +1775,34 @@ void MapCanvas::onKeyBindPress(string name) {
 		}
 	}
 
+	// Screenshot
+#ifdef USE_SFML_RENDERWINDOW
+	else if (name == "map_screenshot") {
+		// Capture shot
+		sf::Image shot = capture();
+		
+		// Remove alpha
+		// sf::Image kinda sucks, shouldn't have to do it like this
+		for (unsigned x = 0; x < shot.getSize().x; x++) {
+			for (unsigned y = 0; y < shot.getSize().y; y++) {
+				sf::Color col = shot.getPixel(x, y);
+				shot.setPixel(x, y, sf::Color(col.r, col.g, col.b, 255));
+			}
+		}
+
+		// Save to file
+		wxDateTime date;
+		date.SetToCurrent();
+		string timestamp = date.FormatISOCombined('-');
+		timestamp.Replace(":", "");
+		string filename = S_FMT("sladeshot-%s.png", CHR(timestamp));
+		shot.saveToFile(CHR(appPath(filename, DIR_APP)));
+
+		// Editor message
+		editor->addEditorMessage(S_FMT("Screenshot taken (%s)", CHR(filename)));
+	}
+#endif
+
 	// Send to editor first
 	if (editor->handleKeyBind(name, mouse_pos_m))
 		return;

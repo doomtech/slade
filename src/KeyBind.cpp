@@ -235,6 +235,7 @@ string KeyBind::keyName(int key) {
 	case WXK_WINDOWS_LEFT:		return "win_left";
 	case WXK_WINDOWS_RIGHT:		return "win_right";
 	case WXK_WINDOWS_MENU:		return "win_menu";
+	case WXK_PRINT:				return "printscrn";
 #ifdef __APPLE__
 	case WXK_COMMAND:			return "command";
 #else
@@ -398,6 +399,7 @@ void KeyBind::initBinds() {
 	addBind("map_edit_accept", keypress_t("return"), "Accept edit", group);
 	addBind("map_edit_cancel", keypress_t("escape"), "Cancel edit", group);
 	addBind("map_toggle_3d", keypress_t("Q"), "Toggle 3d mode", group);
+	addBind("map_screenshot", keypress_t("P", KPM_CTRL|KPM_SHIFT), "Take Screenshot", group);
 
 	// Map Editor 2D (me2d*)
 	group = "Map Editor 2D Mode";
