@@ -963,6 +963,9 @@
     <ClCompile Include="src\UndoManagerHistoryPanel.cpp">
       <Filter>UI Elements</Filter>
     </ClCompile>
+    <ClCompile Include="src\DiskArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1796,6 +1799,9 @@
     </ClInclude>
     <ClInclude Include="src\UndoManagerHistoryPanel.h">
       <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DiskArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
