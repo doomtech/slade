@@ -2253,7 +2253,7 @@ void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 }
 
 void MapRenderer3D::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer != thePaletteChooser || announcer != theResourceManager)
+	if (announcer != thePaletteChooser && announcer != theResourceManager)
 		return;
 
 	if (event_name == "resources_updated" || event_name == "main_palette_changed") {

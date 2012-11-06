@@ -634,7 +634,13 @@ bool MapEditorWindow::handleAction(string id) {
 
 	// File->Save
 	if (id == "mapw_save") {
+		// Save map
 		saveMap();
+
+		// Save archive
+		Archive* a = currentMapDesc().head->getParent();
+		if (a) a->save();
+		
 		return true;
 	}
 
