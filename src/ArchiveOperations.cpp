@@ -505,7 +505,7 @@ void ArchiveOperations::removeUnusedTextures(Archive* archive) {
 			string swname = unused_tex[a];
 			swname.Replace("SW1", "SW2", false);
 
-			// Check if it's counterpart is used
+			// Check if its counterpart is used
 			if (used_textures[swname].used)
 				swtex = true;
 		}
@@ -514,7 +514,7 @@ void ArchiveOperations::removeUnusedTextures(Archive* archive) {
 			string swname = unused_tex[a];
 			swname.Replace("SW2", "SW1", false);
 
-			// Check if it's counterpart is used
+			// Check if its counterpart is used
 			if (used_textures[swname].used)
 				swtex = true;
 		}

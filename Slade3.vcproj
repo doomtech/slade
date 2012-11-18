@@ -1073,6 +1073,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\SectorSpecialDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SectorSpecialDialog.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ShapeDrawPanel.cpp"
 					>
 				</File>

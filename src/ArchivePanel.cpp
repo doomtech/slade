@@ -2732,25 +2732,6 @@ CONSOLE_COMMAND(palconv64, 0) {
 	}
 }
 
-CONSOLE_COMMAND(vertex32x, 0) {
-	ArchivePanel * meep = CH::getCurrentArchivePanel();
-	if (meep)
-	{
-		// Get the entry index of the last selected list item
-		ArchiveEntry* v32x = meep->currentEntry();
-		const uint8_t * source = v32x->getData(true);
-		uint8_t * dest = new uint8_t[v32x->getSize() / 2];
-		for (size_t i = 0; i < v32x->getSize() / 4; ++i)
-		{
-			dest[2*i+0] = source[4*i+1];
-			dest[2*i+1] = source[4*i+0];
-		}
-		v32x->importMem(dest, v32x->getSize()/2);
-		theActivePanel->callRefresh();
-		delete[] dest;
-	}
-}
-
 CONSOLE_COMMAND(palconvpsx, 0) {
 	ArchivePanel * meep = CH::getCurrentArchivePanel();
 	if (meep)
@@ -2780,3 +2761,42 @@ CONSOLE_COMMAND(palconvpsx, 0) {
 		delete[] dest;
 	}
 }
+
+CONSOLE_COMMAND(vertex32x, 0) {
+	ArchivePanel * meep = CH::getCurrentArchivePanel();
+	if (meep)
+	{
+		// Get the entry index of the last selected list item
+		ArchiveEntry* v32x = meep->currentEntry();
+		const uint8_t * source = v32x->getData(true);
+		uint8_t * dest = new uint8_t[v32x->getSize() / 2];
+		for (size_t i = 0; i < v32x->getSize() / 4; ++i)
+		{
+			dest[2*i+0] = source[4*i+1];
+			dest[2*i+1] = source[4*i+0];
+		}
+		v32x->importMem(dest, v32x->getSize()/2);
+		theActivePanel->callRefresh();
+		delete[] dest;
+	}
+}
+
+CONSOLE_COMMAND(vertexpsx, 0) {
+	ArchivePanel * meep = CH::getCurrentArchivePanel();
+	if (meep)
+	{
+		// Get the entry index of the last selected list item
+		ArchiveEntry* vpsx = meep->currentEntry();
+		const uint8_t * source = vpsx->getData(true);
+		uint8_t * dest = new uint8_t[vpsx->getSize() / 2];
+		for (size_t i = 0; i < vpsx->getSize() / 4; ++i)
+		{
+			dest[2*i+0] = source[4*i+2];
+			dest[2*i+1] = source[4*i+3];
+		}
+		vpsx->importMem(dest, vpsx->getSize()/2);
+		theActivePanel->callRefresh();
+		delete[] dest;
+	}
+}
+
