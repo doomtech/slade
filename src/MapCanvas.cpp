@@ -50,6 +50,7 @@
 #include "SectorBuilder.h"
 #include "ActionSpecialTreeView.h"
 #include "Clipboard.h"
+#include "SectorSpecialDialog.h"
 
 
 /*******************************************************************
@@ -2412,6 +2413,26 @@ bool MapCanvas::handleAction(string id) {
 		return true;
 	}
 
+	// Change sector special
+	else if (id == "mapw_sector_changespecial") {
+		// Get selection
+		vector<MapSector*> selection;
+		editor->getSelectedSectors(selection);
+
+		// Open sector special selection dialog
+		if (selection.size() > 0) {
+			SectorSpecialDialog dlg(this);
+			int map_format = editor->getMap().currentFormat();
+			dlg.setup(selection[0]->intProperty("special"), map_format);
+			if (dlg.ShowModal() == wxID_OK) {
+				// Set specials of selected sectors
+				int special = dlg.getSelectedSpecial(map_format);
+				for (unsigned a = 0; a < selection.size(); a++)
+					selection[a]->setIntProperty("special", special);
+			}
+		}
+	}
+
 	// Not handled here
 	return false;
 }
@@ -2708,8 +2729,10 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 				theApp->getAction("mapw_thing_create")->addToMenu(&menu_context);
 			}
 			else if (editor->editMode() == MapEditor::MODE_SECTORS) {
-				if (object_selected)
+				if (object_selected) {
 					theApp->getAction("mapw_sector_changetexture")->addToMenu(&menu_context);
+					theApp->getAction("mapw_sector_changespecial")->addToMenu(&menu_context);
+				}
 			}
 
 			// Properties

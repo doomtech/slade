@@ -182,4 +182,15 @@ public:
 	bool 	OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e);
 };
 
+class MOPGSectorSpecialProperty : public MOPGProperty, public wxIntProperty {
+public:
+	MOPGSectorSpecialProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
+
+	void	openObjects(vector<MapObject*>& objects);
+	void	applyValue();
+
+	// wxPGProperty overrides
+	bool 	OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e);
+};
+
 #endif//__MOPG_PROPERTY_H__

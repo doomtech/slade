@@ -966,6 +966,9 @@
     <ClCompile Include="src\DiskArchive.cpp">
       <Filter>Resources\Archive\Formats</Filter>
     </ClCompile>
+    <ClCompile Include="src\SectorSpecialDialog.cpp">
+      <Filter>Map Editor\UI Elements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1802,6 +1805,9 @@
     </ClInclude>
     <ClInclude Include="src\DiskArchive.h">
       <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SectorSpecialDialog.h">
+      <Filter>Map Editor\UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

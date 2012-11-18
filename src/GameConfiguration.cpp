@@ -64,6 +64,7 @@ void GameConfiguration::setDefaults() {
 	light_levels.clear();
 	for (int a = 0; a < 4; a++)
 		map_formats[a] = false;
+	boom = false;
 }
 
 string GameConfiguration::udmfNamespace() {
@@ -1993,7 +1994,7 @@ string GameConfiguration::sectorTypeName(int type, int map_format) {
 				gen_flags.push_back("Secret");
 
 			// Friction
-			if (type & 2056)
+			if (type & 2048)
 				gen_flags.push_back("Friction Enabled");
 
 			// Pushers/Pullers
@@ -2029,6 +2030,169 @@ string GameConfiguration::sectorTypeName(int type, int map_format) {
 		name += S_FMT(" + %s", CHR(gen_flags[a]));
 
 	return name;
+}
+
+//vector<string> GameConfiguration::allSectorTypeNames() {
+//	vector<string> ret;
+//	for (unsigned a = 0; a < sector_types.size(); a++)
+//		ret.push_back(sector_types[a].name);
+//	return ret;
+//}
+
+int GameConfiguration::sectorTypeByName(string name) {
+	for (unsigned a = 0; a < sector_types.size(); a++) {
+		if (sector_types[a].name == name)
+			return sector_types[a].type;
+	}
+
+	return 0;
+}
+
+int GameConfiguration::baseSectorType(int type, int map_format) {
+	// No type
+	if (type == 0)
+		return 0;
+
+	// Strip boom flags depending on map format
+	if (map_format == MAP_DOOM && type >= 32)
+		return type & 31;
+	else if (type >= 256)
+		return type & 255;
+
+	// No flags
+	return type;
+}
+
+int GameConfiguration::sectorBoomDamage(int type, int map_format) {
+	// No type
+	if (type == 0)
+		return 0;
+
+	// Doom format
+	if (map_format == MAP_DOOM && type >= 32) {
+		if ((type & 96) == 96)
+			return 3;
+		else if (type & 32)
+			return 1;
+		else if (type & 64)
+			return 2;
+	}
+
+	// Hexen format
+	else if (type >= 256) {
+		if ((type & 768) == 768)
+			return 3;
+		else if (type & 256)
+			return 1;
+		else if (type & 512)
+			return 2;
+	}
+
+	// No damage
+	return 0;
+}
+
+bool GameConfiguration::sectorBoomSecret(int type, int map_format) {
+	// No type
+	if (type == 0)
+		return false;
+
+	// Doom format
+	if (map_format == MAP_DOOM && type >= 32 && type & 128)
+		return true;
+
+	// Hexen format
+	else if (type >= 256 && type & 1024)
+		return true;
+
+	// Not secret
+	return false;
+}
+
+bool GameConfiguration::sectorBoomFriction(int type, int map_format) {
+	// No type
+	if (type == 0)
+		return false;
+
+	// Doom format
+	if (map_format == MAP_DOOM && type >= 32 && type & 256)
+		return true;
+
+	// Hexen format
+	else if (type >= 256 && type & 2048)
+		return true;
+
+	// Friction disabled
+	return false;
+}
+
+bool GameConfiguration::sectorBoomPushPull(int type, int map_format) {
+	// No type
+	if (type == 0)
+		return false;
+
+	// Doom format
+	if (map_format == MAP_DOOM && type >= 32 && type & 512)
+		return true;
+
+	// Hexen format
+	else if (type >= 256 && type & 4096)
+		return true;
+
+	// Pusher/Puller disabled
+	return false;
+}
+
+int GameConfiguration::boomSectorType(int base, int damage, bool secret, bool friction, bool pushpull, int map_format) {
+	int fulltype = base;
+
+	// Doom format
+	if (map_format == MAP_DOOM) {
+		// Damage
+		if (damage == 1)
+			fulltype += 32;
+		else if (damage == 2)
+			fulltype += 64;
+		else if (damage == 3)
+			fulltype += 96;
+
+		// Secret
+		if (secret)
+			fulltype += 128;
+
+		// Friction
+		if (friction)
+			fulltype += 256;
+
+		// Pusher/Puller
+		if (pushpull)
+			fulltype += 512;
+	}
+
+	// Hexen format
+	else {
+		// Damage
+		if (damage == 1)
+			fulltype += 256;
+		else if (damage == 2)
+			fulltype += 512;
+		else if (damage == 3)
+			fulltype += 768;
+
+		// Secret
+		if (secret)
+			fulltype += 1024;
+
+		// Friction
+		if (friction)
+			fulltype += 2048;
+
+		// Pusher/Puller
+		if (pushpull)
+			fulltype += 4096;
+	}
+
+	return fulltype;
 }
 
 string GameConfiguration::getDefaultString(int type, string property) {

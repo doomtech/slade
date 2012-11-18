@@ -42,6 +42,13 @@ struct gc_mapinfo_t {
 	string	sky2;
 };
 
+struct sectype_t {
+	int		type;
+	string	name;
+	sectype_t() { type = -1; name = "Unknown"; }
+	sectype_t(int type, string name) { this->type = type; this->name = name; }
+};
+
 WX_DECLARE_HASH_MAP(int, as_t, wxIntegerHash, wxIntegerEqual, ASpecialMap);
 WX_DECLARE_HASH_MAP(int, tt_t, wxIntegerHash, wxIntegerEqual, ThingTypeMap);
 WX_DECLARE_STRING_HASH_MAP(udmfp_t, UDMFPropMap);
@@ -114,12 +121,6 @@ private:
 	vector<flag_t>	triggers_line;
 
 	// Sector types
-	struct sectype_t {
-		int		type;
-		string	name;
-		sectype_t() { type = -1; name = "Unknown"; }
-		sectype_t(int type, string name) { this->type = type; this->name = name; }
-	};
 	vector<sectype_t>	sector_types;
 
 	// Map info
@@ -231,7 +232,15 @@ public:
 	void			cleanObjectUDMFProps(MapObject* object);
 
 	// Sector types
-	string	sectorTypeName(int type, int map_format);
+	string				sectorTypeName(int type, int map_format);
+	vector<sectype_t>	allSectorTypes() { return sector_types; }
+	int					sectorTypeByName(string name);
+	int					baseSectorType(int type, int map_format);
+	int					sectorBoomDamage(int type, int map_format);
+	bool				sectorBoomSecret(int type, int map_format);
+	bool				sectorBoomFriction(int type, int map_format);
+	bool				sectorBoomPushPull(int type, int map_format);
+	int					boomSectorType(int base, int damage, bool secret, bool friction, bool pushpull, int map_format);
 
 	// Defaults
 	string	getDefaultString(int type, string property);

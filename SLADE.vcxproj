@@ -280,6 +280,7 @@
     <ClCompile Include="src\ScriptEditorPanel.cpp" />
     <ClCompile Include="src\SectorBuilder.cpp" />
     <ClCompile Include="src\SectorInfoOverlay.cpp" />
+    <ClCompile Include="src\SectorSpecialDialog.cpp" />
     <ClCompile Include="src\SectorTextureOverlay.cpp" />
     <ClCompile Include="src\SFileDialog.cpp" />
     <ClCompile Include="src\sfMod\sfMod.cpp" />
@@ -548,6 +549,7 @@
     <ClInclude Include="src\ScriptEditorPanel.h" />
     <ClInclude Include="src\SectorBuilder.h" />
     <ClInclude Include="src\SectorInfoOverlay.h" />
+    <ClInclude Include="src\SectorSpecialDialog.h" />
     <ClInclude Include="src\SectorTextureOverlay.h" />
     <ClInclude Include="src\SFileDialog.h" />
     <ClInclude Include="src\sfMod\modplug.h" />

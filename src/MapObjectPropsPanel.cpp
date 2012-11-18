@@ -258,18 +258,21 @@ void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, strin
 	}
 		//addIntProperty(group, prop->getName(), propname, false, grid);
 	else if (prop->getType() == UDMFProperty::TYPE_ASPECIAL) {
-		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty("Special", propname);
+		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty(prop->getName(), propname);
 		prop_as->setParent(this);
 		prop_as->setUDMFProp(prop);
 		properties.push_back(prop_as);
 		grid->AppendIn(group, prop_as);
 	}
 	else if (prop->getType() == UDMFProperty::TYPE_SSPECIAL) {
-		// For now
-		addIntProperty(group, prop->getName(), prop->getProperty(), false, grid, prop);
+		MOPGSectorSpecialProperty* prop_ss = new MOPGSectorSpecialProperty(prop->getName(), propname);
+		prop_ss->setParent(this);
+		prop_ss->setUDMFProp(prop);
+		properties.push_back(prop_ss);
+		grid->AppendIn(group, prop_ss);
 	}
 	else if (prop->getType() == UDMFProperty::TYPE_TTYPE) {
-		MOPGThingTypeProperty* prop_tt = new MOPGThingTypeProperty("Type", propname);
+		MOPGThingTypeProperty* prop_tt = new MOPGThingTypeProperty(prop->getName(), propname);
 		prop_tt->setParent(this);
 		prop_tt->setUDMFProp(prop);
 		properties.push_back(prop_tt);
@@ -450,7 +453,10 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		wxPGProperty* g_special = pg_properties->Append(new wxPropertyCategory("Special"));
 
 		// Add special
-		addIntProperty(g_special, "Special", "special");
+		MOPGSectorSpecialProperty* prop_special = new MOPGSectorSpecialProperty("Special", "special");
+		prop_special->setParent(this);
+		properties.push_back(prop_special);
+		pg_properties->AppendIn(g_special, prop_special);
 	}
 
 	// Thing properties
