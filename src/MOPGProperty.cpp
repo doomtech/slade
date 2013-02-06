@@ -48,7 +48,7 @@ void MOPGBoolProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getBoolValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getBoolValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -97,7 +97,7 @@ void MOPGIntProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -146,7 +146,7 @@ void MOPGFloatProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getFloatValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getFloatValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -195,7 +195,7 @@ void MOPGStringProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getStringValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getStringValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -261,7 +261,7 @@ void MOPGActionSpecialProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -363,7 +363,7 @@ void MOPGThingTypeProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -456,7 +456,7 @@ void MOPGLineFlagProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getBoolValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getBoolValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -507,7 +507,7 @@ void MOPGThingFlagProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getBoolValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getBoolValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -580,7 +580,7 @@ void MOPGAngleProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -703,7 +703,7 @@ void MOPGTextureProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -778,7 +778,7 @@ void MOPGSPACTriggerProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -831,7 +831,7 @@ void MOPGTagProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
 		Hide(true);
 	else
 		Hide(false);
@@ -898,7 +898,7 @@ void MOPGSectorSpecialProperty::openObjects(vector<MapObject*>& objects) {
 
 	// Set to common value
 	noupdate = true;
-	if (udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
+	if (!parent->showAll() && udmf_prop && !udmf_prop->showAlways() && udmf_prop->getDefaultValue().getIntValue() == first)
 		Hide(true);
 	else
 		Hide(false);

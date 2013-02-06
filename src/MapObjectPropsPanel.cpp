@@ -57,6 +57,7 @@ MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	// Bind events
 	btn_apply->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapObjectPropsPanel::onBtnApply, this);
 	btn_reset->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapObjectPropsPanel::onBtnReset, this);
+	cb_show_all->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &MapObjectPropsPanel::onShowAllToggled, this);
 
 	// Hide side property grids
 	pg_props_side1->Show(false);
@@ -693,4 +694,9 @@ void MapObjectPropsPanel::onBtnReset(wxCommandEvent& e) {
 	// Go through all current properties and reset the value
 	for (unsigned a = 0; a < properties.size(); a++)
 		properties[a]->resetValue();
+}
+
+void MapObjectPropsPanel::onShowAllToggled(wxCommandEvent& e) {
+	// Refresh the list
+	openObjects(objects);
 }
