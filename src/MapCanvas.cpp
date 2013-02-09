@@ -2863,13 +2863,14 @@ void MapCanvas::onIdle(wxIdleEvent& e) {
 void MapCanvas::onRTimer(wxTimerEvent& e) {
 	// Get time since last redraw
 	long frametime = (sfclock.GetElapsedTime() * 1000) - last_time;
-
-	if (frametime < fr_idle)
-		return;
-
-	last_time = (sfclock.GetElapsedTime() * 1000);
-	update(frametime);
-	Refresh();
+	
+	if (frametime > fr_idle) {
+		last_time = (sfclock.GetElapsedTime() * 1000);
+		update(frametime);
+		Refresh();
+	}
+	
+	timer.Start(-1, true);
 }
 #else
 void MapCanvas::onIdle(wxIdleEvent& e) {

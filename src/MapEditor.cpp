@@ -2877,7 +2877,8 @@ void MapEditor::paste3d(int type) {
 
 	// Go through items
 	for (unsigned a = 0; a < items.size(); a++) {
-		if (items[a].type == SEL_SIDE_TOP || SEL_SIDE_MIDDLE || SEL_SIDE_BOTTOM) {
+		// Wall
+		if (items[a].type == SEL_SIDE_TOP || items[a].type == SEL_SIDE_MIDDLE || items[a].type == SEL_SIDE_BOTTOM) {
 			MapSide* side = map.getSide(items[a].index);
 			recordPropertyChangeUndoStep(side);
 
@@ -2902,6 +2903,8 @@ void MapEditor::paste3d(int type) {
 					side->setStringProperty("texturebottom", copy_texture);
 			}
 		}
+		
+		// Flat
 		else if (items[a].type == SEL_FLOOR || items[a].type == SEL_CEILING) {
 			MapSector* sector = map.getSector(items[a].index);
 			recordPropertyChangeUndoStep(sector);
@@ -2927,7 +2930,7 @@ void MapEditor::paste3d(int type) {
 			recordPropertyChangeUndoStep(thing);
 
 			// Type
-			if (type == COPY_TEXTYPE)
+			if (type == COPY_TEXTYPE && copy_thing)
 				thing->setIntProperty("type", copy_thing->getType());
 		}
 	}

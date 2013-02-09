@@ -785,7 +785,7 @@ wxColour Drawing::getPanelBGColour() {
 }
 
 wxColour Drawing::getMenuTextColour() {
-#ifdef __WXGTK__
+/*#ifdef __WXGTK__
 	static bool     intitialized(false);
 	static wxColour textColour(wxSystemSettings::GetColour(wxSYS_COLOUR_MENUTEXT));
 
@@ -804,12 +804,13 @@ wxColour Drawing::getMenuTextColour() {
 		intitialized = true;
 	}
 	return textColour;
-#else
+#else*/
 	return wxSystemSettings::GetColour(wxSYS_COLOUR_MENUTEXT);
-#endif
+//#endif
 }
 
 wxColour Drawing::getMenuBarBGColour() {
+/*
 #ifdef __WXGTK__
 	static bool     intitialized(false);
 	static wxColour textColour(wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR));
@@ -829,9 +830,9 @@ wxColour Drawing::getMenuBarBGColour() {
 		intitialized = true;
 	}
 	return textColour;
-#else
-	return wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
-#endif
+#else*/
+	return wxSystemSettings::GetColour(wxSYS_COLOUR_MENU);
+//#endif
 }
 
 wxColour Drawing::lightColour(const wxColour& colour, float percent) {
