@@ -110,3 +110,27 @@ void MapThing::setAnglePoint(fpoint2_t point) {
 	// Set thing angle
 	setIntProperty("angle", angle);
 }
+
+void MapThing::writeBackup(PropertyList& plist) {
+	// General properties
+	//MapObject::backup(plist);
+
+	// Type
+	plist["type"] = type;
+
+	// Position
+	plist["x"] = x;
+	plist["y"] = y;
+}
+
+void MapThing::readBackup(PropertyList& plist) {
+	// General properties
+	//MapObject::loadFromBackup(plist);
+
+	// Type
+	type = plist["type"].getIntValue();
+
+	// Position
+	x = plist["x"].getFloatValue();
+	y = plist["y"].getFloatValue();
+}

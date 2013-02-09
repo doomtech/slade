@@ -166,7 +166,7 @@ void MapRenderer2D::renderVerticesVBO() {
 
 void MapRenderer2D::renderVertexHilight(int index, float fade) {
 	// Check hilight
-	if (index < 0)
+	if (!map->getVertex(index))
 		return;
 
 	// Reset fade if hilight animation is disabled
@@ -362,7 +362,7 @@ void MapRenderer2D::renderLinesVBO(bool show_direction, float alpha) {
 
 void MapRenderer2D::renderLineHilight(int index, float fade) {
 	// Check hilight
-	if (index < 0)
+	if (!map->getLine(index))
 		return;
 
 	// Reset fade if hilight animation is disabled
@@ -1056,7 +1056,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 
 void MapRenderer2D::renderThingHilight(int index, float fade) {
 	// Check hilight
-	if (index < 0)
+	if (!map->getThing(index))
 		return;
 
 	// Reset fade if hilight animation is disabled
@@ -1460,7 +1460,7 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 
 void MapRenderer2D::renderFlatHilight(int index, float fade) {
 	// Check hilight
-	if (index < 0)
+	if (!map->getSector(index))
 		return;
 
 	// Reset fade if hilight animation is disabled

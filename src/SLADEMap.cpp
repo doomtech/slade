@@ -87,6 +87,21 @@ MapThing* SLADEMap::getThing(unsigned index) {
 	return things[index];
 }
 
+MapObject* SLADEMap::getObject(uint8_t type, unsigned index) {
+	if (type == MOBJ_VERTEX)
+		return getVertex(index);
+	else if (type == MOBJ_LINE)
+		return getLine(index);
+	else if (type == MOBJ_SIDE)
+		return getSide(index);
+	else if (type == MOBJ_SECTOR)
+		return getSector(index);
+	else if (type == MOBJ_THING)
+		return getThing(index);
+	
+	return NULL;
+}
+
 int	SLADEMap::vertexIndex(MapVertex* v) {
 	// Check vertex was given
 	if (!v)

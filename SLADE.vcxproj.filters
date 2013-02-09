@@ -148,6 +148,9 @@
     <Filter Include="Map Editor\GameConfiguration\Configurations\Ports\Include">
       <UniqueIdentifier>{99eceb21-bb23-4972-bb7e-23a2cbe6de2b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\libmodplug">
+      <UniqueIdentifier>{d4a54f03-4a85-41e3-8cc0-f8268538d3bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -968,6 +971,108 @@
     </ClCompile>
     <ClCompile Include="src\SectorSpecialDialog.cpp">
       <Filter>Map Editor\UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\fastmix.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_669.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_abc.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_amf.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_ams.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_dbm.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_dmf.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_dsm.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_far.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_it.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_j2b.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_mdl.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_med.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_mid.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_mod.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_mt2.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_mtm.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_okt.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_pat.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_psm.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_ptm.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_s3m.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_stm.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_ult.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_umx.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_wav.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\load_xm.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\mmcmp.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\modplug.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\snd_dsp.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\snd_flt.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\snd_fx.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\sndfile.cpp">
+      <Filter>External\libmodplug</Filter>
+    </ClCompile>
+    <ClCompile Include="libmodplug\sndmix.cpp">
+      <Filter>External\libmodplug</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1808,6 +1913,15 @@
     </ClInclude>
     <ClInclude Include="src\SectorSpecialDialog.h">
       <Filter>Map Editor\UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="libmodplug\load_pat.h">
+      <Filter>External\libmodplug</Filter>
+    </ClInclude>
+    <ClInclude Include="libmodplug\modplug.h">
+      <Filter>External\libmodplug</Filter>
+    </ClInclude>
+    <ClInclude Include="libmodplug\tables.h">
+      <Filter>External\libmodplug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

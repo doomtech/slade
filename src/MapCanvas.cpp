@@ -51,6 +51,7 @@
 #include "ActionSpecialTreeView.h"
 #include "Clipboard.h"
 #include "SectorSpecialDialog.h"
+#include "UndoRedo.h"
 
 
 /*******************************************************************
@@ -159,7 +160,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	Bind(wxEVT_IDLE, &MapCanvas::onIdle, this);
 #endif
 
-	timer.Start(2);
+	timer.Start(1, true);
 }
 
 /* MapCanvas::~MapCanvas
@@ -2308,6 +2309,11 @@ bool MapCanvas::handleAction(string id) {
 		else if (editor->editMode() == MapEditor::MODE_THINGS)
 			type = "Thing";
 
+		// Begin recording undo level
+		editor->undoManager()->beginRecord(S_FMT("Property Edit (%s)", CHR(type)));
+		for (unsigned a = 0; a < list.size(); a++)
+			editor->recordPropertyChangeUndoStep(list[a]);
+
 		string selsize = "";
 		if (list.size() == 1)
 			type += S_FMT(" #%d", list[0]->getIndex());
@@ -2341,6 +2347,10 @@ bool MapCanvas::handleAction(string id) {
 			if (editor->editMode() == MapEditor::MODE_THINGS)
 				editor->copyProperties(list[0]);
 		}
+
+		// End undo level
+		editor->undoManager()->endRecord(true);
+
 		return true;
 	}
 
@@ -2878,12 +2888,13 @@ void MapCanvas::onRTimer(wxTimerEvent& e) {
 	// Get time since last redraw
 	long frametime = (sfclock.getElapsedTime().asMilliseconds()) - last_time;
 
-	if (frametime < fr_idle)
-		return;
+	if (frametime > fr_idle) {
+		last_time = (sfclock.getElapsedTime().asMilliseconds());
+		update(frametime);
+		Refresh();
+	}
 
-	last_time = (sfclock.getElapsedTime().asMilliseconds());
-	update(frametime);
-	Refresh();
+	timer.Start(-1, true);
 }
 #endif
 

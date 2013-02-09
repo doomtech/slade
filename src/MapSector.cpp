@@ -340,3 +340,21 @@ void MapSector::disconnectSide(MapSide* side) {
 	poly_needsupdate = true;
 	bbox.reset();
 }
+
+void MapSector::writeBackup(PropertyList& plist) {
+	// General properties
+	//MapObject::backup(plist);
+
+	// Textures
+	plist["texturefloor"] = f_tex;
+	plist["textureceiling"] = c_tex;
+}
+
+void MapSector::readBackup(PropertyList& plist) {
+	// General properties
+	//MapObject::loadFromBackup(plist);
+
+	// Textures
+	f_tex = plist["texturefloor"].getStringValue();
+	c_tex = plist["textureceiling"].getStringValue();
+}

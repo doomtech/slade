@@ -78,6 +78,9 @@ public:
 	void	disconnectSide(MapSide* side);
 
 	void	updateBBox();
+
+	void	writeBackup(PropertyList& plist);
+	void	readBackup(PropertyList& plist);
 };
 
 #endif //__MAPSECTOR_H__

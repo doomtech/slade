@@ -66,6 +66,9 @@ public:
 	void	copy(MapObject* c);
 
 	void	setAnglePoint(fpoint2_t point);
+
+	void	writeBackup(PropertyList& plist);
+	void	readBackup(PropertyList& plist);
 };
 
 #endif //__MAPTHING_H__

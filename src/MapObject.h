@@ -18,7 +18,7 @@ enum {
 class MapObject {
 friend class SLADEMap;
 private:
-	int			type;
+	uint8_t			type;
 
 protected:
 	unsigned		index;
@@ -31,7 +31,7 @@ public:
 	MapObject(int type = MOBJ_UNKNOWN, SLADEMap* parent = NULL);
 	~MapObject();
 
-	int			getObjType() { return type; }
+	uint8_t		getObjType() { return type; }
 	unsigned	getIndex();
 	SLADEMap*	getParentMap() { return parent_map; }
 	bool		isFiltered() { return filtered; }
@@ -57,6 +57,12 @@ public:
 	void	filter(bool f = true) { filtered = f; }
 
 	virtual void	copy(MapObject* c);
+
+	void	backup(PropertyList& plist);
+	void	loadFromBackup(PropertyList& plist);
+
+	virtual void writeBackup(PropertyList& plist) = 0;
+	virtual void readBackup(PropertyList& plist) = 0;
 };
 
 #endif//__MAP_OBJECT_H__

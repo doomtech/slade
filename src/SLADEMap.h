@@ -104,6 +104,7 @@ public:
 	MapLine*	getLine(unsigned index);
 	MapSector*	getSector(unsigned index);
 	MapThing*	getThing(unsigned index);
+	MapObject*	getObject(uint8_t type, unsigned index);
 	size_t		nVertices() { return vertices.size(); }
 	size_t		nLines() { return lines.size(); }
 	size_t		nSides() { return sides.size(); }

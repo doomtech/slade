@@ -111,6 +111,9 @@ public:
 
 	void	resetInternals();
 	void	flip(bool sides = true);
+
+	void	writeBackup(PropertyList& plist);
+	void	readBackup(PropertyList& plist);
 };
 
 #endif //__MAPLINE_H__

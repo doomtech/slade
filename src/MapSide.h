@@ -48,6 +48,9 @@ public:
 
 	int		intProperty(string key);
 	void	setIntProperty(string key, int value);
+
+	void	writeBackup(PropertyList& plist);
+	void	readBackup(PropertyList& plist);
 };
 
 #endif //__MAPSIDE_H__

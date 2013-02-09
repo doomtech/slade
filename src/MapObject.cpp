@@ -132,3 +132,23 @@ void MapObject::setStringProperty(string key, string value) {
 	// Update modified time
 	modified_time = theApp->runTimer();
 }
+
+void MapObject::backup(PropertyList& plist) {
+	// Save general properties to list
+	properties.copyTo(plist);
+
+	// Object-specific properties
+	writeBackup(plist);
+}
+
+void MapObject::loadFromBackup(PropertyList& plist) {
+	// Load general properties from list
+	properties.clear();
+	plist.copyTo(properties);
+
+	// Object-specific properties
+	readBackup(plist);
+
+	// Update modified time
+	modified_time = theApp->runTimer();
+}

@@ -34,7 +34,7 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-UndoManager* current_undo_manager = NULL;
+UndoManager*	current_undo_manager = NULL;
 
 
 /*******************************************************************
@@ -107,11 +107,12 @@ bool UndoLevel::writeFile(string filename) {
 /* UndoManager::UndoManager
  * UndoManager class constructor
  *******************************************************************/
-UndoManager::UndoManager() {
+UndoManager::UndoManager(SLADEMap* map) {
 	// Init variables
 	current_level = NULL;
 	current_level_index = -1;
 	undo_running = false;
+	this->map = map;
 }
 
 /* UndoManager::~UndoManager
@@ -190,8 +191,12 @@ bool UndoManager::currentlyRecording() {
  *******************************************************************/
 bool UndoManager::recordUndoStep(UndoStep* step) {
 	// Do nothing if not recording or step not given
-	if (!step || !current_level)
+	if (!step)
 		return false;
+	else if (!current_level) {
+		delete step;
+		return false;
+	}
 
 	// Add step to current undo level
 	current_level->addStep(step);
@@ -213,8 +218,10 @@ void UndoManager::undo() {
 
 	// Perform undo level
 	undo_running = true;
+	current_undo_manager = this;
 	undo_levels[current_level_index]->doUndo();
 	undo_running = false;
+	current_undo_manager = NULL;
 	current_level_index--;
 
 	announce("undo");
@@ -235,8 +242,10 @@ void UndoManager::redo() {
 	// Perform redo level
 	current_level_index++;
 	undo_running = true;
+	current_undo_manager = this;
 	undo_levels[current_level_index]->doRedo();
 	undo_running = false;
+	current_undo_manager = NULL;
 
 	announce("redo");
 }
@@ -268,4 +277,14 @@ bool UndoRedo::currentlyRecording() {
  *******************************************************************/
 UndoManager* UndoRedo::currentManager() {
 	return current_undo_manager;
+}
+
+/* UndoRedo::currentMap
+ * Returns the 'current' map, associated with the current undo manager
+ *******************************************************************/
+SLADEMap* UndoRedo::currentMap() {
+	if (current_undo_manager)
+		return current_undo_manager->getMap();
+	else
+		return NULL;
 }

@@ -391,3 +391,57 @@ void MapLine::flip(bool sides) {
 	modified_time = theApp->runTimer();
 	resetInternals();
 }
+
+void MapLine::writeBackup(PropertyList& plist) {
+	// General backup
+	//MapObject::backup(plist);
+
+	// Vertices
+	plist["v1"] = (int)vertex1->getIndex();
+	plist["v2"] = (int)vertex2->getIndex();
+	
+	// Sides
+	if (side1)
+		plist["s1"] = (int)side1->getIndex();
+	else
+		plist["s1"] = -1;
+	if (side2)
+		plist["s2"] = (int)side2->getIndex();
+	else
+		plist["s2"] = -1;
+}
+
+void MapLine::readBackup(PropertyList& plist) {
+	// General backup
+	//MapObject::loadFromBackup(plist);
+
+	// Vertices
+	MapVertex* v1 = parent_map->getVertex(plist["v1"].getIntValue());
+	MapVertex* v2 = parent_map->getVertex(plist["v2"].getIntValue());
+	if (v1 && v1 != vertex1) {
+		vertex1->disconnectLine(this);
+		v1->connectLine(this);
+		vertex1 = v1;
+	}
+	if (v2 && v2 != vertex2) {
+		vertex2->disconnectLine(this);
+		v2->connectLine(this);
+		vertex2 = v2;
+	}
+
+	// Sides
+	int s1 = plist["s1"].getIntValue();
+	int s2 = plist["s2"].getIntValue();
+	if (s1 >= 0) {
+		side1 = parent_map->getSide(s1);
+		side1->parent = this;
+	}
+	else
+		side1 = NULL;
+	if (s2 >= 0) {
+		side2 = parent_map->getSide(s2);
+		side2->parent = this;
+	}
+	else
+		side2 = NULL;
+}

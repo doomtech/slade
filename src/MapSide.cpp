@@ -60,3 +60,32 @@ void MapSide::setIntProperty(string key, int value) {
 	// Update modified time
 	modified_time = theApp->runTimer();
 }
+
+void MapSide::writeBackup(PropertyList& plist) {
+	// General properties
+	//MapObject::backup(plist);
+
+	// Sector
+	if (sector)
+		plist["sector"] = (int)sector->getIndex();
+	else
+		plist["sector"] = -1;
+}
+
+void MapSide::readBackup(PropertyList& plist) {
+	// General properties
+	//MapObject::backup(plist);
+
+	// Sector
+	MapSector* s = parent_map->getSector(plist["sector"].getIntValue());
+	if (s) {
+		sector->disconnectSide(this);
+		sector = s;
+		s->connectSide(this);
+	}
+	else {
+		if (sector)
+			sector->disconnectSide(this);
+		sector = NULL;
+	}
+}

@@ -35,17 +35,20 @@ public:
 	bool	readFile(string filename);
 };
 
+class SLADEMap;
 class UndoManager : public Announcer {
 private:
 	vector<UndoLevel*>	undo_levels;
 	UndoLevel*			current_level;
 	int					current_level_index;
 	bool				undo_running;
+	SLADEMap*			map;
 
 public:
-	UndoManager();
+	UndoManager(SLADEMap* map = NULL);
 	~UndoManager();
 
+	SLADEMap*	getMap() { return map; }
 	void		getAllLevels(vector<string>& list);
 	int			getCurrentIndex() { return current_level_index; }
 	unsigned	nUndoLevels() { return undo_levels.size(); }
@@ -62,6 +65,7 @@ public:
 namespace UndoRedo {
 	bool			currentlyRecording();
 	UndoManager*	currentManager();
+	SLADEMap*		currentMap();
 }
 
 #endif//__UNDO_REDO_H__

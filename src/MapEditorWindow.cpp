@@ -650,6 +650,18 @@ bool MapEditorWindow::handleAction(string id) {
 		return true;
 	}
 
+	// Edit->Undo
+	if (id == "mapw_undo") {
+		editor.undoManager()->undo();
+		return true;
+	}
+
+	// Edit->Redo
+	if (id == "mapw_redo") {
+		editor.undoManager()->redo();
+		return true;
+	}
+
 	// Editor->Set Base Resource Archive
 	if (id == "mapw_setbra") {
 		wxDialog dialog_ebr(this, -1, "Edit Base Resource Archives", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);

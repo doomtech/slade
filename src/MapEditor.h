@@ -34,6 +34,7 @@ private:
 	bool		link_3d_light;
 	bool		link_3d_offset;
 	int			current_tag;
+	bool		undo_locked;
 
 	// Tagged items
 	vector<MapSector*>	tagged_sectors;
@@ -129,6 +130,7 @@ public:
 	bool				hilightLocked() { return hilight_locked; }
 	void				lockHilight(bool lock = true) { hilight_locked = lock; }
 	bool				gridSnap() { return grid_snap; }
+	UndoManager*		undoManager() { return undo_manager; }
 
 	vector<selection_3d_t>&	get3dSelection() { return selection_3d; }
 	void					set3dHilight(selection_3d_t hl) { hilight_3d = hl; }
@@ -231,6 +233,11 @@ public:
 	string		getEditorMessage(int index);
 	long		getEditorMessageTime(int index);
 	void		addEditorMessage(string message);
+
+	// Undo/Redo
+	void	beginUndoRecord(string name);
+	void	endUndoRecord(bool success = true);
+	void	recordPropertyChangeUndoStep(MapObject* object);
 
 	// Misc
 	string	getModeString();

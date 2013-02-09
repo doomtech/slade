@@ -22,6 +22,46 @@ EXTERN_CVAR(Bool, shapedraw_centered)
 EXTERN_CVAR(Bool, shapedraw_lockratio)
 
 
+class PropertyChangeUS : public UndoStep {
+private:
+	PropertyList	properties;
+	unsigned		index;
+	uint8_t			type;
+
+public:
+	PropertyChangeUS(MapObject* object) {
+		object->backup(properties);
+		index = object->getIndex();
+		type = object->getObjType();
+	}
+
+	~PropertyChangeUS() {
+	}
+
+	void doSwap(MapObject* obj) {
+		PropertyList list;
+		obj->backup(list);
+		obj->loadFromBackup(properties);
+		properties.clear();
+		list.copyTo(properties);
+	}
+
+	bool doUndo() {
+		MapObject* obj = UndoRedo::currentMap()->getObject(type, index);
+		if (obj) doSwap(obj);
+
+		return true;
+	}
+
+	bool doRedo() {
+		MapObject* obj = UndoRedo::currentMap()->getObject(type, index);
+		if (obj) doSwap(obj);
+
+		return true;
+	}
+};
+
+
 MapEditor::MapEditor() {
 	// Init variables
 	edit_mode = MODE_LINES;
@@ -35,8 +75,9 @@ MapEditor::MapEditor() {
 	copy_sector = NULL;
 	link_3d_light = true;
 	link_3d_offset = true;
-	undo_manager = new UndoManager();
+	undo_manager = new UndoManager(&map);
 	current_tag = 0;
+	undo_locked = false;
 }
 
 MapEditor::~MapEditor() {
@@ -1047,7 +1088,7 @@ void MapEditor::endMove(bool accept) {
 		// Merge lines
 		for (unsigned a = 0; a < map.nLines(); a++) {
 			if (map.getLine(a)->modifiedTime() >= move_time) {
-				if (map.mergeLine(a) > 0) {
+				if (map.mergeLine(a) > 0 && a < map.nLines()) {
 					map.getLine(a)->clearUnneededTextures();
 					a = 0;
 				}
@@ -2828,48 +2869,66 @@ void MapEditor::paste3d(int type) {
 	else
 		return;
 
+	// Begin undo step
+	string ptype = "Paste Properties";
+	if (type == COPY_TEXTYPE)
+		ptype = "Paste Texture/Type";
+	undo_manager->beginRecord(ptype);
+
 	// Go through items
 	for (unsigned a = 0; a < items.size(); a++) {
-		// Upper wall
-		if (items[a].type == SEL_SIDE_TOP) {
-			// Texture
-			if (type == COPY_TEXTYPE)
-				map.getSide(items[a].index)->setStringProperty("texturetop", copy_texture);
-		}
+		if (items[a].type == SEL_SIDE_TOP || SEL_SIDE_MIDDLE || SEL_SIDE_BOTTOM) {
+			MapSide* side = map.getSide(items[a].index);
+			recordPropertyChangeUndoStep(side);
 
-		// Middle wall
-		if (items[a].type == SEL_SIDE_MIDDLE) {
-			// Texture
-			if (type == COPY_TEXTYPE)
-				map.getSide(items[a].index)->setStringProperty("texturemiddle", copy_texture);
-		}
+			// Upper wall
+			if (items[a].type == SEL_SIDE_TOP) {
+				// Texture
+				if (type == COPY_TEXTYPE)
+					side->setStringProperty("texturetop", copy_texture);
+			}
 
-		// Lower wall
-		if (items[a].type == SEL_SIDE_BOTTOM) {
-			// Texture
-			if (type == COPY_TEXTYPE)
-				map.getSide(items[a].index)->setStringProperty("texturebottom", copy_texture);
-		}
+			// Middle wall
+			else if (items[a].type == SEL_SIDE_MIDDLE) {
+				// Texture
+				if (type == COPY_TEXTYPE)
+					side->setStringProperty("texturemiddle", copy_texture);
+			}
 
-		// Floor
-		if (items[a].type == SEL_FLOOR) {
-			// Texture
-			if (type == COPY_TEXTYPE)
-				map.getSector(items[a].index)->setStringProperty("texturefloor", copy_texture);
+			// Lower wall
+			else if (items[a].type == SEL_SIDE_BOTTOM) {
+				// Texture
+				if (type == COPY_TEXTYPE)
+					side->setStringProperty("texturebottom", copy_texture);
+			}
 		}
+		else if (items[a].type == SEL_FLOOR || items[a].type == SEL_CEILING) {
+			MapSector* sector = map.getSector(items[a].index);
+			recordPropertyChangeUndoStep(sector);
 
-		// Ceiling
-		if (items[a].type == SEL_CEILING) {
-			// Texture
-			if (type == COPY_TEXTYPE)
-				map.getSector(items[a].index)->setStringProperty("textureceiling", copy_texture);
+			// Floor
+			if (items[a].type == SEL_FLOOR) {
+				// Texture
+				if (type == COPY_TEXTYPE)
+					sector->setStringProperty("texturefloor", copy_texture);
+			}
+
+			// Ceiling
+			if (items[a].type == SEL_CEILING) {
+				// Texture
+				if (type == COPY_TEXTYPE)
+					sector->setStringProperty("textureceiling", copy_texture);
+			}
 		}
 
 		// Thing
-		if (items[a].type == SEL_THING) {
+		else if (items[a].type == SEL_THING) {
+			MapThing* thing = map.getThing(items[a].index);
+			recordPropertyChangeUndoStep(thing);
+
 			// Type
 			if (type == COPY_TEXTYPE)
-				map.getThing(items[a].index)->setIntProperty("type", copy_thing->getType());
+				thing->setIntProperty("type", copy_thing->getType());
 		}
 	}
 
@@ -2880,6 +2939,8 @@ void MapEditor::paste3d(int type) {
 		else
 			addEditorMessage("Pasted Texture");
 	}
+
+	undo_manager->endRecord(true);
 }
 
 void MapEditor::changeThingZ3d(int amount) {
@@ -2894,6 +2955,7 @@ void MapEditor::changeThingZ3d(int amount) {
 			MapThing* thing = map.getThing(selection_3d[a].index);
 			if (thing) {
 				// Change z height
+				recordPropertyChangeUndoStep(thing);
 				double z = thing->intProperty("height");
 				z += amount;
 				thing->setIntProperty("height", z);
@@ -3138,6 +3200,19 @@ void MapEditor::updateDisplay() {
 	}
 }
 
+void MapEditor::beginUndoRecord(string name) {
+	if (!undo_locked)
+		undo_manager->beginRecord(name);
+}
+
+void MapEditor::endUndoRecord(bool success) {
+	if (!undo_locked)
+		undo_manager->endRecord(success);
+}
+
+void MapEditor::recordPropertyChangeUndoStep(MapObject* object) {
+	undo_manager->recordUndoStep(new PropertyChangeUS(object));
+}
 
 
 
@@ -3152,17 +3227,67 @@ CONSOLE_COMMAND(m_show_item, 1) {
 
 // testing stuff
 
+// Be nice once SFML2 is finally released so we don't need this >_>
+long getSFMLElapsedTime(sf::Clock& clock) {
+#if SFML_VERSION_MAJOR < 2	// SFML 1.6: uppercase G, returns time in seconds as a float
+	return clock.GetElapsedTime() * 1000;
+#else						// SFML 2.0: lowercase G, returns a Time object
+	return clock.getElapsedTime().asMilliseconds();
+#endif
+}
+void resetSFMLClock(sf::Clock& clock) {
+#if SFML_VERSION_MAJOR < 2
+	clock.Reset();
+#else
+	clock.restart();
+#endif
+}
+
 CONSOLE_COMMAND(m_test_sector, 0) {
 	sf::Clock clock;
 	SLADEMap& map = theMapEditor->mapEditor().getMap();
 	for (unsigned a = 0; a < map.nThings(); a++)
 		map.sectorAt(map.getThing(a)->xPos(), map.getThing(a)->yPos());
-#if SFML_VERSION_MAJOR < 2	// SFML 1.6: uppercase G, returns time in seconds as a float
-	long ms = clock.GetElapsedTime() * 1000;
-#else						// SFML 2.0: lowercase G, returns a Time object
-	long ms = clock.getElapsedTime().asMilliseconds();
-#endif
+	long ms = getSFMLElapsedTime(clock);
 	wxLogMessage("Took %dms", ms);
+}
+
+CONSOLE_COMMAND(m_test_mobj_backup, 0) {
+	sf::Clock clock;
+	sf::Clock totalClock;
+	SLADEMap& map = theMapEditor->mapEditor().getMap();
+	PropertyList plist;
+
+	// Vertices
+	for (unsigned a = 0; a < map.nVertices(); a++)
+		map.getVertex(a)->backup(plist);
+	wxLogMessage("Vertices: %dms", getSFMLElapsedTime(clock));
+
+	// Lines
+	resetSFMLClock(clock);
+	for (unsigned a = 0; a < map.nLines(); a++)
+		map.getLine(a)->backup(plist);
+	wxLogMessage("Lines: %dms", getSFMLElapsedTime(clock));
+
+	// Sides
+	resetSFMLClock(clock);
+	for (unsigned a = 0; a < map.nSides(); a++)
+		map.getSide(a)->backup(plist);
+	wxLogMessage("Sides: %dms", getSFMLElapsedTime(clock));
+
+	// Sectors
+	resetSFMLClock(clock);
+	for (unsigned a = 0; a < map.nSectors(); a++)
+		map.getSector(a)->backup(plist);
+	wxLogMessage("Sectors: %dms", getSFMLElapsedTime(clock));
+
+	// Things
+	resetSFMLClock(clock);
+	for (unsigned a = 0; a < map.nThings(); a++)
+		map.getThing(a)->backup(plist);
+	wxLogMessage("Things: %dms", getSFMLElapsedTime(clock));
+
+	wxLogMessage("Total: %dms", getSFMLElapsedTime(totalClock));
 }
 
 /*
