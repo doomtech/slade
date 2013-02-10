@@ -91,7 +91,8 @@ void PropertyList::copyTo(PropertyList &list) {
 
 	// Add all properties to given list
 	while (i != properties.end()) {
-		list[i->first] = i->second;
+		if (i->second.hasValue())
+			list[i->first] = i->second;
 		i++;
 	}
 }

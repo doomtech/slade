@@ -47,7 +47,7 @@ public:
 
 	void		setTexture(GLTexture* tex) { this->texture = tex; }
 	void		setColour(float r, float g, float b, float a);
-	bool		hasPolygon() { return (subpolys.size() != 0); }
+	bool		hasPolygon() { return !subpolys.empty(); }
 	int			vboUpdate() { return vbo_update; }
 	void		setZ(float z);
 	void		setZ(plane_t plane);

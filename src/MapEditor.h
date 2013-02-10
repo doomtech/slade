@@ -164,7 +164,7 @@ public:
 	void		getSelectedThings(vector<MapThing*>& list);
 	void		getSelectedObjects(vector<MapObject*>& list);
 	void		showItem(int index);
-	bool		isHilightOrSelection() { return selection.size() > 0 || hilight_item != -1; }
+	bool		isHilightOrSelection() { return !selection.empty() || hilight_item != -1; }
 	void		selectItem3d(selection_3d_t item, int sel = TOGGLE);
 
 	// Grid

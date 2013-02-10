@@ -14,6 +14,7 @@ MapLine::MapLine(SLADEMap* parent) : MapObject(MOBJ_LINE, parent) {
 	side1 = NULL;
 	side2 = NULL;
 	length = -1;
+	special = 0;
 }
 
 MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2, SLADEMap* parent) : MapObject(MOBJ_LINE, parent) {
@@ -23,6 +24,7 @@ MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2, SLADEMa
 	side1 = s1;
 	side2 = s2;
 	length = -1;
+	special = 0;
 
 	// Connect to vertices
 	if (v1) v1->connectLine(this);
@@ -34,8 +36,6 @@ MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2, SLADEMa
 }
 
 MapLine::~MapLine() {
-	if (vertex1) vertex1->disconnectLine(this);
-	if (vertex2) vertex2->disconnectLine(this);
 }
 
 MapSector* MapLine::frontSector() {
@@ -118,6 +118,8 @@ int MapLine::intProperty(string key) {
 		return s1Index();
 	else if (key == "sideback")
 		return s2Index();
+	else if (key == "special")
+		return special;
 	else
 		return MapObject::intProperty(key);
 }
@@ -170,6 +172,10 @@ void MapLine::setIntProperty(string key, int value) {
 		if (side2)
 			return side2->setIntProperty(key.Mid(6), value);
 	}
+
+	// Special
+	else if (key == "special")
+		special = value;
 
 	// Line property
 	else
@@ -392,56 +398,48 @@ void MapLine::flip(bool sides) {
 	resetInternals();
 }
 
-void MapLine::writeBackup(PropertyList& plist) {
-	// General backup
-	//MapObject::backup(plist);
-
+void MapLine::writeBackup(mobj_backup_t* backup) {
 	// Vertices
-	plist["v1"] = (int)vertex1->getIndex();
-	plist["v2"] = (int)vertex2->getIndex();
+	backup->properties["v1"] = vertex1->getId();
+	backup->properties["v2"] = vertex2->getId();
 	
 	// Sides
 	if (side1)
-		plist["s1"] = (int)side1->getIndex();
+		backup->properties["s1"] = side1->getId();
 	else
-		plist["s1"] = -1;
+		backup->properties["s1"] = -1;
 	if (side2)
-		plist["s2"] = (int)side2->getIndex();
+		backup->properties["s2"] = side2->getId();
 	else
-		plist["s2"] = -1;
+		backup->properties["s2"] = -1;
+
+	// Special
+	backup->properties["special"] = special;
 }
 
-void MapLine::readBackup(PropertyList& plist) {
-	// General backup
-	//MapObject::loadFromBackup(plist);
-
+void MapLine::readBackup(mobj_backup_t* backup) {
 	// Vertices
-	MapVertex* v1 = parent_map->getVertex(plist["v1"].getIntValue());
-	MapVertex* v2 = parent_map->getVertex(plist["v2"].getIntValue());
+	MapObject* v1 = parent_map->getObjectById(backup->properties["v1"]);
+	MapObject* v2 = parent_map->getObjectById(backup->properties["v2"]);
 	if (v1 && v1 != vertex1) {
 		vertex1->disconnectLine(this);
-		v1->connectLine(this);
-		vertex1 = v1;
+		vertex1 = (MapVertex*)v1;
+		vertex1->connectLine(this);
 	}
 	if (v2 && v2 != vertex2) {
 		vertex2->disconnectLine(this);
-		v2->connectLine(this);
-		vertex2 = v2;
+		vertex2 = (MapVertex*)v2;
+		vertex2->connectLine(this);
 	}
 
 	// Sides
-	int s1 = plist["s1"].getIntValue();
-	int s2 = plist["s2"].getIntValue();
-	if (s1 >= 0) {
-		side1 = parent_map->getSide(s1);
-		side1->parent = this;
-	}
-	else
-		side1 = NULL;
-	if (s2 >= 0) {
-		side2 = parent_map->getSide(s2);
-		side2->parent = this;
-	}
-	else
-		side2 = NULL;
+	MapObject* s1 = parent_map->getObjectById(backup->properties["s1"]);
+	MapObject* s2 = parent_map->getObjectById(backup->properties["s2"]);
+	side1 = (MapSide*)s1;
+	side2 = (MapSide*)s2;
+	if (side1) side1->parent = this;
+	if (side2) side2->parent = this;
+
+	// Special
+	special = backup->properties["special"];
 }

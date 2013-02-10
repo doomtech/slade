@@ -4,6 +4,9 @@
 #include "SLADEMap.h"
 #include "GameConfiguration.h"
 #include "MainApp.h"
+#include "Console.h"
+
+unsigned	current_id = 1;
 
 MapObject::MapObject(int type, SLADEMap* parent) {
 	// Init variables
@@ -12,9 +15,14 @@ MapObject::MapObject(int type, SLADEMap* parent) {
 	this->index = 0;
 	this->filtered = false;
 	this->modified_time = theApp->runTimer();
+	this->id = current_id++;
+
+	if (parent)
+		parent->addMapObject(this);
 }
 
 MapObject::~MapObject() {
+	properties.clear();
 }
 
 unsigned MapObject::getIndex() {
@@ -22,6 +30,24 @@ unsigned MapObject::getIndex() {
 		return parent_map->objectIndex(this);
 	else
 		return index;
+}
+
+string MapObject::getTypeName() {
+	switch (type)
+	{
+	case MOBJ_VERTEX:
+		return "Vertex";
+	case MOBJ_SIDE:
+		return "Side";
+	case MOBJ_LINE:
+		return "Line";
+	case MOBJ_SECTOR:
+		return "Sector";
+	case MOBJ_THING:
+		return "Thing";
+	default:
+		return "Unknown";
+	}
 }
 
 void MapObject::copy(MapObject* c) {
@@ -133,22 +159,45 @@ void MapObject::setStringProperty(string key, string value) {
 	modified_time = theApp->runTimer();
 }
 
-void MapObject::backup(PropertyList& plist) {
+void MapObject::backup(mobj_backup_t* backup) {
+	// Save basic info
+	backup->id = id;
+	backup->type = type;
+
 	// Save general properties to list
-	properties.copyTo(plist);
+	properties.copyTo(backup->properties);
 
 	// Object-specific properties
-	writeBackup(plist);
+	writeBackup(backup);
 }
 
-void MapObject::loadFromBackup(PropertyList& plist) {
+void MapObject::loadFromBackup(mobj_backup_t* backup) {
+	// Check type match
+	if (backup->type != type) {
+		wxLogMessage("loadFromBackup: Mobj type mismatch, %d != %d", type, backup->type);
+		return;
+	}
+	// Check id match
+	if (backup->id != id) {
+		wxLogMessage("loadFromBackup: Mobj id mismatch, %d != %d", id, backup->id);
+		return;
+	}
+
 	// Load general properties from list
 	properties.clear();
-	plist.copyTo(properties);
-
+	backup->properties.copyTo(properties);
+	
 	// Object-specific properties
-	readBackup(plist);
+	readBackup(backup);
 
 	// Update modified time
 	modified_time = theApp->runTimer();
+}
+
+void MapObject::resetIdCounter() {
+	current_id = 1;
+}
+
+CONSOLE_COMMAND(m_next_id, 0) {
+	theConsole->logMessage(S_FMT("Next Object ID: %d", current_id));
 }

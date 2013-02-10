@@ -15,6 +15,14 @@ enum {
 	MOBJ_THING,
 };
 
+struct mobj_backup_t {
+	PropertyList	properties;
+	unsigned		id;
+	uint8_t			type;
+
+	mobj_backup_t() { id = 0; type = 0; }
+};
+
 class MapObject {
 friend class SLADEMap;
 private:
@@ -26,19 +34,21 @@ protected:
 	PropertyList	properties;
 	bool			filtered;
 	long			modified_time;
+	unsigned		id;
 
 public:
 	MapObject(int type = MOBJ_UNKNOWN, SLADEMap* parent = NULL);
-	~MapObject();
+	virtual ~MapObject();
 
 	uint8_t		getObjType() { return type; }
 	unsigned	getIndex();
 	SLADEMap*	getParentMap() { return parent_map; }
 	bool		isFiltered() { return filtered; }
 	long		modifiedTime() { return modified_time; }
+	unsigned	getId() { return id; }
+	string		getTypeName();
 
 	PropertyList&	props()				{ return properties; }
-	//Property&		prop(string key)	{ return properties[key]; }
 	bool			hasProp(string key)	{ return properties.propertyExists(key); }
 
 	// Generic property modification
@@ -58,11 +68,13 @@ public:
 
 	virtual void	copy(MapObject* c);
 
-	void	backup(PropertyList& plist);
-	void	loadFromBackup(PropertyList& plist);
+	void	backup(mobj_backup_t* backup);
+	void	loadFromBackup(mobj_backup_t* backup);
 
-	virtual void writeBackup(PropertyList& plist) = 0;
-	virtual void readBackup(PropertyList& plist) = 0;
+	virtual void writeBackup(mobj_backup_t* backup) = 0;
+	virtual void readBackup(mobj_backup_t* backup) = 0;
+
+	static void resetIdCounter();
 };
 
 #endif//__MAP_OBJECT_H__

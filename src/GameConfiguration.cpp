@@ -504,9 +504,8 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node, ActionSpecial* g
 		groupname.RemoveLast();	// Remove last '/'
 
 	// --- Set up group default properties ---
-	ActionSpecial* as_defaults = NULL;
-	if (group_defaults) as_defaults = new ActionSpecial(*group_defaults);
-	else as_defaults = new ActionSpecial();
+	ActionSpecial* as_defaults = new ActionSpecial();
+	if (group_defaults) as_defaults->copy(group_defaults);
 	as_defaults->parse(node);
 
 	// --- Go through all child nodes ---
@@ -566,9 +565,8 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node, ThingType* group_def
 
 	// --- Set up group default properties ---
 	ParseTreeNode* child = NULL;
-	ThingType* tt_defaults = NULL;
-	if (group_defaults) tt_defaults = new ThingType(*group_defaults);
-	else tt_defaults = new ThingType();
+	ThingType* tt_defaults = new ThingType();
+	tt_defaults->copy(group_defaults);
 	tt_defaults->parse(node);
 
 

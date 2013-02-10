@@ -85,20 +85,14 @@ MapLine* MapVertex::connectedLine(unsigned index) {
 	return connected_lines[index];
 }
 
-void MapVertex::writeBackup(PropertyList& plist) {
-	// General properties
-	//MapObject::backup(plist);
-
+void MapVertex::writeBackup(mobj_backup_t* backup) {
 	// Position
-	plist["x"] = x;
-	plist["y"] = y;
+	backup->properties["x"] = x;
+	backup->properties["y"] = y;
 }
 
-void MapVertex::readBackup(PropertyList& plist) {
-	// General properties
-	//MapObject::backup(plist);
-
+void MapVertex::readBackup(mobj_backup_t* backup) {
 	// Position
-	x = plist["x"].getFloatValue();
-	y = plist["y"].getFloatValue();
+	x = backup->properties["x"].getFloatValue();
+	y = backup->properties["y"].getFloatValue();
 }

@@ -341,20 +341,17 @@ void MapSector::disconnectSide(MapSide* side) {
 	bbox.reset();
 }
 
-void MapSector::writeBackup(PropertyList& plist) {
-	// General properties
-	//MapObject::backup(plist);
-
+void MapSector::writeBackup(mobj_backup_t* backup) {
 	// Textures
-	plist["texturefloor"] = f_tex;
-	plist["textureceiling"] = c_tex;
+	backup->properties["texturefloor"] = f_tex;
+	backup->properties["textureceiling"] = c_tex;
 }
 
-void MapSector::readBackup(PropertyList& plist) {
+void MapSector::readBackup(mobj_backup_t* backup) {
 	// General properties
 	//MapObject::loadFromBackup(plist);
 
 	// Textures
-	f_tex = plist["texturefloor"].getStringValue();
-	c_tex = plist["textureceiling"].getStringValue();
+	f_tex = backup->properties["texturefloor"].getStringValue();
+	c_tex = backup->properties["textureceiling"].getStringValue();
 }

@@ -67,8 +67,8 @@ public:
 
 	void	setAnglePoint(fpoint2_t point);
 
-	void	writeBackup(PropertyList& plist);
-	void	readBackup(PropertyList& plist);
+	void	writeBackup(mobj_backup_t* backup);
+	void	readBackup(mobj_backup_t* backup);
 };
 
 #endif //__MAPTHING_H__

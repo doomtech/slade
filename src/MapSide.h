@@ -49,8 +49,8 @@ public:
 	int		intProperty(string key);
 	void	setIntProperty(string key, int value);
 
-	void	writeBackup(PropertyList& plist);
-	void	readBackup(PropertyList& plist);
+	void	writeBackup(mobj_backup_t* backup);
+	void	readBackup(mobj_backup_t* backup);
 };
 
 #endif //__MAPSIDE_H__

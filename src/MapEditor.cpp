@@ -24,38 +24,71 @@ EXTERN_CVAR(Bool, shapedraw_lockratio)
 
 class PropertyChangeUS : public UndoStep {
 private:
-	PropertyList	properties;
-	unsigned		index;
-	uint8_t			type;
+	mobj_backup_t*	backup;
 
 public:
 	PropertyChangeUS(MapObject* object) {
-		object->backup(properties);
-		index = object->getIndex();
-		type = object->getObjType();
+		backup = new mobj_backup_t();
+		object->backup(backup);
 	}
 
 	~PropertyChangeUS() {
+		delete backup;
 	}
 
 	void doSwap(MapObject* obj) {
-		PropertyList list;
-		obj->backup(list);
-		obj->loadFromBackup(properties);
-		properties.clear();
-		list.copyTo(properties);
+		mobj_backup_t* temp = new mobj_backup_t();
+		obj->backup(temp);
+		obj->loadFromBackup(backup);
+		delete backup;
+		backup = temp;
 	}
 
 	bool doUndo() {
-		MapObject* obj = UndoRedo::currentMap()->getObject(type, index);
+		MapObject* obj = UndoRedo::currentMap()->getObjectById(backup->id);
 		if (obj) doSwap(obj);
 
 		return true;
 	}
 
 	bool doRedo() {
-		MapObject* obj = UndoRedo::currentMap()->getObject(type, index);
+		MapObject* obj = UndoRedo::currentMap()->getObjectById(backup->id);
 		if (obj) doSwap(obj);
+
+		return true;
+	}
+};
+
+class MapObjectDeleteUS : public UndoStep {
+private:
+	vector<unsigned> object_ids;
+
+public:
+	MapObjectDeleteUS() {
+		// Get recently deleted object ids from map
+		vector<unsigned>& deleted_objects = UndoRedo::currentMap()->deletedObjectIds();
+		for (unsigned a = 0; a < deleted_objects.size(); a++)
+			object_ids.push_back(deleted_objects[a]);
+	}
+
+	~MapObjectDeleteUS() {}
+
+	bool doUndo() {
+		// Restore deleted objects
+		for (unsigned a = 0; a < object_ids.size(); a++) {
+			UndoRedo::currentMap()->restoreObjectById(object_ids[a]);
+			//wxLogMessage("Restored object id %d (%s)", object_ids[a], CHR(UndoRedo::currentMap()->getObjectById(object_ids[a])->getTypeName()));
+		}
+
+		return true;
+	}
+
+	bool doRedo() {
+		// Remove objects
+		for (unsigned a = 0; a < object_ids.size(); a++) {
+			UndoRedo::currentMap()->removeObjectById(object_ids[a]);
+			//wxLogMessage("Removed object id %d (%s)", object_ids[a], CHR(UndoRedo::currentMap()->getObjectById(object_ids[a])->getTypeName()));
+		}
 
 		return true;
 	}
@@ -1669,6 +1702,8 @@ void MapEditor::createSector(double x, double y) {
 }
 
 void MapEditor::deleteObject() {
+	vector<MapObject*> objects_prop_change;
+
 	// Vertices mode
 	if (edit_mode == MODE_VERTICES) {
 		// Get selected vertices
@@ -1677,6 +1712,10 @@ void MapEditor::deleteObject() {
 		int index = -1;
 		if (verts.size() == 1)
 			index = verts[0]->getIndex();
+
+		// Begin undo step
+		undo_manager->beginRecord("Delete Vertices");
+		map.clearDeletedObjectIds();
 
 		// Delete them (if any)
 		for (unsigned a = 0; a < verts.size(); a++)
@@ -1698,6 +1737,10 @@ void MapEditor::deleteObject() {
 		if (lines.size() == 1)
 			index = lines[0]->getIndex();
 
+		// Begin undo step
+		undo_manager->beginRecord("Delete Lines");
+		map.clearDeletedObjectIds();
+
 		// Delete them (if any)
 		for (unsigned a = 0; a < lines.size(); a++)
 			map.removeLine(lines[a]);
@@ -1718,14 +1761,24 @@ void MapEditor::deleteObject() {
 		if (sectors.size() == 1)
 			index = sectors[0]->getIndex();
 
-		// Delete them (if any), and keep a list of connected sides
+		// Begin undo step
+		undo_manager->beginRecord("Delete Sectors");
+		map.clearDeletedObjectIds();
+
+		// Delete them (if any), and keep lists of connected lines and sides
 		vector<MapSide*> connected_sides;
+		vector<MapLine*> connected_lines;
 		for (unsigned a = 0; a < sectors.size(); a++) {
 			for (unsigned s = 0; s < sectors[a]->connectedSides().size(); s++)
 				connected_sides.push_back(sectors[a]->connectedSides()[s]);
+			sectors[a]->getLines(connected_lines);
 
 			map.removeSector(sectors[a]);
 		}
+
+		// Backup connected line properties
+		for (unsigned a = 0; a < connected_lines.size(); a++)
+			undo_manager->recordUndoStep(new PropertyChangeUS(connected_lines[a]));
 
 		// Remove all connected sides
 		for (unsigned a = 0; a < connected_sides.size(); a++) {
@@ -1756,6 +1809,10 @@ void MapEditor::deleteObject() {
 		if (things.size() == 1)
 			index = things[0]->getIndex();
 
+		// Begin undo step
+		undo_manager->beginRecord("Delete Things");
+		map.clearDeletedObjectIds();
+
 		// Delete them (if any)
 		for (unsigned a = 0; a < things.size(); a++)
 			map.removeThing(things[a]);
@@ -1769,6 +1826,10 @@ void MapEditor::deleteObject() {
 
 	// Remove detached vertices
 	map.removeDetachedVertices();
+
+	// Record undo step
+	undo_manager->recordUndoStep(new MapObjectDeleteUS());
+	undo_manager->endRecord(true);
 
 	// Clear hilight and selection
 	selection.clear();
@@ -3259,35 +3320,35 @@ CONSOLE_COMMAND(m_test_mobj_backup, 0) {
 	sf::Clock clock;
 	sf::Clock totalClock;
 	SLADEMap& map = theMapEditor->mapEditor().getMap();
-	PropertyList plist;
+	mobj_backup_t* backup = new mobj_backup_t();
 
 	// Vertices
 	for (unsigned a = 0; a < map.nVertices(); a++)
-		map.getVertex(a)->backup(plist);
+		map.getVertex(a)->backup(backup);
 	wxLogMessage("Vertices: %dms", getSFMLElapsedTime(clock));
 
 	// Lines
 	resetSFMLClock(clock);
 	for (unsigned a = 0; a < map.nLines(); a++)
-		map.getLine(a)->backup(plist);
+		map.getLine(a)->backup(backup);
 	wxLogMessage("Lines: %dms", getSFMLElapsedTime(clock));
 
 	// Sides
 	resetSFMLClock(clock);
 	for (unsigned a = 0; a < map.nSides(); a++)
-		map.getSide(a)->backup(plist);
+		map.getSide(a)->backup(backup);
 	wxLogMessage("Sides: %dms", getSFMLElapsedTime(clock));
 
 	// Sectors
 	resetSFMLClock(clock);
 	for (unsigned a = 0; a < map.nSectors(); a++)
-		map.getSector(a)->backup(plist);
+		map.getSector(a)->backup(backup);
 	wxLogMessage("Sectors: %dms", getSFMLElapsedTime(clock));
 
 	// Things
 	resetSFMLClock(clock);
 	for (unsigned a = 0; a < map.nThings(); a++)
-		map.getThing(a)->backup(plist);
+		map.getThing(a)->backup(backup);
 	wxLogMessage("Things: %dms", getSFMLElapsedTime(clock));
 
 	wxLogMessage("Total: %dms", getSFMLElapsedTime(totalClock));

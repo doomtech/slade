@@ -489,7 +489,7 @@ bool MapEditorWindow::saveMap() {
 	}
 
 	// Add map data to temporary wad
-	Archive* wad = new WadArchive();
+	WadArchive* wad = new WadArchive();
 	wad->addNewEntry("MAP01");
 	for (unsigned a = 0; a < map_data.size(); a++)
 		wad->addEntry(map_data[a]);

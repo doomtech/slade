@@ -16,15 +16,6 @@ MapSide::MapSide(MapSector* sector, SLADEMap* parent) : MapObject(MOBJ_SIDE, par
 }
 
 MapSide::~MapSide() {
-	// Remove side from current sector, if any
-	if (this->sector) {
-		for (unsigned a = 0; a < sector->connected_sides.size(); a++) {
-			if (sector->connected_sides[a] == this) {
-				sector->connected_sides.erase(sector->connected_sides.begin() + a);
-				break;
-			}
-		}
-	}
 }
 
 void MapSide::setSector(MapSector* sector) {
@@ -61,27 +52,21 @@ void MapSide::setIntProperty(string key, int value) {
 	modified_time = theApp->runTimer();
 }
 
-void MapSide::writeBackup(PropertyList& plist) {
-	// General properties
-	//MapObject::backup(plist);
-
+void MapSide::writeBackup(mobj_backup_t* backup) {
 	// Sector
 	if (sector)
-		plist["sector"] = (int)sector->getIndex();
+		backup->properties["sector"] = sector->getId();
 	else
-		plist["sector"] = -1;
+		backup->properties["sector"] = 0;
 }
 
-void MapSide::readBackup(PropertyList& plist) {
-	// General properties
-	//MapObject::backup(plist);
-
+void MapSide::readBackup(mobj_backup_t* backup) {
 	// Sector
-	MapSector* s = parent_map->getSector(plist["sector"].getIntValue());
+	MapObject* s = parent_map->getObjectById(backup->properties["sector"]);
 	if (s) {
 		sector->disconnectSide(this);
-		sector = s;
-		s->connectSide(this);
+		sector = (MapSector*)s;
+		sector->connectSide(this);
 	}
 	else {
 		if (sector)

@@ -343,7 +343,7 @@ void MCA3dWallSelection::draw() {
 	// Setup colour
 	rgba_t col;
 	if (select)
-		col.set(255, 255, 255, 180*fade, 1);
+		col.set(255, 255, 255, 90*fade, 1);
 	else {
 		col = ColourConfiguration::getColour("map_3d_selection");
 		col.a *= fade*0.75;
@@ -399,7 +399,7 @@ void MCA3dFlatSelection::draw() {
 	// Setup colour
 	rgba_t col;
 	if (select)
-		col.set(255, 255, 255, 180*fade, 1);
+		col.set(255, 255, 255, 60*fade, 1);
 	else {
 		col = ColourConfiguration::getColour("map_3d_selection");
 		col.a *= fade*0.75*0.5;

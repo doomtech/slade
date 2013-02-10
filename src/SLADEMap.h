@@ -10,6 +10,20 @@
 #include "Archive.h"
 #include "PropertyList.h"
 
+// Hash map of all MapObjects, by ID
+struct mobj_holder_t {
+	MapObject*	mobj;
+	bool		in_map;
+
+	mobj_holder_t() { mobj = NULL; in_map = false; }
+
+	void set(MapObject* object, bool in_map) {
+		this->mobj = object;
+		this->in_map = in_map;
+	}
+};
+WX_DECLARE_HASH_MAP(unsigned, mobj_holder_t, wxIntegerHash, wxIntegerEqual, MObjMap);
+
 class ParseTreeNode;
 class SLADEMap {
 friend class MapEditor;
@@ -24,6 +38,10 @@ private:
 	bool				position_frac;
 	string				name;
 	int					current_format;
+
+	MObjMap				map_objects;
+	vector<unsigned>	deleted_objects;
+	vector<unsigned>	created_objects;
 
 	// The last time the map geometry was updated
 	long	geometry_updated;
@@ -112,6 +130,17 @@ public:
 	size_t		nThings() { return things.size(); }
 	long		geometryUpdated() { return geometry_updated; }
 
+	// MapObject id hashing stuff (used for undo/redo)
+	void				addMapObject(MapObject* object);
+	void				removeMapObject(MapObject* object);
+	MapObject*			getObjectById(unsigned id) { return map_objects[id].mobj; }
+	void				clearCreatedObjectIds() { created_objects.clear(); }
+	vector<unsigned>&	createdObjectIds() { return created_objects; }
+	void				clearDeletedObjectIds() { deleted_objects.clear(); }
+	vector<unsigned>&	deletedObjectIds() { return deleted_objects; }
+	void				restoreObjectById(unsigned id);
+	void				removeObjectById(unsigned id);
+
 	// Map structure indices
 	int		vertexIndex(MapVertex* v);
 	int		sideIndex(MapSide* s);
@@ -142,8 +171,8 @@ public:
 	bool	removeVertex(unsigned index);
 	bool	removeLine(MapLine* line);
 	bool	removeLine(unsigned index);
-	bool	removeSide(MapSide* side);
-	bool	removeSide(unsigned index);
+	bool	removeSide(MapSide* side, bool remove_from_line = true);
+	bool	removeSide(unsigned index, bool remove_from_line = true);
 	bool	removeSector(MapSector* sector);
 	bool	removeSector(unsigned index);
 	bool	removeThing(MapThing* thing);
@@ -169,9 +198,10 @@ public:
 	void	getTaggingLinesById(int id, int type, vector<MapLine*>& list);
 
 	// Info
-	string		getAdjacentLineTexture(MapVertex* vertex, int tex_part = 255);
-	MapSector*	getLineSideSector(MapLine* line, bool front = true);
-	int			findUnusedSectorTag();
+	string				getAdjacentLineTexture(MapVertex* vertex, int tex_part = 255);
+	MapSector*			getLineSideSector(MapLine* line, bool front = true);
+	int					findUnusedSectorTag();
+	vector<MapObject*>	getModifiedObjects(long since, int type = -1);
 
 	// Creation
 	MapVertex*	createVertex(double x, double y, double split_dist = -1);
