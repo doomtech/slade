@@ -378,7 +378,7 @@ void MapLine::resetInternals() {
 		s2->resetBBox();
 	}
 
-	modified_time = theApp->runTimer();
+	setModified();
 }
 
 void MapLine::flip(bool sides) {
@@ -394,7 +394,7 @@ void MapLine::flip(bool sides) {
 		side2 = s;
 	}
 
-	modified_time = theApp->runTimer();
+	setModified();
 	resetInternals();
 }
 
@@ -402,16 +402,16 @@ void MapLine::writeBackup(mobj_backup_t* backup) {
 	// Vertices
 	backup->properties["v1"] = vertex1->getId();
 	backup->properties["v2"] = vertex2->getId();
-	
+
 	// Sides
 	if (side1)
 		backup->properties["s1"] = side1->getId();
 	else
-		backup->properties["s1"] = -1;
+		backup->properties["s1"] = 0;
 	if (side2)
 		backup->properties["s2"] = side2->getId();
 	else
-		backup->properties["s2"] = -1;
+		backup->properties["s2"] = 0;
 
 	// Special
 	backup->properties["special"] = special;
@@ -425,11 +425,13 @@ void MapLine::readBackup(mobj_backup_t* backup) {
 		vertex1->disconnectLine(this);
 		vertex1 = (MapVertex*)v1;
 		vertex1->connectLine(this);
+		resetInternals();
 	}
 	if (v2 && v2 != vertex2) {
 		vertex2->disconnectLine(this);
 		vertex2 = (MapVertex*)v2;
 		vertex2->connectLine(this);
+		resetInternals();
 	}
 
 	// Sides

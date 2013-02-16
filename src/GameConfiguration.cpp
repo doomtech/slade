@@ -11,6 +11,7 @@
 #include "Archive.h"
 #include "ArchiveManager.h"
 #include "SLADEMap.h"
+#include "GenLineSpecial.h"
 #include <wx/textfile.h>
 #include <wx/filename.h>
 #include <wx/dir.h>
@@ -422,7 +423,7 @@ void GameConfiguration::buildConfig(string filename, string& out) {
 /* GameConfiguration::buildConfig
  * Reads the text entry [entry], processing any #include statements
  * in the entry text recursively. This will search in the resource
- * folder and archive as well as in the parent archive. The resulting 
+ * folder and archive as well as in the parent archive. The resulting
  * 'expanded' text is written to [out]
  *******************************************************************/
 void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
@@ -861,7 +862,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source, bool ignor
 
 				long flag_val;
 				string flag_name, flag_udmf;
-				
+
 				if (value->nValues() == 0) {
 					// Full definition
 					flag_name = value->getName();
@@ -889,7 +890,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source, bool ignor
 				for (unsigned f = 0; f < flags_line.size(); f++) {
 					if (flags_line[f].flag == flag_val) {
 						exists = true;
-						flags_line[f].name = value->getStringValue();
+						flags_line[f].name = flag_name;
 						break;
 					}
 				}
@@ -911,7 +912,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source, bool ignor
 
 				long flag_val;
 				string flag_name, flag_udmf;
-				
+
 				if (value->nValues() == 0) {
 					// Full definition
 					flag_name = value->getName();
@@ -939,7 +940,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source, bool ignor
 				for (unsigned f = 0; f < triggers_line.size(); f++) {
 					if (triggers_line[f].flag == flag_val) {
 						exists = true;
-						triggers_line[f].name = value->getStringValue();
+						triggers_line[f].name = flag_name;
 						break;
 					}
 				}
@@ -961,7 +962,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source, bool ignor
 
 				long flag_val;
 				string flag_name, flag_udmf;
-				
+
 				if (value->nValues() == 0) {
 					// Full definition
 					flag_name = value->getName();
@@ -989,7 +990,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source, bool ignor
 				for (unsigned f = 0; f < flags_thing.size(); f++) {
 					if (flags_thing[f].flag == flag_val) {
 						exists = true;
-						flags_thing[f].name = value->getStringValue();
+						flags_thing[f].name = flag_name;
 						break;
 					}
 				}
@@ -1541,6 +1542,8 @@ string GameConfiguration::actionSpecialName(int special) {
 
 	if (action_specials[special].special)
 		return action_specials[special].special->getName();
+	else if (special >= 0x2F80 && boom)
+		return BoomGenLineSpecial::parseLineType(special);
 	else
 		return "Unknown";
 }

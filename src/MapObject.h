@@ -35,6 +35,7 @@ protected:
 	bool			filtered;
 	long			modified_time;
 	unsigned		id;
+	mobj_backup_t*	obj_backup;
 
 public:
 	MapObject(int type = MOBJ_UNKNOWN, SLADEMap* parent = NULL);
@@ -47,6 +48,7 @@ public:
 	long		modifiedTime() { return modified_time; }
 	unsigned	getId() { return id; }
 	string		getTypeName();
+	void		setModified();
 
 	PropertyList&	props()				{ return properties; }
 	bool			hasProp(string key)	{ return properties.propertyExists(key); }
@@ -68,13 +70,17 @@ public:
 
 	virtual void	copy(MapObject* c);
 
-	void	backup(mobj_backup_t* backup);
-	void	loadFromBackup(mobj_backup_t* backup);
+	void			backup(mobj_backup_t* backup);
+	void			loadFromBackup(mobj_backup_t* backup);
+	mobj_backup_t*	getBackup(bool remove = false);
 
 	virtual void writeBackup(mobj_backup_t* backup) = 0;
 	virtual void readBackup(mobj_backup_t* backup) = 0;
 
 	static void resetIdCounter();
+	static long propBackupTime();
+	static void beginPropBackup(long current_time);
+	static void endPropBackup();
 };
 
 #endif//__MAP_OBJECT_H__

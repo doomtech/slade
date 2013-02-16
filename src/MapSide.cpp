@@ -28,7 +28,7 @@ void MapSide::setSector(MapSector* sector) {
 	sector->connectSide(this);
 
 	// Update modified time
-	modified_time = theApp->runTimer();
+	setModified();
 }
 
 int MapSide::intProperty(string key) {
@@ -49,7 +49,7 @@ void MapSide::setIntProperty(string key, int value) {
 		MapObject::setIntProperty(key, value);
 
 	// Update modified time
-	modified_time = theApp->runTimer();
+	setModified();
 }
 
 void MapSide::writeBackup(mobj_backup_t* backup) {

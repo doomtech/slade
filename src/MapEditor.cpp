@@ -61,7 +61,7 @@ public:
 
 class MapObjectDeleteUS : public UndoStep {
 private:
-	vector<unsigned> object_ids;
+	vector<unsigned>	object_ids;
 
 public:
 	MapObjectDeleteUS() {
@@ -88,6 +88,88 @@ public:
 		for (unsigned a = 0; a < object_ids.size(); a++) {
 			UndoRedo::currentMap()->removeObjectById(object_ids[a]);
 			//wxLogMessage("Removed object id %d (%s)", object_ids[a], CHR(UndoRedo::currentMap()->getObjectById(object_ids[a])->getTypeName()));
+		}
+
+		return true;
+	}
+};
+
+class MapObjectCreateUS : public UndoStep {
+private:
+	vector<unsigned>	object_ids;
+
+public:
+	MapObjectCreateUS() {
+		// Get recently created object ids from map
+		vector<unsigned>& created_objects = UndoRedo::currentMap()->createdObjectIds();
+		for (unsigned a = 0; a < created_objects.size(); a++)
+			object_ids.push_back(created_objects[a]);
+	}
+
+	~MapObjectCreateUS() {}
+
+	bool doUndo() {
+		// Remove objects
+		for (unsigned a = 0; a < object_ids.size(); a++) {
+			UndoRedo::currentMap()->removeObjectById(object_ids[a]);
+		}
+
+		return true;
+	}
+
+	bool doRedo() {
+		// Restore objects
+		for (unsigned a = 0; a < object_ids.size(); a++) {
+			UndoRedo::currentMap()->restoreObjectById(object_ids[a]);
+		}
+
+		return true;
+	}
+};
+
+class MultiMapObjectPropertyChangeUS : public UndoStep {
+private:
+	vector<mobj_backup_t*>	backups;
+
+public:
+	MultiMapObjectPropertyChangeUS() {
+		// Get backups of recently modified map objects
+		vector<MapObject*> objects = UndoRedo::currentMap()->getAllModifiedObjects(MapObject::propBackupTime());
+		for (unsigned a = 0; a < objects.size(); a++) {
+			mobj_backup_t* bak = objects[a]->getBackup(true);
+			if (bak) {
+				backups.push_back(bak);
+				wxLogMessage("%s #%d modified", CHR(objects[a]->getTypeName()), objects[a]->getIndex());
+			}
+		}
+	}
+
+	~MultiMapObjectPropertyChangeUS() {
+		for (unsigned a = 0; a < backups.size(); a++)
+			delete backups[a];
+	}
+
+	void doSwap(MapObject* obj, unsigned index) {
+		mobj_backup_t* temp = new mobj_backup_t();
+		obj->backup(temp);
+		obj->loadFromBackup(backups[index]);
+		delete backups[index];
+		backups[index] = temp;
+	}
+
+	bool doUndo() {
+		for (unsigned a = 0; a < backups.size(); a++) {
+			MapObject* obj = UndoRedo::currentMap()->getObjectById(backups[a]->id);
+			if (obj) doSwap(obj, a);
+		}
+
+		return true;
+	}
+
+	bool doRedo() {
+		for (unsigned a = 0; a < backups.size(); a++) {
+			MapObject* obj = UndoRedo::currentMap()->getObjectById(backups[a]->id);
+			if (obj) doSwap(obj, a);
 		}
 
 		return true;
@@ -129,15 +211,15 @@ void MapEditor::setEditMode(int mode) {
 		// Cycle sector edit mode
 		if (mode == MODE_SECTORS)
 			setSectorEditMode(sector_mode + 1);
-		
+
 		// Do nothing otherwise
 		return;
 	}
-	
+
 	// Set edit mode
 	edit_mode = mode;
 	sector_mode = SECTOR_BOTH;
-	
+
 	// Clear hilight and selection stuff
 	hilight_item = -1;
 	selection.clear();
@@ -161,7 +243,7 @@ void MapEditor::setSectorEditMode(int mode) {
 	sector_mode = mode;
 	if (sector_mode > SECTOR_CEILING || sector_mode < 0)
 		sector_mode = SECTOR_BOTH;
-	
+
 	// Editor message
 	if (sector_mode == SECTOR_BOTH)
 		addEditorMessage("Sectors mode (Normal)");
@@ -196,7 +278,7 @@ bool MapEditor::openMap(Archive::mapdesc_t map) {
 			canvas->set3dCameraThing(cam);
 		else if (pstart)
 			canvas->set3dCameraThing(pstart);
-			
+
 		// Reset rendering data
 		canvas->forceRefreshRenderer();
 	}
@@ -287,7 +369,7 @@ void MapEditor::updateTagged() {
 	if (hilight_item >= 0) {
 		// Gather affecting objects
 		int type, tag = 0;
-		if (edit_mode == MODE_LINES) { 
+		if (edit_mode == MODE_LINES) {
 			type = SLADEMap::LINEDEFS;
 			tag = map.getLine(hilight_item)->intProperty("id");
 		} else if (edit_mode == MODE_THINGS) {
@@ -1057,6 +1139,7 @@ void MapEditor::endMove(bool accept) {
 		undo_manager->beginRecord("Move Things");
 		for (unsigned a = 0; a < move_items.size(); a++) {
 			MapThing* t = map.getThing(move_items[a]);
+			undo_manager->recordUndoStep(new PropertyChangeUS(t));
 			map.moveThing(move_items[a], t->xPos() + move_vec.x, t->yPos() + move_vec.y);
 		}
 		undo_manager->endRecord(true);
@@ -1599,7 +1682,7 @@ void MapEditor::createObject(double x, double y) {
 
 	// Sectors mode
 	if (edit_mode == MODE_SECTORS) {
-		// Sector 
+		// Sector
 		if (map.nLines() > 0) {
 			createSector(x, y);
 		} else {
@@ -1639,6 +1722,10 @@ void MapEditor::createThing(double x, double y) {
 		y = snapToGrid(y);
 	}
 
+	// Begin undo step
+	undo_manager->beginRecord("Create Thing");
+	map.clearCreatedObjectIds();
+
 	// Create thing
 	MapThing* thing = map.createThing(x, y);
 
@@ -1653,6 +1740,10 @@ void MapEditor::createThing(double x, double y) {
 	}
 	else
 		theGameConfiguration->applyDefaults(thing);	// No thing properties to copy, get defaults from game configuration
+
+	// End undo step
+	undo_manager->recordUndoStep(new MapObjectCreateUS());
+	undo_manager->endRecord(true);
 
 	// Editor message
 	if (thing)
@@ -1840,7 +1931,7 @@ fpoint2_t MapEditor::lineDrawPoint(unsigned index) {
 	// Check index
 	if (index >= draw_points.size())
 		return fpoint2_t(0, 0);
-	
+
 	return draw_points[index];
 }
 
@@ -1991,6 +2082,12 @@ struct me_ls_t {
 void MapEditor::endLineDraw(bool apply) {
 	// Check if we want to 'apply' the line draw (ie. create the lines)
 	if (apply && draw_points.size() > 1) {
+		// Begin undo level
+		undo_manager->beginRecord("Line Draw");
+		map.clearCreatedObjectIds();
+		map.clearDeletedObjectIds();
+		MapObject::beginPropBackup(theApp->runTimer());
+
 		// Add extra points if any lines overlap existing vertices
 		for (unsigned a = 0; a < draw_points.size() - 1; a++) {
 			MapVertex* v = map.lineCrossVertex(draw_points[a].x, draw_points[a].y, draw_points[a+1].x, draw_points[a+1].y);
@@ -2038,7 +2135,7 @@ void MapEditor::endLineDraw(bool apply) {
 			if (map.sectorAt(mid.x, mid.y) >= 0)
 				edges.push_back(me_ls_t(map.getLine(a), false));
 		}
-		
+
 		// Build sectors
 		SectorBuilder builder;
 		int runs = 0;
@@ -2088,7 +2185,7 @@ void MapEditor::endLineDraw(bool apply) {
 				else
 					sector = NULL;
 			}
-			
+
 			// Create sector
 			builder.createSector(sector);
 		}
@@ -2167,6 +2264,13 @@ void MapEditor::endLineDraw(bool apply) {
 
 		// Remove any extra sectors
 		map.removeDetachedSectors();
+
+		// End recording undo level
+		MapObject::beginPropBackup(-1);
+		undo_manager->recordUndoStep(new MapObjectCreateUS());
+		undo_manager->recordUndoStep(new MapObjectDeleteUS());
+		undo_manager->recordUndoStep(new MultiMapObjectPropertyChangeUS());
+		undo_manager->endRecord(true);
 	}
 
 	// Clear draw points
@@ -2448,7 +2552,7 @@ void MapEditor::selectAdjacent3d(selection_3d_t item) {
 				selectAdjacent3d(selection_3d_t(osector->getIndex(), item.type));
 		}
 	}
-	
+
 	// Wall
 	else if (item.type != SEL_THING) {
 		vector<selection_3d_t> list;
@@ -2684,7 +2788,7 @@ void MapEditor::doAlignX3d(MapSide* side, int offset, string tex, vector<selecti
 		if (walls_done[a].index == side->getIndex())
 			return;
 	}
-	
+
 	// Add to 'done' list
 	walls_done.push_back(selection_3d_t(side->getIndex(), SEL_SIDE_MIDDLE));
 
@@ -2703,7 +2807,7 @@ void MapEditor::doAlignX3d(MapSide* side, int offset, string tex, vector<selecti
 	// Go through connected lines
 	for (unsigned a = 0; a < vertex->nConnectedLines(); a++) {
 		MapLine* l = vertex->connectedLine(a);
-		
+
 		// First side
 		MapSide* s = l->s1();
 		if (s) {
@@ -2964,7 +3068,7 @@ void MapEditor::paste3d(int type) {
 					side->setStringProperty("texturebottom", copy_texture);
 			}
 		}
-		
+
 		// Flat
 		else if (items[a].type == SEL_FLOOR || items[a].type == SEL_CEILING) {
 			MapSector* sector = map.getSector(items[a].index);

@@ -55,6 +55,9 @@ private:
 	double	view_scale_inv;
 	bool	things_angles;
 
+	vector<GLTexture*>	tex_flats;
+	int					last_flat_type;
+
 public:
 	MapRenderer2D(SLADEMap* map);
 	~MapRenderer2D();

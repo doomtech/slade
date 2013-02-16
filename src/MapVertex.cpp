@@ -42,10 +42,10 @@ void MapVertex::setIntProperty(string key, int value) {
 	else if (key == "y")
 		y = value;
 	else
-		MapObject::setIntProperty(key, value);
+		return MapObject::setIntProperty(key, value);
 
 	// Update modified time
-	modified_time = theApp->runTimer();
+	setModified();
 }
 
 void MapVertex::setFloatProperty(string key, double value) {
@@ -54,10 +54,10 @@ void MapVertex::setFloatProperty(string key, double value) {
 	else if (key == "y")
 		y = value;
 	else
-		MapObject::setFloatProperty(key, value);
+		return MapObject::setFloatProperty(key, value);
 
 	// Update modified time
-	modified_time = theApp->runTimer();
+	setModified();
 }
 
 void MapVertex::connectLine(MapLine* line) {

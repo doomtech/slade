@@ -53,10 +53,10 @@ void MapSector::setStringProperty(string key, string value) {
 	else if (key == "textureceiling")
 		c_tex = value;
 	else
-		MapObject::setStringProperty(key, value);
+		return MapObject::setStringProperty(key, value);
 
 	// Update modified time
-	modified_time = theApp->runTimer();
+	setModified();
 }
 
 void MapSector::setFloatProperty(string key, double value) {
@@ -73,7 +73,7 @@ void MapSector::setFloatProperty(string key, double value) {
 	MapObject::setFloatProperty(key, value);
 
 	// Update modified time
-	modified_time = theApp->runTimer();
+	setModified();
 }
 
 fpoint2_t MapSector::midPoint() {

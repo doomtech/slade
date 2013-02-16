@@ -261,8 +261,9 @@
       <File Name="src/Args.h"/>
       <File Name="src/UDMFProperty.h"/>
       <File Name="src/UDMFProperty.cpp"/>
+      <File Name="src/GenLineSpecial.cpp"/>
+      <File Name="src/GenLineSpecial.h"/>
     </VirtualDirectory>
-    <File Name="src/MapRenderer2D.cpp"/>
     <File Name="src/MapRenderer2D.h"/>
     <File Name="src/SectorBuilder.cpp"/>
     <File Name="src/SectorBuilder.h"/>
@@ -270,6 +271,7 @@
     <File Name="src/NodeBuilders.h"/>
     <File Name="src/MapRenderer3D.cpp"/>
     <File Name="src/MapRenderer3D.h"/>
+    <File Name="src/MapRenderer2D.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
     <VirtualDirectory Name="Archive">

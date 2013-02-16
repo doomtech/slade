@@ -512,7 +512,7 @@ bool MapEditorWindow::saveMap() {
 		else
 			return false;
 	}
-	
+
 	// Build nodes
 	buildNodes(wad);
 
@@ -640,7 +640,7 @@ bool MapEditorWindow::handleAction(string id) {
 		// Save archive
 		Archive* a = currentMapDesc().head->getParent();
 		if (a) a->save();
-		
+
 		return true;
 	}
 

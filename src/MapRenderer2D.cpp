@@ -1257,6 +1257,15 @@ void MapRenderer2D::renderFlatsImmediate(int type, bool texture, float alpha) {
 	if (flat_ignore_light)
 		glColor4f(flat_brightness, flat_brightness, flat_brightness, alpha);
 
+	// Re-init flats texture list if invalid
+	if (texture && tex_flats.size() < map->nSectors() || last_flat_type != type) {
+		tex_flats.clear();
+		for (unsigned a = 0; a < map->nSectors(); a++)
+			tex_flats.push_back(NULL);
+
+		last_flat_type = type;
+	}
+
 	// Go through sectors
 	GLTexture* tex_last = NULL;
 	GLTexture* tex = NULL;
@@ -1268,11 +1277,17 @@ void MapRenderer2D::renderFlatsImmediate(int type, bool texture, float alpha) {
 			continue;
 
 		if (texture) {
-			// Get the sector texture
-			if (type <= 1)
-				tex = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());
+			if (!tex_flats[a]) {
+				// Get the sector texture
+				if (type <= 1)
+					tex = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());
+				else
+					tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture(), theGameConfiguration->mixTexFlats());
+
+				tex_flats[a] = tex;
+			}
 			else
-				tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture(), theGameConfiguration->mixTexFlats());
+				tex = tex_flats[a];
 
 			// Bind the texture if needed
 			if (tex) {
@@ -1283,6 +1298,7 @@ void MapRenderer2D::renderFlatsImmediate(int type, bool texture, float alpha) {
 			}
 			else if (tex_last)
 				glDisable(GL_TEXTURE_2D);
+
 			tex_last = tex;
 		}
 
@@ -1342,6 +1358,15 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 	if (!glGenBuffers)
 		return;
 
+	// Re-init flats texture list if invalid
+	if (texture && tex_flats.size() < map->nSectors() || last_flat_type != type) {
+		tex_flats.clear();
+		for (unsigned a = 0; a < map->nSectors(); a++)
+			tex_flats.push_back(NULL);
+
+		last_flat_type = type;
+	}
+
 	// First, check if any polygon vertex data has changed (in this case we need to refresh the entire vbo)
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		Polygon2D* poly = map->getSector(a)->getPolygon();
@@ -1382,18 +1407,24 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 
 		first = false;
 		if (texture) {
-			// Get the sector texture
-			if (type <= 1)
-				tex = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());
+			if (!tex_flats[a]) {
+				// Get the sector texture
+				if (type <= 1)
+					tex = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());
+				else
+					tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture(), theGameConfiguration->mixTexFlats());
+
+				tex_flats[a] = tex;
+			}
 			else
-				tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture(), theGameConfiguration->mixTexFlats());
+				tex = tex_flats[a];
 		}
 
 		// Setup polygon texture info if needed
 		Polygon2D* poly = sector->getPolygon();
 		if (texture && poly->getTexture() != tex) {
 			poly->setTexture(tex);			// Set polygon texture
-			
+
 			// Get scaling/offset info
 			double ox = 0;
 			double oy = 0;
@@ -2084,7 +2115,8 @@ void MapRenderer2D::forceUpdate(float line_alpha) {
 	if (OpenGL::vboSupport()) {
 		updateVerticesVBO();
 		updateLinesVBO(lines_dirs, line_alpha);
-	} else {
+	}
+	else {
 		if (list_lines > 0) {
 			glDeleteLists(list_lines, 1);
 			list_lines = 0;
@@ -2096,6 +2128,8 @@ void MapRenderer2D::forceUpdate(float line_alpha) {
 	}
 	renderVertices(view_scale);
 	renderLines(lines_dirs);
+
+	tex_flats.clear();
 }
 
 double MapRenderer2D::scaledRadius(int radius) {

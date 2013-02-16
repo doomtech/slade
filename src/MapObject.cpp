@@ -7,6 +7,7 @@
 #include "Console.h"
 
 unsigned	current_id = 1;
+long		prop_backup_time = -1;
 
 MapObject::MapObject(int type, SLADEMap* parent) {
 	// Init variables
@@ -16,6 +17,7 @@ MapObject::MapObject(int type, SLADEMap* parent) {
 	this->filtered = false;
 	this->modified_time = theApp->runTimer();
 	this->id = current_id++;
+	this->obj_backup = NULL;
 
 	if (parent)
 		parent->addMapObject(this);
@@ -50,6 +52,17 @@ string MapObject::getTypeName() {
 	}
 }
 
+void MapObject::setModified() {
+	// Backup current properties if required
+	if (modified_time < prop_backup_time) {
+		if (obj_backup) delete obj_backup;
+		obj_backup = new mobj_backup_t();
+		backup(obj_backup);
+	}
+
+	modified_time = theApp->runTimer();
+}
+
 void MapObject::copy(MapObject* c) {
 	// Can't copy an object of a different type
 	if (c->type != type)
@@ -64,7 +77,7 @@ void MapObject::copy(MapObject* c) {
 	this->filtered = c->filtered;
 
 	// Update modified time
-	modified_time = theApp->runTimer();
+	setModified();
 }
 
 bool MapObject::boolProperty(string key) {
@@ -128,35 +141,35 @@ string MapObject::stringProperty(string key) {
 }
 
 void MapObject::setBoolProperty(string key, bool value) {
+	// Update modified time
+	setModified();
+
 	// Set property
 	properties[key] = value;
-
-	// Update modified time
-	modified_time = theApp->runTimer();
 }
 
 void MapObject::setIntProperty(string key, int value) {
+	// Update modified time
+	setModified();
+
 	// Set property
 	properties[key] = value;
-
-	// Update modified time
-	modified_time = theApp->runTimer();
 }
 
 void MapObject::setFloatProperty(string key, double value) {
+	// Update modified time
+	setModified();
+
 	// Set property
 	properties[key] = value;
-
-	// Update modified time
-	modified_time = theApp->runTimer();
 }
 
 void MapObject::setStringProperty(string key, string value) {
+	// Update modified time
+	setModified();
+
 	// Set property
 	properties[key] = value;
-
-	// Update modified time
-	modified_time = theApp->runTimer();
 }
 
 void MapObject::backup(mobj_backup_t* backup) {
@@ -186,16 +199,34 @@ void MapObject::loadFromBackup(mobj_backup_t* backup) {
 	// Load general properties from list
 	properties.clear();
 	backup->properties.copyTo(properties);
-	
+
 	// Object-specific properties
 	readBackup(backup);
 
 	// Update modified time
-	modified_time = theApp->runTimer();
+	setModified();
+}
+
+mobj_backup_t* MapObject::getBackup(bool remove) {
+	mobj_backup_t* bak = obj_backup;
+	if (remove) obj_backup = NULL;
+	return bak;
 }
 
 void MapObject::resetIdCounter() {
 	current_id = 1;
+}
+
+long MapObject::propBackupTime() {
+	return prop_backup_time;
+}
+
+void MapObject::beginPropBackup(long current_time) {
+	prop_backup_time = current_time;
+}
+
+void MapObject::endPropBackup() {
+	prop_backup_time = -1;
 }
 
 CONSOLE_COMMAND(m_next_id, 0) {

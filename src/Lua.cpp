@@ -9,7 +9,7 @@ lua_State*	lua_state = NULL;
 
 namespace Lua {
 	// --- Functions ---
-	
+
 	// log_message: Prints a log message (concatenates args)
 	int log_message(lua_State* ls) {
 		int argc = lua_gettop(ls);
@@ -41,8 +41,23 @@ void Lua::close() {
 }
 
 bool Lua::run(string program) {
+	// Load string to Lua
 	if (luaL_loadstring(lua_state, CHR(program)) == 0) {
+		// Execute script
 		lua_pcall(lua_state, 0, LUA_MULTRET, 0);
+
+		return true;
+	}
+
+	return false;
+}
+
+bool Lua::runFile(string filename) {
+	// Load file to Lua
+	if (luaL_loadfile(lua_state, CHR(filename)) == 0) {
+		// Execute script
+		lua_pcall(lua_state, 0, LUA_MULTRET, 0);
+
 		return true;
 	}
 
@@ -55,18 +70,22 @@ CONSOLE_COMMAND(lua_exec, 1) {
 }
 
 CONSOLE_COMMAND(lua_execfile, 1) {
-	wxFile file(args[0], wxFile::read);
-	if (file.IsOpened()) {
+	//wxFile file(args[0], wxFile::read);
+	//if (file.IsOpened()) {
 		// Read file
-		char* buf = (char*)malloc(file.Length());
-		file.Read(buf, file.Length());
+		//char* buf = (char*)malloc(file.Length());
+		//file.Read(buf, file.Length());
 
 		// Run
-		Lua::run(wxString::FromAscii(buf, file.Length()));
+		//Lua::runFile(args[0]);
+		//Lua::run(wxString::FromAscii(buf, file.Length()));
 
 		// Cleanup
-		free(buf);
-	}
-	else
+		//free(buf);
+	//}
+	//else
+	//	wxLogMessage("Unable to open file \"%s\"", CHR(args[0]));
+
+	if (!Lua::runFile(args[0]))
 		wxLogMessage("Unable to open file \"%s\"", CHR(args[0]));
 }

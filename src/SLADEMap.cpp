@@ -100,7 +100,7 @@ MapObject* SLADEMap::getObject(uint8_t type, unsigned index) {
 		return getSector(index);
 	else if (type == MOBJ_THING)
 		return getThing(index);
-	
+
 	return NULL;
 }
 
@@ -229,27 +229,22 @@ int SLADEMap::objectIndex(MapObject* o) {
 
 void SLADEMap::refreshIndices() {
 	// Vertex indices
-	//i_vertices = true;
 	for (unsigned a = 0; a < vertices.size(); a++)
 		vertices[a]->index = a;
 
 	// Side indices
-	//i_sides = true;
 	for (unsigned a = 0; a < sides.size(); a++)
 		sides[a]->index = a;
 
 	// Line indices
-	//i_lines = true;
 	for (unsigned a = 0; a < lines.size(); a++)
 		lines[a]->index = a;
 
 	// Sector indices
-	//i_sectors = true;
 	for (unsigned a = 0; a < sectors.size(); a++)
 		sectors[a]->index = a;
 
 	// Thing indices
-	//i_things = true;
 	for (unsigned a = 0; a < things.size(); a++)
 		things[a]->index = a;
 }
@@ -1499,7 +1494,7 @@ bool SLADEMap::writeDoomSidedefs(ArchiveEntry* entry) {
 		// Sector
 		side.sector = -1;
 		if (sides[a]->sector) side.sector = sides[a]->sector->getIndex();
-		
+
 		// Textures
 		t_m = sides[a]->stringProperty("texturemiddle");
 		t_u = sides[a]->stringProperty("texturetop");
@@ -1795,7 +1790,7 @@ bool SLADEMap::writeDoom64Sidedefs(ArchiveEntry * entry) {
 		// Sector
 		side.sector = -1;
 		if (sides[a]->sector) side.sector = sides[a]->sector->getIndex();
-		
+
 		// Textures
 		side.tex_middle	= theResourceManager->getTextureHash(sides[a]->stringProperty("texturemiddle"));
 		side.tex_upper	= theResourceManager->getTextureHash(sides[a]->stringProperty("texturetop"));
@@ -2115,7 +2110,7 @@ bool SLADEMap::removeVertex(unsigned index) {
 	removeMapObject(vertices[index]);
 	vertices[index] = vertices.back();
 	vertices[index]->index = index;
-	vertices[index]->modified_time = theApp->runTimer();
+	//vertices[index]->modified_time = theApp->runTimer();
 	vertices.pop_back();
 
 	geometry_updated = theApp->runTimer();
@@ -2155,7 +2150,7 @@ bool SLADEMap::removeLine(unsigned index) {
 	removeMapObject(lines[index]);
 	lines[index] = lines[lines.size()-1];
 	lines[index]->index = index;
-	lines[index]->modified_time = theApp->runTimer();
+	//lines[index]->modified_time = theApp->runTimer();
 	lines.pop_back();
 
 	geometry_updated = theApp->runTimer();
@@ -2203,7 +2198,7 @@ bool SLADEMap::removeSide(unsigned index, bool remove_from_line) {
 	removeMapObject(sides[index]);
 	sides[index] = sides.back();
 	sides[index]->index = index;
-	sides[index]->modified_time = theApp->runTimer();
+	//sides[index]->modified_time = theApp->runTimer();
 	sides.pop_back();
 
 	return true;
@@ -2230,7 +2225,7 @@ bool SLADEMap::removeSector(unsigned index) {
 	removeMapObject(sectors[index]);
 	sectors[index] = sectors.back();
 	sectors[index]->index = index;
-	sectors[index]->modified_time = theApp->runTimer();
+	//sectors[index]->modified_time = theApp->runTimer();
 	sectors.pop_back();
 
 	return true;
@@ -2253,7 +2248,7 @@ bool SLADEMap::removeThing(unsigned index) {
 	removeMapObject(things[index]);
 	things[index] = things.back();
 	things[index]->index = index;
-	things[index]->modified_time = theApp->runTimer();
+	//things[index]->modified_time = theApp->runTimer();
 	things.pop_back();
 
 	return true;
@@ -2863,6 +2858,19 @@ vector<MapObject*> SLADEMap::getModifiedObjects(long since, int type) {
 	return modified_objects;
 }
 
+vector<MapObject*> SLADEMap::getAllModifiedObjects(long since) {
+	vector<MapObject*> modified_objects;
+
+	MObjMap::iterator i = map_objects.begin();
+	while (i != map_objects.end()) {
+		if (i->second.mobj && i->second.mobj->modifiedTime() >= since)
+			modified_objects.push_back(i->second.mobj);
+		i++;
+	}
+
+	return modified_objects;
+}
+
 MapVertex* SLADEMap::createVertex(double x, double y, double split_dist) {
 	// Round position to integral if fractional positions are disabled
 	if (!position_frac) {
@@ -3012,18 +3020,15 @@ void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
 
 	// Move the vertex
 	MapVertex* v = vertices[vertex];
+	v->setModified();
 	v->x = nx;
 	v->y = ny;
-	long time = theApp->runTimer();
-	v->modified_time = time;
 
 	// Reset all attached lines' geometry info
-	for (unsigned a = 0; a < v->connected_lines.size(); a++) {
+	for (unsigned a = 0; a < v->connected_lines.size(); a++)
 		v->connected_lines[a]->resetInternals();
-		v->connected_lines[a]->modified_time = time;
-	}
 
-	geometry_updated = time;
+	geometry_updated = theApp->runTimer();
 }
 
 void SLADEMap::mergeVertices(unsigned vertex1, unsigned vertex2) {
@@ -3105,11 +3110,11 @@ void SLADEMap::splitLine(unsigned line, unsigned vertex) {
 
 	// Shorten line
 	MapVertex* v2 = l->vertex2;
+	l->setModified();
 	v2->disconnectLine(l);
 	l->vertex2 = v;
 	v->connectLine(l);
 	l->length = -1;
-	l->modified_time = theApp->runTimer();
 
 	// Create and add new sides
 	MapSide* s1 = NULL;
@@ -3145,7 +3150,7 @@ void SLADEMap::splitLine(unsigned line, unsigned vertex) {
 	MapLine* nl = new MapLine(v, v2, s1, s2, this);
 	nl->copy(l);
 	nl->index = lines.size();
-	nl->modified_time = theApp->runTimer();
+	nl->setModified();
 	lines.push_back(nl);
 
 	// Update x-offsets
@@ -3164,10 +3169,9 @@ void SLADEMap::moveThing(unsigned thing, double nx, double ny) {
 
 	// Move the thing
 	MapThing* t = things[thing];
+	t->setModified();
 	t->x = nx;
 	t->y = ny;
-
-	t->modified_time = theApp->runTimer();
 }
 
 void SLADEMap::splitLinesAt(MapVertex* vertex, double split_dist) {
@@ -3338,7 +3342,7 @@ int SLADEMap::removeDetachedSectors() {
 			count++;
 		}
 	}
-	
+
 	refreshIndices();
 
 	return count;
@@ -3402,4 +3406,28 @@ bool SLADEMap::convertToUDMF() {
 	// Set format
 	current_format = MAP_UDMF;
 	return true;
+}
+
+void SLADEMap::rebuildConnectedLines() {
+	// Clear vertex connected lines lists
+	for (unsigned a = 0; a < vertices.size(); a++)
+		vertices[a]->connected_lines.clear();
+
+	// Connect lines to their vertices
+	for (unsigned a = 0; a < lines.size(); a++) {
+		lines[a]->vertex1->connected_lines.push_back(lines[a]);
+		lines[a]->vertex2->connected_lines.push_back(lines[a]);
+	}
+}
+
+void SLADEMap::rebuildConnectedSides() {
+	// Clear sector connected sides lists
+	for (unsigned a = 0; a < sectors.size(); a++)
+		sectors[a]->connected_sides.clear();
+
+	// Connect sides to their sectors
+	for (unsigned a = 0; a < sides.size(); a++) {
+		if (sides[a]->sector)
+			sides[a]->sector->connected_sides.push_back(sides[a]);
+	}
 }

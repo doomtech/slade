@@ -202,6 +202,7 @@ public:
 	MapSector*			getLineSideSector(MapLine* line, bool front = true);
 	int					findUnusedSectorTag();
 	vector<MapObject*>	getModifiedObjects(long since, int type = -1);
+	vector<MapObject*>	getAllModifiedObjects(long since);
 
 	// Creation
 	MapVertex*	createVertex(double x, double y, double split_dist = -1);
@@ -232,6 +233,10 @@ public:
 	// Convert
 	bool	convertToHexen();
 	bool	convertToUDMF();
+
+	// Cleanup/Extra
+	void	rebuildConnectedLines();
+	void	rebuildConnectedSides();
 };
 
 #endif //__SLADEMAP_H__
