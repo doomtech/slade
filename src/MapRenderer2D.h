@@ -125,6 +125,7 @@ public:
 	void	forceUpdate(float line_alpha = 1.0f);
 	double	scaledRadius(int radius);
 	bool	visOK();
+	void	clearTextureCache() { tex_flats.clear(); }
 };
 
 #endif//__MAP_RENDERER_2D__

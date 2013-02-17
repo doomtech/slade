@@ -87,6 +87,7 @@ EXTERN_CVAR(Float, render_max_dist)
 EXTERN_CVAR(Int, render_3d_things)
 EXTERN_CVAR(Int, render_3d_things_style)
 EXTERN_CVAR(Int, render_3d_hilight)
+EXTERN_CVAR(Bool, map_animate_hilight)
 
 
 /* MapCanvas::MapCanvas
@@ -855,16 +856,22 @@ void MapCanvas::drawMap3d() {
 	renderer_3d->renderMap();
 
 	// Determine hilight
+	selection_3d_t old_hl = editor->hilightItem3d();
 	selection_3d_t hl = renderer_3d->determineHilight();
-	editor->set3dHilight(hl);
+	if (editor->set3dHilight(hl)) {
+		// Update 3d info overlay
+		if (info_overlay_3d && hl.index >= 0) {
+			info_3d.update(hl.index, hl.type, &(editor->getMap()));
+			anim_info_show = true;
+		}
+		else
+			anim_info_show = false;
 
-	// Update 3d info overlay
-	if (info_overlay_3d && hl.index >= 0) {
-		info_3d.update(hl.index, hl.type, &(editor->getMap()));
-		anim_info_show = true;
+		// Animation
+		animations.push_back(new MCAHilightFade3D(theApp->runTimer(), old_hl.index, old_hl.type, renderer_3d, anim_flash_level));
+		anim_flash_inc = true;
+		anim_flash_level = 0.0f;
 	}
-	else
-		anim_info_show = false;
 
 	// Draw selection if any
 	vector<selection_3d_t> selection = editor->get3dSelection();
@@ -1025,8 +1032,18 @@ void MapCanvas::draw() {
 
 bool MapCanvas::update2d(double mult) {
 	// Update hilight if needed
-	if (mouse_state == MSTATE_NORMAL && !mouse_movebegin)
-		editor->updateHilight(mouse_pos_m, view_scale);
+	if (mouse_state == MSTATE_NORMAL && !mouse_movebegin) {
+		MapObject* old_hl = editor->getHilightedObject();
+		if (editor->updateHilight(mouse_pos_m, view_scale)) {
+			// Hilight fade animation
+			if (old_hl && map_animate_hilight)
+				animations.push_back(new MCAHilightFade(theApp->runTimer(), old_hl, renderer_2d, anim_flash_level));
+
+			// Reset hilight flash
+			anim_flash_inc = true;
+			anim_flash_level = 0.0f;
+		}
+	}
 
 	// Do item moving if needed
 	if (mouse_state == MSTATE_MOVE)
@@ -1255,7 +1272,10 @@ void MapCanvas::update(long frametime) {
 	// Flashing animation for hilight
 	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
 	if (anim_flash_inc) {
-		anim_flash_level += 0.015f*mult;
+		if (anim_flash_level < 0.5f)
+			anim_flash_level += 0.05*mult;	// Initial fade in
+		else
+			anim_flash_level += 0.015f*mult;
 		if (anim_flash_level >= 1.0f) {
 			anim_flash_inc = false;
 			anim_flash_level = 1.0f;
@@ -1616,6 +1636,7 @@ void MapCanvas::changeSectorTexture() {
 	// Determine the initial texture
 	string texture = "";
 	string browser_title;
+	string undo_name;
 	vector<MapSector*> selection;
 	editor->getSelectedSectors(selection);
 	if (selection.size() > 0) {
@@ -1623,10 +1644,12 @@ void MapCanvas::changeSectorTexture() {
 		if (editor->sectorEditMode() == MapEditor::SECTOR_FLOOR) {
 			texture = selection[0]->stringProperty("texturefloor");
 			browser_title = "Browse Floor Texture";
+			undo_name = "Change Floor Texture";
 		}
 		else if (editor->sectorEditMode() == MapEditor::SECTOR_CEILING) {
 			texture = selection[0]->stringProperty("textureceiling");
 			browser_title = "Browse Ceiling Texture";
+			undo_name = "Change Ceiling Texture";
 		}
 		else {
 			if (overlay_current) delete overlay_current;
@@ -1648,16 +1671,19 @@ void MapCanvas::changeSectorTexture() {
 	browser.SetTitle(browser_title);
 	if (browser.ShowModal() == wxID_OK) {
 		// Set texture depending on edit mode
+		editor->beginUndoRecord(undo_name, true, false, false);
 		for (unsigned a = 0; a < selection.size(); a++) {
 			if (editor->sectorEditMode() == MapEditor::SECTOR_FLOOR)
 				selection[a]->setStringProperty("texturefloor", browser.getSelectedItem()->getName());
 			else if (editor->sectorEditMode() == MapEditor::SECTOR_CEILING)
 				selection[a]->setStringProperty("textureceiling", browser.getSelectedItem()->getName());
 		}
+		editor->endUndoRecord();
 	}
 
 	// Unlock hilight if needed
 	editor->lockHilight(hl_lock);
+	renderer_2d->clearTextureCache();
 }
 
 void MapCanvas::changeThingType3d(selection_3d_t first) {
@@ -1704,6 +1730,9 @@ void MapCanvas::changeTexture3d(selection_3d_t first) {
 		bool mix = theGameConfiguration->mixTexFlats();
 		tex = browser.getSelectedItem()->getName();
 		selection_3d_t hl = editor->hilightItem3d();
+
+		// Begin undo level
+		editor->beginUndoRecord("Change Texture", true, false, false);
 		
 		// Apply to flats
 		vector<selection_3d_t>& selection = editor->get3dSelection();
@@ -1749,6 +1778,9 @@ void MapCanvas::changeTexture3d(selection_3d_t first) {
 					editor->getMap().getSide(hl.index)->setStringProperty("texturetop", tex);
 			}
 		}
+
+		// End undo level
+		editor->endUndoRecord();
 	}
 }
 
@@ -2388,9 +2420,11 @@ bool MapCanvas::handleAction(string id) {
 			int as = ActionSpecialTreeView::showDialog(this, selection[0]->intProperty("special"));
 			if (as >= 0) {
 				// Set specials
+				editor->beginUndoRecord("Change Line Special", true, false, false);
 				for (unsigned a = 0; a < selection.size(); a++) {
 					selection[a]->setIntProperty("special", as);
 				}
+				editor->endUndoRecord();
 				renderer_2d->forceUpdate();
 			}
 		}
@@ -2442,8 +2476,10 @@ bool MapCanvas::handleAction(string id) {
 			if (dlg.ShowModal() == wxID_OK) {
 				// Set specials of selected sectors
 				int special = dlg.getSelectedSpecial(map_format);
+				editor->beginUndoRecord("Change Sector Special", true, false, false);
 				for (unsigned a = 0; a < selection.size(); a++)
 					selection[a]->setIntProperty("special", special);
+				editor->endUndoRecord();
 			}
 		}
 	}

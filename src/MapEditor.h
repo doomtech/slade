@@ -139,7 +139,7 @@ public:
 	UndoManager*		undoManager() { return undo_manager; }
 
 	vector<selection_3d_t>&	get3dSelection() { return selection_3d; }
-	void					set3dHilight(selection_3d_t hl);
+	bool					set3dHilight(selection_3d_t hl);
 	selection_3d_t			hilightItem3d() { return hilight_3d; }
 
 	void	setEditMode(int mode);

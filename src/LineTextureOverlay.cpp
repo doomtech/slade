@@ -85,6 +85,8 @@ void LineTextureOverlay::openLines(vector<MapLine*>& list) {
 void LineTextureOverlay::close(bool cancel) {
 	// Apply texture changes if not cancelled
 	if (!cancel) {
+		theMapEditor->mapEditor().beginUndoRecord("Change Line Texture", true, false, false);
+
 		// Go through lines
 		for (unsigned a = 0; a < lines.size(); a++) {
 			// Front Upper
@@ -112,6 +114,8 @@ void LineTextureOverlay::close(bool cancel) {
 			if (textures[BACK_LOWER].changed)
 				lines[a]->setStringProperty("side2.texturebottom", textures[BACK_LOWER].textures[0]);
 		}
+
+		theMapEditor->mapEditor().endUndoRecord();
 	}
 
 	// Deactivate

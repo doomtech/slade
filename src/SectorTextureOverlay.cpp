@@ -175,12 +175,15 @@ void SectorTextureOverlay::close(bool cancel) {
 
 	// Set textures if not cancelled
 	if (!cancel) {
+		theMapEditor->mapEditor().beginUndoRecord("Change Sector Texture", true, false, false);
 		for (unsigned a = 0; a < sectors.size(); a++) {
 			if (tex_floor.size() == 1)
 				sectors[a]->setStringProperty("texturefloor", tex_floor[0]);
 			if (tex_ceil.size() == 1)
 				sectors[a]->setStringProperty("textureceiling", tex_ceil[0]);
 		}
+		theMapEditor->mapEditor().endUndoRecord();
+		theMapEditor->forceRefresh(true);
 	}
 }
 

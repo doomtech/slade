@@ -227,11 +227,16 @@ double MapEditor::gridSize() {
 	return grid_sizes[gridsize];
 }
 
-void MapEditor::set3dHilight(selection_3d_t item) {
-	if (item.index != hilight_3d.index || item.type != hilight_3d.type)
+bool MapEditor::set3dHilight(selection_3d_t item) {
+	bool changed = false;
+	if (item.index != hilight_3d.index || item.type != hilight_3d.type) {
 		last_undo_level = "";
+		changed = true;
+	}
 
 	hilight_3d = item;
+
+	return changed;
 }
 
 void MapEditor::setEditMode(int mode) {

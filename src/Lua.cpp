@@ -39,6 +39,29 @@ namespace Lua {
 
 		return 0;
 	}
+
+	/*int set_mobj_int_prop(lua_State* ls) {
+		SLADEMap& map = theMapEditor->mapEditor().getMap();
+
+		int argc = lua_gettop(ls);
+		if (argc < 4)
+			return 0;
+
+		int type = lua_tointeger(ls, 1);
+		int index = lua_tointeger(ls, 2);
+		MapObject* mobj = map.getObject(type, index);
+
+		if (!mobj) {
+			wxLogMessage("Invalid map object");
+			return 0;
+		}
+		
+		string prop = lua_tostring(ls, 3);
+		int value = lua_tointeger(ls, 4);
+		mobj->setIntProperty(prop, value);
+
+		return 0;
+	}*/
 }
 
 bool Lua::init() {
@@ -48,6 +71,7 @@ bool Lua::init() {
 
 	// Register functions
 	lua_register(lua_state, "log_message", log_message);
+	//lua_register(lua_state, "set_mobj_int_prop", set_mobj_int_prop);
 
 	return true;
 }
@@ -86,6 +110,11 @@ CONSOLE_COMMAND(lua_exec, 1, true) {
 }
 
 CONSOLE_COMMAND(lua_execfile, 1, true) {
+	if (!wxFile::Exists(args[0])) {
+		wxLogMessage("File \"%s\" does not exist", CHR(args[0]));
+		return;
+	}
+
 	if (!Lua::runFile(args[0]))
-		wxLogMessage("Unable to open file \"%s\"", CHR(args[0]));
+		wxLogMessage("Error loading lua script file \"%s\"", CHR(args[0]));
 }
