@@ -2407,7 +2407,7 @@ void GameConfiguration::dumpUDMFProperties() {
 }
 
 
-CONSOLE_COMMAND(testgc, 0) {
+CONSOLE_COMMAND(testgc, 0, false) {
 	string game = "doomu";
 
 	if (args.size() > 0)
@@ -2416,10 +2416,10 @@ CONSOLE_COMMAND(testgc, 0) {
 	theGameConfiguration->openConfig(game);
 }
 
-CONSOLE_COMMAND(dumpactionspecials, 0) {
+CONSOLE_COMMAND(dumpactionspecials, 0, false) {
 	theGameConfiguration->dumpActionSpecials();
 }
 
-CONSOLE_COMMAND(dumpudmfprops, 0) {
+CONSOLE_COMMAND(dumpudmfprops, 0, false) {
 	theGameConfiguration->dumpUDMFProperties();
 }

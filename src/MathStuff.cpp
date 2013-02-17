@@ -361,7 +361,7 @@ double MathStuff::distanceRayPlane(fpoint3_t r_o, fpoint3_t r_v, plane_t plane) 
 
 
 
-CONSOLE_COMMAND(angle2d, 6) {
+CONSOLE_COMMAND(angle2d, 6, false) {
 	double vals[6];
 	for (unsigned a = 0; a < args.size(); a++) {
 		args[a].ToDouble(&vals[a]);

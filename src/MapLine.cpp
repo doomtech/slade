@@ -174,8 +174,10 @@ void MapLine::setIntProperty(string key, int value) {
 	}
 
 	// Special
-	else if (key == "special")
+	else if (key == "special") {
+		setModified();
 		special = value;
+	}
 
 	// Line property
 	else
@@ -220,6 +222,7 @@ void MapLine::setStringProperty(string key, string value) {
 
 void MapLine::setS1(MapSide* side) {
 	if (!side1) {
+		setModified();
 		side1 = side;
 		side->parent = this;
 	}
@@ -227,6 +230,7 @@ void MapLine::setS1(MapSide* side) {
 
 void MapLine::setS2(MapSide* side) {
 	if (!side2) {
+		setModified();
 		side2 = side;
 		side->parent = this;
 	}
@@ -382,6 +386,8 @@ void MapLine::resetInternals() {
 }
 
 void MapLine::flip(bool sides) {
+	setModified();
+
 	// Flip vertices
 	MapVertex* v = vertex1;
 	vertex1 = vertex2;
@@ -394,7 +400,6 @@ void MapLine::flip(bool sides) {
 		side2 = s;
 	}
 
-	setModified();
 	resetInternals();
 }
 

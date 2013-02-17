@@ -1074,6 +1074,9 @@
     <ClCompile Include="libmodplug\sndmix.cpp">
       <Filter>External\libmodplug</Filter>
     </ClCompile>
+    <ClCompile Include="src\GenLineSpecial.cpp">
+      <Filter>Map Editor\GameConfiguration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1922,6 +1925,9 @@
     </ClInclude>
     <ClInclude Include="libmodplug\tables.h">
       <Filter>External\libmodplug</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GenLineSpecial.h">
+      <Filter>Map Editor\GameConfiguration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

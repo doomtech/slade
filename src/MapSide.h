@@ -37,6 +37,7 @@ private:
 
 public:
 	MapSide(MapSector* sector = NULL, SLADEMap* parent = NULL);
+	MapSide(SLADEMap* parent);
 	~MapSide();
 
 	bool	isOk() { return !!sector; }

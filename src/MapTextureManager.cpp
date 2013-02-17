@@ -349,6 +349,7 @@ void MapTextureManager::refreshResources() {
 	flats.clear();
 	sprites.clear();
 	thePaletteChooser->setGlobalFromArchive(archive);
+	theMapEditor->forceRefresh(true);
 	//wxLogMessage("texture manager cleared");
 }
 

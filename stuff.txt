@@ -61,6 +61,7 @@ TODO List ---------------------------------------------------------------
 --- Formats ---
 - 7z
 - Lzma/bz2 for zip
+- View any entry as raw gfx
 
 --- Text Editor ---
 - 'Tabs as Spaces' option

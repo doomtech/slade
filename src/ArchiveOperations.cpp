@@ -696,12 +696,12 @@ void ArchiveOperations::removeUnusedFlats(Archive* archive) {
 }
 
 
-CONSOLE_COMMAND(test_cleantex, 0) {
+CONSOLE_COMMAND(test_cleantex, 0, false) {
 	Archive* current = theMainWindow->getCurrentArchive();
 	if (current) ArchiveOperations::removeUnusedTextures(current);
 }
 
-CONSOLE_COMMAND(test_cleanflats, 0) {
+CONSOLE_COMMAND(test_cleanflats, 0, false) {
 	Archive* current = theMainWindow->getCurrentArchive();
 	if (current) ArchiveOperations::removeUnusedFlats(current);
 }
@@ -873,7 +873,7 @@ size_t ArchiveOperations::replaceThings(Archive* archive, int oldtype, int newty
 	return changed;
 }
 
-CONSOLE_COMMAND(replacethings, 2) {
+CONSOLE_COMMAND(replacethings, 2, true) {
 	Archive* current = theMainWindow->getCurrentArchive();
 	long oldtype, newtype;
 
@@ -1108,7 +1108,7 @@ size_t ArchiveOperations::replaceSpecials(Archive* archive, int oldtype, int new
 	return changed;
 }
 
-CONSOLE_COMMAND(replacespecials, 2) {
+CONSOLE_COMMAND(replacespecials, 2, true) {
 	Archive* current = theMainWindow->getCurrentArchive();
 	long oldtype, newtype;
 	bool arg0 = false, arg1 = false, arg2 = false, arg3 = false, arg4 = false;
@@ -1407,7 +1407,7 @@ size_t ArchiveOperations::replaceTextures(Archive* archive, string oldtex, strin
 	return changed;
 }
 
-CONSOLE_COMMAND(replacetextures, 2) {
+CONSOLE_COMMAND(replacetextures, 2, true) {
 	Archive* current = theMainWindow->getCurrentArchive();
 
 	if (current) {

@@ -1381,7 +1381,7 @@ void fixpngsrc(ArchiveEntry * entry) {
  * CONSOLE COMMANDS
  *******************************************************************/
 
-CONSOLE_COMMAND(fixpngcrc, 0) {
+CONSOLE_COMMAND(fixpngcrc, 0, true) {
 	vector<ArchiveEntry *> selection = theMainWindow->getCurrentEntrySelection();
 	if (selection.size() == 0) {
 		wxLogMessage("No entry selected");

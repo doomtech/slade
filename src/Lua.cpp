@@ -1,4 +1,20 @@
 
+/*
+
+Potential Lua functions
+
+Map Editor:
+getMapObjectProperty(type, index, property)
+getMapObjectProperty(id, property)
+getMapObjectModifiedTime(type, index)
+getMapObjectId(type, index)
+setMapObjectProperty(type, index, property, value)
+setMapObjectProperty(id, property, value)
+getNumObjects(type)
+
+*/
+
+
 #include "Main.h"
 #include "Lua.h"
 #include "lua/lua.hpp"
@@ -65,27 +81,11 @@ bool Lua::runFile(string filename) {
 }
 
 
-CONSOLE_COMMAND(lua_exec, 1) {
+CONSOLE_COMMAND(lua_exec, 1, true) {
 	Lua::run(args[0]);
 }
 
-CONSOLE_COMMAND(lua_execfile, 1) {
-	//wxFile file(args[0], wxFile::read);
-	//if (file.IsOpened()) {
-		// Read file
-		//char* buf = (char*)malloc(file.Length());
-		//file.Read(buf, file.Length());
-
-		// Run
-		//Lua::runFile(args[0]);
-		//Lua::run(wxString::FromAscii(buf, file.Length()));
-
-		// Cleanup
-		//free(buf);
-	//}
-	//else
-	//	wxLogMessage("Unable to open file \"%s\"", CHR(args[0]));
-
+CONSOLE_COMMAND(lua_execfile, 1, true) {
 	if (!Lua::runFile(args[0]))
 		wxLogMessage("Unable to open file \"%s\"", CHR(args[0]));
 }

@@ -9,6 +9,9 @@
 unsigned	current_id = 1;
 long		prop_backup_time = -1;
 
+//testing
+//vector<MapObject*> all_objects;
+
 MapObject::MapObject(int type, SLADEMap* parent) {
 	// Init variables
 	this->type = type;
@@ -21,10 +24,15 @@ MapObject::MapObject(int type, SLADEMap* parent) {
 
 	if (parent)
 		parent->addMapObject(this);
+
+	//all_objects.push_back(this);
 }
 
 MapObject::~MapObject() {
 	properties.clear();
+	//all_objects[id - 1] = NULL;
+	if (obj_backup)
+		delete obj_backup;
 }
 
 unsigned MapObject::getIndex() {
@@ -229,6 +237,14 @@ void MapObject::endPropBackup() {
 	prop_backup_time = -1;
 }
 
-CONSOLE_COMMAND(m_next_id, 0) {
+CONSOLE_COMMAND(m_next_id, 0, false) {
 	theConsole->logMessage(S_FMT("Next Object ID: %d", current_id));
 }
+
+//CONSOLE_COMMAND(mobj_check_deleted, 0) {
+//	theConsole->logMessage(S_FMT("Checking %d ids", all_objects.size()));
+//	for (unsigned a = 0; a < all_objects.size(); a++) {
+//		if (all_objects[a])
+//			theConsole->logMessage(S_FMT("Object id %d not deleted", a+1));
+//	}
+//}

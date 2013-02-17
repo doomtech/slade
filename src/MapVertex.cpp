@@ -37,27 +37,27 @@ double MapVertex::floatProperty(string key) {
 }
 
 void MapVertex::setIntProperty(string key, int value) {
+	// Update modified time
+	setModified();
+
 	if (key == "x")
 		x = value;
 	else if (key == "y")
 		y = value;
 	else
 		return MapObject::setIntProperty(key, value);
-
-	// Update modified time
-	setModified();
 }
 
 void MapVertex::setFloatProperty(string key, double value) {
+	// Update modified time
+	setModified();
+
 	if (key == "x")
 		x = value;
 	else if (key == "y")
 		y = value;
 	else
 		return MapObject::setFloatProperty(key, value);
-
-	// Update modified time
-	setModified();
 }
 
 void MapVertex::connectLine(MapLine* line) {

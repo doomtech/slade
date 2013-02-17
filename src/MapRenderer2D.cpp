@@ -2111,6 +2111,7 @@ void MapRenderer2D::forceUpdate(float line_alpha) {
 	// Update variables
 	this->view_scale = view_scale;
 	this->view_scale_inv = 1.0 / view_scale;
+	tex_flats.clear();
 
 	if (OpenGL::vboSupport()) {
 		updateVerticesVBO();
@@ -2128,8 +2129,6 @@ void MapRenderer2D::forceUpdate(float line_alpha) {
 	}
 	renderVertices(view_scale);
 	renderLines(lines_dirs);
-
-	tex_flats.clear();
 }
 
 double MapRenderer2D::scaledRadius(int radius) {

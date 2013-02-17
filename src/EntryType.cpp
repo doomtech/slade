@@ -657,7 +657,7 @@ vector<string> EntryType::allCategories() {
 
 // Command to attempt to detect the currently selected entries
 // as the given type id. Lists all type ids if no parameters given
-CONSOLE_COMMAND (type, 0) {
+CONSOLE_COMMAND (type, 0, true) {
 	vector<EntryType*> all_types = EntryType::allTypes();
 	if (args.size() == 0) {
 		// List existing types and their IDs
@@ -730,7 +730,7 @@ CONSOLE_COMMAND (type, 0) {
 	}
 }
 
-CONSOLE_COMMAND (size, 0) {
+CONSOLE_COMMAND (size, 0, true) {
 	ArchiveEntry * meep = theMainWindow->getCurrentEntry();
 	if (!meep) {
 		wxLogMessage("No entry selected");

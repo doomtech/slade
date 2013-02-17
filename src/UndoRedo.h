@@ -58,8 +58,10 @@ public:
 	void	endRecord(bool success);
 	bool	currentlyRecording();
 	bool	recordUndoStep(UndoStep* step);
-	void	undo();
-	void	redo();
+	string	undo();
+	string	redo();
+
+	void	clear();
 };
 
 namespace UndoRedo {

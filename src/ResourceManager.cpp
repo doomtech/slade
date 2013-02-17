@@ -683,6 +683,6 @@ void ResourceManager::onAnnouncement(Announcer* announcer, string event_name, Me
 
 
 
-CONSOLE_COMMAND(list_res_patches, 0) {
+CONSOLE_COMMAND(list_res_patches, 0, false) {
 	theResourceManager->listAllPatches();
 }

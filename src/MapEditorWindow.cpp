@@ -652,13 +652,13 @@ bool MapEditorWindow::handleAction(string id) {
 
 	// Edit->Undo
 	if (id == "mapw_undo") {
-		editor.undoManager()->undo();
+		editor.doUndo();
 		return true;
 	}
 
 	// Edit->Redo
 	if (id == "mapw_redo") {
-		editor.undoManager()->redo();
+		editor.doRedo();
 		return true;
 	}
 

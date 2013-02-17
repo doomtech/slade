@@ -69,6 +69,13 @@ public:
 		vector<unsigned>& deleted_objects = UndoRedo::currentMap()->deletedObjectIds();
 		for (unsigned a = 0; a < deleted_objects.size(); a++)
 			object_ids.push_back(deleted_objects[a]);
+
+		if (Global::log_verbosity >= 2) {
+			string msg = "Deleted ids: ";
+			for (unsigned a = 0; a < object_ids.size(); a++)
+				msg += S_FMT("%d, ", object_ids[a]);
+			wxLogMessage(msg);
+		}
 	}
 
 	~MapObjectDeleteUS() {}
@@ -104,6 +111,13 @@ public:
 		vector<unsigned>& created_objects = UndoRedo::currentMap()->createdObjectIds();
 		for (unsigned a = 0; a < created_objects.size(); a++)
 			object_ids.push_back(created_objects[a]);
+
+		if (Global::log_verbosity >= 2) {
+			string msg = "Created ids: ";
+			for (unsigned a = 0; a < object_ids.size(); a++)
+				msg += S_FMT("%d, ", object_ids[a]);
+			wxLogMessage(msg);
+		}
 	}
 
 	~MapObjectCreateUS() {}
@@ -139,8 +153,15 @@ public:
 			mobj_backup_t* bak = objects[a]->getBackup(true);
 			if (bak) {
 				backups.push_back(bak);
-				wxLogMessage("%s #%d modified", CHR(objects[a]->getTypeName()), objects[a]->getIndex());
+				//wxLogMessage("%s #%d modified", CHR(objects[a]->getTypeName()), objects[a]->getIndex());
 			}
+		}
+
+		if (Global::log_verbosity >= 2) {
+			string msg = "Modified ids: ";
+			for (unsigned a = 0; a < backups.size(); a++)
+				msg += S_FMT("%d, ", backups[a]->id);
+			wxLogMessage(msg);
 		}
 	}
 
@@ -191,18 +212,26 @@ MapEditor::MapEditor() {
 	link_3d_light = true;
 	link_3d_offset = true;
 	undo_manager = new UndoManager(&map);
+	undo_manager_3d = new UndoManager(&map);
 	current_tag = 0;
-	undo_locked = false;
 }
 
 MapEditor::~MapEditor() {
 	if (copy_thing) delete copy_thing;
 	if (copy_sector) delete copy_sector;
 	delete undo_manager;
+	delete undo_manager_3d;
 }
 
 double MapEditor::gridSize() {
 	return grid_sizes[gridsize];
+}
+
+void MapEditor::set3dHilight(selection_3d_t item) {
+	if (item.index != hilight_3d.index || item.type != hilight_3d.type)
+		last_undo_level = "";
+
+	hilight_3d = item;
 }
 
 void MapEditor::setEditMode(int mode) {
@@ -216,6 +245,10 @@ void MapEditor::setEditMode(int mode) {
 		return;
 	}
 
+	// Clear 3d mode undo manager on exiting 3d mode
+	if (edit_mode == MODE_3D && mode != MODE_3D)
+		undo_manager_3d->clear();
+
 	// Set edit mode
 	edit_mode = mode;
 	sector_mode = SECTOR_BOTH;
@@ -226,6 +259,7 @@ void MapEditor::setEditMode(int mode) {
 	tagged_sectors.clear();
 	tagged_lines.clear();
 	tagged_things.clear();
+	last_undo_level = "";
 
 	// Add editor message
 	switch (edit_mode) {
@@ -298,6 +332,10 @@ void MapEditor::clearMap() {
 	hilight_item = -1;
 	link_3d_light = true;
 	link_3d_offset = true;
+
+	// Clear undo manager
+	undo_manager->clear();
+	last_undo_level = "";
 }
 
 bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
@@ -338,12 +376,11 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 	}
 
 	// Update tagged lists if the hilight changed
-	if (current != hilight_item) {
+	if (current != hilight_item)
 		updateTagged();
-	}
 
 	// Update map object properties panel if the hilight changed
-	if (current != hilight_item && selection.size() == 0) {
+	if (current != hilight_item && selection.empty()) {
 		switch (edit_mode) {
 		case MODE_VERTICES: theMapEditor->propsPanel()->openObject(map.getVertex(hilight_item)); break;
 		case MODE_LINES: theMapEditor->propsPanel()->openObject(map.getLine(hilight_item)); break;
@@ -351,6 +388,8 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 		case MODE_THINGS: theMapEditor->propsPanel()->openObject(map.getThing(hilight_item)); break;
 		default: break;
 		}
+
+		last_undo_level = "";
 	}
 
 	return current != hilight_item;
@@ -523,6 +562,8 @@ void MapEditor::selectionUpdated() {
 	}
 
 	theMapEditor->propsPanel()->openObjects(objects);
+
+	last_undo_level = "";
 }
 
 void MapEditor::clearSelection() {
@@ -993,6 +1034,7 @@ void MapEditor::selectItem3d(selection_3d_t item, int sel) {
 			else if (sel == DESELECT || sel == TOGGLE) {
 				selection_3d[a] = selection_3d.back();
 				selection_3d.pop_back();
+				last_undo_level = "";
 				return;
 			}
 		}
@@ -1001,6 +1043,7 @@ void MapEditor::selectItem3d(selection_3d_t item, int sel) {
 	// Selection didn't exist, add if selecting or toggling
 	if (sel == SELECT || sel == TOGGLE) {
 		selection_3d.push_back(item);
+		last_undo_level = "";
 		if (canvas) canvas->itemSelected3d(item);
 	}
 }
@@ -1136,17 +1179,17 @@ void MapEditor::endMove(bool accept) {
 	// Move depending on edit mode
 	if (edit_mode == MODE_THINGS && accept) {
 		// Move things
-		undo_manager->beginRecord("Move Things");
+		beginUndoRecord("Move Things", true, false, false);
 		for (unsigned a = 0; a < move_items.size(); a++) {
 			MapThing* t = map.getThing(move_items[a]);
 			undo_manager->recordUndoStep(new PropertyChangeUS(t));
 			map.moveThing(move_items[a], t->xPos() + move_vec.x, t->yPos() + move_vec.y);
 		}
-		undo_manager->endRecord(true);
+		endUndoRecord(true);
 	}
 	else if (accept) {
 		// Any other edit mode we're technically moving vertices
-		undo_manager->beginRecord("Move Vertices");
+		beginUndoRecord("Move Vertices");//, true, false, false);
 
 		// Get list of vertices being moved
 		bool* move_verts = new bool[map.nVertices()];
@@ -1183,6 +1226,9 @@ void MapEditor::endMove(bool accept) {
 			merge_points.push_back(np);
 		}
 
+		//endUndoRecord(true);
+		//beginUndoRecord("Stitch And Merge");
+
 		// Merge vertices and split lines
 		for (unsigned a = 0; a < merge_points.size(); a++) {
 			MapVertex* v = map.mergeVerticesPoint(merge_points[a].x, merge_points[a].y);
@@ -1214,7 +1260,7 @@ void MapEditor::endMove(bool accept) {
 		// Remove any resulting zero-length lines
 		map.removeZeroLengthLines();
 
-		undo_manager->endRecord(true);
+		endUndoRecord(true);
 	}
 
 	// Un-filter objects
@@ -1289,12 +1335,14 @@ void MapEditor::pasteProperties() {
 			return;
 
 		// Paste properties to selection/hilight
+		beginUndoRecord("Paste Sector Properties", true, false, false);
 		if (selection.size() > 0) {
 			for (unsigned a = 0; a < selection.size(); a++)
 				map.getSector(selection[a])->copy(copy_sector);
 		}
 		else if (hilight_item >= 0)
 			map.getSector(hilight_item)->copy(copy_sector);
+		endUndoRecord();
 
 		// Editor message
 		addEditorMessage("Pasted sector properties");
@@ -1307,6 +1355,7 @@ void MapEditor::pasteProperties() {
 			return;
 
 		// Paste properties to selection/hilight
+		beginUndoRecord("Paste Thing Properties", true, false, false);
 		if (selection.size() > 0) {
 			for (unsigned a = 0; a < selection.size(); a++) {
 				// Paste properties (but keep position)
@@ -1327,6 +1376,7 @@ void MapEditor::pasteProperties() {
 			thing->setFloatProperty("x", x);
 			thing->setFloatProperty("y", y);
 		}
+		endUndoRecord();
 
 		// Editor message
 		addEditorMessage("Pasted thing properties");
@@ -1345,6 +1395,9 @@ void MapEditor::splitLine(double x, double y, double min_dist) {
 	if (!line)
 		return;
 
+	// Begin recording undo level
+	beginUndoRecord("Split Line", true, true, false);
+
 	// Get closest point on the line
 	fpoint2_t closest = MathStuff::closestPointOnLine(x, y, line->x1(), line->y1(), line->x2(), line->y2());
 
@@ -1354,6 +1407,9 @@ void MapEditor::splitLine(double x, double y, double min_dist) {
 
 	// Do line split
 	map.splitLine(lindex, vindex);
+
+	// Finish recording undo level
+	endUndoRecord();
 }
 
 void MapEditor::flipLines(bool sides) {
@@ -1361,9 +1417,16 @@ void MapEditor::flipLines(bool sides) {
 	vector<MapLine*> lines;
 	getSelectedLines(lines);
 
+	if (lines.empty())
+		return;
+
 	// Go through list
-	for (unsigned a = 0; a < lines.size(); a++)
+	undo_manager->beginRecord("Flip Line");
+	for (unsigned a = 0; a < lines.size(); a++) {
+		undo_manager->recordUndoStep(new PropertyChangeUS(lines[a]));
 		lines[a]->flip(sides);
+	}
+	undo_manager->endRecord(true);
 
 	// Update display
 	canvas->forceRefreshRenderer();
@@ -1391,6 +1454,9 @@ void MapEditor::changeSectorHeight(int amount, bool floor, bool ceiling) {
 			floor = false;
 	}
 
+	// Begin record undo level
+	beginUndoRecordLocked("Change Sector Height", true, false, false);
+
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
 		// Change floor height
@@ -1405,6 +1471,9 @@ void MapEditor::changeSectorHeight(int amount, bool floor, bool ceiling) {
 			selection[a]->setIntProperty("heightceiling", height + amount);
 		}
 	}
+
+	// End record undo level
+	endUndoRecord();
 
 	// Add editor message
 	string what = "";
@@ -1438,6 +1507,9 @@ void MapEditor::changeSectorLight(bool up, bool fine) {
 	if (selection.size() == 0)
 		return;
 
+	// Begin record undo level
+	beginUndoRecordLocked("Change Sector Light", true, false, false);
+
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
 		// Get current light
@@ -1452,6 +1524,9 @@ void MapEditor::changeSectorLight(bool up, bool fine) {
 		// Change light level
 		selection[a]->setIntProperty("lightlevel", light);
 	}
+
+	// End record undo level
+	endUndoRecord();
 
 	// Add editor message
 	string dir = up ? "increased" : "decreased";
@@ -1483,6 +1558,9 @@ void MapEditor::joinSectors(bool remove_lines) {
 
 	// Init list of lines
 	vector<MapLine*> lines;
+
+	// Begin recording undo level
+	beginUndoRecord("Join/Merge Sectors", true, false, true);
 
 	// Go through merge sectors
 	for (unsigned a = 1; a < sectors.size(); a++) {
@@ -1520,6 +1598,9 @@ void MapEditor::joinSectors(bool remove_lines) {
 		}
 	}
 
+	// Finish recording undo level
+	endUndoRecord();
+
 	// Editor message
 	if (nlines == 0)
 		addEditorMessage(S_FMT("Joined %d Sectors", selection.size()));
@@ -1541,8 +1622,10 @@ void MapEditor::changeThingType(int newtype) {
 		return;
 
 	// Go through selection
+	beginUndoRecord("Thing Type Change", true, false, false);
 	for (unsigned a = 0; a < selection.size(); a++)
 		selection[a]->setIntProperty("type", newtype);
+	endUndoRecord(true);
 
 	// Add editor message
 	string type_name = theGameConfiguration->thingType(newtype)->getName();
@@ -1562,13 +1645,15 @@ void MapEditor::thingQuickAngle(fpoint2_t mouse_pos) {
 
 	// If selection is empty, check for hilight
 	if (selection.size() == 0 && hilight_item >= 0) {
+		MapThing* thing = map.getThing(hilight_item);
 		map.getThing(hilight_item)->setAnglePoint(mouse_pos);
 		return;
 	}
 
 	// Go through selection
-	for (unsigned a = 0; a < selection.size(); a++)
+	for (unsigned a = 0; a < selection.size(); a++) {
 		map.getThing(selection[a])->setAnglePoint(mouse_pos);
+	}
 }
 
 int MapEditor::beginTagEdit() {
@@ -1630,6 +1715,9 @@ void MapEditor::endTagEdit(bool accept) {
 	getSelectedLines(lines);
 
 	if (accept) {
+		// Begin undo level
+		beginUndoRecord("Tag Edit", true, false, false);
+
 		// Clear sector tags
 		for (unsigned a = 0; a < map.nSectors(); a++) {
 			MapSector* sector = map.getSector(a);
@@ -1654,6 +1742,8 @@ void MapEditor::endTagEdit(bool accept) {
 			addEditorMessage("Cleared tags");
 		else
 			addEditorMessage(S_FMT("Set tag %d", current_tag));
+
+		endUndoRecord(true);
 	}
 	else
 		addEditorMessage("Tag edit cancelled");
@@ -1667,8 +1757,10 @@ void MapEditor::createObject(double x, double y) {
 			createVertex(x, y);
 		else {
 			// Otherwise, create lines between selected vertices
+			beginUndoRecord("Create Lines", false, true, false);
 			for (unsigned a = 0; a < selection.size() - 1; a++)
 				map.createLine(map.getVertex(selection[a]), map.getVertex(selection[a+1]));
+			endUndoRecord(true);
 
 			// Editor message
 			addEditorMessage(S_FMT("Created %d line(s)", selection.size() - 1));
@@ -1708,7 +1800,9 @@ void MapEditor::createVertex(double x, double y) {
 	}
 
 	// Create vertex
+	beginUndoRecord("Create Vertex", true, true, false);
 	MapVertex* vertex = map.createVertex(x, y, 2);
+	endUndoRecord(true);
 
 	// Editor message
 	if (vertex)
@@ -1723,8 +1817,7 @@ void MapEditor::createThing(double x, double y) {
 	}
 
 	// Begin undo step
-	undo_manager->beginRecord("Create Thing");
-	map.clearCreatedObjectIds();
+	beginUndoRecord("Create Thing", false, true, false);
 
 	// Create thing
 	MapThing* thing = map.createThing(x, y);
@@ -1742,8 +1835,7 @@ void MapEditor::createThing(double x, double y) {
 		theGameConfiguration->applyDefaults(thing);	// No thing properties to copy, get defaults from game configuration
 
 	// End undo step
-	undo_manager->recordUndoStep(new MapObjectCreateUS());
-	undo_manager->endRecord(true);
+	endUndoRecord(true);
 
 	// Editor message
 	if (thing)
@@ -1772,8 +1864,10 @@ void MapEditor::createSector(double x, double y) {
 		ok = builder.traceSector(&map, line, false);
 
 	// Create sector from builder result
-	if (ok)
+	if (ok) {
+		beginUndoRecord("Create Sector", true, true, false);
 		builder.createSector(NULL, sector_copy);
+	}
 
 	// Set some sector defaults from game configuration if needed
 	if (!sector_copy && ok) {
@@ -1783,8 +1877,10 @@ void MapEditor::createSector(double x, double y) {
 	}
 
 	// Editor message
-	if (ok)
+	if (ok) {
 		addEditorMessage(S_FMT("Created sector #%d", map.nSectors() - 1));
+		endUndoRecord(true);
+	}
 	else
 		addEditorMessage("Sector creation failed: " + builder.getError());
 
@@ -1805,12 +1901,16 @@ void MapEditor::deleteObject() {
 			index = verts[0]->getIndex();
 
 		// Begin undo step
-		undo_manager->beginRecord("Delete Vertices");
-		map.clearDeletedObjectIds();
+		beginUndoRecord("Delete Vertices", false, false, true);
+		//undo_manager->beginRecord("Delete Vertices");
+		//map.clearDeletedObjectIds();
 
 		// Delete them (if any)
 		for (unsigned a = 0; a < verts.size(); a++)
 			map.removeVertex(verts[a]);
+
+		// Remove detached vertices
+		map.removeDetachedVertices();
 
 		// Editor message
 		if (verts.size() == 1)
@@ -1829,12 +1929,14 @@ void MapEditor::deleteObject() {
 			index = lines[0]->getIndex();
 
 		// Begin undo step
-		undo_manager->beginRecord("Delete Lines");
-		map.clearDeletedObjectIds();
+		beginUndoRecord("Delete Lines", false, false, true);
 
 		// Delete them (if any)
 		for (unsigned a = 0; a < lines.size(); a++)
 			map.removeLine(lines[a]);
+
+		// Remove detached vertices
+		map.removeDetachedVertices();
 
 		// Editor message
 		if (lines.size() == 1)
@@ -1853,8 +1955,7 @@ void MapEditor::deleteObject() {
 			index = sectors[0]->getIndex();
 
 		// Begin undo step
-		undo_manager->beginRecord("Delete Sectors");
-		map.clearDeletedObjectIds();
+		beginUndoRecord("Delete Sectors", true, false, true);
 
 		// Delete them (if any), and keep lists of connected lines and sides
 		vector<MapSide*> connected_sides;
@@ -1868,8 +1969,8 @@ void MapEditor::deleteObject() {
 		}
 
 		// Backup connected line properties
-		for (unsigned a = 0; a < connected_lines.size(); a++)
-			undo_manager->recordUndoStep(new PropertyChangeUS(connected_lines[a]));
+		//for (unsigned a = 0; a < connected_lines.size(); a++)
+		//	undo_manager->recordUndoStep(new PropertyChangeUS(connected_lines[a]));
 
 		// Remove all connected sides
 		for (unsigned a = 0; a < connected_sides.size(); a++) {
@@ -1887,6 +1988,9 @@ void MapEditor::deleteObject() {
 		else if (sectors.size() > 1)
 			addEditorMessage(S_FMT("Deleted %d sector", sectors.size()));
 
+		// Remove detached vertices
+		map.removeDetachedVertices();
+
 		// Refresh map view
 		theMapEditor->forceRefresh(true);
 	}
@@ -1901,8 +2005,7 @@ void MapEditor::deleteObject() {
 			index = things[0]->getIndex();
 
 		// Begin undo step
-		undo_manager->beginRecord("Delete Things");
-		map.clearDeletedObjectIds();
+		beginUndoRecord("Delete Things", false, false, true);
 
 		// Delete them (if any)
 		for (unsigned a = 0; a < things.size(); a++)
@@ -1915,12 +2018,8 @@ void MapEditor::deleteObject() {
 			addEditorMessage(S_FMT("Deleted %d things", things.size()));
 	}
 
-	// Remove detached vertices
-	map.removeDetachedVertices();
-
 	// Record undo step
-	undo_manager->recordUndoStep(new MapObjectDeleteUS());
-	undo_manager->endRecord(true);
+	endUndoRecord(true);
 
 	// Clear hilight and selection
 	selection.clear();
@@ -2083,10 +2182,11 @@ void MapEditor::endLineDraw(bool apply) {
 	// Check if we want to 'apply' the line draw (ie. create the lines)
 	if (apply && draw_points.size() > 1) {
 		// Begin undo level
-		undo_manager->beginRecord("Line Draw");
+		/*undo_manager->beginRecord("Line Draw");
 		map.clearCreatedObjectIds();
 		map.clearDeletedObjectIds();
-		MapObject::beginPropBackup(theApp->runTimer());
+		MapObject::beginPropBackup(theApp->runTimer());*/
+		beginUndoRecord("Line Draw");
 
 		// Add extra points if any lines overlap existing vertices
 		for (unsigned a = 0; a < draw_points.size() - 1; a++) {
@@ -2266,11 +2366,12 @@ void MapEditor::endLineDraw(bool apply) {
 		map.removeDetachedSectors();
 
 		// End recording undo level
-		MapObject::beginPropBackup(-1);
+		/*MapObject::beginPropBackup(-1);
 		undo_manager->recordUndoStep(new MapObjectCreateUS());
 		undo_manager->recordUndoStep(new MapObjectDeleteUS());
 		undo_manager->recordUndoStep(new MultiMapObjectPropertyChangeUS());
-		undo_manager->endRecord(true);
+		undo_manager->endRecord(true);*/
+		endUndoRecord(true);
 	}
 
 	// Clear draw points
@@ -2323,16 +2424,20 @@ void MapEditor::paste(fpoint2_t mouse_pos) {
 	for (unsigned a = 0; a < theClipboard->nItems(); a++) {
 		// Map architecture
 		if (theClipboard->getItem(a)->getType() == CLIPBOARD_MAP_ARCH) {
+			beginUndoRecord("Paste Map Architecture");
 			MapArchClipboardItem* p = (MapArchClipboardItem*)theClipboard->getItem(a);
 			p->pasteToMap(&map, mouse_pos);
 			addEditorMessage(S_FMT("Pasted %s", CHR(p->getInfo())));
+			endUndoRecord(true);
 		}
 
 		// Things
 		else if (theClipboard->getItem(a)->getType() == CLIPBOARD_MAP_THINGS) {
+			beginUndoRecord("Paste Things", false, true, false);
 			MapThingsClipboardItem* p = (MapThingsClipboardItem*)theClipboard->getItem(a);
 			p->pasteToMap(&map, mouse_pos);
 			addEditorMessage(S_FMT("Pasted %s", CHR(p->getInfo())));
+			endUndoRecord(true);
 		}
 	}
 }
@@ -2574,6 +2679,9 @@ void MapEditor::changeSectorLight3d(int amount) {
 		}
 	}
 
+	// Begin undo level
+	beginUndoRecordLocked("Change Sector Light", true, false, false);
+
 	// Go through items
 	for (unsigned a = 0; a < items.size(); a++) {
 		// Wall
@@ -2610,6 +2718,9 @@ void MapEditor::changeSectorLight3d(int amount) {
 		}
 	}
 
+	// End undo level
+	endUndoRecord();
+
 	// Editor message
 	if (items.size() > 0) {
 		if (amount > 0)
@@ -2634,6 +2745,9 @@ void MapEditor::changeWallOffset3d(int amount, bool x) {
 	}
 	if (items.size() == 0)
 		return;
+
+	// Begin undo level
+	beginUndoRecordLocked("Change Wall Offset", true, false, false);
 
 	// Go through items
 	vector<int> done;
@@ -2685,6 +2799,9 @@ void MapEditor::changeWallOffset3d(int amount, bool x) {
 		}
 	}
 
+	// End undo level
+	endUndoRecord();
+
 	// Editor message
 	if (items.size() > 0) {
 		string axis = "X";
@@ -2708,6 +2825,9 @@ void MapEditor::changeSectorHeight3d(int amount) {
 				items.push_back(selection_3d[a]);
 		}
 	}
+
+	// Begin undo level
+	beginUndoRecordLocked("Change Sector Height", true, false, false);
 
 	// Go through items
 	vector<int> ceilings;
@@ -2772,6 +2892,9 @@ void MapEditor::changeSectorHeight3d(int amount) {
 			ceilings.push_back(sector->getIndex());
 		}
 	}
+
+	// End undo level
+	endUndoRecord();
 
 	// Editor message
 	if (items.size() > 0) {
@@ -2847,8 +2970,14 @@ void MapEditor::autoAlignX3d(selection_3d_t start) {
 	// Init aligned wall list
 	vector<selection_3d_t> walls_done;
 
+	// Begin undo level
+	beginUndoRecord("Auto Align X", true, false, false);
+
 	// Do alignment
 	doAlignX3d(side, side->intProperty("offsetx"), tex, walls_done);
+
+	// End undo level
+	endUndoRecord();
 
 	// Editor message
 	addEditorMessage("Auto-aligned on X axis");
@@ -2869,6 +2998,9 @@ void MapEditor::resetWall3d() {
 	}
 	if (items.size() == 0)
 		return;
+
+	// Begin undo level
+	beginUndoRecord("Reset Wall", true, false, false);
 
 	// Go through items
 	for (unsigned a = 0; a < items.size(); a++) {
@@ -2914,6 +3046,9 @@ void MapEditor::resetWall3d() {
 		}
 	}
 
+	// End undo level
+	endUndoRecord();
+
 	// Editor message
 	if (theGameConfiguration->udmfNamespace() == "zdoom")
 		addEditorMessage("Offsets and scaling reset");
@@ -2937,6 +3072,10 @@ void MapEditor::toggleUnpegged3d(bool lower) {
 	if (items.size() == 0)
 		return;
 
+	// Begin undo level
+	string undo_type = lower ? "Toggle Lower Unpegged" : "Toggle Upper Unpegged";
+	undo_manager_3d->beginRecord(undo_type);
+
 	// Go through items
 	for (unsigned a = 0; a < items.size(); a++) {
 		// Get line
@@ -2944,6 +3083,7 @@ void MapEditor::toggleUnpegged3d(bool lower) {
 		if (!line) continue;
 
 		// Toggle flag
+		recordPropertyChangeUndoStep(line);
 		if (lower) {
 			bool unpegged = theGameConfiguration->lineBasicFlagSet("dontpegbottom", line, theMapEditor->currentMapDesc().format);
 			theGameConfiguration->setLineBasicFlag("dontpegbottom", line, map.currentFormat(), !unpegged);
@@ -2953,6 +3093,9 @@ void MapEditor::toggleUnpegged3d(bool lower) {
 			theGameConfiguration->setLineBasicFlag("dontpegtop", line, map.currentFormat(), !unpegged);
 		}
 	}
+
+	// End undo level
+	undo_manager_3d->endRecord(true);
 
 	// Editor message
 	if (lower)
@@ -3038,7 +3181,7 @@ void MapEditor::paste3d(int type) {
 	string ptype = "Paste Properties";
 	if (type == COPY_TEXTYPE)
 		ptype = "Paste Texture/Type";
-	undo_manager->beginRecord(ptype);
+	undo_manager_3d->beginRecord(ptype);
 
 	// Go through items
 	for (unsigned a = 0; a < items.size(); a++) {
@@ -3108,7 +3251,7 @@ void MapEditor::paste3d(int type) {
 			addEditorMessage("Pasted Texture");
 	}
 
-	undo_manager->endRecord(true);
+	undo_manager_3d->endRecord(true);
 }
 
 void MapEditor::changeThingZ3d(int amount) {
@@ -3368,23 +3511,92 @@ void MapEditor::updateDisplay() {
 	}
 }
 
-void MapEditor::beginUndoRecord(string name) {
-	if (!undo_locked)
-		undo_manager->beginRecord(name);
+void MapEditor::beginUndoRecord(string name, bool mod, bool create, bool del) {
+	// Setup
+	undo_modified = mod;
+	undo_deleted = del;
+	undo_created = create;
+	UndoManager* manager = (edit_mode == MODE_3D) ? undo_manager_3d : undo_manager;
+
+	// Begin recording
+	manager->beginRecord(name);
+
+	// Init map/objects for recording
+	if (undo_modified)
+		MapObject::beginPropBackup(theApp->runTimer());
+	if (undo_deleted)
+		map.clearDeletedObjectIds();
+	if (undo_created)
+		map.clearCreatedObjectIds();
+
+	last_undo_level = "";
+}
+
+void MapEditor::beginUndoRecordLocked(string name, bool mod, bool create, bool del) {
+	if (name != last_undo_level) {
+		beginUndoRecord(name, mod, create, del);
+		last_undo_level = name;
+	}
 }
 
 void MapEditor::endUndoRecord(bool success) {
-	if (!undo_locked)
-		undo_manager->endRecord(success);
+	UndoManager* manager = (edit_mode == MODE_3D) ? undo_manager_3d : undo_manager;
+
+	if (manager->currentlyRecording()) {
+		// Record necessary undo steps
+		MapObject::beginPropBackup(-1);
+		if (undo_created)
+			manager->recordUndoStep(new MapObjectCreateUS());
+		if (undo_deleted)
+			manager->recordUndoStep(new MapObjectDeleteUS());
+		if (undo_modified)
+			manager->recordUndoStep(new MultiMapObjectPropertyChangeUS());
+
+		// End recording
+		manager->endRecord(success);
+	}
 }
 
 void MapEditor::recordPropertyChangeUndoStep(MapObject* object) {
-	undo_manager->recordUndoStep(new PropertyChangeUS(object));
+	UndoManager* manager = (edit_mode == MODE_3D) ? undo_manager_3d : undo_manager;
+	manager->recordUndoStep(new PropertyChangeUS(object));
+}
+
+void MapEditor::doUndo() {
+	// Undo
+	UndoManager* manager = (edit_mode == MODE_3D) ? undo_manager_3d : undo_manager;
+	string undo_name = manager->undo();
+
+	// Editor message
+	if (undo_name != "") {
+		addEditorMessage(S_FMT("Undo: %s", CHR(undo_name)));
+
+		// Refresh stuff
+		//updateTagged();
+		theMapEditor->forceRefresh(true);
+		last_undo_level = "";
+	}
+}
+
+void MapEditor::doRedo() {
+	// Redo
+	UndoManager* manager = (edit_mode == MODE_3D) ? undo_manager_3d : undo_manager;
+	string undo_name = manager->redo();
+
+	// Editor message
+	if (undo_name != "") {
+		addEditorMessage(S_FMT("Redo: %s", CHR(undo_name)));
+
+		// Refresh stuff
+		//updateTagged();
+		theMapEditor->forceRefresh(true);
+		last_undo_level = "";
+	}
 }
 
 
 
-CONSOLE_COMMAND(m_show_item, 1) {
+CONSOLE_COMMAND(m_show_item, 1, true) {
 	int index = atoi(CHR(args[0]));
 	theMapEditor->mapEditor().showItem(index);
 }
@@ -3411,7 +3623,7 @@ void resetSFMLClock(sf::Clock& clock) {
 #endif
 }
 
-CONSOLE_COMMAND(m_test_sector, 0) {
+CONSOLE_COMMAND(m_test_sector, 0, false) {
 	sf::Clock clock;
 	SLADEMap& map = theMapEditor->mapEditor().getMap();
 	for (unsigned a = 0; a < map.nThings(); a++)
@@ -3420,7 +3632,7 @@ CONSOLE_COMMAND(m_test_sector, 0) {
 	wxLogMessage("Took %dms", ms);
 }
 
-CONSOLE_COMMAND(m_test_mobj_backup, 0) {
+CONSOLE_COMMAND(m_test_mobj_backup, 0, false) {
 	sf::Clock clock;
 	sf::Clock totalClock;
 	SLADEMap& map = theMapEditor->mapEditor().getMap();
@@ -3458,8 +3670,7 @@ CONSOLE_COMMAND(m_test_mobj_backup, 0) {
 	wxLogMessage("Total: %dms", getSFMLElapsedTime(totalClock));
 }
 
-/*
-CONSOLE_COMMAND(m_vertex_attached, 1) {
+CONSOLE_COMMAND(m_vertex_attached, 1, false) {
 	MapVertex* vertex = theMapEditor->mapEditor().getMap().getVertex(atoi(CHR(args[0])));
 	if (vertex) {
 		wxLogMessage("Attached lines:");
@@ -3467,10 +3678,8 @@ CONSOLE_COMMAND(m_vertex_attached, 1) {
 			wxLogMessage("Line #%d", vertex->connectedLine(a)->getIndex());
 	}
 }
-*/
 
-/*
-CONSOLE_COMMAND(n_polys ,0) {
+CONSOLE_COMMAND(m_n_polys, 0, false) {
 	SLADEMap& map = theMapEditor->mapEditor().getMap();
 	int npoly = 0;
 	for (unsigned a = 0; a < map.nSectors(); a++)
@@ -3478,17 +3687,14 @@ CONSOLE_COMMAND(n_polys ,0) {
 
 	theConsole->logMessage(S_FMT("%d polygons total", npoly));
 }
-*/
 
-/*
-CONSOLE_COMMAND(m_test_save, 1) {
-	vector<ArchiveEntry*> entries;
-	theMapEditor->mapEditor().getMap().writeDoomMap(entries);
-	WadArchive temp;
-	temp.addNewEntry("MAP01");
-	for (unsigned a = 0; a < entries.size(); a++)
-		temp.addEntry(entries[a]);
-	temp.save(args[0]);
-	temp.close();
-}
-*/
+//CONSOLE_COMMAND(m_test_save, 1, false) {
+//	vector<ArchiveEntry*> entries;
+//	theMapEditor->mapEditor().getMap().writeDoomMap(entries);
+//	WadArchive temp;
+//	temp.addNewEntry("MAP01");
+//	for (unsigned a = 0; a < entries.size(); a++)
+//		temp.addEntry(entries[a]);
+//	temp.save(args[0]);
+//	temp.close();
+//}

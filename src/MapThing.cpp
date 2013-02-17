@@ -41,6 +41,9 @@ double MapThing::floatProperty(string key) {
 }
 
 void MapThing::setIntProperty(string key, int value) {
+	// Update modified time
+	setModified();
+
 	if (key == "type")
 		type = value;
 	else if (key == "x")
@@ -49,21 +52,18 @@ void MapThing::setIntProperty(string key, int value) {
 		y = value;
 	else
 		return MapObject::setIntProperty(key, value);
-
-	// Update modified time
-	setModified();
 }
 
 void MapThing::setFloatProperty(string key, double value) {
+	// Update modified time
+	setModified();
+
 	if (key == "x")
 		x = value;
 	else if (key == "y")
 		y = value;
 	else
 		return MapObject::setFloatProperty(key, value);
-
-	// Update modified time
-	setModified();
 }
 
 void MapThing::copy(MapObject* c) {

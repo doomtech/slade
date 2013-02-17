@@ -64,11 +64,20 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
+
 	string version = "3.1.0 alpha"
 #ifdef SVN_REVISION_STRING
 	" (r" SVN_REVISION_STRING ")"
 #endif
 	"";
+
+	int log_verbosity = 1;
+
+#ifdef DEBUG
+	bool debug = true;
+#else
+	bool debug = false;
+#endif
 }
 
 string	dir_data = "";
@@ -78,6 +87,7 @@ bool	exiting = false;
 string	current_action = "";
 CVAR(Bool, temp_use_appdir, false, CVAR_SAVE)
 CVAR(String, dir_last, "", CVAR_SAVE)
+CVAR(Int, log_verbosity, 1, CVAR_SAVE)
 
 
 /*******************************************************************
@@ -591,6 +601,7 @@ bool MainApp::OnInit() {
 	// Load configuration file
 	wxLogMessage("Loading configuration");
 	readConfigFile();
+	Global::log_verbosity = log_verbosity;
 
 	// Check that SLADE.pk3 can be found
 	wxLogMessage("Loading resources");
@@ -928,7 +939,7 @@ void MainApp::onMenu(wxCommandEvent& e) {
 }
 
 
-CONSOLE_COMMAND (crash, 0) {
+CONSOLE_COMMAND (crash, 0, false) {
 	if (wxMessageBox("Yes, this command does actually exist and *will* crash the program. Do you really want it to crash?", "...Really?", wxYES_NO|wxCENTRE) == wxYES) {
 		uint8_t* test = NULL;
 		test[123] = 5;

@@ -2102,8 +2102,12 @@ void MapCanvas::keyBinds2d(string name) {
 
 			// Quick angle
 			else if (name == "me2d_thing_quick_angle") {
-				if (mouse_state == MSTATE_NORMAL)
+				if (mouse_state == MSTATE_NORMAL) {
+					if (editor->isHilightOrSelection())
+						editor->beginUndoRecord("Thing Direction Change", true, false, false);
+
 					mouse_state = MSTATE_THING_ANGLE;
+				}
 			}
 		}
 
@@ -2217,6 +2221,7 @@ void MapCanvas::onKeyBindRelease(string name) {
 
 	else if (name == "me2d_thing_quick_angle" && mouse_state == MSTATE_THING_ANGLE) {
 		mouse_state = MSTATE_NORMAL;
+		editor->endUndoRecord(true);
 		editor->updateHilight(mouse_pos_m);
 	}
 }

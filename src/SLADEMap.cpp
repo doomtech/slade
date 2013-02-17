@@ -263,7 +263,7 @@ void SLADEMap::restoreObjectById(unsigned id) {
 	// Get map object to restore
 	MapObject* object = map_objects[id].mobj;
 	if (!object) {
-		wxLogMessage("restoreDeletedObject: Invalid object id %d", id);
+		LOG_MESSAGE(2, S_FMT("restoreObjectById: Invalid object id %d", id));
 		return;
 	}
 
@@ -329,7 +329,7 @@ void SLADEMap::removeObjectById(unsigned id) {
 	// Get map object to remove
 	MapObject* object = map_objects[id].mobj;
 	if (!object) {
-		wxLogMessage("removeObjectById: Invalid object id %d", id);
+		LOG_MESSAGE(2, S_FMT("removeObjectById: Invalid object id %d", id));
 		return;
 	}
 
@@ -490,15 +490,18 @@ bool SLADEMap::addLine(doomline_t& l) {
 	// Check if side1 already belongs to a line
 	if (s1 && s1->parent) {
 		// Duplicate side
-		s1 = new MapSide(*s1);
-		s1->setSector(s1->getSector());
+		MapSide* ns = new MapSide(s1->sector, this);
+		ns->copy(s1);
+		s1 = ns;
 		sides.push_back(s1);
 	}
 
 	// Check if side2 already belongs to a line
 	if (s2 && s2->parent) {
-		s2 = new MapSide(*s2);
-		s2->setSector(s2->getSector());
+		// Duplicate side
+		MapSide* ns = new MapSide(s2->sector, this);
+		ns->copy(s2);
+		s2 = ns;
 		sides.push_back(s2);
 	}
 
@@ -541,15 +544,18 @@ bool SLADEMap::addLine(doom64line_t& l) {
 	// Check if side1 already belongs to a line
 	if (s1 && s1->parent) {
 		// Duplicate side
-		s1 = new MapSide(*s1);
-		s1->setSector(s1->getSector());
+		MapSide* ns = new MapSide(s1->sector, this);
+		ns->copy(s1);
+		s1 = ns;
 		sides.push_back(s1);
 	}
 
 	// Check if side2 already belongs to a line
 	if (s2 && s2->parent) {
-		s2 = new MapSide(*s2);
-		s2->setSector(s2->getSector());
+		// Duplicate side
+		MapSide* ns = new MapSide(s2->sector, this);
+		ns->copy(s2);
+		s2 = ns;
 		sides.push_back(s2);
 	}
 
@@ -837,15 +843,18 @@ bool SLADEMap::addLine(hexenline_t& l) {
 	// Check if side1 already belongs to a line
 	if (s1 && s1->parent) {
 		// Duplicate side
-		s1 = new MapSide(*s1);
-		s1->setSector(s1->getSector());
+		MapSide* ns = new MapSide(s1->sector, this);
+		ns->copy(s1);
+		s1 = ns;
 		sides.push_back(s1);
 	}
 
 	// Check if side2 already belongs to a line
 	if (s2 && s2->parent) {
-		s2 = new MapSide(*s2);
-		s2->setSector(s2->getSector());
+		// Duplicate side
+		MapSide* ns = new MapSide(s2->sector, this);
+		ns->copy(s2);
+		s2 = ns;
 		sides.push_back(s2);
 	}
 
@@ -2174,6 +2183,7 @@ bool SLADEMap::removeSide(unsigned index, bool remove_from_line) {
 	if (remove_from_line) {
 		// Remove from parent line
 		MapLine* l = sides[index]->parent;
+		l->setModified();
 		if (l->side1 == sides[index])
 			l->side1 = NULL;
 		if (l->side2 == sides[index])
@@ -2898,7 +2908,7 @@ MapVertex* SLADEMap::createVertex(double x, double y, double split_dist) {
 				continue;
 
 			if (lines[a]->distanceTo(x, y) < split_dist) {
-				wxLogMessage("Vertex at (%1.2f,%1.2f) splits line %d", x, y, a);
+				//wxLogMessage("Vertex at (%1.2f,%1.2f) splits line %d", x, y, a);
 				splitLine(a, nv->index);
 			}
 		}
@@ -3121,7 +3131,8 @@ void SLADEMap::splitLine(unsigned line, unsigned vertex) {
 	MapSide* s2 = NULL;
 	if (l->side1) {
 		// Create side 1
-		s1 = new MapSide(*l->side1);
+		s1 = new MapSide(this);
+		s1->copy(l->side1);
 		s1->setSector(l->side1->sector);
 		if (s1->sector) {
 			s1->sector->resetBBox();
@@ -3134,7 +3145,8 @@ void SLADEMap::splitLine(unsigned line, unsigned vertex) {
 	}
 	if (l->side2) {
 		// Create side 2
-		s2 = new MapSide(*l->side2);
+		s2 = new MapSide(this);
+		s2->copy(l->side2);
 		s2->setSector(l->side2->sector);
 		if (s2->sector) {
 			s2->sector->resetBBox();
@@ -3214,6 +3226,7 @@ bool SLADEMap::setLineSector(unsigned line, unsigned sector, bool front) {
 
 		// Set appropriate line flags
 		bool twosided = (lines[line]->side1 && lines[line]->side2);
+		lines[line]->setModified();
 		theGameConfiguration->setLineBasicFlag("blocking", lines[line], current_format, !twosided);
 		theGameConfiguration->setLineBasicFlag("twosided", lines[line], current_format, twosided);
 

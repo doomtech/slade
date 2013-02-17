@@ -22,6 +22,7 @@ private:
 	SLADEMap			map;
 	MapCanvas*			canvas;
 	UndoManager*		undo_manager;
+	UndoManager*		undo_manager_3d;
 
 	// Editor state
 	uint8_t		edit_mode;
@@ -34,7 +35,12 @@ private:
 	bool		link_3d_light;
 	bool		link_3d_offset;
 	int			current_tag;
-	bool		undo_locked;
+
+	// Undo/Redo
+	bool	undo_modified;
+	bool	undo_created;
+	bool	undo_deleted;
+	string	last_undo_level;
 
 	// Tagged items
 	vector<MapSector*>	tagged_sectors;
@@ -133,7 +139,7 @@ public:
 	UndoManager*		undoManager() { return undo_manager; }
 
 	vector<selection_3d_t>&	get3dSelection() { return selection_3d; }
-	void					set3dHilight(selection_3d_t hl) { hilight_3d = hl; }
+	void					set3dHilight(selection_3d_t hl);
 	selection_3d_t			hilightItem3d() { return hilight_3d; }
 
 	void	setEditMode(int mode);
@@ -235,9 +241,12 @@ public:
 	void		addEditorMessage(string message);
 
 	// Undo/Redo
-	void	beginUndoRecord(string name);
+	void	beginUndoRecord(string name, bool mod = true, bool create = true, bool del = true);
+	void	beginUndoRecordLocked(string name, bool mod = true, bool create = true, bool del = true);
 	void	endUndoRecord(bool success = true);
 	void	recordPropertyChangeUndoStep(MapObject* object);
+	void	doUndo();
+	void	doRedo();
 
 	// Misc
 	string	getModeString();

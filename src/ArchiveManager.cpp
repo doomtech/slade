@@ -963,7 +963,7 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
 /* Console Command - "list_archives"
  * Lists the filenames of all open archives
  *******************************************************************/
-CONSOLE_COMMAND (list_archives, 0) {
+CONSOLE_COMMAND (list_archives, 0, true) {
 	wxLogMessage(S_FMT("%d Open Archives:", theArchiveManager->numArchives()));
 
 	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
@@ -979,4 +979,4 @@ void c_open(vector<string> args) {
 	for (size_t a = 0; a < args.size(); a++)
 		theArchiveManager->openArchive(args[a]);
 }
-ConsoleCommand am_open("open", &c_open, 1); // Can't use the macro with this name
+ConsoleCommand am_open("open", &c_open, 1, true); // Can't use the macro with this name

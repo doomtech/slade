@@ -1039,7 +1039,7 @@ GfxEntryPanel * CH::getCurrentGfxPanel() {
 	return NULL;
 }
 
-CONSOLE_COMMAND(rotate, 1) {
+CONSOLE_COMMAND(rotate, 1, true) {
 	double val;
 	string bluh = args[0];
 	if (!bluh.ToDouble(&val)) {
@@ -1089,7 +1089,7 @@ CONSOLE_COMMAND(rotate, 1) {
 	}
 }
 
-CONSOLE_COMMAND (mirror, 1) {
+CONSOLE_COMMAND (mirror, 1, true) {
 	bool vertical;
 	string bluh = args[0];
 	if (!bluh.CmpNoCase("y") || !bluh.CmpNoCase("v") ||
@@ -1127,7 +1127,7 @@ CONSOLE_COMMAND (mirror, 1) {
 	}
 }
 
-CONSOLE_COMMAND (crop, 4) {
+CONSOLE_COMMAND (crop, 4, true) {
 	long x1, y1, x2, y2;
 	if (args[0].ToLong(&x1) && args[1].ToLong(&y1) && args[2].ToLong(&x2) && args[3].ToLong(&y2))
 	{
@@ -1157,7 +1157,7 @@ CONSOLE_COMMAND (crop, 4) {
 	}
 }
 
-CONSOLE_COMMAND(imgconv, 0) {
+CONSOLE_COMMAND(imgconv, 0, true) {
 	ArchivePanel * foo = CH::getCurrentArchivePanel();
 	if (!foo) {
 		wxLogMessage("No active panel.");

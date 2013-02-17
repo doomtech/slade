@@ -184,6 +184,7 @@
     <ClCompile Include="src\FileMonitor.cpp" />
     <ClCompile Include="src\GameConfiguration.cpp" />
     <ClCompile Include="src\GeneralPrefsPanel.cpp" />
+    <ClCompile Include="src\GenLineSpecial.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
     <ClCompile Include="src\glew\glew.c" />
     <ClCompile Include="src\GobArchive.cpp" />
@@ -460,6 +461,7 @@
     <ClInclude Include="src\FileMonitor.h" />
     <ClInclude Include="src\GameConfiguration.h" />
     <ClInclude Include="src\GeneralPrefsPanel.h" />
+    <ClInclude Include="src\GenLineSpecial.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
     <ClInclude Include="src\glew\glew.h" />
     <ClInclude Include="src\glew\glxew.h" />

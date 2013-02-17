@@ -449,7 +449,7 @@ CONSOLE_COMMAND (testparse, 0) {
 }
 */
 
-CONSOLE_COMMAND (testregex, 2) {
+CONSOLE_COMMAND (testregex, 2, false) {
 	wxRegEx re(args[0]);
 	if (re.Matches(args[1]))
 		theConsole->logMessage("Matches");

@@ -207,52 +207,70 @@ bool UndoManager::recordUndoStep(UndoStep* step) {
 /* UndoManager::undo
  * Performs an undo operation
  *******************************************************************/
-void UndoManager::undo() {
+string UndoManager::undo() {
 	// Can't while currently recording
 	if (current_level)
-		return;
+		return "";
 
 	// Can't if no more levels to undo
 	if (current_level_index < 0)
-		return;
+		return "";
 
 	// Perform undo level
 	undo_running = true;
 	current_undo_manager = this;
-	undo_levels[current_level_index]->doUndo();
+	UndoLevel* level = undo_levels[current_level_index];
+	level->doUndo();
 	undo_running = false;
 	current_undo_manager = NULL;
 	current_level_index--;
 
 	announce("undo");
+
+	return level->getName();
 }
 
 /* UndoManager::redo
  * Performs a redo operation
  *******************************************************************/
-void UndoManager::redo() {
+string UndoManager::redo() {
 	// Can't while currently recording
 	if (current_level)
-		return;
+		return "";
 
 	// Can't if no more levels to redo
 	if (current_level_index == undo_levels.size() - 1 || undo_levels.size() == 0)
-		return;
+		return "";
 
 	// Perform redo level
 	current_level_index++;
 	undo_running = true;
 	current_undo_manager = this;
-	undo_levels[current_level_index]->doRedo();
+	UndoLevel* level = undo_levels[current_level_index];
+	level->doRedo();
 	undo_running = false;
 	current_undo_manager = NULL;
 
 	announce("redo");
+
+	return level->getName();
 }
 
 void UndoManager::getAllLevels(vector<string>& list) {
 	for (unsigned a = 0; a < undo_levels.size(); a++)
 		list.push_back(undo_levels[a]->getName());
+}
+
+void UndoManager::clear() {
+	// Clean up undo levels
+	for (unsigned a = 0; a < undo_levels.size(); a++)
+		delete undo_levels[a];
+
+	// Reset
+	undo_levels.clear();
+	current_level = NULL;
+	current_level_index = -1;
+	undo_running = false;
 }
 
 

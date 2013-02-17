@@ -2698,7 +2698,7 @@ ArchivePanel * CH::getCurrentArchivePanel() {
 	return NULL;
 }
 
-CONSOLE_COMMAND(palconv, 0) {
+CONSOLE_COMMAND(palconv, 0, false) {
 	ArchivePanel * meep = CH::getCurrentArchivePanel();
 	if (meep)
 	{
@@ -2707,7 +2707,7 @@ CONSOLE_COMMAND(palconv, 0) {
 	}
 }
 
-CONSOLE_COMMAND(palconv64, 0) {
+CONSOLE_COMMAND(palconv64, 0, false) {
 	ArchivePanel * meep = CH::getCurrentArchivePanel();
 	if (meep)
 	{
@@ -2732,7 +2732,7 @@ CONSOLE_COMMAND(palconv64, 0) {
 	}
 }
 
-CONSOLE_COMMAND(palconvpsx, 0) {
+CONSOLE_COMMAND(palconvpsx, 0, false) {
 	ArchivePanel * meep = CH::getCurrentArchivePanel();
 	if (meep)
 	{
@@ -2762,7 +2762,7 @@ CONSOLE_COMMAND(palconvpsx, 0) {
 	}
 }
 
-CONSOLE_COMMAND(vertex32x, 0) {
+CONSOLE_COMMAND(vertex32x, 0, false) {
 	ArchivePanel * meep = CH::getCurrentArchivePanel();
 	if (meep)
 	{
@@ -2781,7 +2781,7 @@ CONSOLE_COMMAND(vertex32x, 0) {
 	}
 }
 
-CONSOLE_COMMAND(vertexpsx, 0) {
+CONSOLE_COMMAND(vertexpsx, 0, false) {
 	ArchivePanel * meep = CH::getCurrentArchivePanel();
 	if (meep)
 	{

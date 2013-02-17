@@ -15,6 +15,12 @@ MapSide::MapSide(MapSector* sector, SLADEMap* parent) : MapObject(MOBJ_SIDE, par
 	if (sector) sector->connected_sides.push_back(this);
 }
 
+MapSide::MapSide(SLADEMap* parent) : MapObject(MOBJ_SIDE, parent) {
+	// Init variables
+	this->sector = NULL;
+	this->parent = NULL;
+}
+
 MapSide::~MapSide() {
 }
 
@@ -23,12 +29,12 @@ void MapSide::setSector(MapSector* sector) {
 	if (this->sector)
 		this->sector->disconnectSide(this);
 
+	// Update modified time
+	setModified();
+
 	// Add side to new sector
 	this->sector = sector;
 	sector->connectSide(this);
-
-	// Update modified time
-	setModified();
 }
 
 int MapSide::intProperty(string key) {
@@ -47,9 +53,6 @@ void MapSide::setIntProperty(string key, int value) {
 		setSector(parent_map->getSector(value));
 	else
 		MapObject::setIntProperty(key, value);
-
-	// Update modified time
-	setModified();
 }
 
 void MapSide::writeBackup(mobj_backup_t* backup) {
@@ -58,6 +61,7 @@ void MapSide::writeBackup(mobj_backup_t* backup) {
 		backup->properties["sector"] = sector->getId();
 	else
 		backup->properties["sector"] = 0;
+	//wxLogMessage("Side %d backup sector #%d", id, sector->getIndex());
 }
 
 void MapSide::readBackup(mobj_backup_t* backup) {
@@ -67,6 +71,7 @@ void MapSide::readBackup(mobj_backup_t* backup) {
 		sector->disconnectSide(this);
 		sector = (MapSector*)s;
 		sector->connectSide(this);
+		//wxLogMessage("Side %d load backup sector #%d", id, s->getIndex());
 	}
 	else {
 		if (sector)
