@@ -426,7 +426,7 @@ void GameConfiguration::buildConfig(string filename, string& out) {
  * folder and archive as well as in the parent archive. The resulting
  * 'expanded' text is written to [out]
  *******************************************************************/
-void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
+void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out, bool use_res) {
 	// Check entry was given
 	if (!entry)
 		return;
@@ -441,7 +441,7 @@ void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
 		return;
 
 	// Go through line-by-line
-	string line = file.GetNextLine();
+	string line = file.GetFirstLine();
 	while (!file.Eof()) {
 		// Check for #include
 		if (line.Trim().StartsWith("#include")) {
@@ -459,9 +459,11 @@ void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
 				buildConfig(entry_inc, out);
 				done = true;
 			}
+			else
+				LOG_MESSAGE(2, S_FMT("Couldn't find entry to #include: %s", CHR(entry_inc->getPath(true))));
 
 			// Look in resource pack
-			if (!done && theArchiveManager->programResourceArchive()) {
+			if (use_res && !done && theArchiveManager->programResourceArchive()) {
 				name = "config/games/" + inc_name;
 				entry_inc = theArchiveManager->programResourceArchive()->entryAtPath(name);
 				if (entry_inc) {
@@ -1644,6 +1646,160 @@ void GameConfiguration::setThingFlag(unsigned index, MapThing* thing, bool set) 
 
 	// Update thing flags
 	thing->setIntProperty("flags", flags);
+}
+
+bool GameConfiguration::parseDecorateDefs(Archive* archive) {
+	// Get base decorate file
+	Archive::search_options_t opt;
+	opt.match_name = "decorate";
+	//opt.match_type = EntryType::getType("text");
+	opt.ignore_ext = true;
+	vector<ArchiveEntry*> decorate_entries = archive->findAll(opt);
+	if (decorate_entries.empty())
+		return false;
+
+	//ArchiveEntry* decorate_base = archive->getEntry("DECORATE", true);
+	//if (!decorate_base)
+	//	return false;
+
+	// Build full definition string
+	string full_defs;
+	for (unsigned a = 0; a < decorate_entries.size(); a++)
+		buildConfig(decorate_entries[a], full_defs, false);
+	//buildConfig(decorate_base, full_defs, false);
+
+	// Init tokenizer
+	Tokenizer tz;
+	tz.setSpecialCharacters(":,{}");
+	tz.enableDecorate(true);
+	tz.openString(full_defs);
+
+	// --- Parse ---
+	string token = tz.getToken();
+	while (!token.empty()) {
+		// Check for actor definition
+		if (S_CMPNOCASE(token, "actor")) {
+			// Get actor name
+			string name = tz.getToken();
+
+			// Check for inheritance
+			string next = tz.peekToken();
+			if (next == ":") {
+				tz.skipToken(); // Skip :
+				tz.skipToken(); // Skip parent actor
+				next = tz.peekToken();
+			}
+
+			// Check for replaces
+			if (S_CMPNOCASE(next, "replaces")) {
+				tz.skipToken(); // Skip replaces
+				tz.skipToken(); // Skip replace actor
+			}
+
+			// Check for no editor number (ie can't be placed in the map)
+			if (tz.peekToken() == "{") {
+				LOG_MESSAGE(2, S_FMT("Not adding actor %s, no editor number", CHR(name)));
+
+				// Skip actor definition
+				tz.skipToken();
+				tz.skipSection("{", "}");
+			}
+			else {
+				// Read editor number
+				int type;
+				tz.getInteger(&type);
+
+				// Create thing type object if needed
+				if (!thing_types[type].type) {
+					thing_types[type].type = new ThingType();
+					thing_types[type].index = thing_types.size();
+					thing_types[type].number = type;
+					thing_types[type].type->decorate = true;
+				}
+
+				// Setup thing
+				ThingType* tt = thing_types[type].type;
+				tt->name = name;
+				tt->group = "Decorate";
+
+				// Check for actor definition open
+				token = tz.getToken();
+				if (token == "{") {
+					token = tz.getToken();
+					bool title_given = false;
+					while (token != "}") {
+						// Check for subsection
+						if (token == "{")
+							tz.skipSection("{", "}");
+
+						// Title
+						else if (S_CMPNOCASE(token, "//$Title")) {
+							tt->name = tz.getToken();
+							title_given = true;
+						}
+
+						// Tag
+						else if (!title_given && S_CMPNOCASE(token, "tag"))
+							tt->name = tz.getToken();
+
+						// Category
+						else if (S_CMPNOCASE(token, "//$Category"))
+							tt->group = tz.getToken();
+
+						// Sprite
+						else if (S_CMPNOCASE(token, "//$EditorSprite"))
+							tt->sprite = tz.getToken();
+						else if (S_CMPNOCASE(token, "//$Sprite"))
+							tt->sprite = tz.getToken();
+
+						// Radius
+						else if (S_CMPNOCASE(token, "radius"))
+							tt->radius = tz.getInteger();
+
+						// Height
+						else if (S_CMPNOCASE(token, "height"))
+							tt->height = tz.getInteger();
+
+						// Hanging
+						else if (S_CMPNOCASE(token, "+spawnceiling"))
+							tt->hanging = true;
+
+						// Fullbright
+						else if (S_CMPNOCASE(token, "+bright"))
+							tt->fullbright = true;
+
+						// Is Decoration
+						else if (S_CMPNOCASE(token, "//$IsDecoration"))
+							tt->decoration = true;
+
+						// Icon
+						else if (S_CMPNOCASE(token, "//$Icon"))
+							tt->icon = tz.getToken();
+
+						// Translation
+						else if (S_CMPNOCASE(token, "translation")) {
+							tt->translation = tz.getToken();
+							// TODO: multiple translation strings
+						}
+
+						token = tz.getToken();
+					}
+
+					LOG_MESSAGE(2, S_FMT("Parsed actor %s: %d", CHR(name), type));
+				}
+				else
+					LOG_MESSAGE(1, S_FMT("Warning: Invalid actor definition for %s", CHR(name)));
+			}
+		}
+
+		token = tz.getToken();
+	}
+
+	//wxFile tempfile(appPath("decorate_full.txt", DIR_APP), wxFile::write);
+	//tempfile.Write(full_defs);
+	//tempfile.Close();
+
+	return true;
 }
 
 string GameConfiguration::lineFlag(unsigned index) {

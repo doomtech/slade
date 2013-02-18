@@ -348,6 +348,9 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	// Show window if opened ok
 	if (ok) {
 		mdesc_current = map;
+		
+		// Read DECORATE definitions if any
+		theGameConfiguration->parseDecorateDefs(archive);
 
 		// Load scripts if any
 		loadMapScripts(map);

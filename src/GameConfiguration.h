@@ -55,6 +55,7 @@ WX_DECLARE_STRING_HASH_MAP(udmfp_t, UDMFPropMap);
 
 class ParseTreeNode;
 class ArchiveEntry;
+class Archive;
 class MapLine;
 class MapThing;
 class MapObject;
@@ -184,7 +185,7 @@ public:
 
 	// Config #include handling
 	void	buildConfig(string filename, string& out);
-	void	buildConfig(ArchiveEntry* entry, string& out);
+	void	buildConfig(ArchiveEntry* entry, string& out, bool use_res = true);
 
 	// Configuration reading
 	void	readActionSpecials(ParseTreeNode* node, ActionSpecial* group_defaults = NULL);
@@ -211,6 +212,9 @@ public:
 	bool	thingFlagSet(unsigned flag_index, MapThing* thing);
 	string	thingFlagsString(int flags);
 	void	setThingFlag(unsigned flag_index, MapThing* thing, bool set = true);
+
+	// DECORATE
+	bool	parseDecorateDefs(Archive* archive);
 
 	// Line flags
 	int		nLineFlags() { return flags_line.size(); }

@@ -1,7 +1,7 @@
 
 #include "Main.h"
 
-#define GenFloorBase				0x6000
+#define GenFloorBase			0x6000
 #define GenCeilingBase			0x4000
 #define GenDoorBase				0x3c00
 #define GenLockedBase			0x3800
@@ -10,7 +10,7 @@
 #define GenCrusherBase			0x2F80
 
 #define TriggerType				0x0007
-#define TriggerTypeShift			0
+#define TriggerTypeShift		0
 
 #define FloorCrush				0x1000
 #define FloorChange				0x0c00
@@ -20,18 +20,18 @@
 #define FloorSpeed				0x0018
 
 #define FloorCrushShift			12
-#define FloorChangeShift			10
-#define FloorTargetShift			7
+#define FloorChangeShift		10
+#define FloorTargetShift		7
 #define FloorDirectionShift		6
 #define FloorModelShift			5
 #define FloorSpeedShift			3
 
-#define CeilingCrush				0x1000
+#define CeilingCrush			0x1000
 #define CeilingChange			0x0c00
 #define CeilingTarget			0x0380
-#define CeilingDirection			0x0040
-#define CeilingModel				0x0020
-#define CeilingSpeed				0x0018
+#define CeilingDirection		0x0040
+#define CeilingModel			0x0020
+#define CeilingSpeed			0x0018
 
 #define CeilingCrushShift		12
 #define CeilingChangeShift		10
@@ -47,16 +47,16 @@
 
 #define LiftTargetShift			8
 #define LiftDelayShift			6
-#define LiftMonsterShift			5
+#define LiftMonsterShift		5
 #define LiftSpeedShift			3
 
 #define StairIgnore				0x0200
 #define StairDirection			0x0100
 #define StairStep				0x00c0
-#define StairMonster				0x0020
+#define StairMonster			0x0020
 #define StairSpeed				0x0018
 
-#define StairIgnoreShift			9
+#define StairIgnoreShift		9
 #define StairDirectionShift		8
 #define StairStepShift			6
 #define StairMonsterShift		5
@@ -64,7 +64,7 @@
 
 #define CrusherSilent			0x0040
 #define CrusherMonster			0x0020
-#define CrusherSpeed				0x0018
+#define CrusherSpeed			0x0018
 
 #define CrusherSilentShift		6
 #define CrusherMonsterShift		5
@@ -72,11 +72,11 @@
 
 #define DoorDelay				0x0300
 #define DoorMonster				0x0080
-#define DoorKind					0x0060
+#define DoorKind				0x0060
 #define DoorSpeed				0x0018
 
 #define DoorDelayShift			8
-#define DoorMonsterShift			7
+#define DoorMonsterShift		7
 #define DoorKindShift			5
 #define DoorSpeedShift			3
 
@@ -85,10 +85,10 @@
 #define LockedKind				0x0020
 #define LockedSpeed				0x0018
 
-#define LockedNKeysShift			9
+#define LockedNKeysShift		9
 #define LockedKeyShift			6
 #define LockedKindShift			5
-#define LockedSpeedShift			3
+#define LockedSpeedShift		3
 
 namespace BoomGenLineSpecial {
 	static const char *Triggers[]=
@@ -266,20 +266,43 @@ namespace BoomGenLineSpecial {
 		}
 		else if (type>=0x3400) // Lift type
 		{
-			// put in trigger type
-			strcat(linedes,Triggers[type&TriggerType]);
-			if (type&LiftMonster)
-				strcat(linedes,"m");
-			strcat(linedes," Lft ");
+			string type_string;
+			int trigger = type & TriggerType;
+			int target = (type & LiftTarget) >> LiftTargetShift;
+			int delay = (type & LiftDelay) >> LiftDelayShift;
+			int speed = (type & LiftSpeed) >> LiftSpeedShift;
 
-			// put in lift target and delay
-			strcat(linedes,LiftTargets[(type&LiftTarget)>>LiftTargetShift]);
-			strcat(linedes," ");
-			strcat(linedes,"D");
-			strcat(linedes,LiftDelays[(type&LiftDelay)>>LiftDelayShift]);
+			// Trigger
+			type_string += Triggers[trigger];
+			if (type & LiftMonster)
+				type_string += "M";
 
-			// put in lift speed
-			strcat(linedes,Speeds[(type&LiftSpeed)>>LiftSpeedShift]);
+			type_string += " Lift ";
+
+			// Target
+			type_string += LiftTargets[target];
+
+			// Delay
+			type_string += S_FMT(" Delay %s ", LiftDelays[delay]);
+
+			// Speed
+			type_string += Speeds[speed];
+
+
+			//// put in trigger type
+			//strcat(linedes,Triggers[type&TriggerType]);
+			//if (type&LiftMonster)
+			//	strcat(linedes,"m");
+			//strcat(linedes," Lft ");
+
+			//// put in lift target and delay
+			//strcat(linedes,LiftTargets[(type&LiftTarget)>>LiftTargetShift]);
+			//strcat(linedes," ");
+			//strcat(linedes,"D");
+			//strcat(linedes,LiftDelays[(type&LiftDelay)>>LiftDelayShift]);
+
+			//// put in lift speed
+			//strcat(linedes,Speeds[(type&LiftSpeed)>>LiftSpeedShift]);
 		}
 		else if (type>=0x3000) // Stairs type
 		{

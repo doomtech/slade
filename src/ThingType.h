@@ -23,6 +23,7 @@ private:
 	string	translation;
 	string	palette;
 	arg_t	args[5];
+	bool	decorate;
 
 public:
 	ThingType(string name = "Unknown");

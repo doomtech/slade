@@ -22,6 +22,8 @@ EXTERN_CVAR(Bool, shapedraw_centered)
 EXTERN_CVAR(Bool, shapedraw_lockratio)
 
 
+#pragma region UNDO STEPS
+
 class PropertyChangeUS : public UndoStep {
 private:
 	mobj_backup_t*	backup;
@@ -197,6 +199,8 @@ public:
 	}
 };
 
+#pragma endregion
+
 
 MapEditor::MapEditor() {
 	// Init variables
@@ -221,22 +225,6 @@ MapEditor::~MapEditor() {
 	if (copy_sector) delete copy_sector;
 	delete undo_manager;
 	delete undo_manager_3d;
-}
-
-double MapEditor::gridSize() {
-	return grid_sizes[gridsize];
-}
-
-bool MapEditor::set3dHilight(selection_3d_t item) {
-	bool changed = false;
-	if (item.index != hilight_3d.index || item.type != hilight_3d.type) {
-		last_undo_level = "";
-		changed = true;
-	}
-
-	hilight_3d = item;
-
-	return changed;
 }
 
 void MapEditor::setEditMode(int mode) {
@@ -343,6 +331,40 @@ void MapEditor::clearMap() {
 	last_undo_level = "";
 }
 
+#pragma region GENERAL
+
+void MapEditor::showItem(int index) {
+	selection.clear();
+	int max = 0;
+	switch (edit_mode) {
+	case MODE_VERTICES: max = map.nVertices(); break;
+	case MODE_LINES: max = map.nLines(); break;
+	case MODE_SECTORS: max = map.nSectors(); break;
+	case MODE_THINGS: max = map.nThings(); break;
+	default: max = 0; break;
+	}
+
+	if (index < max) {
+		selection.push_back(index);
+		if (canvas) canvas->viewShowObject();
+	}
+}
+
+string MapEditor::getModeString() {
+	switch (edit_mode) {
+	case MODE_VERTICES: return "Vertices";
+	case MODE_LINES: return "Lines";
+	case MODE_SECTORS: return "Sectors";
+	case MODE_THINGS: return "Things";
+	case MODE_3D: return "3D";
+	default: return "Items";
+	};
+}
+
+#pragma endregion
+
+#pragma region HILIGHT
+
 bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 	// Do nothing if hilight is locked
 	if (hilight_locked)
@@ -399,6 +421,71 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 
 	return current != hilight_item;
 }
+
+MapVertex* MapEditor::getHilightedVertex() {
+	// Check edit mode is correct
+	if (edit_mode != MODE_VERTICES)
+		return NULL;
+
+	// Having one item selected counts as a hilight
+	if (hilight_item == -1 && selection.size() == 1)
+		return map.getVertex(selection[0]);
+
+	return map.getVertex(hilight_item);
+}
+
+MapLine* MapEditor::getHilightedLine() {
+	// Check edit mode is correct
+	if (edit_mode != MODE_LINES)
+		return NULL;
+
+	// Having one item selected counts as a hilight
+	if (hilight_item == -1 && selection.size() == 1)
+		return map.getLine(selection[0]);
+
+	return map.getLine(hilight_item);
+}
+
+MapSector* MapEditor::getHilightedSector() {
+	// Check edit mode is correct
+	if (edit_mode != MODE_SECTORS)
+		return NULL;
+
+	// Having one item selected counts as a hilight
+	if (hilight_item == -1 && selection.size() == 1)
+		return map.getSector(selection[0]);
+
+	return map.getSector(hilight_item);
+}
+
+MapThing* MapEditor::getHilightedThing() {
+	// Check edit mode is correct
+	if (edit_mode != MODE_THINGS)
+		return NULL;
+
+	// Having one item selected counts as a hilight
+	if (hilight_item == -1 && selection.size() == 1)
+		return map.getThing(selection[0]);
+
+	return map.getThing(hilight_item);
+}
+
+MapObject* MapEditor::getHilightedObject() {
+	if (edit_mode == MODE_VERTICES)
+		return getHilightedVertex();
+	else if (edit_mode == MODE_LINES)
+		return getHilightedLine();
+	else if (edit_mode == MODE_SECTORS)
+		return getHilightedSector();
+	else if (edit_mode == MODE_THINGS)
+		return getHilightedThing();
+	else
+		return NULL;
+}
+
+#pragma endregion
+
+#pragma region TAGGING
 
 void MapEditor::updateTagged() {
 	// Clear tagged lists
@@ -544,6 +631,10 @@ void MapEditor::updateTagged() {
 		}
 	}
 }
+
+#pragma endregion
+
+#pragma region SELECTION
 
 void MapEditor::selectionUpdated() {
 	// Open selected objects in properties panel
@@ -816,67 +907,6 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax,
 	return (nsel.size() > 0);
 }
 
-MapVertex* MapEditor::getHilightedVertex() {
-	// Check edit mode is correct
-	if (edit_mode != MODE_VERTICES)
-		return NULL;
-
-	// Having one item selected counts as a hilight
-	if (hilight_item == -1 && selection.size() == 1)
-		return map.getVertex(selection[0]);
-
-	return map.getVertex(hilight_item);
-}
-
-MapLine* MapEditor::getHilightedLine() {
-	// Check edit mode is correct
-	if (edit_mode != MODE_LINES)
-		return NULL;
-
-	// Having one item selected counts as a hilight
-	if (hilight_item == -1 && selection.size() == 1)
-		return map.getLine(selection[0]);
-
-	return map.getLine(hilight_item);
-}
-
-MapSector* MapEditor::getHilightedSector() {
-	// Check edit mode is correct
-	if (edit_mode != MODE_SECTORS)
-		return NULL;
-
-	// Having one item selected counts as a hilight
-	if (hilight_item == -1 && selection.size() == 1)
-		return map.getSector(selection[0]);
-
-	return map.getSector(hilight_item);
-}
-
-MapThing* MapEditor::getHilightedThing() {
-	// Check edit mode is correct
-	if (edit_mode != MODE_THINGS)
-		return NULL;
-
-	// Having one item selected counts as a hilight
-	if (hilight_item == -1 && selection.size() == 1)
-		return map.getThing(selection[0]);
-
-	return map.getThing(hilight_item);
-}
-
-MapObject* MapEditor::getHilightedObject() {
-	if (edit_mode == MODE_VERTICES)
-		return getHilightedVertex();
-	else if (edit_mode == MODE_LINES)
-		return getHilightedLine();
-	else if (edit_mode == MODE_SECTORS)
-		return getHilightedSector();
-	else if (edit_mode == MODE_THINGS)
-		return getHilightedThing();
-	else
-		return NULL;
-}
-
 void MapEditor::getSelectedVertices(vector<MapVertex*>& list) {
 	if (edit_mode != MODE_VERTICES)
 		return;
@@ -1009,23 +1039,6 @@ void MapEditor::getSelectedObjects(vector<MapObject*>& list) {
 	}
 }
 
-void MapEditor::showItem(int index) {
-	selection.clear();
-	int max = 0;
-	switch (edit_mode) {
-	case MODE_VERTICES: max = map.nVertices(); break;
-	case MODE_LINES: max = map.nLines(); break;
-	case MODE_SECTORS: max = map.nSectors(); break;
-	case MODE_THINGS: max = map.nThings(); break;
-	default: max = 0; break;
-	}
-
-	if (index < max) {
-		selection.push_back(index);
-		if (canvas) canvas->viewShowObject();
-	}
-}
-
 void MapEditor::selectItem3d(selection_3d_t item, int sel) {
 	// Go through selection
 	for (unsigned a = 0; a < selection_3d.size(); a++) {
@@ -1051,6 +1064,14 @@ void MapEditor::selectItem3d(selection_3d_t item, int sel) {
 		last_undo_level = "";
 		if (canvas) canvas->itemSelected3d(item);
 	}
+}
+
+#pragma endregion
+
+#pragma region GRID
+
+double MapEditor::gridSize() {
+	return grid_sizes[gridsize];
 }
 
 void MapEditor::incrementGrid() {
@@ -1095,6 +1116,12 @@ double MapEditor::snapToGrid(double position) {
 	else
 		return lower;
 }
+
+#pragma endregion
+
+#pragma region EDITING
+
+#pragma region MOVE
 
 bool MapEditor::beginMove(fpoint2_t mouse_pos) {
 	// Check if we have any selection or hilight
@@ -1281,115 +1308,9 @@ void MapEditor::endMove(bool accept) {
 	map.refreshIndices();
 }
 
-void MapEditor::copyProperties(MapObject* object) {
-	// Do nothing if no selection or hilight
-	if (selection.size() == 0 && hilight_item < 0)
-		return;
+#pragma endregion
 
-	// Sectors mode
-	if (edit_mode == MODE_SECTORS) {
-		// Create copy sector if needed
-		if (!copy_sector)
-			copy_sector = new MapSector(NULL);
-
-		// Copy selection/hilight properties
-		if (selection.size() > 0)
-			copy_sector->copy(map.getSector(selection[0]));
-		else if (hilight_item >= 0)
-			copy_sector->copy(map.getSector(hilight_item));
-
-		// Editor message
-		if (!object)
-			addEditorMessage("Copied sector properties");
-	}
-
-	// Things mode
-	else if (edit_mode == MODE_THINGS) {
-		// Create copy thing if needed
-		if (!copy_thing)
-			copy_thing = new MapThing(NULL);
-
-		// Copy given object properties (if any)
-		if (object && object->getObjType() == MOBJ_THING)
-			copy_thing->copy(object);
-		else {
-			// Otherwise copy selection/hilight properties
-			if (selection.size() > 0)
-				copy_thing->copy(map.getThing(selection[0]));
-			else if (hilight_item >= 0)
-				copy_thing->copy(map.getThing(hilight_item));
-			else
-				return;
-		}
-
-		// Editor message
-		if (!object)
-			addEditorMessage("Copied thing properties");
-	}
-}
-
-void MapEditor::pasteProperties() {
-	// Do nothing if no selection or hilight
-	if (selection.size() == 0 && hilight_item < 0)
-		return;
-
-	// Sectors mode
-	if (edit_mode == MODE_SECTORS) {
-		// Do nothing if no properties have been copied
-		if (!copy_sector)
-			return;
-
-		// Paste properties to selection/hilight
-		beginUndoRecord("Paste Sector Properties", true, false, false);
-		if (selection.size() > 0) {
-			for (unsigned a = 0; a < selection.size(); a++)
-				map.getSector(selection[a])->copy(copy_sector);
-		}
-		else if (hilight_item >= 0)
-			map.getSector(hilight_item)->copy(copy_sector);
-		endUndoRecord();
-
-		// Editor message
-		addEditorMessage("Pasted sector properties");
-	}
-
-	// Things mode
-	if (edit_mode == MODE_THINGS) {
-		// Do nothing if no properties have been copied
-		if (!copy_thing)
-			return;
-
-		// Paste properties to selection/hilight
-		beginUndoRecord("Paste Thing Properties", true, false, false);
-		if (selection.size() > 0) {
-			for (unsigned a = 0; a < selection.size(); a++) {
-				// Paste properties (but keep position)
-				MapThing* thing = map.getThing(selection[a]);
-				double x = thing->xPos();
-				double y = thing->yPos();
-				thing->copy(copy_thing);
-				thing->setFloatProperty("x", x);
-				thing->setFloatProperty("y", y);
-			}
-		}
-		else if (hilight_item >= 0) {
-			// Paste properties (but keep position)
-			MapThing* thing = map.getThing(hilight_item);
-			double x = thing->xPos();
-			double y = thing->yPos();
-			thing->copy(copy_thing);
-			thing->setFloatProperty("x", x);
-			thing->setFloatProperty("y", y);
-		}
-		endUndoRecord();
-
-		// Editor message
-		addEditorMessage("Pasted thing properties");
-	}
-
-	// Update display
-	updateDisplay();
-}
+#pragma region LINES
 
 void MapEditor::splitLine(double x, double y, double min_dist) {
 	// Get the closest line
@@ -1437,6 +1358,10 @@ void MapEditor::flipLines(bool sides) {
 	canvas->forceRefreshRenderer();
 	updateDisplay();
 }
+
+#pragma endregion
+
+#pragma region SECTORS
 
 void MapEditor::changeSectorHeight(int amount, bool floor, bool ceiling) {
 	// Do nothing if not in sectors mode
@@ -1613,6 +1538,10 @@ void MapEditor::joinSectors(bool remove_lines) {
 		addEditorMessage(S_FMT("Joined %d Sectors (removed %d Lines)", selection.size(), nlines));
 }
 
+#pragma endregion
+
+#pragma region THINGS
+
 void MapEditor::changeThingType(int newtype) {
 	// Do nothing if not in things mode
 	if (edit_mode != MODE_THINGS && edit_mode != MODE_3D)
@@ -1660,6 +1589,10 @@ void MapEditor::thingQuickAngle(fpoint2_t mouse_pos) {
 		map.getThing(selection[a])->setAnglePoint(mouse_pos);
 	}
 }
+
+#pragma endregion
+
+#pragma region TAG EDIT
 
 int MapEditor::beginTagEdit() {
 	// Check lines mode
@@ -1753,6 +1686,10 @@ void MapEditor::endTagEdit(bool accept) {
 	else
 		addEditorMessage("Tag edit cancelled");
 }
+
+#pragma endregion
+
+#pragma region OBJECT CREATION
 
 void MapEditor::createObject(double x, double y) {
 	// Vertices mode
@@ -1893,6 +1830,10 @@ void MapEditor::createSector(double x, double y) {
 	canvas->forceRefreshRenderer();
 }
 
+#pragma endregion
+
+#pragma region OBJECT DELETION
+
 void MapEditor::deleteObject() {
 	vector<MapObject*> objects_prop_change;
 
@@ -2030,6 +1971,10 @@ void MapEditor::deleteObject() {
 	selection.clear();
 	hilight_item = -1;
 }
+
+#pragma endregion
+
+#pragma region LINE DRAWING
 
 fpoint2_t MapEditor::lineDrawPoint(unsigned index) {
 	// Check index
@@ -2383,6 +2328,120 @@ void MapEditor::endLineDraw(bool apply) {
 	draw_points.clear();
 }
 
+#pragma endregion
+
+#pragma region COPY / PASTE
+
+void MapEditor::copyProperties(MapObject* object) {
+	// Do nothing if no selection or hilight
+	if (selection.size() == 0 && hilight_item < 0)
+		return;
+
+	// Sectors mode
+	if (edit_mode == MODE_SECTORS) {
+		// Create copy sector if needed
+		if (!copy_sector)
+			copy_sector = new MapSector(NULL);
+
+		// Copy selection/hilight properties
+		if (selection.size() > 0)
+			copy_sector->copy(map.getSector(selection[0]));
+		else if (hilight_item >= 0)
+			copy_sector->copy(map.getSector(hilight_item));
+
+		// Editor message
+		if (!object)
+			addEditorMessage("Copied sector properties");
+	}
+
+	// Things mode
+	else if (edit_mode == MODE_THINGS) {
+		// Create copy thing if needed
+		if (!copy_thing)
+			copy_thing = new MapThing(NULL);
+
+		// Copy given object properties (if any)
+		if (object && object->getObjType() == MOBJ_THING)
+			copy_thing->copy(object);
+		else {
+			// Otherwise copy selection/hilight properties
+			if (selection.size() > 0)
+				copy_thing->copy(map.getThing(selection[0]));
+			else if (hilight_item >= 0)
+				copy_thing->copy(map.getThing(hilight_item));
+			else
+				return;
+		}
+
+		// Editor message
+		if (!object)
+			addEditorMessage("Copied thing properties");
+	}
+}
+
+void MapEditor::pasteProperties() {
+	// Do nothing if no selection or hilight
+	if (selection.size() == 0 && hilight_item < 0)
+		return;
+
+	// Sectors mode
+	if (edit_mode == MODE_SECTORS) {
+		// Do nothing if no properties have been copied
+		if (!copy_sector)
+			return;
+
+		// Paste properties to selection/hilight
+		beginUndoRecord("Paste Sector Properties", true, false, false);
+		if (selection.size() > 0) {
+			for (unsigned a = 0; a < selection.size(); a++)
+				map.getSector(selection[a])->copy(copy_sector);
+		}
+		else if (hilight_item >= 0)
+			map.getSector(hilight_item)->copy(copy_sector);
+		endUndoRecord();
+
+		// Editor message
+		addEditorMessage("Pasted sector properties");
+	}
+
+	// Things mode
+	if (edit_mode == MODE_THINGS) {
+		// Do nothing if no properties have been copied
+		if (!copy_thing)
+			return;
+
+		// Paste properties to selection/hilight
+		beginUndoRecord("Paste Thing Properties", true, false, false);
+		if (selection.size() > 0) {
+			for (unsigned a = 0; a < selection.size(); a++) {
+				// Paste properties (but keep position)
+				MapThing* thing = map.getThing(selection[a]);
+				double x = thing->xPos();
+				double y = thing->yPos();
+				thing->copy(copy_thing);
+				thing->setFloatProperty("x", x);
+				thing->setFloatProperty("y", y);
+			}
+		}
+		else if (hilight_item >= 0) {
+			// Paste properties (but keep position)
+			MapThing* thing = map.getThing(hilight_item);
+			double x = thing->xPos();
+			double y = thing->yPos();
+			thing->copy(copy_thing);
+			thing->setFloatProperty("x", x);
+			thing->setFloatProperty("y", y);
+		}
+		endUndoRecord();
+
+		// Editor message
+		addEditorMessage("Pasted thing properties");
+	}
+
+	// Update display
+	updateDisplay();
+}
+
 void MapEditor::copy() {
 	// Can't copy/paste vertices (no point)
 	if (edit_mode == MODE_VERTICES) {
@@ -2445,6 +2504,25 @@ void MapEditor::paste(fpoint2_t mouse_pos) {
 			endUndoRecord(true);
 		}
 	}
+}
+
+#pragma endregion
+
+#pragma endregion
+
+// Why won't it allow numbers for region names?
+#pragma region EDITING THREE-D
+
+bool MapEditor::set3dHilight(selection_3d_t item) {
+	bool changed = false;
+	if (item.index != hilight_3d.index || item.type != hilight_3d.type) {
+		last_undo_level = "";
+		changed = true;
+	}
+
+	hilight_3d = item;
+
+	return changed;
 }
 
 bool MapEditor::wallMatches(MapSide* side, uint8_t part, string tex) {
@@ -2675,7 +2753,7 @@ void MapEditor::selectAdjacent3d(selection_3d_t item) {
 void MapEditor::changeSectorLight3d(int amount) {
 	// Get items to process
 	vector<selection_3d_t> items;
-	if (selection_3d.size() == 0 && hilight_3d.type != SEL_THING)
+	if (selection_3d.empty() && hilight_3d.index >= 0 && hilight_3d.type != SEL_THING)
 		items.push_back(hilight_3d);
 	else {
 		for (unsigned a = 0; a < selection_3d.size(); a++) {
@@ -2683,6 +2761,8 @@ void MapEditor::changeSectorLight3d(int amount) {
 				items.push_back(selection_3d[a]);
 		}
 	}
+	if (items.empty())
+		return;
 
 	// Begin undo level
 	beginUndoRecordLocked("Change Sector Light", true, false, false);
@@ -2738,8 +2818,8 @@ void MapEditor::changeSectorLight3d(int amount) {
 void MapEditor::changeWallOffset3d(int amount, bool x) {
 	// Get items to process
 	vector<selection_3d_t> items;
-	if (selection_3d.size() == 0) {
-		if (hilight_3d.type >= SEL_SIDE_TOP && hilight_3d.type <= SEL_SIDE_BOTTOM)
+	if (selection_3d.empty()) {
+		if (hilight_3d.index >= 0 && hilight_3d.type >= SEL_SIDE_TOP && hilight_3d.type <= SEL_SIDE_BOTTOM)
 			items.push_back(hilight_3d);
 	}
 	else {
@@ -2748,7 +2828,7 @@ void MapEditor::changeWallOffset3d(int amount, bool x) {
 				items.push_back(selection_3d[a]);
 		}
 	}
-	if (items.size() == 0)
+	if (items.empty())
 		return;
 
 	// Begin undo level
@@ -2822,7 +2902,7 @@ void MapEditor::changeWallOffset3d(int amount, bool x) {
 void MapEditor::changeSectorHeight3d(int amount) {
 	// Get items to process
 	vector<selection_3d_t> items;
-	if (selection_3d.size() == 0 && hilight_3d.type != SEL_THING)
+	if (selection_3d.empty() && hilight_3d.type != SEL_THING && hilight_3d.index >= 0)
 		items.push_back(hilight_3d);
 	else {
 		for (unsigned a = 0; a < selection_3d.size(); a++) {
@@ -2830,6 +2910,8 @@ void MapEditor::changeSectorHeight3d(int amount) {
 				items.push_back(selection_3d[a]);
 		}
 	}
+	if (items.empty())
+		return;
 
 	// Begin undo level
 	beginUndoRecordLocked("Change Sector Height", true, false, false);
@@ -3289,6 +3371,10 @@ void MapEditor::deleteThing3d() {
 	}
 }
 
+#pragma endregion
+
+#pragma region EDITOR MESSAGES
+
 string MapEditor::getEditorMessage(int index) {
 	// Check index
 	if (index < 0 || index >= (int)editor_messages.size())
@@ -3321,15 +3407,7 @@ unsigned MapEditor::numEditorMessages() {
 	return editor_messages.size();
 }
 
-string MapEditor::getModeString() {
-	switch (edit_mode) {
-	case MODE_VERTICES: return "Vertices";
-	case MODE_LINES: return "Lines";
-	case MODE_SECTORS: return "Sectors";
-	case MODE_THINGS: return "Things";
-	default: return "Items";
-	};
-}
+#pragma endregion
 
 bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 	// --- General keybinds ---
@@ -3516,6 +3594,8 @@ void MapEditor::updateDisplay() {
 	}
 }
 
+#pragma region UNDO / REDO
+
 void MapEditor::beginUndoRecord(string name, bool mod, bool create, bool del) {
 	// Setup
 	undo_modified = mod;
@@ -3599,12 +3679,17 @@ void MapEditor::doRedo() {
 	}
 }
 
+#pragma endregion
 
+#pragma region CONSOLE COMMANDS
 
 CONSOLE_COMMAND(m_show_item, 1, true) {
 	int index = atoi(CHR(args[0]));
 	theMapEditor->mapEditor().showItem(index);
 }
+
+#pragma endregion
+
 
 
 
