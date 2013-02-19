@@ -476,8 +476,17 @@ bool SLADEMap::addSide(doom64side_t& s) {
 
 bool SLADEMap::addLine(doomline_t& l) {
 	// Get relevant sides
-	MapSide* s1 = getSide(l.side1);
-	MapSide* s2 = getSide(l.side2);
+	MapSide* s1 = NULL;
+	MapSide* s2 = NULL;
+	if (sides.size() > 32767) {
+		// Support for > 32768 sides
+		if (l.side1 != 65535) s1 = getSide(static_cast<unsigned short>(l.side1));
+		if (l.side2 != 65535) s2 = getSide(static_cast<unsigned short>(l.side2));
+	}
+	else {
+		s1 = getSide(l.side1);
+		s2 = getSide(l.side2);
+	}
 
 	// Get relevant vertices
 	MapVertex* v1 = getVertex(l.vertex1);
@@ -525,8 +534,8 @@ bool SLADEMap::addLine(doom64line_t& l) {
 	MapSide* s2 = NULL;
 	if (sides.size() > 32767) {
 		// Support for > 32768 sides
-		s1 = getSide(static_cast<unsigned short>(l.side1));
-		s2 = getSide(static_cast<unsigned short>(l.side2));
+		if (l.side1 != 65535) s1 = getSide(static_cast<unsigned short>(l.side1));
+		if (l.side2 != 65535) s2 = getSide(static_cast<unsigned short>(l.side2));
 	}
 	else {
 		s1 = getSide(l.side1);
@@ -824,8 +833,8 @@ bool SLADEMap::addLine(hexenline_t& l) {
 	MapSide* s2 = NULL;
 	if (sides.size() > 32767) {
 		// Support for > 32768 sides
-		s1 = getSide(static_cast<unsigned short>(l.side1));
-		s2 = getSide(static_cast<unsigned short>(l.side2));
+		if (l.side1 != 65535) s1 = getSide(static_cast<unsigned short>(l.side1));
+		if (l.side2 != 65535) s2 = getSide(static_cast<unsigned short>(l.side2));
 	}
 	else {
 		s1 = getSide(l.side1);
