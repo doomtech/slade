@@ -46,6 +46,9 @@ GameConfiguration::~GameConfiguration() {
 		if (tt->second.type) delete tt->second.type;
 		tt++;
 	}
+
+	for (unsigned a = 0; a < tt_group_defaults.size(); a++)
+		delete tt_group_defaults[a];
 }
 
 void GameConfiguration::setDefaults() {
@@ -571,6 +574,8 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node, ThingType* group_def
 	ThingType* tt_defaults = new ThingType();
 	tt_defaults->copy(group_defaults);
 	tt_defaults->parse(node);
+	tt_defaults->group = groupname;
+	tt_group_defaults.push_back(tt_defaults);
 
 
 	// --- Go through all child nodes ---
@@ -608,7 +613,7 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node, ThingType* group_def
 		}
 	}
 
-	delete tt_defaults;
+	//delete tt_defaults;
 }
 
 void GameConfiguration::readUDMFProperties(ParseTreeNode* block, UDMFPropMap& plist) {
@@ -797,6 +802,9 @@ bool GameConfiguration::readConfiguration(string& cfg, string source, bool ignor
 		udmf_sidedef_props.clear();
 		udmf_sector_props.clear();
 		udmf_thing_props.clear();
+		for (unsigned a = 0; a < tt_group_defaults.size(); a++)
+			delete tt_group_defaults[a];
+		tt_group_defaults.clear();
 	}
 
 	// Parse the full configuration
@@ -1708,25 +1716,15 @@ bool GameConfiguration::parseDecorateDefs(Archive* archive) {
 				// Read editor number
 				int type;
 				tz.getInteger(&type);
-
-				// Create thing type object if needed
-				if (!thing_types[type].type) {
-					thing_types[type].type = new ThingType();
-					thing_types[type].index = thing_types.size();
-					thing_types[type].number = type;
-					thing_types[type].type->decorate = true;
-				}
-
-				// Setup thing
-				ThingType* tt = thing_types[type].type;
-				tt->name = name;
-				tt->group = "Decorate";
+				string group;
+				PropertyList found_props;
 
 				// Check for actor definition open
 				token = tz.getToken();
 				if (token == "{") {
 					token = tz.getToken();
 					bool title_given = false;
+					bool sprite_given = false;
 					while (token != "}") {
 						// Check for subsection
 						if (token == "{")
@@ -1734,52 +1732,78 @@ bool GameConfiguration::parseDecorateDefs(Archive* archive) {
 
 						// Title
 						else if (S_CMPNOCASE(token, "//$Title")) {
-							tt->name = tz.getToken();
+							name = tz.getToken();
 							title_given = true;
 						}
 
 						// Tag
 						else if (!title_given && S_CMPNOCASE(token, "tag"))
-							tt->name = tz.getToken();
+							name = tz.getToken();
 
 						// Category
 						else if (S_CMPNOCASE(token, "//$Category"))
-							tt->group = tz.getToken();
+							group = tz.getToken();
 
 						// Sprite
-						else if (S_CMPNOCASE(token, "//$EditorSprite"))
-							tt->sprite = tz.getToken();
-						else if (S_CMPNOCASE(token, "//$Sprite"))
-							tt->sprite = tz.getToken();
+						else if (S_CMPNOCASE(token, "//$EditorSprite")) {
+							found_props["sprite"] = tz.getToken();
+							sprite_given = true;
+						}
+						else if (S_CMPNOCASE(token, "//$Sprite")) {
+							found_props["sprite"] = tz.getToken();
+							sprite_given = true;
+						}
 
 						// Radius
 						else if (S_CMPNOCASE(token, "radius"))
-							tt->radius = tz.getInteger();
+							found_props["radius"] = tz.getInteger();
 
 						// Height
 						else if (S_CMPNOCASE(token, "height"))
-							tt->height = tz.getInteger();
+							found_props["height"] = tz.getInteger();
 
 						// Hanging
 						else if (S_CMPNOCASE(token, "+spawnceiling"))
-							tt->hanging = true;
+							found_props["hanging"] = true;
 
 						// Fullbright
 						else if (S_CMPNOCASE(token, "+bright"))
-							tt->fullbright = true;
+							found_props["bright"] = true;
 
 						// Is Decoration
 						else if (S_CMPNOCASE(token, "//$IsDecoration"))
-							tt->decoration = true;
+							found_props["decoration"] = true;
 
 						// Icon
 						else if (S_CMPNOCASE(token, "//$Icon"))
-							tt->icon = tz.getToken();
+							found_props["icon"] = tz.getToken();
 
 						// Translation
 						else if (S_CMPNOCASE(token, "translation")) {
-							tt->translation = tz.getToken();
+							found_props["translation"] = tz.getToken();
 							// TODO: multiple translation strings
+						}
+
+						// States
+						if (!sprite_given && S_CMPNOCASE(token, "states")) {
+							tz.skipToken(); // Skip {
+
+							token = tz.getToken();
+							while (token != "}") {
+								// Spawn state
+								if (S_CMPNOCASE(token, "spawn")) {
+									tz.skipToken();	// Skip :
+									string sb = tz.getToken(); // Sprite base
+									string sf = tz.getToken(); // Sprite frame(s)
+									string sprite = sb + sf.Left(1) + "?";
+									found_props["sprite"] = sprite;
+									LOG_MESSAGE(2, S_FMT("Actor %s found sprite %s", CHR(name), CHR(sprite)));
+									tz.skipSection("{", "}");
+									break;
+								}
+
+								token = tz.getToken();
+							}
 						}
 
 						token = tz.getToken();
@@ -1789,6 +1813,41 @@ bool GameConfiguration::parseDecorateDefs(Archive* archive) {
 				}
 				else
 					LOG_MESSAGE(1, S_FMT("Warning: Invalid actor definition for %s", CHR(name)));
+
+				// Create thing type object if needed
+				if (!thing_types[type].type) {
+					thing_types[type].type = new ThingType();
+					thing_types[type].index = thing_types.size();
+					thing_types[type].number = type;
+					thing_types[type].type->decorate = true;
+				}
+				ThingType* tt = thing_types[type].type;
+
+				// Get group defaults (if any)
+				if (!group.empty()) {
+					ThingType* group_defaults = NULL;
+					for (unsigned a = 0; a < tt_group_defaults.size(); a++) {
+						if (S_CMPNOCASE(group, tt_group_defaults[a]->group)) {
+							group_defaults = tt_group_defaults[a];
+							break;
+						}
+					}
+
+					if (group_defaults)
+						tt->copy(group_defaults);
+				}
+
+				// Setup thing
+				tt->name = name;
+				tt->group = group.empty() ? "Decorate" : group;
+				if (found_props["sprite"].hasValue()) tt->sprite = found_props["sprite"].getStringValue();
+				if (found_props["radius"].hasValue()) tt->radius = found_props["radius"].getIntValue();
+				if (found_props["height"].hasValue()) tt->height = found_props["height"].getIntValue();
+				if (found_props["hanging"].hasValue()) tt->hanging = found_props["hanging"].getBoolValue();
+				if (found_props["bright"].hasValue()) tt->fullbright = found_props["bright"].getBoolValue();
+				if (found_props["decoration"].hasValue()) tt->decoration = found_props["decoration"].getBoolValue();
+				if (found_props["icon"].hasValue()) tt->icon = found_props["icon"].getStringValue();
+				if (found_props["translation"].hasValue()) tt->translation = found_props["translation"].getStringValue();
 			}
 		}
 

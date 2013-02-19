@@ -62,21 +62,22 @@ class MapObject;
 class GameConfiguration {
 private:
 	//string			name;				// Game/port name
-	string			current_game;		// Current game name
-	string			current_port;		// Current port name (empty if none)
-	bool			map_formats[4];		// Supported map formats
-	string			udmf_namespace;		// Namespace to use for UDMF
-	bool			boom;				// Boom extensions enabled
-	ASpecialMap		action_specials;	// Action specials
-	ActionSpecial	as_unknown;			// Default action special
-	ThingTypeMap	thing_types;		// Thing types
-	ThingType		ttype_unknown;		// Default thing type
-	bool			any_map_name;		// Allow any map name
-	bool			mix_tex_flats;		// Allow mixed textures/flats
-	bool			tx_textures;		// Allow TX_ textures
-	string			sky_flat;			// Sky flat for 3d mode
-	string			script_language;	// Scripting language (should be extended to allow multiple)
-	vector<int>		light_levels;		// Light levels for up/down light in editor
+	string				current_game;		// Current game name
+	string				current_port;		// Current port name (empty if none)
+	bool				map_formats[4];		// Supported map formats
+	string				udmf_namespace;		// Namespace to use for UDMF
+	bool				boom;				// Boom extensions enabled
+	ASpecialMap			action_specials;	// Action specials
+	ActionSpecial		as_unknown;			// Default action special
+	ThingTypeMap		thing_types;		// Thing types
+	vector<ThingType*>	tt_group_defaults;	// Thing type group defaults
+	ThingType			ttype_unknown;		// Default thing type
+	bool				any_map_name;		// Allow any map name
+	bool				mix_tex_flats;		// Allow mixed textures/flats
+	bool				tx_textures;		// Allow TX_ textures
+	string				sky_flat;			// Sky flat for 3d mode
+	string				script_language;	// Scripting language (should be extended to allow multiple)
+	vector<int>			light_levels;		// Light levels for up/down light in editor
 
 	// Basic game configuration info
 	struct gconf_t {

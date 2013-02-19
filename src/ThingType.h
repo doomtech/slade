@@ -47,6 +47,7 @@ public:
 	string	getPalette() { return palette; }
 	arg_t&	getArg(int index) { if (index >= 0 && index < 5) return args[index]; else return args[0]; }
 	string	getArgsString(int args[5]);
+	void	setSprite(string sprite) { this->sprite = sprite; }
 
 	void	reset();
 	void	parse(ParseTreeNode* node);

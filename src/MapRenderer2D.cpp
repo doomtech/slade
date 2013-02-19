@@ -654,6 +654,24 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	// Attempt to get sprite texture
 	tex = theMapEditor->textureManager().getSprite(tt->getSprite(), tt->getTranslation(), tt->getPalette());
 
+	// Check for ? ending (0 or 1)
+	/*
+	if (!tex && tt->getSprite().EndsWith("?")) {
+		string sprite = tt->getSprite();
+		sprite.RemoveLast(1);
+		sprite = sprite + "0";
+		tex = theMapEditor->textureManager().getSprite(sprite, tt->getTranslation(), tt->getPalette());
+		if (!tex) {
+			sprite.RemoveLast(1);
+			sprite = sprite + "1";
+			tex = theMapEditor->textureManager().getSprite(sprite, tt->getTranslation(), tt->getPalette());
+		}
+
+		if (tex)
+			tt->setSprite(sprite);
+	}
+	*/
+
 	// If sprite not found, just draw as a normal, round thing
 	if (!tex) {
 		renderRoundThing(x, y, angle, tt, alpha);
