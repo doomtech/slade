@@ -72,6 +72,7 @@ CVAR(Int, camera_3d_crosshair_size, 6, CVAR_SAVE)
 CVAR(Bool, camera_3d_show_distance, false, CVAR_SAVE)
 CVAR(Int, map_bg_ms, 15, CVAR_SAVE)
 CVAR(Bool, info_overlay_3d, true, CVAR_SAVE)
+CVAR(Bool, hilight_smooth, true, CVAR_SAVE)
 
 // for testing
 PolygonSplitter splitter;
@@ -1034,9 +1035,9 @@ bool MapCanvas::update2d(double mult) {
 	// Update hilight if needed
 	if (mouse_state == MSTATE_NORMAL && !mouse_movebegin) {
 		MapObject* old_hl = editor->getHilightedObject();
-		if (editor->updateHilight(mouse_pos_m, view_scale)) {
+		if (editor->updateHilight(mouse_pos_m, view_scale) && hilight_smooth) {
 			// Hilight fade animation
-			if (old_hl && map_animate_hilight)
+			if (old_hl)
 				animations.push_back(new MCAHilightFade(theApp->runTimer(), old_hl, renderer_2d, anim_flash_level));
 
 			// Reset hilight flash
@@ -1273,7 +1274,7 @@ void MapCanvas::update(long frametime) {
 	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
 	if (anim_flash_inc) {
 		if (anim_flash_level < 0.5f)
-			anim_flash_level += 0.05*mult;	// Initial fade in
+			anim_flash_level += 0.053*mult;	// Initial fade in
 		else
 			anim_flash_level += 0.015f*mult;
 		if (anim_flash_level >= 1.0f) {

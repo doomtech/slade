@@ -2573,15 +2573,11 @@ void SLADEMap::getLinesById(int id, vector<MapLine*>& list) {
 
 void SLADEMap::getTaggingThingsById(int id, int type, vector<MapThing*>& list) {
 	// Find things with special affecting matching id
+	int needs_tag, tag, arg2, arg3, arg4, arg5;
 	for (unsigned a = 0; a < things.size(); a++) {
 		if (things[a]->intProperty("special")) {
-			int needs_tag, tag, arg2, arg3, arg4, arg5;
 			needs_tag = theGameConfiguration->actionSpecial(things[a]->intProperty("special"))->needsTag();
 			tag = things[a]->intProperty("arg0");
-			arg2 = things[a]->intProperty("arg1");
-			arg3 = things[a]->intProperty("arg2");
-			arg4 = things[a]->intProperty("arg3");
-			arg5 = things[a]->intProperty("arg4");
 			bool fits = false;
 			switch (needs_tag) {
 				case AS_TT_SECTOR:
@@ -2598,46 +2594,65 @@ void SLADEMap::getTaggingThingsById(int id, int type, vector<MapThing*>& list) {
 					fits = (tag == id && type == THINGS);
 					break;
 				case AS_TT_1THING_2SECTOR:
+					arg2 = things[a]->intProperty("arg1");
 					fits = (type == THINGS ? (tag == id) : (arg2 == id && type == SECTORS));
 					break;
 				case AS_TT_1THING_3SECTOR:
+					arg3 = things[a]->intProperty("arg2");
 					fits = (type == THINGS ? (tag == id) : (arg3 == id && type == SECTORS));
 					break;
 				case AS_TT_1THING_2THING:
+					arg2 = things[a]->intProperty("arg1");
 					fits = (type == THINGS && (tag == id || arg2 == id));
 					break;
 				case AS_TT_1THING_4THING:
+					arg4 = things[a]->intProperty("arg3");
 					fits = (type == THINGS && (tag == id || arg4 == id));
 					break;
 				case AS_TT_1THING_2THING_3THING:
+					arg2 = things[a]->intProperty("arg1");
+					arg3 = things[a]->intProperty("arg2");
 					fits = (type == THINGS && (tag == id || arg2 == id || arg3 == id));
 					break;
 				case AS_TT_1SECTOR_2THING_3THING_5THING:
+					arg2 = things[a]->intProperty("arg1");
+					arg3 = things[a]->intProperty("arg2");
+					arg5 = things[a]->intProperty("arg4");
 					fits = (type == SECTORS ? (tag == id) : (type == THINGS &&
 						(arg2 == id || arg3 == id || arg5 == id)));
 					break;
 				case AS_TT_1LINEID_2LINE:
+					arg2 = things[a]->intProperty("arg1");
 					fits = (type == LINEDEFS && arg2 == id);
 					break;
 				case AS_TT_4THING:
+					arg4 = things[a]->intProperty("arg3");
 					fits = (type == THINGS && arg4 == id);
 					break;
 				case AS_TT_5THING:
+					arg5 = things[a]->intProperty("arg4");
 					fits = (type == THINGS && arg5 == id);
 					break;
 				case AS_TT_1LINE_2SECTOR:
+					arg2 = things[a]->intProperty("arg1");
 					fits = (type == LINEDEFS ? (tag == id) : (arg2 == id && type == SECTORS));
 					break;
 				case AS_TT_1SECTOR_2SECTOR:
+					arg2 = things[a]->intProperty("arg1");
 					fits = (type == SECTORS && (tag == id || arg2 == id));
 					break;
 				case AS_TT_1SECTOR_2SECTOR_3SECTOR_4SECTOR:
+					arg2 = things[a]->intProperty("arg1");
+					arg3 = things[a]->intProperty("arg2");
+					arg4 = things[a]->intProperty("arg3");
 					fits = (type == SECTORS && (tag == id || arg2 == id || arg3 == id || arg4 == id));
 					break;
 				case AS_TT_SECTOR_2IS3_LINE:
+					arg2 = things[a]->intProperty("arg1");
 					fits = (tag == id && (arg2 == 3 ? type == LINEDEFS : type == SECTORS));
 					break;
 				case AS_TT_1SECTOR_2THING:
+					arg2 = things[a]->intProperty("arg1");
 					fits = (type == SECTORS ? (tag == id) : (arg2 == id && type == THINGS));
 					break;
 				default:
@@ -2650,16 +2665,12 @@ void SLADEMap::getTaggingThingsById(int id, int type, vector<MapThing*>& list) {
 
 void SLADEMap::getTaggingLinesById(int id, int type, vector<MapLine*>& list) {
 	// Find lines with special affecting matching id
+	int needs_tag, tag, arg2, arg3, arg4, arg5;
 	for (unsigned a = 0; a < lines.size(); a++) {
 		int special = lines[a]->special;
 		if (special) {
-			int needs_tag, tag, arg2, arg3, arg4, arg5;
-			needs_tag = theGameConfiguration->actionSpecial(lines[a]->intProperty("special"))->needsTag();
+			needs_tag = theGameConfiguration->actionSpecial(lines[a]->special)->needsTag();
 			tag = lines[a]->intProperty("arg0");
-			arg2 = lines[a]->intProperty("arg1");
-			arg3 = lines[a]->intProperty("arg2");
-			arg4 = lines[a]->intProperty("arg3");
-			arg5 = lines[a]->intProperty("arg4");
 			bool fits = false;
 			switch (needs_tag) {
 				case AS_TT_SECTOR:
@@ -2676,46 +2687,65 @@ void SLADEMap::getTaggingLinesById(int id, int type, vector<MapLine*>& list) {
 					fits = (tag == id && type == THINGS);
 					break;
 				case AS_TT_1THING_2SECTOR:
+					arg2 = lines[a]->intProperty("arg1");
 					fits = (type == THINGS ? (tag == id) : (arg2 == id && type == SECTORS));
 					break;
 				case AS_TT_1THING_3SECTOR:
+					arg3 = lines[a]->intProperty("arg2");
 					fits = (type == THINGS ? (tag == id) : (arg3 == id && type == SECTORS));
 					break;
 				case AS_TT_1THING_2THING:
+					arg2 = lines[a]->intProperty("arg1");
 					fits = (type == THINGS && (tag == id || arg2 == id));
 					break;
 				case AS_TT_1THING_4THING:
+					arg4 = lines[a]->intProperty("arg3");
 					fits = (type == THINGS && (tag == id || arg4 == id));
 					break;
 				case AS_TT_1THING_2THING_3THING:
+					arg2 = lines[a]->intProperty("arg1");
+					arg3 = lines[a]->intProperty("arg2");
 					fits = (type == THINGS && (tag == id || arg2 == id || arg3 == id));
 					break;
 				case AS_TT_1SECTOR_2THING_3THING_5THING:
+					arg2 = lines[a]->intProperty("arg1");
+					arg3 = lines[a]->intProperty("arg2");
+					arg5 = lines[a]->intProperty("arg4");
 					fits = (type == SECTORS ? (tag == id) : (type == THINGS &&
 						(arg2 == id || arg3 == id || arg5 == id)));
 					break;
 				case AS_TT_1LINEID_2LINE:
+					arg2 = lines[a]->intProperty("arg1");
 					fits = (type == LINEDEFS && arg2 == id);
 					break;
 				case AS_TT_4THING:
+					arg4 = lines[a]->intProperty("arg3");
 					fits = (type == THINGS && arg4 == id);
 					break;
 				case AS_TT_5THING:
+					arg5 = lines[a]->intProperty("arg4");
 					fits = (type == THINGS && arg5 == id);
 					break;
 				case AS_TT_1LINE_2SECTOR:
+					arg2 = lines[a]->intProperty("arg1");
 					fits = (type == LINEDEFS ? (tag == id) : (arg2 == id && type == SECTORS));
 					break;
 				case AS_TT_1SECTOR_2SECTOR:
+					arg2 = lines[a]->intProperty("arg1");
 					fits = (type == SECTORS && (tag == id || arg2 == id));
 					break;
 				case AS_TT_1SECTOR_2SECTOR_3SECTOR_4SECTOR:
+					arg2 = lines[a]->intProperty("arg1");
+					arg3 = lines[a]->intProperty("arg2");
+					arg4 = lines[a]->intProperty("arg3");
 					fits = (type == SECTORS && (tag == id || arg2 == id || arg3 == id || arg4 == id));
 					break;
 				case AS_TT_SECTOR_2IS3_LINE:
+					arg2 = lines[a]->intProperty("arg1");
 					fits = (tag == id && (arg2 == 3 ? type == LINEDEFS : type == SECTORS));
 					break;
 				case AS_TT_1SECTOR_2THING:
+					arg2 = lines[a]->intProperty("arg1");
 					fits = (type == SECTORS ? (tag == id) : (arg2 == id && type == THINGS));
 					break;
 				default:
