@@ -1066,6 +1066,15 @@ void MapEditor::selectItem3d(selection_3d_t item, int sel) {
 	}
 }
 
+void MapEditor::get3dSelectionOrHilight(vector<selection_3d_t>& list) {
+	if (selection_3d.empty() && hilight_3d.index >= 0)
+		list.push_back(hilight_3d);
+	else if (!selection_3d.empty()) {
+		for (unsigned a = 0; a < selection_3d.size(); a++)
+			list.push_back(selection_3d[a]);
+	}
+}
+
 #pragma endregion
 
 #pragma region GRID

@@ -463,7 +463,7 @@ void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out, bool use_r
 				done = true;
 			}
 			else
-				LOG_MESSAGE(2, S_FMT("Couldn't find entry to #include: %s", CHR(entry_inc->getPath(true))));
+				LOG_MESSAGE(2, S_FMT("Couldn't find entry to #include: %s", CHR(name)));
 
 			// Look in resource pack
 			if (use_res && !done && theArchiveManager->programResourceArchive()) {

@@ -331,6 +331,11 @@ void KeyBind::allKeyBinds(vector<KeyBind*>& list) {
 		list.push_back(&keybinds[a]);
 }
 
+void KeyBind::releaseAll() {
+	for (unsigned a = 0; a < keybinds.size(); a++)
+		keybinds[a].pressed = false;
+}
+
 // The + key char is different between windows and unix/mac
 #ifdef __WXMSW__
 #define PLUSKEY "+"
@@ -484,6 +489,7 @@ void KeyBind::initBinds() {
 	addBind("me3d_paste_tex_type", keypress_t("V", KPM_CTRL), "Paste texture or thing type", group);
 	addBind("me3d_paste_tex_type", keypress_t("mouse3", KPM_SHIFT));
 	addBind("me3d_toggle_info", keypress_t("I"), "Toggle information overlay", group);
+	addBind("me3d_quick_texture", keypress_t("T", KPM_CTRL), "Quick Texture", group);
 
 	// Map Editor 3D Camera (me3d_camera*)
 	group = "Map Editor 3D Mode Camera";

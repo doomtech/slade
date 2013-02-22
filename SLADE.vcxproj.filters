@@ -1077,6 +1077,9 @@
     <ClCompile Include="src\MapEditor.cpp">
       <Filter>Map Editor</Filter>
     </ClCompile>
+    <ClCompile Include="src\QuickTextureOverlay3d.cpp">
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1928,6 +1931,9 @@
     </ClInclude>
     <ClInclude Include="src\MapEditor.h">
       <Filter>Map Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QuickTextureOverlay3d.h">
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

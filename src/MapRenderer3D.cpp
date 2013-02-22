@@ -38,6 +38,8 @@ MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	this->n_quads = 0;
 	this->n_flats = 0;
 	this->flat_last = 0;
+	this->render_hilight = true;
+	this->render_selection = true;
 
 	// Build skybox circle
 	buildSkyCircle();
@@ -786,6 +788,9 @@ void MapRenderer3D::renderFlats() {
 }
 
 void MapRenderer3D::renderFlatSelection(vector<selection_3d_t>& selection, float alpha) {
+	if (!render_selection)
+		return;
+
 	// Setup gl stuff
 	glLineWidth(2.0f);
 	glDisable(GL_TEXTURE_2D);
@@ -1288,6 +1293,9 @@ void MapRenderer3D::renderWalls() {
 }
 
 void MapRenderer3D::renderWallSelection(vector<selection_3d_t>& selection, float alpha) {
+	if (!render_selection)
+		return;
+
 	// Setup gl stuff
 	glLineWidth(2.0f);
 	glDisable(GL_TEXTURE_2D);
@@ -1621,7 +1629,7 @@ void MapRenderer3D::renderThings() {
 
 void MapRenderer3D::renderThingSelection(vector<selection_3d_t>& selection, float alpha) {
 	// Do nothing if no things visible
-	if (render_3d_things == 0)
+	if (render_3d_things == 0 || !render_selection)
 		return;
 
 	// Setup gl stuff
@@ -2096,7 +2104,7 @@ selection_3d_t MapRenderer3D::determineHilight() {
 
 void MapRenderer3D::renderHilight(selection_3d_t hilight, float alpha) {
 	// Do nothing if no item hilighted
-	if (hilight.index < 0 || render_3d_hilight == 0)
+	if (hilight.index < 0 || render_3d_hilight == 0 || !render_hilight)
 		return;
 
 	// Setup gl stuff

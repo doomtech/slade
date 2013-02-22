@@ -52,6 +52,7 @@
 #include "Clipboard.h"
 #include "SectorSpecialDialog.h"
 #include "UndoRedo.h"
+#include "QuickTextureOverlay3d.h"
 
 
 /*******************************************************************
@@ -127,7 +128,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	overlay_current = NULL;
 	mouse_locked = false;
 	mouse_warp = false;
-	
+
 #ifdef USE_SFML_RENDERWINDOW
 #if SFML_VERSION_MAJOR < 2
 	UseVerticalSync(false);
@@ -857,21 +858,24 @@ void MapCanvas::drawMap3d() {
 	renderer_3d->renderMap();
 
 	// Determine hilight
-	selection_3d_t old_hl = editor->hilightItem3d();
-	selection_3d_t hl = renderer_3d->determineHilight();
-	if (editor->set3dHilight(hl)) {
-		// Update 3d info overlay
-		if (info_overlay_3d && hl.index >= 0) {
-			info_3d.update(hl.index, hl.type, &(editor->getMap()));
-			anim_info_show = true;
-		}
-		else
-			anim_info_show = false;
+	selection_3d_t hl;
+	if (!editor->hilightLocked()) {
+		selection_3d_t old_hl = editor->hilightItem3d();
+		hl = renderer_3d->determineHilight();
+		if (editor->set3dHilight(hl)) {
+			// Update 3d info overlay
+			if (info_overlay_3d && hl.index >= 0) {
+				info_3d.update(hl.index, hl.type, &(editor->getMap()));
+				anim_info_show = true;
+			}
+			else
+				anim_info_show = false;
 
-		// Animation
-		animations.push_back(new MCAHilightFade3D(theApp->runTimer(), old_hl.index, old_hl.type, renderer_3d, anim_flash_level));
-		anim_flash_inc = true;
-		anim_flash_level = 0.0f;
+			// Animation
+			animations.push_back(new MCAHilightFade3D(theApp->runTimer(), old_hl.index, old_hl.type, renderer_3d, anim_flash_level));
+			anim_flash_inc = true;
+			anim_flash_level = 0.0f;
+		}
 	}
 
 	// Draw selection if any
@@ -1201,6 +1205,10 @@ bool MapCanvas::update2d(double mult) {
 }
 
 bool MapCanvas::update3d(double mult) {
+	// Check if overlay active
+	if (overlayActive())
+		return true;
+
 	// --- Check for held-down keys ---
 	bool moving = false;
 
@@ -1596,6 +1604,7 @@ void MapCanvas::changeEditMode(int mode) {
 	else if (mode == MapEditor::MODE_THINGS)
 		theApp->toggleAction("mapw_mode_things");
 	else if (mode == MapEditor::MODE_3D) {
+		KeyBind::releaseAll();
 		lockMouse(true);
 		renderer_3d->refresh();
 	}
@@ -1734,7 +1743,7 @@ void MapCanvas::changeTexture3d(selection_3d_t first) {
 
 		// Begin undo level
 		editor->beginUndoRecord("Change Texture", true, false, false);
-		
+
 		// Apply to flats
 		vector<selection_3d_t>& selection = editor->get3dSelection();
 		if (mix || type == 1) {
@@ -1789,12 +1798,18 @@ void MapCanvas::onKeyBindPress(string name) {
 	// Check if an overlay is active
 	if (overlayActive()) {
 		// Accept edit
-		if (name == "map_edit_accept")
+		if (name == "map_edit_accept") {
 			overlay_current->close();
+			renderer_3d->enableHilight(true);
+			renderer_3d->enableSelection(true);
+		}
 
 		// Cancel edit
-		else if (name == "map_edit_cancel")
+		else if (name == "map_edit_cancel") {
 			overlay_current->close(true);
+			renderer_3d->enableHilight(true);
+			renderer_3d->enableSelection(true);
+		}
 
 		// Nothing else
 		return;
@@ -1815,7 +1830,7 @@ void MapCanvas::onKeyBindPress(string name) {
 	else if (name == "map_screenshot") {
 		// Capture shot
 		sf::Image shot = capture();
-		
+
 		// Remove alpha
 		// sf::Image kinda sucks, shouldn't have to do it like this
 		for (unsigned x = 0; x < shot.getSize().x; x++) {
@@ -1942,7 +1957,7 @@ void MapCanvas::keyBinds2d(string name) {
 			mouse_state = MSTATE_NORMAL;
 			editor->endTagEdit(true);
 		}
-		
+
 		// Cancel
 		else if (name == "map_edit_cancel") {
 			mouse_state = MSTATE_NORMAL;
@@ -1955,7 +1970,7 @@ void MapCanvas::keyBinds2d(string name) {
 			mouse_state = MSTATE_NORMAL;
 			editor->endTagEdit(true);
 		}
-		
+
 		// Cancel
 		else if (name == "map_edit_cancel") {
 			mouse_state = MSTATE_NORMAL;
@@ -2144,7 +2159,7 @@ void MapCanvas::keyBinds2d(string name) {
 			}
 		}
 
-		
+
 		// --- Sectors edit mode ---
 		else if (editor->editMode() == MapEditor::MODE_SECTORS) {
 			// Change sector texture
@@ -2240,6 +2255,49 @@ void MapCanvas::keyBinds3d(string name) {
 	else if (name == "me3d_toggle_info")
 		info_overlay_3d = !info_overlay_3d;
 
+	// Quick texture
+	else if (name == "me3d_quick_texture") {
+		if (overlay_current) delete overlay_current;
+		QuickTextureOverlay3d* qto = new QuickTextureOverlay3d(editor);
+		overlay_current = qto;
+
+/*
+		// Get hilight or first selected wall/flat
+		selection_3d_t item = editor->hilightItem3d();
+		if (item.index < 0 || item.type == MapEditor::SEL_THING) {
+			vector<selection_3d_t>& sel = editor->get3dSelection();
+			for (unsigned a = 0; a < sel.size(); a++) {
+				if (sel[a].index >= 0 && sel[a].type != MapEditor::SEL_THING) {
+					item = sel[a];
+					break;
+				}
+			}
+		}
+
+		// Get initial texture
+		if (item.index >= 0 && item.type != MapEditor::SEL_THING) {
+			string init_tex;
+
+			if (item.type == MapEditor::SEL_FLOOR)
+				init_tex = editor->getMap().getSector(item.index)->floorTexture();
+			else if (item.type == MapEditor::SEL_CEILING)
+				init_tex = editor->getMap().getSector(item.index)->ceilingTexture();
+			else if (item.type == MapEditor::SEL_SIDE_BOTTOM)
+				init_tex = editor->getMap().getSide(item.index)->stringProperty("texturebottom");
+			else if (item.type == MapEditor::SEL_SIDE_MIDDLE)
+				init_tex = editor->getMap().getSide(item.index)->stringProperty("texturemiddle");
+			else
+				init_tex = editor->getMap().getSide(item.index)->stringProperty("texturetop");
+
+			qto->setTexture(init_tex);
+		}
+*/
+
+		renderer_3d->enableHilight(false);
+		renderer_3d->enableSelection(false);
+		editor->lockHilight(true);
+	}
+
 	// Send to map editor
 	else
 		editor->handleKeyBind(name, mouse_pos_m);
@@ -2303,15 +2361,15 @@ bool MapCanvas::handleAction(string id) {
 	// 'Textured' flat type
 	else if (id == "mapw_flat_textured")
 		flat_drawtype = 2;
-		
+
 	// Normal sector edit mode
 	else if (id == "mapw_sectormode_normal")
 		editor->setSectorEditMode(MapEditor::SECTOR_BOTH);
-	
+
 	// Floors sector edit mode
 	else if (id == "mapw_sectormode_floor")
 		editor->setSectorEditMode(MapEditor::SECTOR_FLOOR);
-		
+
 	// Ceilings sector edit mode
 	else if (id == "mapw_sectormode_ceiling")
 		editor->setSectorEditMode(MapEditor::SECTOR_CEILING);
@@ -2507,12 +2565,12 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 	// Set current modifiers
 	modifiers_current = e.GetModifiers();
 
-	// Let keybind system handle it
-	KeyBind::keyPressed(KeyBind::asKeyPress(e.GetKeyCode(), e.GetModifiers()));
-
 	// Send to overlay if active
 	if (overlayActive())
 		overlay_current->keyDown(KeyBind::keyName(e.GetKeyCode()));
+
+	// Let keybind system handle it
+	KeyBind::keyPressed(KeyBind::asKeyPress(e.GetKeyCode(), e.GetModifiers()));
 
 	// Testing
 	if (e.GetKeyCode() == WXK_F6) {
@@ -2627,7 +2685,7 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 					mouse_state = MSTATE_NORMAL;
 				}
 			}
-			
+
 			// Shape drawing
 			else {
 				if (draw_state == DSTATE_SHAPE_ORIGIN) {
@@ -2810,23 +2868,25 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 		return;
 	}
 
+	// Check for 3d mode
+	if (editor->editMode() == MapEditor::MODE_3D && mouse_locked) {
+		if (!overlay_current || !overlayActive() || (overlay_current && overlay_current->allow3dMlook())) {
+			// Get relative mouse movement
+			double xrel = e.GetX() - int(GetSize().x * 0.5);
+			double yrel = e.GetY() - int(GetSize().y * 0.5);
+
+			renderer_3d->cameraTurn(xrel*0.1);
+			renderer_3d->cameraPitch(-yrel*0.003);
+
+			mouseToCenter();
+			fr_idle = 0;
+			return;
+		}
+	}
+
 	// Check if a full screen overlay is active
 	if (overlayActive()) {
 		overlay_current->mouseMotion(e.GetX(), e.GetY());
-		return;
-	}
-
-	// Check for 3d mode
-	if (editor->editMode() == MapEditor::MODE_3D && mouse_locked) {
-		// Get relative mouse movement
-		double xrel = e.GetX() - int(GetSize().x * 0.5);
-		double yrel = e.GetY() - int(GetSize().y * 0.5);
-
-		renderer_3d->cameraTurn(xrel*0.1);
-		renderer_3d->cameraPitch(-yrel*0.003);
-
-		mouseToCenter();
-		fr_idle = 0;
 		return;
 	}
 
@@ -2864,10 +2924,20 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 void MapCanvas::onMouseWheel(wxMouseEvent& e) {
 	if (e.GetWheelRotation() > 0) {
 		KeyBind::keyPressed(keypress_t("mwheelup", e.AltDown(), e.CmdDown(), e.ShiftDown()));
+
+		// Send to overlay if active
+		if (overlayActive())
+			overlay_current->keyDown("mwheelup");
+
 		KeyBind::keyReleased("mwheelup");
 	}
 	else if (e.GetWheelRotation() < 0) {
 		KeyBind::keyPressed(keypress_t("mwheeldown", e.AltDown(), e.CmdDown(), e.ShiftDown()));
+
+		// Send to overlay if active
+		if (overlayActive())
+			overlay_current->keyDown("mwheeldown");
+
 		KeyBind::keyReleased("mwheeldown");
 	}
 }
@@ -2905,13 +2975,13 @@ void MapCanvas::onIdle(wxIdleEvent& e) {
 void MapCanvas::onRTimer(wxTimerEvent& e) {
 	// Get time since last redraw
 	long frametime = (sfclock.GetElapsedTime() * 1000) - last_time;
-	
+
 	if (frametime > fr_idle) {
 		last_time = (sfclock.GetElapsedTime() * 1000);
 		update(frametime);
 		Refresh();
 	}
-	
+
 	timer.Start(-1, true);
 }
 #else

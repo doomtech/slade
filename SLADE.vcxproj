@@ -308,6 +308,7 @@
     <ClCompile Include="src\PNGPrefsPanel.cpp" />
     <ClCompile Include="src\Polygon2D.cpp" />
     <ClCompile Include="src\PreferencesDialog.cpp" />
+    <ClCompile Include="src\QuickTextureOverlay3d.cpp" />
     <ClCompile Include="src\ResArchive.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\RffArchive.cpp" />
@@ -581,6 +582,7 @@
     <ClInclude Include="src\Polygon2D.h" />
     <ClInclude Include="src\PreferencesDialog.h" />
     <ClInclude Include="src\PrefsPanelBase.h" />
+    <ClInclude Include="src\QuickTextureOverlay3d.h" />
     <ClInclude Include="src\ResArchive.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RffArchive.h" />

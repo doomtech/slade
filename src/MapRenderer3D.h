@@ -101,6 +101,8 @@ public:
 	void	enableFullbright(bool enable = true) { fullbright = enable; }
 	void	enableFog(bool enable = true) { fog = enable; }
 	int		itemDistance() { return item_dist; }
+	void	enableHilight(bool render) { render_hilight = render; }
+	void	enableSelection(bool render) { render_selection = render; }
 
 	bool	init();
 	void	refresh();
@@ -175,6 +177,8 @@ private:
 	unsigned	n_quads;
 	unsigned	n_flats;
 	int			flat_last;
+	bool		render_hilight;
+	bool		render_selection;
 
 	// Visibility
 	vector<float>	dist_sectors;

@@ -141,6 +141,7 @@ public:
 	vector<selection_3d_t>&	get3dSelection() { return selection_3d; }
 	bool					set3dHilight(selection_3d_t hl);
 	selection_3d_t			hilightItem3d() { return hilight_3d; }
+	void					get3dSelectionOrHilight(vector<selection_3d_t>& list);
 
 	void	setEditMode(int mode);
 	void	setSectorEditMode(int mode);
@@ -200,7 +201,7 @@ public:
 	int		beginTagEdit();
 	void	tagSectorAt(double x, double y);
 	void	endTagEdit(bool accept = true);
-	
+
 	// Object creation/deletion
 	void	createObject(double x, double y);
 	void	createVertex(double x, double y);

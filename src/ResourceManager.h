@@ -94,8 +94,10 @@ public:
 	void	getAllPatchEntries(vector<ArchiveEntry*>& list, Archive* priority);
 
 	void	getAllTextures(vector<TextureResource::tex_res_t>& list, Archive* priority, Archive* ignore = NULL);
+	void	getAllTextureNames(vector<string>& list);
 
 	void	getAllFlatEntries(vector<ArchiveEntry*>& list, Archive* priority);
+	void	getAllFlatNames(vector<string>& list);
 
 	ArchiveEntry*	getPaletteEntry(string palette, Archive* priority = NULL);
 	ArchiveEntry*	getPatchEntry(string patch, string nspace = "patches", Archive* priority = NULL);
