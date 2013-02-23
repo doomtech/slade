@@ -1,8 +1,9 @@
 
 #include "Main.h"
 #include "WxStuff.h"
-#include "ActionSpecialTreeView.h"
+#include "ActionSpecialDialog.h"
 #include "GameConfiguration.h"
+#include "GenLineSpecialPanel.h"
 
 ActionSpecialTreeView::ActionSpecialTreeView(wxWindow* parent) : wxDataViewTreeCtrl(parent, -1) {
 	parent_dialog = NULL;
@@ -112,24 +113,67 @@ void ActionSpecialTreeView::onItemActivated(wxDataViewEvent& e) {
 
 
 
-
-
-int ActionSpecialTreeView::showDialog(wxWindow* parent, int init) {
-	wxDialog dlg(parent, -1, "Action Special", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
-
+ActionSpecialDialog::ActionSpecialDialog(wxWindow* parent)
+: wxDialog(parent, -1, "Select Action Special", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
+	// Setup layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	dlg.SetSizer(sizer);
+	SetSizer(sizer);
 
-	ActionSpecialTreeView* astv = new ActionSpecialTreeView(&dlg);
-	astv->setParentDialog(&dlg);
-	sizer->Add(astv, 1, wxEXPAND|wxALL, 4);
-	sizer->Add(dlg.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxTOP|wxBOTTOM, 4);
-	if (init >= 0) astv->showSpecial(init);
+	// Boom (tabbed w/generalised tab)
+	if (theGameConfiguration->isBoom()) {
+		// Notebook (tabs)
+		nb_tabs = new wxNotebook(this, -1);
+		sizer->Add(nb_tabs, 1, wxEXPAND|wxALL, 4);
 
-	dlg.SetSize(400, 500);
-	dlg.CenterOnScreen();
-	if (dlg.ShowModal() == wxID_OK)
-		return astv->selectedSpecial();
+		// Action special tree page
+		tree_specials = new ActionSpecialTreeView(nb_tabs);
+		nb_tabs->AddPage(tree_specials, "Action Special", true);
+
+		// Boom generalised line special page
+		panel_gen_specials = new GenLineSpecialPanel(nb_tabs);
+		nb_tabs->AddPage(panel_gen_specials, "Generalised Special");
+	}
+	
+	// Non-Boom (no generalised tab)
+	else {
+		tree_specials = new ActionSpecialTreeView(this);
+		sizer->Add(tree_specials, 1, wxEXPAND|wxALL, 4);
+	}
+
+	// Add buttons
+	sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Init
+	SetInitialSize(wxSize(400, 500));
+	CenterOnParent();
+}
+
+ActionSpecialDialog::~ActionSpecialDialog() {
+}
+
+void ActionSpecialDialog::setSpecial(int special) {
+	// Check for boom generalised special
+	if (theGameConfiguration->isBoom()) {
+		if (panel_gen_specials->loadSpecial(special)) {
+			nb_tabs->SetSelection(1);
+			panel_gen_specials->SetFocus();
+			return;
+		}
+	}
+
+	// Regular action special
+	tree_specials->showSpecial(special);
+	tree_specials->SetFocus();
+	tree_specials->SetFocusFromKbd();
+}
+
+int ActionSpecialDialog::selectedSpecial() {
+	if (theGameConfiguration->isBoom()) {
+		if (nb_tabs->GetSelection() == 0)
+			return tree_specials->selectedSpecial();
+		else
+			return panel_gen_specials->getSpecial();
+	}
 	else
-		return -1;
+		return tree_specials->selectedSpecial();
 }

@@ -1,8 +1,9 @@
 
-#ifndef __ACTION_SPECIAL_TREE_VIEW_H__
-#define __ACTION_SPECIAL_TREE_VIEW_H__
+#ifndef __ACTION_SPECIAL_DIALOG_H__
+#define __ACTION_SPECIAL_DIALOG_H__
 
 #include <wx/dataview.h>
+#include <wx/notebook.h>
 
 class ActionSpecialTreeView : public wxDataViewTreeCtrl {
 private:
@@ -31,8 +32,21 @@ public:
 
 	void	onItemEdit(wxDataViewEvent& e);
 	void	onItemActivated(wxDataViewEvent& e);
-
-	static int showDialog(wxWindow* parent, int init = -1);
 };
 
-#endif//__ACTION_SPECIAL_TREE_VIEW_H__
+class GenLineSpecialPanel;
+class ActionSpecialDialog : public wxDialog {
+private:
+	wxNotebook*				nb_tabs;
+	ActionSpecialTreeView*	tree_specials;
+	GenLineSpecialPanel*	panel_gen_specials;
+
+public:
+	ActionSpecialDialog(wxWindow* parent);
+	~ActionSpecialDialog();
+
+	void	setSpecial(int special);
+	int		selectedSpecial();
+};
+
+#endif//__ACTION_SPECIAL_DIALOG_H__

@@ -48,7 +48,7 @@
 #include "SectorTextureOverlay.h"
 #include "LineTextureOverlay.h"
 #include "SectorBuilder.h"
-#include "ActionSpecialTreeView.h"
+#include "ActionSpecialDialog.h"
 #include "Clipboard.h"
 #include "SectorSpecialDialog.h"
 #include "UndoRedo.h"
@@ -2476,7 +2476,12 @@ bool MapCanvas::handleAction(string id) {
 
 		// Open action special selection dialog
 		if (selection.size() > 0) {
-			int as = ActionSpecialTreeView::showDialog(this, selection[0]->intProperty("special"));
+			int as = -1;
+			ActionSpecialDialog dlg(this);
+			dlg.setSpecial(selection[0]->getSpecial());
+			if (dlg.ShowModal() == wxID_OK)
+				as = dlg.selectedSpecial();
+
 			if (as >= 0) {
 				// Set specials
 				editor->beginUndoRecord("Change Line Special", true, false, false);

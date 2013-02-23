@@ -3,7 +3,7 @@
 #include "WxStuff.h"
 #include "MOPGProperty.h"
 #include "SLADEMap.h"
-#include "ActionSpecialTreeView.h"
+#include "ActionSpecialDialog.h"
 #include "ThingTypeTreeView.h"
 #include "GameConfiguration.h"
 #include "MapObjectPropsPanel.h"
@@ -313,7 +313,12 @@ wxString MOPGActionSpecialProperty::ValueToString(wxVariant &value, int argFlags
 
 bool MOPGActionSpecialProperty::OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) {
 	if (e.GetEventType() == wxEVT_COMMAND_BUTTON_CLICKED) {
-		int special = ActionSpecialTreeView::showDialog(window, GetValue().GetInteger());
+		int special = -1;
+		ActionSpecialDialog dlg(window);
+		dlg.setSpecial(GetValue().GetInteger());
+		if (dlg.ShowModal() == wxID_OK)
+			special = dlg.selectedSpecial();
+
 		if (special >= 0) SetValue(special);
 	}
 
