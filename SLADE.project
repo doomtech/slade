@@ -223,9 +223,9 @@
         <File Name="src/LineTextureOverlay.h"/>
         <File Name="src/InfoOverlay3d.cpp"/>
         <File Name="src/InfoOverlay3d.h"/>
+        <File Name="src/QuickTextureOverlay3d.cpp"/>
+        <File Name="src/QuickTextureOverlay3d.h"/>
       </VirtualDirectory>
-      <File Name="src/ActionSpecialTreeView.cpp"/>
-      <File Name="src/ActionSpecialTreeView.h"/>
       <File Name="src/ThingTypeTreeView.cpp"/>
       <File Name="src/ThingTypeTreeView.h"/>
       <VirtualDirectory Name="MapObjectPropsPanel">
@@ -244,6 +244,10 @@
       <File Name="src/ScriptEditorPanel.h"/>
       <File Name="src/SectorSpecialDialog.cpp"/>
       <File Name="src/SectorSpecialDialog.h"/>
+      <File Name="src/ActionSpecialDialog.cpp"/>
+      <File Name="src/ActionSpecialDialog.h"/>
+      <File Name="src/GenLineSpecialPanel.cpp"/>
+      <File Name="src/GenLineSpecialPanel.h"/>
     </VirtualDirectory>
     <File Name="src/MapEditorWindow.h"/>
     <File Name="src/MapEditorWindow.cpp"/>
