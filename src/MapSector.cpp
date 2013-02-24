@@ -324,6 +324,7 @@ void MapSector::connectSide(MapSide* side) {
 	connected_sides.push_back(side);
 	poly_needsupdate = true;
 	bbox.reset();
+	setModified();
 }
 
 void MapSector::disconnectSide(MapSide* side) {
@@ -334,6 +335,7 @@ void MapSector::disconnectSide(MapSide* side) {
 		}
 	}
 
+	setModified();
 	poly_needsupdate = true;
 	bbox.reset();
 }

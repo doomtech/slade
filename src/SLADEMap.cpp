@@ -250,18 +250,19 @@ void SLADEMap::refreshIndices() {
 }
 
 void SLADEMap::addMapObject(MapObject* object) {
-	map_objects[object->id].set(object, true);
+	all_objects.push_back(mobj_holder_t(object, true));
+	object->id = all_objects.size() - 1;
 	created_objects.push_back(object->id);
 }
 
 void SLADEMap::removeMapObject(MapObject* object) {
-	map_objects[object->id].in_map = false;
+	all_objects[object->id].in_map = false;
 	deleted_objects.push_back(object->id);
 }
 
 void SLADEMap::restoreObjectById(unsigned id) {
 	// Get map object to restore
-	MapObject* object = map_objects[id].mobj;
+	MapObject* object = all_objects[id].mobj;
 	if (!object) {
 		LOG_MESSAGE(2, S_FMT("restoreObjectById: Invalid object id %d", id));
 		return;
@@ -327,7 +328,7 @@ void SLADEMap::restoreObjectById(unsigned id) {
 
 void SLADEMap::removeObjectById(unsigned id) {
 	// Get map object to remove
-	MapObject* object = map_objects[id].mobj;
+	MapObject* object = all_objects[id].mobj;
 	if (!object) {
 		LOG_MESSAGE(2, S_FMT("removeObjectById: Invalid object id %d", id));
 		return;
@@ -2094,16 +2095,11 @@ void SLADEMap::clearMap() {
 	things.clear();
 
 	// Clear map objects
-	MObjMap::iterator i = map_objects.begin();
-	while (i != map_objects.end()) {
-		if (i->second.mobj)
-			delete i->second.mobj;
-		i++;
+	for (unsigned a = 0; a < all_objects.size(); a++) {
+		if (all_objects[a].mobj)
+			delete all_objects[a].mobj;
 	}
-	map_objects.clear();
-
-	// This will need to change if support for multiple maps is added
-	MapObject::resetIdCounter();
+	all_objects.clear();
 }
 
 bool SLADEMap::removeVertex(MapVertex* vertex) {
@@ -2910,11 +2906,9 @@ vector<MapObject*> SLADEMap::getModifiedObjects(long since, int type) {
 vector<MapObject*> SLADEMap::getAllModifiedObjects(long since) {
 	vector<MapObject*> modified_objects;
 
-	MObjMap::iterator i = map_objects.begin();
-	while (i != map_objects.end()) {
-		if (i->second.mobj && i->second.mobj->modifiedTime() >= since)
-			modified_objects.push_back(i->second.mobj);
-		i++;
+	for (unsigned a = 0; a < all_objects.size(); a++) {
+		if (all_objects[a].mobj && all_objects[a].mobj->modifiedTime() >= since)
+			modified_objects.push_back(all_objects[a].mobj);
 	}
 
 	return modified_objects;

@@ -190,6 +190,7 @@ public:
 	}
 
 	bool doRedo() {
+		LOG_MESSAGE(2, S_FMT("Restore %d objects", backups.size()));
 		for (unsigned a = 0; a < backups.size(); a++) {
 			MapObject* obj = UndoRedo::currentMap()->getObjectById(backups[a]->id);
 			if (obj) doSwap(obj, a);
@@ -3667,7 +3668,7 @@ void MapEditor::doUndo() {
 
 		// Refresh stuff
 		//updateTagged();
-		theMapEditor->forceRefresh(true);
+		//theMapEditor->forceRefresh(true);
 		last_undo_level = "";
 	}
 }
@@ -3683,7 +3684,7 @@ void MapEditor::doRedo() {
 
 		// Refresh stuff
 		//updateTagged();
-		theMapEditor->forceRefresh(true);
+		//theMapEditor->forceRefresh(true);
 		last_undo_level = "";
 	}
 }

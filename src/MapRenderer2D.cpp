@@ -1262,6 +1262,8 @@ void MapRenderer2D::renderFlats(int type, bool texture, float alpha) {
 		renderFlatsVBO(type, texture, alpha);
 	else
 		renderFlatsImmediate(type, texture, alpha);
+
+	flats_updated = theApp->runTimer();
 }
 
 bool sortPolyByTex(Polygon2D* left, Polygon2D* right) {
@@ -1295,7 +1297,7 @@ void MapRenderer2D::renderFlatsImmediate(int type, bool texture, float alpha) {
 			continue;
 
 		if (texture) {
-			if (!tex_flats[a]) {
+			if (!tex_flats[a] || sector->modifiedTime() > flats_updated) {
 				// Get the sector texture
 				if (type <= 1)
 					tex = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());
@@ -1425,7 +1427,7 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 
 		first = false;
 		if (texture) {
-			if (!tex_flats[a]) {
+			if (!tex_flats[a] || sector->modifiedTime() > flats_updated) {
 				// Get the sector texture
 				if (type <= 1)
 					tex = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());

@@ -6,7 +6,7 @@
 #include "MainApp.h"
 #include "Console.h"
 
-unsigned	current_id = 1;
+//unsigned	current_id = 1;
 long		prop_backup_time = -1;
 
 //testing
@@ -19,7 +19,7 @@ MapObject::MapObject(int type, SLADEMap* parent) {
 	this->index = 0;
 	this->filtered = false;
 	this->modified_time = theApp->runTimer();
-	this->id = current_id++;
+	this->id = 0;//current_id++;
 	this->obj_backup = NULL;
 
 	if (parent)
@@ -221,9 +221,9 @@ mobj_backup_t* MapObject::getBackup(bool remove) {
 	return bak;
 }
 
-void MapObject::resetIdCounter() {
-	current_id = 1;
-}
+//void MapObject::resetIdCounter() {
+//	current_id = 1;
+//}
 
 long MapObject::propBackupTime() {
 	return prop_backup_time;
@@ -237,9 +237,9 @@ void MapObject::endPropBackup() {
 	prop_backup_time = -1;
 }
 
-CONSOLE_COMMAND(m_next_id, 0, false) {
-	theConsole->logMessage(S_FMT("Next Object ID: %d", current_id));
-}
+//CONSOLE_COMMAND(m_next_id, 0, false) {
+//	theConsole->logMessage(S_FMT("Next Object ID: %d", current_id));
+//}
 
 //CONSOLE_COMMAND(mobj_check_deleted, 0) {
 //	theConsole->logMessage(S_FMT("Checking %d ids", all_objects.size()));

@@ -16,13 +16,14 @@ struct mobj_holder_t {
 	bool		in_map;
 
 	mobj_holder_t() { mobj = NULL; in_map = false; }
+	mobj_holder_t(MapObject* mobj, bool in_map) { this->mobj = mobj; this->in_map = in_map; }
 
 	void set(MapObject* object, bool in_map) {
 		this->mobj = object;
 		this->in_map = in_map;
 	}
 };
-WX_DECLARE_HASH_MAP(unsigned, mobj_holder_t, wxIntegerHash, wxIntegerEqual, MObjMap);
+//WX_DECLARE_HASH_MAP(unsigned, mobj_holder_t, wxIntegerHash, wxIntegerEqual, MObjMap);
 
 class ParseTreeNode;
 class SLADEMap {
@@ -39,9 +40,10 @@ private:
 	string				name;
 	int					current_format;
 
-	MObjMap				map_objects;
-	vector<unsigned>	deleted_objects;
-	vector<unsigned>	created_objects;
+	//MObjMap				map_objects;
+	vector<mobj_holder_t>	all_objects;
+	vector<unsigned>		deleted_objects;
+	vector<unsigned>		created_objects;
 
 	// The last time the map geometry was updated
 	long	geometry_updated;
@@ -133,7 +135,7 @@ public:
 	// MapObject id hashing stuff (used for undo/redo)
 	void				addMapObject(MapObject* object);
 	void				removeMapObject(MapObject* object);
-	MapObject*			getObjectById(unsigned id) { return map_objects[id].mobj; }
+	MapObject*			getObjectById(unsigned id) { return all_objects[id].mobj; }
 	void				clearCreatedObjectIds() { created_objects.clear(); }
 	vector<unsigned>&	createdObjectIds() { return created_objects; }
 	void				clearDeletedObjectIds() { deleted_objects.clear(); }
