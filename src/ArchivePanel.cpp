@@ -2800,3 +2800,23 @@ CONSOLE_COMMAND(vertexpsx, 0, false) {
 	}
 }
 
+CONSOLE_COMMAND(lightspsxtopalette, 0, false) {
+	ArchivePanel * meep = CH::getCurrentArchivePanel();
+	if (meep)
+	{
+		// Get the entry index of the last selected list item
+		ArchiveEntry* lights = meep->currentEntry();
+		const uint8_t * source = lights->getData(true);
+		size_t entries = lights->getSize() / 4;
+		uint8_t * dest = new uint8_t[entries * 3];
+		for (size_t i = 0; i < entries; ++i)
+		{
+			dest[3*i+0] = source[4*i+0];
+			dest[3*i+1] = source[4*i+1];
+			dest[3*i+2] = source[4*i+2];
+		}
+		lights->importMem(dest, entries * 3);
+		theActivePanel->callRefresh();
+		delete[] dest;
+	}
+}

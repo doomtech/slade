@@ -136,7 +136,7 @@ z_mapinfo {
 		OldFallingDamage, ForceFallingDamage, NoFallingDamage, Gravity, AirControl, AirSupply, FilterStarts,
 		NoInventoryBar, KeepFullInventory, EnterText, ExitText, Music, Flat, Hub, Pic, ExitTextIsLump, NoAllies,
 		SuckTime, DeathSlideShow, Redirect, StrifeFallingDamage, IronLichSpecial, MinotaurSpecial, DsparilSpecial,
-		DefaultEnvironment,
+		DefaultEnvironment, SpawnWithWeaponRaised, 
 
 		// GZDoom
 		FogDensity, OutsideFogDensity, SkyFog, LightMode, NoColoredSpriteLighting, SkyRotate,
@@ -155,7 +155,7 @@ z_mapinfo {
 		DefaultRespawnTime, DefaultDropStyle, Endoom, Player5Start, PickupColor, QuitMessages, MenuFontColor_Title,
 		MenuFontColor_Label, MenuFontColor_Value, MenuFontColor_Action, MenuFontColor_Header, MenuFontColor_Highlight,
 		MenuFontColor_Selection, MenuBackButton, PlayerClasses, PauseSign, GibFactor, CursorPic, SwapMenu, TextScreenX,
-		TextScreenY, DefaultEndSequence, MapArrow,
+		TextScreenY, DefaultEndSequence, MapArrow, NoRandomPlayerclass, 
 
 		// Intermission definitions
 		Intermission, Link, Cast, Fader, GotoTitle, Image, Scroller, TextScreen, Wiper, Background, CDMusic, Draw,
