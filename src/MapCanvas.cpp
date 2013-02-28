@@ -60,7 +60,7 @@
  *******************************************************************/
 CVAR(Int, things_always, 2, CVAR_SAVE)
 CVAR(Int, vertices_always, 0, CVAR_SAVE)
-CVAR(Bool, line_tabs_always, 0, CVAR_SAVE)
+CVAR(Bool, line_tabs_always, 1, CVAR_SAVE)
 CVAR(Bool, flat_fade, 1, CVAR_SAVE)
 CVAR(Bool, line_fade, 0, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)

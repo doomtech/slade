@@ -225,7 +225,7 @@ public:
 	// 3d mode
 	void	selectAdjacent3d(selection_3d_t item);
 	void	changeSectorLight3d(int amount);
-	void	changeWallOffset3d(int amount, bool x);
+	void	changeOffset3d(int amount, bool x);
 	void	changeSectorHeight3d(int amount);
 	void	autoAlignX3d(selection_3d_t start);
 	void	resetWall3d();
@@ -234,6 +234,7 @@ public:
 	void	paste3d(int type);
 	void	changeThingZ3d(int amount);
 	void	deleteThing3d();
+	void	changeScale3d(double amount, bool x);
 
 	// Editor messages
 	unsigned	numEditorMessages();

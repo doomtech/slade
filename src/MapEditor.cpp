@@ -2825,16 +2825,16 @@ void MapEditor::changeSectorLight3d(int amount) {
 	}
 }
 
-void MapEditor::changeWallOffset3d(int amount, bool x) {
+void MapEditor::changeOffset3d(int amount, bool x) {
 	// Get items to process
 	vector<selection_3d_t> items;
 	if (selection_3d.empty()) {
-		if (hilight_3d.index >= 0 && hilight_3d.type >= SEL_SIDE_TOP && hilight_3d.type <= SEL_SIDE_BOTTOM)
+		if (hilight_3d.index >= 0 && hilight_3d.type != SEL_THING)
 			items.push_back(hilight_3d);
 	}
 	else {
 		for (unsigned a = 0; a < selection_3d.size(); a++) {
-			if (selection_3d[a].type >= SEL_SIDE_TOP && selection_3d[a].type <= SEL_SIDE_BOTTOM)
+			if (selection_3d[a].type != SEL_THING)
 				items.push_back(selection_3d[a]);
 		}
 	}
@@ -2842,55 +2842,85 @@ void MapEditor::changeWallOffset3d(int amount, bool x) {
 		return;
 
 	// Begin undo level
-	beginUndoRecordLocked("Change Wall Offset", true, false, false);
+	beginUndoRecordLocked("Change Offset", true, false, false);
 
 	// Go through items
 	vector<int> done;
+	bool udmf_ext = (map.currentFormat() == MAP_UDMF && theGameConfiguration->udmfNamespace() == "zdoom");
 	for (unsigned a = 0; a < items.size(); a++) {
-		MapSide* side = map.getSide(items[a].index);
+		// Wall
+		if (items[a].type >= SEL_SIDE_TOP && items[a].type <= SEL_SIDE_BOTTOM) {
+			MapSide* side = map.getSide(items[a].index);
 
-		// If offsets are linked, just change the whole side offset
-		if (link_3d_offset) {
-			// Check we haven't processed this side already
-			bool d = false;
-			for (unsigned b = 0; b < done.size(); b++) {
-				if (done[b] == items[a].index) {
-					d = true;
-					break;
+			// If offsets are linked, just change the whole side offset
+			if (link_3d_offset) {
+				// Check we haven't processed this side already
+				bool d = false;
+				for (unsigned b = 0; b < done.size(); b++) {
+					if (done[b] == items[a].index) {
+						d = true;
+						break;
+					}
 				}
-			}
-			if (d)
-				continue;
+				if (d)
+					continue;
 
-			// Change the appropriate offset
-			if (x) {
-				int offset = side->intProperty("offsetx");
-				side->setIntProperty("offsetx", offset + amount);
+				// Change the appropriate offset
+				if (x) {
+					int offset = side->intProperty("offsetx");
+					side->setIntProperty("offsetx", offset + amount);
+				}
+				else {
+					int offset = side->intProperty("offsety");
+					side->setIntProperty("offsety", offset + amount);
+				}
+
+				// Add to done list
+				done.push_back(items[a].index);
 			}
+
+			// Unlinked offsets
 			else {
-				int offset = side->intProperty("offsety");
-				side->setIntProperty("offsety", offset + amount);
-			}
+				// Build property string (offset[x/y]_[top/mid/bottom])
+				string ofs = "offsetx";
+				if (!x) ofs = "offsety";
+				if (items[a].type == SEL_SIDE_BOTTOM)
+					ofs += "_bottom";
+				else if (items[a].type == SEL_SIDE_TOP)
+					ofs += "_top";
+				else
+					ofs += "_mid";
 
-			// Add to done list
-			done.push_back(items[a].index);
+				// Change the offset
+				int offset = side->floatProperty(ofs);
+				side->setFloatProperty(ofs, offset + amount);
+			}
 		}
 
-		// Unlinked offsets
-		else {
-			// Build property string (offset[x/y]_[top/mid/bottom])
-			string ofs = "offsetx";
-			if (!x) ofs = "offsety";
-			if (items[a].type == SEL_SIDE_BOTTOM)
-				ofs += "_bottom";
-			else if (items[a].type == SEL_SIDE_TOP)
-				ofs += "_top";
-			else
-				ofs += "_mid";
+		// Flat (UDMF+ZDoom only)
+		else if (udmf_ext) {
+			MapSector* sector = map.getSector(items[a].index);
 
-			// Change the offset
-			int offset = side->floatProperty(ofs);
-			side->setFloatProperty(ofs, offset + amount);
+			if (items[a].type == SEL_FLOOR) {
+				if (x) {
+					double offset = sector->floatProperty("xpanningfloor");
+					sector->setFloatProperty("xpanningfloor", offset + amount);
+				}
+				else {
+					double offset = sector->floatProperty("ypanningfloor");
+					sector->setFloatProperty("ypanningfloor", offset + amount);
+				}
+			}
+			else if (items[a].type == SEL_CEILING) {
+				if (x) {
+					double offset = sector->floatProperty("xpanningceiling");
+					sector->setFloatProperty("xpanningceiling", offset + amount);
+				}
+				else {
+					double offset = sector->floatProperty("ypanningceiling");
+					sector->setFloatProperty("ypanningceiling", offset + amount);
+				}
+			}
 		}
 	}
 
@@ -3381,6 +3411,68 @@ void MapEditor::deleteThing3d() {
 	}
 }
 
+void MapEditor::changeScale3d(double amount, bool x) {
+	// Get items to process
+	vector<selection_3d_t> items;
+	if (selection_3d.empty()) {
+		if (hilight_3d.index >= 0 && hilight_3d.type != SEL_THING)
+			items.push_back(hilight_3d);
+	}
+	else {
+		for (unsigned a = 0; a < selection_3d.size(); a++) {
+			if (selection_3d[a].type != SEL_THING)
+				items.push_back(selection_3d[a]);
+		}
+	}
+	if (items.empty())
+		return;
+
+	// Begin undo level
+	beginUndoRecordLocked("Change Scale", true, false, false);
+
+	// Go through selection
+	for (unsigned a = 0; a < items.size(); a++) {
+		// Wall
+		if (items[a].type >= SEL_SIDE_TOP && items[a].type <= SEL_SIDE_BOTTOM) {
+			MapSide* side = map.getSide(items[a].index);
+
+			// Build property string (offset[x/y]_[top/mid/bottom])
+			string ofs = "scalex";
+			if (!x) ofs = "scaley";
+			if (items[a].type == SEL_SIDE_BOTTOM)
+				ofs += "_bottom";
+			else if (items[a].type == SEL_SIDE_TOP)
+				ofs += "_top";
+			else
+				ofs += "_mid";
+
+			// Change the offset
+			double scale = side->floatProperty(ofs);
+			if (scale + amount > 0)
+				side->setFloatProperty(ofs, scale + amount);
+		}
+
+		// Flat (UDMF+ZDoom only)
+		else {
+			MapSector* sector = map.getSector(items[a].index);
+
+			// Build property string
+			string prop = x ? "xpanning" : "ypanning";
+			prop += (items[a].type == SEL_FLOOR) ? "floor" : "ceiling";
+
+			// Set
+			double scale = sector->floatProperty(prop);
+			if (scale + amount > 0)
+				sector->setFloatProperty(prop, scale + amount);
+		}
+	}
+
+	// End undo record
+	endUndoRecord(true);
+
+	// Editor message
+}
+
 #pragma endregion
 
 #pragma region EDITOR MESSAGES
@@ -3542,15 +3634,15 @@ bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 		else if (key == "me3d_light_down16")	changeSectorLight3d(-16);
 		else if (key == "me3d_light_down")		changeSectorLight3d(-1);
 
-		// Wall offset changes
-		else if	(key == "me3d_wall_xoff_up8")	changeWallOffset3d(8, true);
-		else if	(key == "me3d_wall_xoff_up")	changeWallOffset3d(1, true);
-		else if	(key == "me3d_wall_xoff_down8")	changeWallOffset3d(-8, true);
-		else if	(key == "me3d_wall_xoff_down")	changeWallOffset3d(-1, true);
-		else if	(key == "me3d_wall_yoff_up8")	changeWallOffset3d(8, false);
-		else if	(key == "me3d_wall_yoff_up")	changeWallOffset3d(1, false);
-		else if	(key == "me3d_wall_yoff_down8")	changeWallOffset3d(-8, false);
-		else if	(key == "me3d_wall_yoff_down")	changeWallOffset3d(-1, false);
+		// Wall/Flat offset changes
+		else if	(key == "me3d_xoff_up8")	changeOffset3d(8, true);
+		else if	(key == "me3d_xoff_up")		changeOffset3d(1, true);
+		else if	(key == "me3d_xoff_down8")	changeOffset3d(-8, true);
+		else if	(key == "me3d_xoff_down")	changeOffset3d(-1, true);
+		else if	(key == "me3d_yoff_up8")	changeOffset3d(8, false);
+		else if	(key == "me3d_yoff_up")		changeOffset3d(1, false);
+		else if	(key == "me3d_yoff_down8")	changeOffset3d(-8, false);
+		else if	(key == "me3d_yoff_down")	changeOffset3d(-1, false);
 
 		// Height changes
 		else if	(key == "me3d_flat_height_up8")		changeSectorHeight3d(8);
@@ -3563,6 +3655,16 @@ bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 		else if (key == "me3d_thing_up8")	changeThingZ3d(8);
 		else if (key == "me3d_thing_down")	changeThingZ3d(-1);
 		else if (key == "me3d_thing_down8")	changeThingZ3d(-8);
+
+		// Wall/Flat scale changes
+		else if (key == "me3d_scalex_up_l" && ext) changeScale3d(1, true);
+		else if (key == "me3d_scalex_up_s" && ext) changeScale3d(0.1, true);
+		else if (key == "me3d_scalex_down_l" && ext) changeScale3d(-1, true);
+		else if (key == "me3d_scalex_down_s" && ext) changeScale3d(-0.1, true);
+		else if (key == "me3d_scaley_up_l" && ext) changeScale3d(1, false);
+		else if (key == "me3d_scaley_up_s" && ext) changeScale3d(0.1, false);
+		else if (key == "me3d_scaley_down_l" && ext) changeScale3d(-1, false);
+		else if (key == "me3d_scaley_down_s" && ext) changeScale3d(-0.1, false);
 
 		// Auto-align
 		else if (key == "me3d_wall_autoalign_x")

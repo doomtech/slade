@@ -9,11 +9,11 @@
 #include "ResourceManager.h"
 #include "MainWindow.h"
 
-CVAR(Float, render_max_dist, -1, CVAR_SAVE)
-CVAR(Float, render_max_thing_dist, 3000, CVAR_SAVE)
+CVAR(Float, render_max_dist, 2000, CVAR_SAVE)
+CVAR(Float, render_max_thing_dist, 2000, CVAR_SAVE)
 CVAR(Int, render_thing_icon_size, 16, CVAR_SAVE)
 CVAR(Bool, render_fog_quality, true, CVAR_SAVE)
-CVAR(Bool, render_max_dist_adaptive, true, CVAR_SAVE)
+CVAR(Bool, render_max_dist_adaptive, false, CVAR_SAVE)
 CVAR(Int, render_adaptive_ms, 15, CVAR_SAVE)
 CVAR(Bool, render_3d_sky, true, CVAR_SAVE)
 CVAR(Int, render_3d_things, 1, CVAR_SAVE)

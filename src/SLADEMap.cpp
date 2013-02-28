@@ -1278,16 +1278,6 @@ bool SLADEMap::addLine(ParseTreeNode* def) {
 	// Create new line
 	MapLine* nl = new MapLine(vertices[v1], vertices[v2], sides[s1], side2, this);
 
-	// Set some reasonable defaults
-	/*
-	nl->prop("special") = 0;
-	nl->prop("arg0") = 0;
-	nl->prop("arg1") = 0;
-	nl->prop("arg2") = 0;
-	nl->prop("arg3") = 0;
-	nl->prop("arg4") = 0;
-	*/
-
 	// Add extra line info
 	ParseTreeNode* prop = NULL;
 	for (unsigned a = 0; a < def->nChildren(); a++) {
@@ -1297,7 +1287,10 @@ bool SLADEMap::addLine(ParseTreeNode* def) {
 		if (prop == prop_v1 || prop == prop_v2 || prop == prop_s1 || prop == prop_s2)
 			continue;
 
-		nl->properties[prop->getName()] = prop->getValue();
+		if (prop->getName() == "special")
+			nl->special = prop->getIntValue();
+		else
+			nl->properties[prop->getName()] = prop->getValue();
 	}
 
 	// Add line to map
@@ -2008,6 +2001,8 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 		tempfile.Write(S_FMT("v1=%d;\nv2=%d;\nsidefront=%d;\n", lines[a]->v1Index(), lines[a]->v2Index(), lines[a]->s1Index()));
 		if (lines[a]->s2())
 			tempfile.Write(S_FMT("sideback=%d;\n", lines[a]->s2Index()));
+		if (lines[a]->special > 0)
+			tempfile.Write(S_FMT("special=%d;\n", lines[a]->special));
 
 		// Remove internal 'flags' property if it exists
 		lines[a]->props().removeProperty("flags");

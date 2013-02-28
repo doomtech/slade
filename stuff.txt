@@ -23,29 +23,25 @@ TODO List ---------------------------------------------------------------
 	- Overlapping lines
 - 3d mode
 	- Auto-align Y
-	- Thing z height editing
 	- Offsets/scaling copy+paste
-	- Flat offset/scale editing (udmf+zdoom)
+	- Wall/flat scaling
 	- Better vis checking
 	- (Z)MAPINFO parsing for sky texture
 - Editing:
 	- Proper UDMF/Hexen/Doom64 Map saving (BEHAVIOR, SCRIPTS, DIALOGUE, LIGHTS, MACROS, etc.)
-	- Generalised sector and line specials
 	- Rotate/scale objects ('edit' mode similar to db2 would be nice, perhaps not a mode though)
 	- Proper split/merge checks on paste lines
-	- Sector specials selection dialog for property list
-	- Find new tag (/ use last tag)
 - Script editor
 - Better UDMF property handling, proper support for unknown properties read with the map
 - (Possibly) better line/thing flag handling
-- 'Tag edit' mode
 - Optimise Polygon2D splitting somehow, it creates many unneeded splits
-- Undo/Redo for map editor stuff
 
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
 - Incorrect ctrl+tab behaviour with tabs
+- Focus find+replace window on opening it
+- Esc to close find+replace window
 
 --- Editor Features ---
 - Generic entry data view (for VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, DEMO*, TEXTUREX/PNAMES, ...)

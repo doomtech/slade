@@ -510,16 +510,30 @@ void KeyBind::initBinds() {
 	addBind("me3d_light_down", keypress_t(";", KPM_SHIFT), "Sector light level down 1", group);
 	addBind("me3d_light_toggle_link", keypress_t("L", KPM_CTRL), "Toggle linked flat light levels", group);
 
+	// Map Editor 3D Offsets (me3d_xoff*, me3d_yoff*)
+	group = "Map Editor 3D Mode Offsets";
+	addBind("me3d_xoff_up8", keypress_t("num_4"), "X offset up 8", group);
+	addBind("me3d_xoff_up", keypress_t("num_left"), "X offset up 1", group);
+	addBind("me3d_xoff_down8", keypress_t("num_6"), "X offset down 8", group);
+	addBind("me3d_xoff_down", keypress_t("num_right"), "X offset down 1", group);
+	addBind("me3d_yoff_up8", keypress_t("num_8"), "Y offset up 8", group);
+	addBind("me3d_yoff_up", keypress_t("num_up"), "Y offset up 1", group);
+	addBind("me3d_yoff_down8", keypress_t("num_2"), "Y offset down 8", group);
+	addBind("me3d_yoff_down", keypress_t("num_down"), "Y offset down 1", group);
+
+	// Map Editor 3D Scaling (me3d_scale*)
+	group = "Map Editor 3D Mode Scaling";
+	addBind("me3d_scalex_up_l", keypress_t("num_4", KPM_CTRL), "X scale up (large)", group);
+	addBind("me3d_scalex_up_s", keypress_t("num_left", KPM_CTRL), "X scale up (small)", group);
+	addBind("me3d_scalex_down_l", keypress_t("num_6", KPM_CTRL), "X scale down (large)", group);
+	addBind("me3d_scalex_down_s", keypress_t("num_right", KPM_CTRL), "X scale down (small)", group);
+	addBind("me3d_scaley_up_l", keypress_t("num_8", KPM_CTRL), "Y scale up (large)", group);
+	addBind("me3d_scaley_up_s", keypress_t("num_up", KPM_CTRL), "Y scale up (small)", group);
+	addBind("me3d_scaley_down_l", keypress_t("num_2", KPM_CTRL), "Y scale down (large)", group);
+	addBind("me3d_scaley_down_s", keypress_t("num_down", KPM_CTRL), "Y scale down (small)", group);
+
 	// Map Editor 3D Walls (me3d_wall*)
 	group = "Map Editor 3D Mode Walls";
-	addBind("me3d_wall_xoff_up8", keypress_t("num_4"), "X offset up 8", group);
-	addBind("me3d_wall_xoff_up", keypress_t("num_left"), "X offset up 1", group);
-	addBind("me3d_wall_xoff_down8", keypress_t("num_6"), "X offset down 8", group);
-	addBind("me3d_wall_xoff_down", keypress_t("num_right"), "X offset down 1", group);
-	addBind("me3d_wall_yoff_up8", keypress_t("num_8"), "Y offset up 8", group);
-	addBind("me3d_wall_yoff_up", keypress_t("num_up"), "Y offset up 1", group);
-	addBind("me3d_wall_yoff_down8", keypress_t("num_2"), "Y offset down 8", group);
-	addBind("me3d_wall_yoff_down", keypress_t("num_down"), "Y offset down 1", group);
 	addBind("me3d_wall_toggle_link_ofs", keypress_t("O", KPM_CTRL), "Toggle linked wall offsets", group);
 	addBind("me3d_wall_autoalign_x", keypress_t("A", KPM_CTRL), "Auto-align textures on X", group);
 	addBind("me3d_wall_reset", keypress_t("R"), "Reset wall (offsets and scaling)", group);
