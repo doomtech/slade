@@ -1223,6 +1223,13 @@ bool SLADEMap::addSide(ParseTreeNode* def) {
 	// Create new side
 	MapSide* ns = new MapSide(sectors[sector], this);
 
+	// Set defaults
+	ns->offset_x = 0;
+	ns->offset_y = 0;
+	ns->tex_upper = "-";
+	ns->tex_middle = "-";
+	ns->tex_lower = "-";
+
 	// Add extra side info
 	ParseTreeNode* prop = NULL;
 	for (unsigned a = 0; a < def->nChildren(); a++) {
@@ -1280,6 +1287,9 @@ bool SLADEMap::addLine(ParseTreeNode* def) {
 	// Create new line
 	MapLine* nl = new MapLine(vertices[v1], vertices[v2], sides[s1], side2, this);
 
+	// Set defaults
+	nl->special = 0;
+
 	// Add extra line info
 	ParseTreeNode* prop = NULL;
 	for (unsigned a = 0; a < def->nChildren(); a++) {
@@ -1311,6 +1321,13 @@ bool SLADEMap::addSector(ParseTreeNode* def) {
 	// Create new sector
 	MapSector* ns = new MapSector(prop_ftex->getStringValue(), prop_ctex->getStringValue(), this);
 
+	// Set defaults
+	ns->f_height = 0;
+	ns->c_height = 0;
+	ns->light = 160;
+	ns->special = 0;
+	ns->tag = 0;
+
 	// Add extra sector info
 	ParseTreeNode* prop = NULL;
 	for (unsigned a = 0; a < def->nChildren(); a++) {
@@ -1328,10 +1345,10 @@ bool SLADEMap::addSector(ParseTreeNode* def) {
 			ns->light = prop->getIntValue();
 		else if (S_CMPNOCASE(prop->getName(), "special"))
 			ns->special = prop->getIntValue();
-		else if (S_CMPNOCASE(prop->getName(), "tag"))
+		else if (S_CMPNOCASE(prop->getName(), "id"))
 			ns->tag = prop->getIntValue();
-
-		ns->properties[prop->getName()] = prop->getValue();
+		else
+			ns->properties[prop->getName()] = prop->getValue();
 	}
 
 	// Add sector to map
@@ -1980,11 +1997,12 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 	//sf::Clock clock;
 
 	// Write things
+	string object_def;
 	for (unsigned a = 0; a < things.size(); a++) {
-		tempfile.Write(S_FMT("thing//#%d\n{\n", a));
+		object_def = S_FMT("thing//#%d\n{\n", a);
 
 		// Basic properties
-		tempfile.Write(S_FMT("x=%1.3f;\ny=%1.3f;\ntype=%d;\n", things[a]->x, things[a]->y, things[a]->type));
+		object_def += S_FMT("x=%1.3f;\ny=%1.3f;\ntype=%d;\n", things[a]->x, things[a]->y, things[a]->type);
 
 		// Remove internal 'flags' property if it exists
 		things[a]->props().removeProperty("flags");
@@ -1992,10 +2010,11 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 		// Other properties
 		if (!things[a]->properties.isEmpty()) {
 			theGameConfiguration->cleanObjectUDMFProps(things[a]);
-			tempfile.Write(things[a]->properties.toString(true));
+			object_def += things[a]->properties.toString(true);
 		}
 
-		tempfile.Write("}\n\n");
+		object_def += "}\n\n";
+		tempfile.Write(object_def);
 	}
 	//wxLogMessage("Writing things took %dms", clock.getElapsedTime().asMilliseconds());
 
@@ -2008,7 +2027,7 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 		tempfile.Write(S_FMT("v1=%d;\nv2=%d;\nsidefront=%d;\n", lines[a]->v1Index(), lines[a]->v2Index(), lines[a]->s1Index()));
 		if (lines[a]->s2())
 			tempfile.Write(S_FMT("sideback=%d;\n", lines[a]->s2Index()));
-		if (lines[a]->special > 0)
+		if (lines[a]->special != 0)
 			tempfile.Write(S_FMT("special=%d;\n", lines[a]->special));
 
 		// Remove internal 'flags' property if it exists
@@ -2027,61 +2046,72 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 	// Write sides
 	//clock.restart();
 	for (unsigned a = 0; a < sides.size(); a++) {
-		tempfile.Write(S_FMT("sidedef//#%d\n{\n", a));
+		object_def = S_FMT("sidedef//#%d\n{\n", a);
 
 		// Basic properties
-		tempfile.Write(S_FMT("sector=%d;\n", sides[a]->sector->getIndex()));
+		object_def += S_FMT("sector=%d;\n", sides[a]->sector->getIndex());
 		if (sides[a]->tex_upper != "-")
-			tempfile.Write(S_FMT("texturetop=\"%s\";\n", CHR(sides[a]->tex_upper)));
+			object_def += S_FMT("texturetop=\"%s\";\n", CHR(sides[a]->tex_upper));
 		if (sides[a]->tex_middle != "-")
-			tempfile.Write(S_FMT("texturemiddle=\"%s\";\n", CHR(sides[a]->tex_middle)));
+			object_def += S_FMT("texturemiddle=\"%s\";\n", CHR(sides[a]->tex_middle));
 		if (sides[a]->tex_lower != "-")
-			tempfile.Write(S_FMT("texturebottom=\"%s\";\n", CHR(sides[a]->tex_lower)));
+			object_def += S_FMT("texturebottom=\"%s\";\n", CHR(sides[a]->tex_lower));
+		if (sides[a]->offset_x != 0)
+			object_def += S_FMT("offsetx=%d;\n", sides[a]->offset_x);
+		if (sides[a]->offset_y != 0)
+			object_def += S_FMT("offsety=%d;\n", sides[a]->offset_y);
 
 		// Other properties
 		if (!sides[a]->properties.isEmpty()) {
 			theGameConfiguration->cleanObjectUDMFProps(sides[a]);
-			tempfile.Write(sides[a]->properties.toString(true));
+			object_def += sides[a]->properties.toString(true);
 		}
 
-		tempfile.Write("}\n\n");
+		object_def += "}\n\n";
+		tempfile.Write(object_def);
 	}
 	//wxLogMessage("Writing sides took %dms", clock.getElapsedTime().asMilliseconds());
 
 	// Write vertices
 	//clock.restart();
 	for (unsigned a = 0; a < vertices.size(); a++) {
-		tempfile.Write(S_FMT("vertex//#%d\n{\n", a));
+		object_def = S_FMT("vertex//#%d\n{\n", a);
 
 		// Basic properties
-		tempfile.Write(S_FMT("x=%1.3f;\ny=%1.3f;\n", vertices[a]->x, vertices[a]->y));
+		object_def += S_FMT("x=%1.3f;\ny=%1.3f;\n", vertices[a]->x, vertices[a]->y);
 
 		// Other properties
 		if (!vertices[a]->properties.isEmpty()) {
 			theGameConfiguration->cleanObjectUDMFProps(vertices[a]);
-			tempfile.Write(vertices[a]->properties.toString(true));
+			object_def += vertices[a]->properties.toString(true);
 		}
 
-		tempfile.Write("}\n\n");
+		object_def += "}\n\n";
+		tempfile.Write(object_def);
 	}
 	//wxLogMessage("Writing vertices took %dms", clock.getElapsedTime().asMilliseconds());
 
 	// Write sectors
 	//clock.restart();
 	for (unsigned a = 0; a < sectors.size(); a++) {
-		tempfile.Write(S_FMT("sector//#%d\n{\n", a));
+		object_def = S_FMT("sector//#%d\n{\n", a);
 
 		// Basic properties
-		tempfile.Write(S_FMT("texturefloor=\"%s\";\ntextureceiling=\"%s\";\nheightfloor=%d;\nheightceiling=%d;\nlightlevel=%d;\nspecial=%d;\nid=%d;\n",
-						CHR(sectors[a]->f_tex), CHR(sectors[a]->c_tex), sectors[a]->f_height, sectors[a]->c_height, sectors[a]->light, sectors[a]->special, sectors[a]->tag));
+		object_def += S_FMT("texturefloor=\"%s\";\ntextureceiling=\"%s\";", CHR(sectors[a]->f_tex), CHR(sectors[a]->c_tex));
+		if (sectors[a]->f_height != 0) object_def += S_FMT("heightfloor=%d;\n", sectors[a]->f_height);
+		if (sectors[a]->c_height != 0) object_def += S_FMT("heightceiling=%d;\n", sectors[a]->c_height);
+		if (sectors[a]->light != 0) object_def += S_FMT("lightlevel=%d;\n", sectors[a]->light);
+		if (sectors[a]->special != 0) object_def += S_FMT("special=%d;\n", sectors[a]->special);
+		if (sectors[a]->tag != 0) object_def += S_FMT("id=%d;\n", sectors[a]->tag);
 
 		// Other properties
 		if (!sectors[a]->properties.isEmpty()) {
 			theGameConfiguration->cleanObjectUDMFProps(sectors[a]);
-			tempfile.Write(sectors[a]->properties.toString(true));
+			object_def += sectors[a]->properties.toString(true);
 		}
 
-		tempfile.Write("}\n\n");
+		object_def += "}\n\n";
+		tempfile.Write(object_def);
 	}
 	//wxLogMessage("Writing sectors took %dms", clock.getElapsedTime().asMilliseconds());
 

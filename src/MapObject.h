@@ -51,7 +51,7 @@ public:
 	void		setModified();
 
 	PropertyList&	props()				{ return properties; }
-	bool			hasProp(string key)	{ return properties.propertyExists(key); }
+	bool			hasProp(string key)	{ return properties[key].hasValue(); }
 
 	// Generic property modification
 	virtual bool	boolProperty(string key);
