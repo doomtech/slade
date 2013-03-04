@@ -4,7 +4,6 @@
  *******************************************************************/
 #include "Main.h"
 #include "KeyBind.h"
-#include <wx/hashmap.h>
 #include <wx/event.h>
 
 

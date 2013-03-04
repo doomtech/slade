@@ -41,15 +41,15 @@
 #include "MapThing.h"
 #include "MapLine.h"
 #include "Console.h"
-#include <wx/hashmap.h>
+#include <map>
 
 
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-WX_DECLARE_STRING_HASH_MAP(int, StrIntMap);
-WX_DECLARE_STRING_HASH_MAP(vector<ArchiveEntry *>, PathMap);
-WX_DECLARE_HASH_MAP(int, vector<ArchiveEntry *>, wxIntegerHash, wxIntegerEqual, CRCMap);
+typedef std::map<string, int> StrIntMap;
+typedef std::map<string, vector<ArchiveEntry*>> PathMap;
+typedef std::map<int, vector<ArchiveEntry*>> CRCMap;
 
 
 /*******************************************************************

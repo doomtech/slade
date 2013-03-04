@@ -4,9 +4,9 @@
 #include "Parser.h"
 #include "ArchiveManager.h"
 #include "Console.h"
-#include <wx/hashmap.h>
+#include <map>
 
-WX_DECLARE_STRING_HASH_MAP(cc_col_t, ColourHashMap);
+typedef std::map<string, cc_col_t> ColourHashMap;
 ColourHashMap	cc_colours;
 
 rgba_t ColourConfiguration::getColour(string name) {

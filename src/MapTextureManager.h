@@ -4,7 +4,7 @@
 
 #include "GLTexture.h"
 #include "ListenerAnnouncer.h"
-#include <wx/hashmap.h>
+#include <map>
 
 struct map_tex_t {
 	GLTexture*	texture;
@@ -12,8 +12,7 @@ struct map_tex_t {
 	~map_tex_t() { if (texture && texture != &(GLTexture::missingTex())) delete texture; }
 };
 
-// Declare hash map class to hold textures
-WX_DECLARE_STRING_HASH_MAP(map_tex_t, MapTexHashMap);
+typedef std::map<string, map_tex_t> MapTexHashMap;
 
 class Archive;
 class Palette8bit;
