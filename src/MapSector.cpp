@@ -33,6 +33,11 @@ void MapSector::copy(MapObject* s) {
 	MapSector* sector = (MapSector*)s;
 	this->f_tex = sector->f_tex;
 	this->c_tex = sector->c_tex;
+	this->f_height = sector->f_height;
+	this->c_height = sector->c_height;
+	this->light = sector->light;
+	this->special = sector->special;
+	this->tag = sector->tag;
 
 	// Other properties
 	MapObject::copy(s);
@@ -45,6 +50,21 @@ string MapSector::stringProperty(string key) {
 		return c_tex;
 	else
 		return MapObject::stringProperty(key);
+}
+
+int MapSector::intProperty(string key) {
+	if (key == "heightfloor")
+		return f_height;
+	else if (key == "heightceiling")
+		return c_height;
+	else if (key == "lightlevel")
+		return light;
+	else if (key == "special")
+		return special;
+	else if (key == "id")
+		return tag;
+	else
+		return MapObject::intProperty(key);
 }
 
 void MapSector::setStringProperty(string key, string value) {
@@ -71,6 +91,24 @@ void MapSector::setFloatProperty(string key, double value) {
 	}
 
 	MapObject::setFloatProperty(key, value);
+}
+
+void MapSector::setIntProperty(string key, int value) {
+	// Update modified time
+	setModified();
+
+	if (key == "heightfloor")
+		f_height = value;
+	else if (key == "heightceiling")
+		c_height = value;
+	else if (key == "lightlevel")
+		light = value;
+	else if (key == "special")
+		special = value;
+	else if (key == "id")
+		tag = value;
+	else
+		MapObject::setIntProperty(key, value);
 }
 
 fpoint2_t MapSector::midPoint() {
@@ -206,48 +244,50 @@ bool MapSector::getVertices(vector<MapVertex*>& list) {
 }
 
 uint8_t MapSector::getLight(int where) {
-	// Get sector light level
-	int light = intProperty("lightlevel");
-
 	// Check for UDMF+ZDoom namespace
 	if (parent_map->currentFormat() == MAP_UDMF && S_CMPNOCASE(parent_map->udmfNamespace(), "zdoom")) {
+		// Get general light level
+		int l = light;
+
 		// Get specific light level
 		if (where == 1) {
 			// Floor
 			int fl = intProperty("lightfloor");
 			if (boolProperty("lightfloorabsolute"))
-				light = fl;
+				l = fl;
 			else
-				light += fl;
+				l += fl;
 		}
 		else if (where == 2) {
 			// Ceiling
 			int cl = intProperty("lightceiling");
 			if (boolProperty("lightceilingabsolute"))
-				light = cl;
+				l = cl;
 			else
-				light += cl;
+				l += cl;
 		}
+
+		// Clamp light level
+		if (l > 255)
+			l = 255;
+		if (l < 0)
+			l = 0;
+
+		return l;
 	}
-
-	// Clamp light level
-	if (light > 255)
-		light = 255;
-	if (light < 0)
-		light = 0;
-
-	return light;
+	else
+		return light;
 }
 
 void MapSector::changeLight(int amount, int where) {
 	// Get current light level
-	int light = getLight(where);
+	int ll = getLight(where);
 
 	// Clamp amount
-	if (light + amount > 255)
-		amount -= ((light+amount) - 255);
-	else if (light + amount < 0)
-		amount = -light;
+	if (ll + amount > 255)
+		amount -= ((ll+amount) - 255);
+	else if (ll + amount < 0)
+		amount = -ll;
 
 	// Check for UDMF+ZDoom namespace
 	bool separate = false;
@@ -264,7 +304,7 @@ void MapSector::changeLight(int amount, int where) {
 		setIntProperty("lightceiling", cur + amount);
 	}
 	else
-		setIntProperty("lightlevel", light + amount);
+		light = ll + amount;
 }
 
 rgba_t MapSector::getColour(int where, bool fullbright) {
@@ -279,44 +319,42 @@ rgba_t MapSector::getColour(int where, bool fullbright) {
 			return rgba_t(wxcol.Blue(), wxcol.Green(), wxcol.Red(), 255);
 
 		// Get sector light level
-		int light = intProperty("lightlevel");
+		int ll = intProperty("lightlevel");
 
 		// Get specific light level
 		if (where == 1) {
 			// Floor
 			int fl = intProperty("lightfloor");
 			if (boolProperty("lightfloorabsolute"))
-				light = fl;
+				ll = fl;
 			else
-				light += fl;
+				ll += fl;
 		}
 		else if (where == 2) {
 			// Ceiling
 			int cl = intProperty("lightceiling");
 			if (boolProperty("lightceilingabsolute"))
-				light = cl;
+				ll = cl;
 			else
-				light += cl;
+				ll += cl;
 		}
 
 		// Clamp light level
-		if (light > 255)
-			light = 255;
-		if (light < 0)
-			light = 0;
+		if (ll > 255)
+			ll = 255;
+		if (ll < 0)
+			ll = 0;
 
 		// Calculate and return the colour
-		float lightmult = (float)light / 255.0f;
+		float lightmult = (float)ll / 255.0f;
 		return rgba_t(wxcol.Blue() * lightmult, wxcol.Green() * lightmult, wxcol.Red() * lightmult, 255);
 	}
 	else {
 		// Other format, simply return the light level
 		if (fullbright)
 			return rgba_t(255, 255, 255, 255);
-		else {
-			int light = intProperty("lightlevel");
+		else
 			return rgba_t(light, light, light, 255);
-		}
 	}
 }
 
@@ -341,16 +379,21 @@ void MapSector::disconnectSide(MapSide* side) {
 }
 
 void MapSector::writeBackup(mobj_backup_t* backup) {
-	// Textures
 	backup->properties["texturefloor"] = f_tex;
 	backup->properties["textureceiling"] = c_tex;
+	backup->properties["heightfloor"] = f_height;
+	backup->properties["heightceiling"] = c_height;
+	backup->properties["lightlevel"] = light;
+	backup->properties["special"] = special;
+	backup->properties["id"] = tag;
 }
 
 void MapSector::readBackup(mobj_backup_t* backup) {
-	// General properties
-	//MapObject::loadFromBackup(plist);
-
-	// Textures
 	f_tex = backup->properties["texturefloor"].getStringValue();
 	c_tex = backup->properties["textureceiling"].getStringValue();
+	f_height = backup->properties["heightfloor"].getIntValue();
+	c_height = backup->properties["heightceiling"].getIntValue();
+	light = backup->properties["lightlevel"].getIntValue();
+	special = backup->properties["special"].getIntValue();
+	tag = backup->properties["id"].getIntValue();
 }

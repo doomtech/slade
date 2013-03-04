@@ -1824,7 +1824,7 @@ void MapEditor::createSector(double x, double y) {
 	// Set some sector defaults from game configuration if needed
 	if (!sector_copy && ok) {
 		MapSector* n_sector = map.getSector(map.nSectors()-1);
-		if (n_sector->ceilingTexture().IsEmpty())
+		if (n_sector->getCeilingTex().IsEmpty())
 			theGameConfiguration->applyDefaults(n_sector);
 	}
 
@@ -2284,7 +2284,7 @@ void MapEditor::endLineDraw(bool apply) {
 			MapSector* sector = map.getSector(a);
 
 			// Skip if sector already has properties
-			if (!sector->ceilingTexture().IsEmpty())
+			if (!sector->getCeilingTex().IsEmpty())
 				continue;
 
 			// Copy from adjacent sector if any
@@ -2723,7 +2723,7 @@ void MapEditor::selectAdjacent3d(selection_3d_t item) {
 					continue;
 
 				// Check sector floor texture
-				if (osector->floorTexture() != sector->floorTexture())
+				if (osector->getFloorTex() != sector->getFloorTex())
 					continue;
 			}
 			else {
@@ -2732,7 +2732,7 @@ void MapEditor::selectAdjacent3d(selection_3d_t item) {
 					continue;
 
 				// Check sector ceiling texture
-				if (osector->ceilingTexture() != sector->ceilingTexture())
+				if (osector->getCeilingTex() != sector->getCeilingTex())
 					continue;
 			}
 
@@ -3261,14 +3261,14 @@ void MapEditor::copy3d(int type) {
 	else if (hilight_3d.type == SEL_FLOOR) {
 		// Texture
 		if (type == COPY_TEXTYPE)
-			copy_texture = map.getSector(hilight_3d.index)->floorTexture();
+			copy_texture = map.getSector(hilight_3d.index)->getFloorTex();
 	}
 
 	// Ceiling
 	else if (hilight_3d.type == SEL_CEILING) {
 		// Texture
 		if (type == COPY_TEXTYPE)
-			copy_texture = map.getSector(hilight_3d.index)->ceilingTexture();
+			copy_texture = map.getSector(hilight_3d.index)->getCeilingTex();
 	}
 
 	// Thing

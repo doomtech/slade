@@ -132,11 +132,11 @@ void InfoOverlay3D::update(int item_index, int item_type, SLADEMap* map) {
 
 		// Texture
 		if (item_type == MapEditor::SEL_SIDE_BOTTOM)
-			texname = side->stringProperty("texturebottom");
+			texname = side->getTexLower();
 		else if (item_type == MapEditor::SEL_SIDE_MIDDLE)
-			texname = side->stringProperty("texturemiddle");
+			texname = side->getTexMiddle();
 		else
-			texname = side->stringProperty("texturetop");
+			texname = side->getTexUpper();
 		texture = theMapEditor->textureManager().getTexture(texname, theGameConfiguration->mixTexFlats());
 	}
 
@@ -238,9 +238,9 @@ void InfoOverlay3D::update(int item_index, int item_type, SLADEMap* map) {
 
 		// Texture
 		if (item_type == MapEditor::SEL_FLOOR)
-			texname = sector->floorTexture();
+			texname = sector->getFloorTex();
 		else
-			texname = sector->ceilingTexture();
+			texname = sector->getCeilingTex();
 		texture = theMapEditor->textureManager().getFlat(texname, theGameConfiguration->mixTexFlats());
 	}
 

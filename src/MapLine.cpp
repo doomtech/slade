@@ -315,10 +315,10 @@ int MapLine::needsTexture() {
 		return TEX_FRONT_MIDDLE;
 
 	// Get sector heights
-	int floor_front = frontSector()->intProperty("heightfloor");
-	int ceiling_front = frontSector()->intProperty("heightceiling");
-	int floor_back = backSector()->intProperty("heightfloor");
-	int ceiling_back = backSector()->intProperty("heightceiling");
+	int floor_front = frontSector()->getFloorHeight();
+	int ceiling_front = frontSector()->getCeilingHeight();
+	int floor_back = backSector()->getFloorHeight();
+	int ceiling_back = backSector()->getCeilingHeight();
 
 	// Front lower
 	int tex = 0;

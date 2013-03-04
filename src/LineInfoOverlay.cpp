@@ -74,9 +74,9 @@ void LineInfoOverlay::update(MapLine* line) {
 		else
 			side_front.info = S_FMT("Front Side #%d (Sector %d)", s->getIndex(), s->getSector()->getIndex());
 		side_front.offsets = S_FMT("Offsets: (%d, %d)", xoff, yoff);
-		side_front.tex_upper = s->stringProperty("texturetop");
-		side_front.tex_middle = s->stringProperty("texturemiddle");
-		side_front.tex_lower = s->stringProperty("texturebottom");
+		side_front.tex_upper = s->getTexUpper();
+		side_front.tex_middle = s->getTexMiddle();
+		side_front.tex_lower = s->getTexLower();
 	}
 	else side_front.exists = false;
 
@@ -91,9 +91,9 @@ void LineInfoOverlay::update(MapLine* line) {
 		else
 			side_back.info = S_FMT("Back Side #%d (Sector %d)", s->getIndex(), s->getSector()->getIndex());
 		side_back.offsets = S_FMT("Offsets: (%d, %d)", xoff, yoff);
-		side_back.tex_upper = s->stringProperty("texturetop");
-		side_back.tex_middle = s->stringProperty("texturemiddle");
-		side_back.tex_lower = s->stringProperty("texturebottom");
+		side_back.tex_upper = s->getTexUpper();
+		side_back.tex_middle = s->getTexMiddle();
+		side_back.tex_lower = s->getTexLower();
 	}
 	else side_back.exists = false;
 }

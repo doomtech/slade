@@ -3,6 +3,7 @@
 #define __MAPLINE_H__
 
 #include "MapObject.h"
+#include <map>
 
 class MapVertex;
 class MapSide;

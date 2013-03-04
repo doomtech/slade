@@ -1300,9 +1300,9 @@ void MapRenderer2D::renderFlatsImmediate(int type, bool texture, float alpha) {
 			if (!tex_flats[a] || sector->modifiedTime() > flats_updated) {
 				// Get the sector texture
 				if (type <= 1)
-					tex = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());
+					tex = theMapEditor->textureManager().getFlat(sector->getFloorTex(), theGameConfiguration->mixTexFlats());
 				else
-					tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture(), theGameConfiguration->mixTexFlats());
+					tex = theMapEditor->textureManager().getFlat(sector->getCeilingTex(), theGameConfiguration->mixTexFlats());
 
 				tex_flats[a] = tex;
 			}
@@ -1430,9 +1430,9 @@ void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 			if (!tex_flats[a] || sector->modifiedTime() > flats_updated) {
 				// Get the sector texture
 				if (type <= 1)
-					tex = theMapEditor->textureManager().getFlat(sector->floorTexture(), theGameConfiguration->mixTexFlats());
+					tex = theMapEditor->textureManager().getFlat(sector->getFloorTex(), theGameConfiguration->mixTexFlats());
 				else
-					tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture(), theGameConfiguration->mixTexFlats());
+					tex = theMapEditor->textureManager().getFlat(sector->getCeilingTex(), theGameConfiguration->mixTexFlats());
 
 				tex_flats[a] = tex;
 			}

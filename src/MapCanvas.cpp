@@ -390,7 +390,7 @@ void MapCanvas::set3dCameraThing(MapThing* thing) {
 	fpoint3_t pos(thing->xPos(), thing->yPos(), 40);
 	int sector = editor->getMap().sectorAt(pos.x, pos.y);
 	if (sector >= 0)
-		pos.z += editor->getMap().getSector(sector)->intProperty("heightfloor");
+		pos.z += editor->getMap().getSector(sector)->getFloorHeight();
 
 	// Determine direction
 	fpoint2_t dir = MathStuff::vectorAngle(MathStuff::degToRad(thing->intProperty("angle")));
@@ -1719,11 +1719,11 @@ void MapCanvas::changeTexture3d(selection_3d_t first) {
 	string tex;
 	int type = 0;
 	if (first.type == MapEditor::SEL_FLOOR) {
-		tex = editor->getMap().getSector(first.index)->floorTexture();
+		tex = editor->getMap().getSector(first.index)->getFloorTex();
 		type = 1;
 	}
 	else if (first.type == MapEditor::SEL_CEILING) {
-		tex = editor->getMap().getSector(first.index)->ceilingTexture();
+		tex = editor->getMap().getSector(first.index)->getCeilingTex();
 		type = 1;
 	}
 	else if (first.type == MapEditor::SEL_SIDE_BOTTOM)
@@ -2384,7 +2384,7 @@ bool MapCanvas::handleAction(string id) {
 		SLADEMap& map = editor->getMap();
 		MapSector* sector = map.getSector(map.sectorAt(pos.x, pos.y));
 		if (sector)
-			pos.z = sector->intProperty("heightfloor") + 40;
+			pos.z = sector->getFloorHeight() + 40;
 		renderer_3d->cameraSetPosition(pos);
 	}
 

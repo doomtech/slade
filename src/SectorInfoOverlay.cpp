@@ -40,8 +40,8 @@ void SectorInfoOverlay::update(MapSector* sector) {
 	info.push_back(S_FMT("Tag: %d", sector->intProperty("id")));
 
 	// Textures
-	ftex = sector->floorTexture();
-	ctex = sector->ceilingTexture();
+	ftex = sector->getFloorTex();
+	ctex = sector->getCeilingTex();
 }
 
 void SectorInfoOverlay::draw(int bottom, int right, float alpha) {

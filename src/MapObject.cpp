@@ -80,9 +80,11 @@ void MapObject::copy(MapObject* c) {
 	properties.clear();
 
 	// Copy object properties
-	c->properties.copyTo(properties);
-	this->parent_map = c->parent_map;
-	this->filtered = c->filtered;
+	if (!c->properties.isEmpty()) {
+		c->properties.copyTo(properties);
+		this->parent_map = c->parent_map;
+		this->filtered = c->filtered;
+	}
 
 	// Update modified time
 	setModified();

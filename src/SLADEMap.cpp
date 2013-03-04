@@ -448,11 +448,11 @@ bool SLADEMap::addSide(doomside_t& s) {
 	MapSide* ns = new MapSide(getSector(s.sector), this);
 
 	// Setup side properties
-	ns->properties["texturetop"] = wxString::FromAscii(s.tex_upper, 8);
-	ns->properties["texturebottom"] = wxString::FromAscii(s.tex_lower, 8);
-	ns->properties["texturemiddle"] = wxString::FromAscii(s.tex_middle, 8);
-	ns->properties["offsetx"] = s.x_offset;
-	ns->properties["offsety"] = s.y_offset;
+	ns->tex_upper = wxString::FromAscii(s.tex_upper, 8);
+	ns->tex_lower = wxString::FromAscii(s.tex_lower, 8);
+	ns->tex_middle = wxString::FromAscii(s.tex_middle, 8);
+	ns->offset_x = s.x_offset;
+	ns->offset_y = s.y_offset;
 
 	// Add side
 	sides.push_back(ns);
@@ -464,11 +464,11 @@ bool SLADEMap::addSide(doom64side_t& s) {
 	MapSide* ns = new MapSide(getSector(s.sector), this);
 
 	// Setup side properties
-	ns->properties["texturetop"] = theResourceManager->getTextureName(s.tex_upper);
-	ns->properties["texturebottom"] = theResourceManager->getTextureName(s.tex_lower);
-	ns->properties["texturemiddle"] = theResourceManager->getTextureName(s.tex_middle);
-	ns->properties["offsetx"] = s.x_offset;
-	ns->properties["offsety"] = s.y_offset;
+	ns->tex_upper = theResourceManager->getTextureName(s.tex_upper);
+	ns->tex_lower = theResourceManager->getTextureName(s.tex_lower);
+	ns->tex_middle = theResourceManager->getTextureName(s.tex_middle);
+	ns->offset_x = s.x_offset;
+	ns->offset_y = s.y_offset;
 
 	// Add side
 	sides.push_back(ns);
@@ -591,11 +591,11 @@ bool SLADEMap::addSector(doomsector_t& s) {
 	MapSector* ns = new MapSector(wxString::FromAscii(s.f_tex, 8), wxString::FromAscii(s.c_tex, 8), this);
 
 	// Setup sector properties
-	ns->properties["heightfloor"] = s.f_height;
-	ns->properties["heightceiling"] = s.c_height;
-	ns->properties["lightlevel"] = s.light;
-	ns->properties["special"] = s.special;
-	ns->properties["id"] = s.tag;
+	ns->f_height = s.f_height;
+	ns->c_height = s.c_height;
+	ns->light = s.light;
+	ns->special = s.special;
+	ns->tag = s.tag;
 
 	// Add sector
 	sectors.push_back(ns);
@@ -609,11 +609,11 @@ bool SLADEMap::addSector(doom64sector_t& s) {
 		theResourceManager->getTextureName(s.c_tex), this);
 
 	// Setup sector properties
-	ns->properties["heightfloor"] = s.f_height;
-	ns->properties["heightceiling"] = s.c_height;
-	ns->properties["lightlevel"] = 255;
-	ns->properties["special"] = s.special;
-	ns->properties["id"] = s.tag;
+	ns->f_height = s.f_height;
+	ns->c_height = s.c_height;
+	ns->light = 255;
+	ns->special = s.special;
+	ns->tag = s.tag;
 	ns->properties["flags"] = s.flags;
 	ns->properties["color_things"] = s.color[0];
 	ns->properties["color_floor"] = s.color[1];
@@ -1223,15 +1223,6 @@ bool SLADEMap::addSide(ParseTreeNode* def) {
 	// Create new side
 	MapSide* ns = new MapSide(sectors[sector], this);
 
-	// Set some reasonable defaults
-	/*
-	ns->prop("texturetop").setValue(string("-"));
-	ns->prop("texturemiddle").setValue(string("-"));
-	ns->prop("texturebottom").setValue(string("-"));
-	ns->prop("offsetx") = 0;
-	ns->prop("offsety") = 0;
-	*/
-
 	// Add extra side info
 	ParseTreeNode* prop = NULL;
 	for (unsigned a = 0; a < def->nChildren(); a++) {
@@ -1241,7 +1232,18 @@ bool SLADEMap::addSide(ParseTreeNode* def) {
 		if (prop == prop_sector)
 			continue;
 
-		ns->properties[prop->getName()] = prop->getValue();
+		if (S_CMPNOCASE(prop->getName(), "texturetop"))
+			ns->tex_upper = prop->getStringValue();
+		else if (S_CMPNOCASE(prop->getName(), "texturemiddle"))
+			ns->tex_middle = prop->getStringValue();
+		else if (S_CMPNOCASE(prop->getName(), "texturebottom"))
+			ns->tex_lower = prop->getStringValue();
+		else if (S_CMPNOCASE(prop->getName(), "offsetx"))
+			ns->offset_x = prop->getIntValue();
+		else if (S_CMPNOCASE(prop->getName(), "offsety"))
+			ns->offset_y = prop->getIntValue();
+		else
+			ns->properties[prop->getName()] = prop->getValue();
 		//wxLogMessage("Property %s type %s (%s)", CHR(prop->getName()), CHR(prop->getValue().typeString()), CHR(prop->getValue().getStringValue()));
 	}
 
@@ -1309,9 +1311,6 @@ bool SLADEMap::addSector(ParseTreeNode* def) {
 	// Create new sector
 	MapSector* ns = new MapSector(prop_ftex->getStringValue(), prop_ctex->getStringValue(), this);
 
-	// Set some reasonable defaults
-	//ns->properties["id"] = 0;
-
 	// Add extra sector info
 	ParseTreeNode* prop = NULL;
 	for (unsigned a = 0; a < def->nChildren(); a++) {
@@ -1320,6 +1319,17 @@ bool SLADEMap::addSector(ParseTreeNode* def) {
 		// Skip required properties
 		if (prop == prop_ftex || prop == prop_ctex)
 			continue;
+		
+		if (S_CMPNOCASE(prop->getName(), "heightfloor"))
+			ns->f_height = prop->getIntValue();
+		else if (S_CMPNOCASE(prop->getName(), "heightceiling"))
+			ns->c_height = prop->getIntValue();
+		else if (S_CMPNOCASE(prop->getName(), "lightlevel"))
+			ns->light = prop->getIntValue();
+		else if (S_CMPNOCASE(prop->getName(), "special"))
+			ns->special = prop->getIntValue();
+		else if (S_CMPNOCASE(prop->getName(), "tag"))
+			ns->tag = prop->getIntValue();
 
 		ns->properties[prop->getName()] = prop->getValue();
 	}
@@ -1500,17 +1510,17 @@ bool SLADEMap::writeDoomSidedefs(ArchiveEntry* entry) {
 		memset(&side, 0, 30);
 
 		// Offsets
-		side.x_offset = sides[a]->intProperty("offsetx");
-		side.y_offset = sides[a]->intProperty("offsety");
+		side.x_offset = sides[a]->offset_x;
+		side.y_offset = sides[a]->offset_y;
 
 		// Sector
 		side.sector = -1;
 		if (sides[a]->sector) side.sector = sides[a]->sector->getIndex();
 
 		// Textures
-		t_m = sides[a]->stringProperty("texturemiddle");
-		t_u = sides[a]->stringProperty("texturetop");
-		t_l = sides[a]->stringProperty("texturebottom");
+		t_m = sides[a]->tex_middle;
+		t_u = sides[a]->tex_upper;
+		t_l = sides[a]->tex_lower;
 		memcpy(side.tex_middle, CHR(t_m), t_m.Length());
 		memcpy(side.tex_upper, CHR(t_u), t_u.Length());
 		memcpy(side.tex_lower, CHR(t_l), t_l.Length());
@@ -1567,24 +1577,21 @@ bool SLADEMap::writeDoomSectors(ArchiveEntry* entry) {
 
 	// Write sector data
 	doomsector_t sector;
-	string t_f, t_c;
 	for (unsigned a = 0; a < sectors.size(); a++) {
 		memset(&sector, 0, 26);
 
 		// Height
-		sector.f_height = sectors[a]->intProperty("heightfloor");
-		sector.c_height = sectors[a]->intProperty("heightceiling");
+		sector.f_height = sectors[a]->f_height;
+		sector.c_height = sectors[a]->c_height;
 
 		// Textures
-		t_f = sectors[a]->stringProperty("texturefloor");
-		t_c = sectors[a]->stringProperty("textureceiling");
-		memcpy(sector.f_tex, CHR(t_f), t_f.Length());
-		memcpy(sector.c_tex, CHR(t_c), t_c.Length());
+		memcpy(sector.f_tex, CHR(sectors[a]->f_tex), sectors[a]->f_tex.Length());
+		memcpy(sector.c_tex, CHR(sectors[a]->c_tex), sectors[a]->c_tex.Length());
 
 		// Properties
-		sector.light = sectors[a]->intProperty("lightlevel");
-		sector.special = sectors[a]->intProperty("special");
-		sector.tag = sectors[a]->intProperty("id");
+		sector.light = sectors[a]->light;
+		sector.special = sectors[a]->special;
+		sector.tag = sectors[a]->tag;
 
 		entry->write(&sector, 26);
 	}
@@ -1796,17 +1803,17 @@ bool SLADEMap::writeDoom64Sidedefs(ArchiveEntry * entry) {
 		memset(&side, 0, sizeof(doom64side_t));
 
 		// Offsets
-		side.x_offset = sides[a]->intProperty("offsetx");
-		side.y_offset = sides[a]->intProperty("offsety");
+		side.x_offset = sides[a]->offset_x;
+		side.y_offset = sides[a]->offset_y;
 
 		// Sector
 		side.sector = -1;
 		if (sides[a]->sector) side.sector = sides[a]->sector->getIndex();
 
 		// Textures
-		side.tex_middle	= theResourceManager->getTextureHash(sides[a]->stringProperty("texturemiddle"));
-		side.tex_upper	= theResourceManager->getTextureHash(sides[a]->stringProperty("texturetop"));
-		side.tex_lower	= theResourceManager->getTextureHash(sides[a]->stringProperty("texturebottom"));
+		side.tex_middle	= theResourceManager->getTextureHash(sides[a]->tex_middle);
+		side.tex_upper	= theResourceManager->getTextureHash(sides[a]->tex_upper);
+		side.tex_lower	= theResourceManager->getTextureHash(sides[a]->tex_lower);
 
 		entry->write(&side, sizeof(doom64side_t));
 	}
@@ -1864,8 +1871,8 @@ bool SLADEMap::writeDoom64Sectors(ArchiveEntry * entry) {
 		memset(&sector, 0, sizeof(doom64sector_t));
 
 		// Height
-		sector.f_height = sectors[a]->intProperty("heightfloor");
-		sector.c_height = sectors[a]->intProperty("heightceiling");
+		sector.f_height = sectors[a]->f_height;
+		sector.c_height = sectors[a]->c_height;
 
 		// Textures
 		sector.f_tex = theResourceManager->getTextureHash(sectors[a]->stringProperty("texturefloor"));
@@ -1879,9 +1886,9 @@ bool SLADEMap::writeDoom64Sectors(ArchiveEntry * entry) {
 		sector.color[4] = sectors[a]->intProperty("color_lower");
 
 		// Properties
-		sector.special = sectors[a]->intProperty("special");
+		sector.special = sectors[a]->special;
 		sector.flags = sectors[a]->intProperty("flags");
-		sector.tag = sectors[a]->intProperty("id");
+		sector.tag = sectors[a]->tag;
 
 		entry->write(&sector, sizeof(doom64sector_t));
 	}
@@ -2024,6 +2031,12 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 
 		// Basic properties
 		tempfile.Write(S_FMT("sector=%d;\n", sides[a]->sector->getIndex()));
+		if (sides[a]->tex_upper != "-")
+			tempfile.Write(S_FMT("texturetop=\"%s\";\n", CHR(sides[a]->tex_upper)));
+		if (sides[a]->tex_middle != "-")
+			tempfile.Write(S_FMT("texturemiddle=\"%s\";\n", CHR(sides[a]->tex_middle)));
+		if (sides[a]->tex_lower != "-")
+			tempfile.Write(S_FMT("texturebottom=\"%s\";\n", CHR(sides[a]->tex_lower)));
 
 		// Other properties
 		if (!sides[a]->properties.isEmpty()) {
@@ -2059,7 +2072,8 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 		tempfile.Write(S_FMT("sector//#%d\n{\n", a));
 
 		// Basic properties
-		tempfile.Write(S_FMT("texturefloor=\"%s\";\ntextureceiling=\"%s\";\n", CHR(sectors[a]->f_tex), CHR(sectors[a]->c_tex)));
+		tempfile.Write(S_FMT("texturefloor=\"%s\";\ntextureceiling=\"%s\";\nheightfloor=%d;\nheightceiling=%d;\nlightlevel=%d;\nspecial=%d;\nid=%d;\n",
+						CHR(sectors[a]->f_tex), CHR(sectors[a]->c_tex), sectors[a]->f_height, sectors[a]->c_height, sectors[a]->light, sectors[a]->special, sectors[a]->tag));
 
 		// Other properties
 		if (!sectors[a]->properties.isEmpty()) {
@@ -3041,9 +3055,9 @@ MapSide* SLADEMap::createSide(MapSector* sector) {
 
 	// Setup initial values
 	side->index = sides.size();
-	side->setStringProperty("texturemiddle", "-");
-	side->setStringProperty("texturetop", "-");
-	side->setStringProperty("texturebottom", "-");
+	side->tex_middle = "-";
+	side->tex_upper = "-";
+	side->tex_lower = "-";
 
 	// Add to sides
 	sides.push_back(side);
