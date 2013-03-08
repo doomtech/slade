@@ -33,6 +33,7 @@ void InfoOverlay3D::update(int item_index, int item_type, SLADEMap* map) {
 		if (!side) return;
 		MapLine* line = side->getParentLine();
 		if (!line) return;
+		object = side;
 
 		// --- Line/side info ---
 		info.push_back(S_FMT("Line #%d", line->getIndex()));
@@ -146,6 +147,7 @@ void InfoOverlay3D::update(int item_index, int item_type, SLADEMap* map) {
 		// Get sector
 		MapSector* sector = map->getSector(item_index);
 		if (!sector) return;
+		object = sector;
 
 		// Get basic info
 		int fheight = sector->intProperty("heightfloor");
@@ -251,6 +253,7 @@ void InfoOverlay3D::update(int item_index, int item_type, SLADEMap* map) {
 		// Get thing
 		MapThing* thing = map->getThing(item_index);
 		if (!thing) return;
+		object = thing;
 
 		// Index
 		info.push_back(S_FMT("Thing #%d", item_index));
@@ -303,6 +306,8 @@ void InfoOverlay3D::update(int item_index, int item_type, SLADEMap* map) {
 		}
 		texname = "";
 	}
+
+	last_update = theApp->runTimer();
 }
 
 void InfoOverlay3D::draw(int bottom, int right, int middle, float alpha) {
@@ -313,6 +318,12 @@ void InfoOverlay3D::draw(int bottom, int right, int middle, float alpha) {
 	// Don't bother if no info
 	if (info.size() == 0)
 		return;
+
+	// Update if needed
+	if (object->modifiedTime() > last_update)
+		update(object->getIndex(), current_type, object->getParentMap());	// object updated
+	else if (object->getObjType() == MOBJ_SIDE && ((MapSide*)object)->getParentLine()->modifiedTime() > last_update)
+		update(object->getIndex(), current_type, object->getParentMap());	// parent line updated
 
 	// Init GL stuff
 	glLineWidth(1.0f);

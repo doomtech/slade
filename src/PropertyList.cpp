@@ -121,10 +121,12 @@ string PropertyList::toString(bool condensed) {
 		if (i->second.getType() == PROP_STRING)
 			val = "\"" + val + "\"";
 
-		if (condensed)
-			ret += key + "=" + val + ";\n";
-		else
-			ret += key + " = " + val + ";\n";
+		if (!val.empty()) {
+			if (condensed)
+				ret += key + "=" + val + ";\n";
+			else
+				ret += key + " = " + val + ";\n";
+		}
 
 		//wxLogMessage("key %s type %s value %s", CHR(key), CHR(i->second.typeString()), CHR(val));
 

@@ -42,7 +42,7 @@
 wxRegEx re_int1("^[+-]?[0-9]+[0-9]*$", wxRE_DEFAULT|wxRE_NOSUB);
 wxRegEx re_int2("^0[0-9]+$", wxRE_DEFAULT|wxRE_NOSUB);
 wxRegEx re_int3("^0x[0-9A-Fa-f]+$", wxRE_DEFAULT|wxRE_NOSUB);
-wxRegEx re_float("^[+-]?[0-9]+'.'[0-9]*([eE][+-]?[0-9]+)?$", wxRE_DEFAULT|wxRE_NOSUB);
+wxRegEx re_float("^[-+]?[0-9]*.?[0-9]+([eE][-+]?[0-9]+)?$", wxRE_DEFAULT|wxRE_NOSUB);
 
 
 /*******************************************************************
@@ -262,6 +262,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 					double val;
 					token.ToDouble(&val);
 					value = (double)val;
+					//LOG_MESSAGE(3, S_FMT("%s: %s is float %1.3f", CHR(name), CHR(token), val));
 				}
 				else									// Unknown, just treat as string
 					value = token;

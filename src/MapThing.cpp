@@ -113,18 +113,18 @@ void MapThing::setAnglePoint(fpoint2_t point) {
 
 void MapThing::writeBackup(mobj_backup_t* backup) {
 	// Type
-	backup->properties["type"] = type;
+	backup->props_internal["type"] = type;
 
 	// Position
-	backup->properties["x"] = x;
-	backup->properties["y"] = y;
+	backup->props_internal["x"] = x;
+	backup->props_internal["y"] = y;
 }
 
 void MapThing::readBackup(mobj_backup_t* backup) {
 	// Type
-	type = backup->properties["type"].getIntValue();
+	type = backup->props_internal["type"].getIntValue();
 
 	// Position
-	x = backup->properties["x"].getFloatValue();
-	y = backup->properties["y"].getFloatValue();
+	x = backup->props_internal["x"].getFloatValue();
+	y = backup->props_internal["y"].getFloatValue();
 }

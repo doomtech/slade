@@ -87,12 +87,12 @@ MapLine* MapVertex::connectedLine(unsigned index) {
 
 void MapVertex::writeBackup(mobj_backup_t* backup) {
 	// Position
-	backup->properties["x"] = x;
-	backup->properties["y"] = y;
+	backup->props_internal["x"] = x;
+	backup->props_internal["y"] = y;
 }
 
 void MapVertex::readBackup(mobj_backup_t* backup) {
 	// Position
-	x = backup->properties["x"].getFloatValue();
-	y = backup->properties["y"].getFloatValue();
+	x = backup->props_internal["x"].getFloatValue();
+	y = backup->props_internal["y"].getFloatValue();
 }

@@ -17,6 +17,7 @@ enum {
 
 struct mobj_backup_t {
 	PropertyList	properties;
+	PropertyList	props_internal;
 	unsigned		id;
 	uint8_t			type;
 

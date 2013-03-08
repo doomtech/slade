@@ -303,8 +303,10 @@ void MapSector::changeLight(int amount, int where) {
 		int cur = intProperty("lightceiling");
 		setIntProperty("lightceiling", cur + amount);
 	}
-	else
+	else {
+		setModified();
 		light = ll + amount;
+	}
 }
 
 rgba_t MapSector::getColour(int where, bool fullbright) {
@@ -379,21 +381,21 @@ void MapSector::disconnectSide(MapSide* side) {
 }
 
 void MapSector::writeBackup(mobj_backup_t* backup) {
-	backup->properties["texturefloor"] = f_tex;
-	backup->properties["textureceiling"] = c_tex;
-	backup->properties["heightfloor"] = f_height;
-	backup->properties["heightceiling"] = c_height;
-	backup->properties["lightlevel"] = light;
-	backup->properties["special"] = special;
-	backup->properties["id"] = tag;
+	backup->props_internal["texturefloor"] = f_tex;
+	backup->props_internal["textureceiling"] = c_tex;
+	backup->props_internal["heightfloor"] = f_height;
+	backup->props_internal["heightceiling"] = c_height;
+	backup->props_internal["lightlevel"] = light;
+	backup->props_internal["special"] = special;
+	backup->props_internal["id"] = tag;
 }
 
 void MapSector::readBackup(mobj_backup_t* backup) {
-	f_tex = backup->properties["texturefloor"].getStringValue();
-	c_tex = backup->properties["textureceiling"].getStringValue();
-	f_height = backup->properties["heightfloor"].getIntValue();
-	c_height = backup->properties["heightceiling"].getIntValue();
-	light = backup->properties["lightlevel"].getIntValue();
-	special = backup->properties["special"].getIntValue();
-	tag = backup->properties["id"].getIntValue();
+	f_tex = backup->props_internal["texturefloor"].getStringValue();
+	c_tex = backup->props_internal["textureceiling"].getStringValue();
+	f_height = backup->props_internal["heightfloor"].getIntValue();
+	c_height = backup->props_internal["heightceiling"].getIntValue();
+	light = backup->props_internal["lightlevel"].getIntValue();
+	special = backup->props_internal["special"].getIntValue();
+	tag = backup->props_internal["id"].getIntValue();
 }

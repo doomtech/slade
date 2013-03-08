@@ -111,25 +111,25 @@ void MapSide::setStringProperty(string key, string value) {
 void MapSide::writeBackup(mobj_backup_t* backup) {
 	// Sector
 	if (sector)
-		backup->properties["sector"] = sector->getId();
+		backup->props_internal["sector"] = sector->getId();
 	else
-		backup->properties["sector"] = 0;
+		backup->props_internal["sector"] = 0;
 
 	// Textures
-	backup->properties["texturetop"] = tex_upper;
-	backup->properties["texturemiddle"] = tex_middle;
-	backup->properties["texturebottom"] = tex_lower;
+	backup->props_internal["texturetop"] = tex_upper;
+	backup->props_internal["texturemiddle"] = tex_middle;
+	backup->props_internal["texturebottom"] = tex_lower;
 
 	// Offsets
-	backup->properties["offsetx"] = offset_x;
-	backup->properties["offsety"] = offset_y;
+	backup->props_internal["offsetx"] = offset_x;
+	backup->props_internal["offsety"] = offset_y;
 
 	//wxLogMessage("Side %d backup sector #%d", id, sector->getIndex());
 }
 
 void MapSide::readBackup(mobj_backup_t* backup) {
 	// Sector
-	MapObject* s = parent_map->getObjectById(backup->properties["sector"]);
+	MapObject* s = parent_map->getObjectById(backup->props_internal["sector"]);
 	if (s) {
 		sector->disconnectSide(this);
 		sector = (MapSector*)s;
@@ -143,11 +143,11 @@ void MapSide::readBackup(mobj_backup_t* backup) {
 	}
 
 	// Textures
-	tex_upper = backup->properties["texturetop"].getStringValue();
-	tex_middle = backup->properties["texturemiddle"].getStringValue();
-	tex_lower = backup->properties["texturebottom"].getStringValue();
+	tex_upper = backup->props_internal["texturetop"].getStringValue();
+	tex_middle = backup->props_internal["texturemiddle"].getStringValue();
+	tex_lower = backup->props_internal["texturebottom"].getStringValue();
 
 	// Offsets
-	offset_x = backup->properties["offsetx"].getIntValue();
-	offset_y = backup->properties["offsety"].getIntValue();
+	offset_x = backup->props_internal["offsetx"].getIntValue();
+	offset_y = backup->props_internal["offsety"].getIntValue();
 }

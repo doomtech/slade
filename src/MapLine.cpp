@@ -405,27 +405,27 @@ void MapLine::flip(bool sides) {
 
 void MapLine::writeBackup(mobj_backup_t* backup) {
 	// Vertices
-	backup->properties["v1"] = vertex1->getId();
-	backup->properties["v2"] = vertex2->getId();
+	backup->props_internal["v1"] = vertex1->getId();
+	backup->props_internal["v2"] = vertex2->getId();
 
 	// Sides
 	if (side1)
-		backup->properties["s1"] = side1->getId();
+		backup->props_internal["s1"] = side1->getId();
 	else
-		backup->properties["s1"] = 0;
+		backup->props_internal["s1"] = 0;
 	if (side2)
-		backup->properties["s2"] = side2->getId();
+		backup->props_internal["s2"] = side2->getId();
 	else
-		backup->properties["s2"] = 0;
+		backup->props_internal["s2"] = 0;
 
 	// Special
-	backup->properties["special"] = special;
+	backup->props_internal["special"] = special;
 }
 
 void MapLine::readBackup(mobj_backup_t* backup) {
 	// Vertices
-	MapObject* v1 = parent_map->getObjectById(backup->properties["v1"]);
-	MapObject* v2 = parent_map->getObjectById(backup->properties["v2"]);
+	MapObject* v1 = parent_map->getObjectById(backup->props_internal["v1"]);
+	MapObject* v2 = parent_map->getObjectById(backup->props_internal["v2"]);
 	if (v1 && v1 != vertex1) {
 		vertex1->disconnectLine(this);
 		vertex1 = (MapVertex*)v1;
@@ -440,13 +440,13 @@ void MapLine::readBackup(mobj_backup_t* backup) {
 	}
 
 	// Sides
-	MapObject* s1 = parent_map->getObjectById(backup->properties["s1"]);
-	MapObject* s2 = parent_map->getObjectById(backup->properties["s2"]);
+	MapObject* s1 = parent_map->getObjectById(backup->props_internal["s1"]);
+	MapObject* s2 = parent_map->getObjectById(backup->props_internal["s2"]);
 	side1 = (MapSide*)s1;
 	side2 = (MapSide*)s2;
 	if (side1) side1->parent = this;
 	if (side2) side2->parent = this;
 
 	// Special
-	special = backup->properties["special"];
+	special = backup->props_internal["special"];
 }

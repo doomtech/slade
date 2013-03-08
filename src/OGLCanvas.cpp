@@ -93,6 +93,8 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id, bool handle_timer)
 	//Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
 	if (handle_timer)
 		Bind(wxEVT_TIMER, &OGLCanvas::onTimer, this);
+
+	GLTexture::resetBgTex();
 }
 #else
 /* OGLCanvas::OGLCanvas
@@ -108,6 +110,8 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id, bool handle_timer)
 	Bind(wxEVT_ERASE_BACKGROUND, &OGLCanvas::onEraseBackground, this);
 	//Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
 	//Bind(wxEVT_TIMER, &OGLCanvas::onTimer, this);
+
+	GLTexture::resetBgTex();
 }
 #endif
 

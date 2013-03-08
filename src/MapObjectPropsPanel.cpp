@@ -9,6 +9,8 @@
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
 
+CVAR(Bool, mobj_props_show_all, false, CVAR_SAVE)
+
 
 MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	// Init variables
@@ -22,6 +24,7 @@ MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	//label_item = new wxStaticText(this, -1, "");
 	//sizer->Add(label_item, 0, wxEXPAND|wxALL, 4);
 	cb_show_all = new wxCheckBox(this, -1, "Show All");
+	cb_show_all->SetValue(mobj_props_show_all);
 	sizer->Add(cb_show_all, 0, wxEXPAND|wxALL, 4);
 	sizer->AddSpacer(4);
 
@@ -662,9 +665,11 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	}
 
 	// Update internal objects list
-	this->objects.clear();
-	for (unsigned a = 0; a < objects.size(); a++)
-		this->objects.push_back(objects[a]);
+	if (&objects != &this->objects) {
+		this->objects.clear();
+		for (unsigned a = 0; a < objects.size(); a++)
+			this->objects.push_back(objects[a]);
+	}
 
 	pg_properties->Refresh();
 	pg_props_side1->Refresh();
@@ -697,6 +702,8 @@ void MapObjectPropsPanel::onBtnReset(wxCommandEvent& e) {
 }
 
 void MapObjectPropsPanel::onShowAllToggled(wxCommandEvent& e) {
+	mobj_props_show_all = cb_show_all->GetValue();
+
 	// Refresh the list
 	openObjects(objects);
 }
