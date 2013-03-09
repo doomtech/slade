@@ -1371,7 +1371,7 @@ ArchiveEntry * ArchivePanel::currentEntry() {
 		return NULL;
 }
 
-/* ArchivePanel::currentEntry
+/* ArchivePanel::currentEntries
  * Returns a vector of all selected entries
  *******************************************************************/
 vector<ArchiveEntry*> ArchivePanel::currentEntries() {
@@ -1379,6 +1379,15 @@ vector<ArchiveEntry*> ArchivePanel::currentEntries() {
 	if (entry_list)
 		selection = entry_list->getSelectedEntries();
 	return selection;
+}
+
+/* ArchivePanel::currentDir
+ * Returns a vector of all selected entries
+ *******************************************************************/
+ArchiveTreeNode* ArchivePanel::currentDir() {
+	if (entry_list)
+		return entry_list->getCurrentDir();
+	return NULL;
 }
 
 /* ArchivePanel::basConvert
@@ -1653,6 +1662,13 @@ bool ArchivePanel::mapOpenDb2() {
 	return EntryOperations::openMapDB2(entry);
 }
 
+
+/* ArchivePanel::openDir
+ * Opens the given directory.
+ *******************************************************************/
+bool ArchivePanel::openDir(ArchiveTreeNode* dir) {
+	return entry_list->setDir(dir);
+}
 
 /* ArchivePanel::openEntry
  * Shows the appropriate entry area and sends the given entry to it.
@@ -2819,4 +2835,125 @@ CONSOLE_COMMAND(lightspsxtopalette, 0, false) {
 		theActivePanel->callRefresh();
 		delete[] dest;
 	}
+}
+
+
+vector<ArchiveEntry*> Console_SearchEntries(string name) {
+	vector<ArchiveEntry*> entries;
+	Archive* archive = theMainWindow->getCurrentArchive();
+	ArchivePanel* panel = CH::getCurrentArchivePanel();
+
+	if (archive)
+	{
+		Archive::search_options_t options;
+		options.search_subdirs = true;
+		if (panel) {
+			options.dir = panel->currentDir();
+		}
+		options.match_name = name;
+		entries = archive->findAll(options);
+	}
+	return entries;
+}
+
+CONSOLE_COMMAND(find, 1, true) {
+	vector<ArchiveEntry*> entries = Console_SearchEntries(args[0]);
+
+	string message;
+	size_t count = entries.size();
+	if (count > 0) {
+		for (size_t i = 0; i < count; ++i) {
+			message += entries[i]->getPath(true) + "\n";
+		}
+	}
+	wxLogMessage(S_FMT("Found %i entr%s", count, count==1?"y":"ies\n") + message);
+}
+
+CONSOLE_COMMAND(ren, 2, true) {
+	Archive* archive = theMainWindow->getCurrentArchive();
+	vector<ArchiveEntry*> entries = Console_SearchEntries(args[0]);
+	if (entries.size() > 0) {
+		size_t count = 0;
+		for (size_t i = 0; i < entries.size(); ++i) {
+			// Rename filter logic
+			string newname = entries[i]->getName();
+			for (unsigned c = 0; c < args[1].size(); c++) {
+				// Check character
+				if (args[1][c] == '*')
+					continue;					// Skip if *
+				else {
+					// First check that we aren't past the end of the name
+					if (c >= newname.size()) {
+						// If we are, pad it with spaces
+						while (newname.size() <= c)
+							newname += " ";
+					}
+
+					// Replace character
+					newname[c] = args[1][c];
+				}
+			}
+
+			if (archive->renameEntry(entries[i], newname))
+				++count;
+		}
+		wxLogMessage("Renamed %i entr%s", count, count==1?"y":"ies");
+	}
+}
+
+CONSOLE_COMMAND(cd, 1, true) {
+	Archive* current = theMainWindow->getCurrentArchive();
+	ArchivePanel* panel = CH::getCurrentArchivePanel();
+
+	if (current && panel) {
+		ArchiveTreeNode* dir = panel->currentDir();
+		ArchiveTreeNode* newdir = current->getDir(args[0], dir);
+		if (newdir == NULL) {
+			if (args[0].Matches(".."))
+				newdir = (ArchiveTreeNode*) dir->getParent();
+			else if (args[0].Matches("/") || args[0].Matches("\\"))
+				newdir = current->getRoot();
+		}
+
+		if (newdir) {
+			panel->openDir(newdir);
+		} else {
+			wxLogMessage("Error: Trying to open nonexistant directory %s", CHR(args[0]));
+		}
+
+	}
+}
+
+CONSOLE_COMMAND(run, 1, true) {
+	MemChunk mc;
+	// Try to run a batch command file
+	if (wxFile::Exists(args[0])) {
+		if (!mc.importFile(args[0]))
+			return;
+	} else {
+	// Try to run a batch command lump
+		vector<ArchiveEntry*> entries = Console_SearchEntries(args[0]);
+		if (entries.size() > 0) {
+			if (!mc.importMem(entries[0]->getData(), entries[0]->getSize()))
+				return;
+		}
+	}
+
+	Tokenizer t;
+	if (!t.openMem(&mc, args[0]))
+		return;
+
+	string cmdline, s;
+	uint32_t line = t.lineNo();
+
+	// There's probably a better way to slice the chunk into lines...
+	while (1 + t.tokenEnd() < mc.getSize()) {
+		s = t.getToken() + " ";
+		if (t.lineNo() != line || 1 + t.tokenEnd() >= mc.getSize()) {
+			theConsole->execute(cmdline);
+			cmdline.Empty();
+			line = t.lineNo();
+		};
+		cmdline += s;
+	};
 }

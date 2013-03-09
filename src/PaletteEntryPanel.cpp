@@ -1049,7 +1049,7 @@ bool PaletteEntryPanel::generatePalettes() {
 		for (int a = 1; a < 9; ++a)
 			generatePalette(255, 0, 0, a, 9);
 
-		// Then the four BONUSPALS, no table-based mess here, just a plain factor. :)
+		// Then the four BONUSPALS
 		for (int a = 1; a < 5; ++a)
 			generatePalette(215, 186, 69, a, 8);
 

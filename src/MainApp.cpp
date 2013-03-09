@@ -53,6 +53,7 @@
 #include <wx/stackwalk.h>
 #include <wx/dir.h>
 #include <wx/sysopt.h>
+#include <FreeImage.h>
 
 #ifdef UPDATEREVISION
 #include "svnrevision.h"
@@ -266,6 +267,24 @@ void SLADELog::DoLogText(const wxString& msg) {
 
 
 /*******************************************************************
+ * FREEIMAGE ERROR HANDLER
+ *******************************************************************/
+
+/* FreeImageErrorHandler
+ * Allows to catch FreeImage errors and log them to the console.
+ *******************************************************************/
+void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) {
+	string error = "FreeImage: ";
+	if (fif != FIF_UNKNOWN) {
+		error += S_FMT("[%s] ", FreeImage_GetFormatFromFIF(fif));
+	}
+	error += message;
+
+	LOG_MESSAGE(2, error);
+}
+
+
+/*******************************************************************
  * MAINAPP CLASS FUNCTIONS
  *******************************************************************/
 IMPLEMENT_APP(MainApp)
@@ -349,6 +368,9 @@ void MainApp::initLogFile() {
 	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
 #endif
 	wxLogMessage("--------------------------------");
+
+	// Set up FreeImage to use our log:
+	FreeImage_SetOutputMessage(FreeImageErrorHandler);
 }
 
 /* MainApp::initActions

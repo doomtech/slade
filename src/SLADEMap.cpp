@@ -2021,14 +2021,14 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 	// Write lines
 	//clock.restart();
 	for (unsigned a = 0; a < lines.size(); a++) {
-		tempfile.Write(S_FMT("linedef//#%d\n{\n", a));
+		object_def = S_FMT("linedef//#%d\n{\n", a);
 
 		// Basic properties
-		tempfile.Write(S_FMT("v1=%d;\nv2=%d;\nsidefront=%d;\n", lines[a]->v1Index(), lines[a]->v2Index(), lines[a]->s1Index()));
+		object_def += S_FMT("v1=%d;\nv2=%d;\nsidefront=%d;\n", lines[a]->v1Index(), lines[a]->v2Index(), lines[a]->s1Index());
 		if (lines[a]->s2())
-			tempfile.Write(S_FMT("sideback=%d;\n", lines[a]->s2Index()));
+			object_def += S_FMT("sideback=%d;\n", lines[a]->s2Index());
 		if (lines[a]->special != 0)
-			tempfile.Write(S_FMT("special=%d;\n", lines[a]->special));
+			object_def += S_FMT("special=%d;\n", lines[a]->special);
 
 		// Remove internal 'flags' property if it exists
 		lines[a]->props().removeProperty("flags");
@@ -2036,10 +2036,11 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 		// Other properties
 		if (!lines[a]->properties.isEmpty()) {
 			theGameConfiguration->cleanObjectUDMFProps(lines[a]);
-			tempfile.Write(lines[a]->properties.toString(true));
+			object_def += lines[a]->properties.toString(true);
 		}
 
-		tempfile.Write("}\n\n");
+		object_def += "}\n\n";
+		tempfile.Write(object_def);
 	}
 	//wxLogMessage("Writing lines took %dms", clock.getElapsedTime().asMilliseconds());
 
