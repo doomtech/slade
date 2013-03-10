@@ -2142,10 +2142,6 @@ void MapEditor::endLineDraw(bool apply) {
 	// Check if we want to 'apply' the line draw (ie. create the lines)
 	if (apply && draw_points.size() > 1) {
 		// Begin undo level
-		/*undo_manager->beginRecord("Line Draw");
-		map.clearCreatedObjectIds();
-		map.clearDeletedObjectIds();
-		MapObject::beginPropBackup(theApp->runTimer());*/
 		beginUndoRecord("Line Draw");
 
 		// Add extra points if any lines overlap existing vertices
@@ -2167,7 +2163,7 @@ void MapEditor::endLineDraw(bool apply) {
 		for (unsigned a = 0; a < draw_points.size() - 1; a++) {
 			// Check for intersections
 			vector<fpoint2_t> intersect = map.cutLines(draw_points[a].x, draw_points[a].y, draw_points[a+1].x, draw_points[a+1].y);
-			//wxLogMessage("%d intersect points", intersect.size());
+			LOG_MESSAGE(2, S_FMT("%d intersect points", intersect.size()));
 
 			// Create line normally if no intersections
 			if (intersect.size() == 0)
@@ -3888,6 +3884,24 @@ CONSOLE_COMMAND(m_n_polys, 0, false) {
 		npoly += map.getSector(a)->getPolygon()->nSubPolys();
 
 	theConsole->logMessage(S_FMT("%d polygons total", npoly));
+}
+
+CONSOLE_COMMAND(mobj_info, 1, false) {
+	long id;
+	args[0].ToLong(&id);
+
+	MapObject* obj = theMapEditor->mapEditor().getMap().getObjectById(id);
+	if (!obj)
+		theConsole->logMessage("Object id out of range");
+	else {
+		mobj_backup_t bak;
+		obj->backup(&bak);
+		theConsole->logMessage(S_FMT("Object %d: %s #%d", id, CHR(obj->getTypeName()), obj->getIndex()));
+		theConsole->logMessage("Properties:");
+		theConsole->logMessage(bak.properties.toString());
+		theConsole->logMessage("Properties (internal):");
+		theConsole->logMessage(bak.props_internal.toString());
+	}
 }
 
 //CONSOLE_COMMAND(m_test_save, 1, false) {

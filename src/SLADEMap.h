@@ -10,7 +10,6 @@
 #include "Archive.h"
 #include "PropertyList.h"
 
-// Hash map of all MapObjects, by ID
 struct mobj_holder_t {
 	MapObject*	mobj;
 	bool		in_map;
@@ -23,7 +22,6 @@ struct mobj_holder_t {
 		this->in_map = in_map;
 	}
 };
-//WX_DECLARE_HASH_MAP(unsigned, mobj_holder_t, wxIntegerHash, wxIntegerEqual, MObjMap);
 
 class ParseTreeNode;
 class SLADEMap {
@@ -40,7 +38,6 @@ private:
 	string				name;
 	int					current_format;
 
-	//MObjMap				map_objects;
 	vector<mobj_holder_t>	all_objects;
 	vector<unsigned>		deleted_objects;
 	vector<unsigned>		created_objects;
@@ -198,11 +195,13 @@ public:
 	void	getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list);
 	void	getTaggingThingsById(int id, int type, vector<MapThing*>& list);
 	void	getTaggingLinesById(int id, int type, vector<MapLine*>& list);
+	int		findUnusedSectorTag();
+	int		findUnusedThingId();
+	int		findUnusedLineId();
 
 	// Info
 	string				getAdjacentLineTexture(MapVertex* vertex, int tex_part = 255);
 	MapSector*			getLineSideSector(MapLine* line, bool front = true);
-	int					findUnusedSectorTag();
 	vector<MapObject*>	getModifiedObjects(long since, int type = -1);
 	vector<MapObject*>	getAllModifiedObjects(long since);
 

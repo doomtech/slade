@@ -39,6 +39,7 @@
 #include "MainWindow.h"
 #include "FileMonitor.h"
 #include "WadArchive.h"
+#include "PreferencesDialog.h"
 #include <wx/filename.h>
 #include <wx/utils.h>
 
@@ -47,6 +48,7 @@
  * VARIABLES
  *******************************************************************/
 CVAR(String, path_acc, "", CVAR_SAVE);
+CVAR(String, path_acc_libs, "", CVAR_SAVE);
 CVAR(String, path_pngout, "", CVAR_SAVE);
 CVAR(String, path_pngcrush, "", CVAR_SAVE);
 CVAR(String, path_deflopt, "", CVAR_SAVE);
@@ -1032,7 +1034,7 @@ bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen, ArchiveEntry* 
 		return false;
 
 	// Check entry has a parent (this is useless otherwise)
-	if (!entry->getParent())
+	if (!target && !entry->getParent())
 		return false;
 
 	// Check entry is text
@@ -1045,23 +1047,45 @@ bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen, ArchiveEntry* 
 	string accpath = path_acc;
 	if (accpath.IsEmpty() || !wxFileExists(accpath)) {
 		wxMessageBox("Error: ACC path not defined, please configure in SLADE preferences", "Error", wxOK|wxCENTRE|wxICON_ERROR);
+		PreferencesDialog::openPreferences(parent, "ACS");
 		return false;
 	}
 
 	// Setup some path strings
-	wxFileName fn(accpath);
-	fn.SetFullName(entry->getName());
-	fn.SetExt("acs");
-	string srcfile = fn.GetFullPath();
-	fn.SetExt("o");
-	string ofile = fn.GetFullPath();
+	string srcfile = appPath(entry->getName(true) + ".acs", DIR_TEMP);
+	string ofile = appPath(entry->getName(true) + ".o", DIR_TEMP);
+	wxArrayString include_paths = wxSplit(path_acc_libs, ';');
+
+	// Setup command options
+	string opt;
+	if (hexen)
+		opt += " -h";
+	if (!include_paths.IsEmpty()) {
+		for (unsigned a = 0; a < include_paths.size(); a++)
+			opt += S_FMT(" -i \"%s\"", CHR(include_paths[a]));
+	}
+
+	// Find/export any resource libraries
+	Archive::search_options_t sopt;
+	sopt.match_type = EntryType::getType("acs");
+	sopt.search_subdirs = true;
+	vector<ArchiveEntry*> entries = theArchiveManager->findAllResourceEntries(sopt);
+	wxArrayString lib_paths;
+	for (unsigned a = 0; a < entries.size(); a++) {
+		// Ignore SCRIPTS
+		if (S_CMPNOCASE(entries[a]->getName(true), "SCRIPTS"))
+			continue;
+		string path = appPath(entries[a]->getName(true) + ".acs", DIR_TEMP);
+		entries[a]->exportFile(path);
+		lib_paths.Add(path);
+		LOG_MESSAGE(2, "Exporting ACS library %s", CHR(entries[a]->getName()));
+	}
 
 	// Export script to file
 	entry->exportFile(srcfile);
 
 	// Execute acc
-	string command = path_acc + " \"" + srcfile + "\" \"" + ofile + "\"";
-	if (hexen) command += " -h";
+	string command = path_acc + " " + opt + " \"" + srcfile + "\" \"" + ofile + "\"";
 	wxExecute(command, wxEXEC_SYNC);
 
 	// Deal with focus-stealing apps
@@ -1070,6 +1094,10 @@ bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen, ArchiveEntry* 
 
 	// Delete source file
 	wxRemoveFile(srcfile);
+	
+	// Delete library files
+	for (unsigned a = 0; a < lib_paths.size(); a++)
+		wxRemoveFile(lib_paths[a]);
 
 	// Check it compiled successfully
 	if (wxFileExists(ofile)) {
@@ -1112,8 +1140,7 @@ bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen, ArchiveEntry* 
 	}
 	else {
 		// Read acs.err to string
-		fn.SetFullName("acs.err");
-		wxFile file(fn.GetFullPath());
+		wxFile file(appPath("acs.err", DIR_TEMP));
 		char* buf = new char[file.Length()];
 		file.Read(buf, file.Length());
 		string errors = wxString::From8BitData(buf, file.Length());

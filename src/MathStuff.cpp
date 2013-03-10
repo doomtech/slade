@@ -210,6 +210,10 @@ bool MathStuff::linesIntersect(double l1x1, double l1y1, double l1x2, double l1y
 	x = (b2*c1 - b1*c2) / det;
 	y = (a1*c2 - a2*c1) / det;
 
+	// Round to nearest 3 decimal places
+	x = std::floor(x * 1000.0 + 0.5) / 1000.0;
+	y = std::floor(y * 1000.0 + 0.5) / 1000.0;
+
 	// Check that the intersection point is on both lines
 	if (min(l1x1, l1x2) <= x && x <= max(l1x1, l1x2) &&
 		min(l1y1, l1y2) <= y && y <= max(l1y1, l1y2) &&

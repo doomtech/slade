@@ -18,6 +18,8 @@ MapSector::MapSector(string f_tex, string c_tex, SLADEMap* parent) : MapObject(M
 	// Init variables
 	this->f_tex = f_tex;
 	this->c_tex = c_tex;
+	this->special = 0;
+	this->id = 0;
 	poly_needsupdate = true;
 }
 

@@ -43,6 +43,9 @@ SLADEMap::SLADEMap() {
 	// Init variables
 	this->geometry_updated = 0;
 	this->position_frac = false;
+
+	// Object id 0 is always null
+	all_objects.push_back(mobj_holder_t(NULL, false));
 }
 
 SLADEMap::~SLADEMap() {
@@ -2140,6 +2143,9 @@ void SLADEMap::clearMap() {
 			delete all_objects[a].mobj;
 	}
 	all_objects.clear();
+
+	// Object id 0 is always null
+	all_objects.push_back(mobj_holder_t(NULL, false));
 }
 
 bool SLADEMap::removeVertex(MapVertex* vertex) {
@@ -2503,10 +2509,15 @@ vector<fpoint2_t> SLADEMap::cutLines(double x1, double y1, double x2, double y2)
 	// Go through map lines
 	for (unsigned a = 0; a < lines.size(); a++) {
 		// Check for intersection
+		x = x1;
+		y = y1;
 		if (MathStuff::linesIntersect(x1, y1, x2, y2, lines[a]->x1(), lines[a]->y1(), lines[a]->x2(), lines[a]->y2(), x, y)) {
 			// Add intersection point to vector
 			intersect_points.push_back(fpoint2_t(x, y));
+			LOG_MESSAGE(3, S_FMT("Intersection point %1.9f,%1.9f valid with line %d", x, y, a));
 		}
+		else if (x != x1 || y != y1)
+			LOG_MESSAGE(3, S_FMT("Intersection point %1.20f,%1.20f invalid", x, y));
 	}
 
 	// Return if no intersections
@@ -2792,6 +2803,66 @@ void SLADEMap::getTaggingLinesById(int id, int type, vector<MapLine*>& list) {
 	}
 }
 
+int SLADEMap::findUnusedSectorTag() {
+	int tag = 1;
+	for (unsigned a = 0; a < sectors.size(); a++) {
+		if (sectors[a]->intProperty("id") == tag) {
+			tag++;
+			a = 0;
+		}
+	}
+
+	return tag;
+}
+
+int SLADEMap::findUnusedThingId() {
+	int tag = 1;
+	for (unsigned a = 0; a < things.size(); a++) {
+		if (things[a]->intProperty("id") == tag) {
+			tag++;
+			a = 0;
+		}
+	}
+
+	return tag;
+}
+
+int SLADEMap::findUnusedLineId() {
+	int tag = 1;
+
+	// UDMF (id property)
+	if (current_format == MAP_UDMF) {
+		for (unsigned a = 0; a < lines.size(); a++) {
+			if (lines[a]->intProperty("id") == tag) {
+				tag++;
+				a = 0;
+			}
+		}
+	}
+
+	// Hexen (special 121 arg0)
+	else if (current_format == MAP_HEXEN) {
+		for (unsigned a = 0; a < lines.size(); a++) {
+			if (lines[a]->special == 121 && lines[a]->intProperty("arg0") == tag) {
+				tag++;
+				a = 0;
+			}
+		}
+	}
+
+	// Boom (sector tag (arg0))
+	else if (current_format == MAP_DOOM && theGameConfiguration->isBoom()) {
+		for (unsigned a = 0; a < lines.size(); a++) {
+			if (lines[a]->intProperty("arg0") == tag) {
+				tag++;
+				a = 0;
+			}
+		}
+	}
+
+	return tag;
+}
+
 string SLADEMap::getAdjacentLineTexture(MapVertex* vertex, int tex_part) {
 	// Go through adjacent lines
 	string tex = "-";
@@ -2883,18 +2954,6 @@ MapSector* SLADEMap::getLineSideSector(MapLine* line, bool front) {
 	}
 
 	return NULL;
-}
-
-int SLADEMap::findUnusedSectorTag() {
-	int tag = 1;
-	for (unsigned a = 0; a < sectors.size(); a++) {
-		if (sectors[a]->intProperty("id") == tag) {
-			tag++;
-			a = 0;
-		}
-	}
-
-	return tag;
 }
 
 vector<MapObject*> SLADEMap::getModifiedObjects(long since, int type) {

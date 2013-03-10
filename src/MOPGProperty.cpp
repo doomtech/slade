@@ -810,7 +810,7 @@ void MOPGSPACTriggerProperty::applyValue() {
 
 
 MOPGTagProperty::MOPGTagProperty(const wxString& label, const wxString& name)
-: wxIntProperty(label, name, 0), MOPGProperty(MOPGProperty::TYPE_ASPECIAL) {
+: wxIntProperty(label, name, 0), MOPGProperty(MOPGProperty::TYPE_ID) {
 	// Set to text+button editor
 	SetEditor(wxPGEditor_TextCtrlAndButton);
 }
@@ -866,7 +866,16 @@ bool MOPGTagProperty::OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEven
 			return false;
 		if (!objects[0]->getParentMap())
 			return false;
-		int tag = objects[0]->getParentMap()->findUnusedSectorTag();
+
+		// Get unused tag/id depending on object type
+		int tag = GetValue().GetInteger();
+		if (objects[0]->getObjType() == MOBJ_SECTOR)
+			tag = objects[0]->getParentMap()->findUnusedSectorTag();
+		else if (objects[0]->getObjType() == MOBJ_THING)
+			tag = objects[0]->getParentMap()->findUnusedThingId();
+		else if (objects[0]->getObjType() == MOBJ_LINE)
+			tag = objects[0]->getParentMap()->findUnusedLineId();
+
 		SetValue(tag);
 		return true;
 	}

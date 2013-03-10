@@ -374,21 +374,40 @@ void MapEditorWindow::loadMapScripts(Archive::mapdesc_t map) {
 	if (theGameConfiguration->scriptLanguage().IsEmpty())
 		return;
 
+	// Check for pk3 map
+	if (map.archive) {
+		WadArchive* wad = new WadArchive();
+		wad->open(map.head->getMCData());
+		vector<Archive::mapdesc_t> maps = wad->detectMaps();
+		if (!maps.empty()) {
+			loadMapScripts(maps[0]);
+			wad->close();
+			delete wad;
+			return;
+		}
+	}
+
 	// Go through map entries
 	ArchiveEntry* entry = map.head->nextEntry();
+	ArchiveEntry* scripts = NULL;
+	ArchiveEntry* compiled = NULL;
 	while (entry && entry != map.end->nextEntry()) {
-		// Check for SCRIPTS
+		// Check for SCRIPTS/BEHAVIOR
 		if (theGameConfiguration->scriptLanguage() == "acs_hexen" ||
 			theGameConfiguration->scriptLanguage() == "acs_zdoom") {
 			if (S_CMPNOCASE(entry->getName(), "SCRIPTS"))
-				panel_script_editor->openScripts(entry);
+				scripts = entry;
 			if (S_CMPNOCASE(entry->getName(), "BEHAVIOR"))
-				panel_script_editor->setCompiledEntry(entry);
+				compiled = entry;
 		}
 
 		// Next entry
 		entry = entry->nextEntry();
 	}
+
+	// Open scripts/compiled if found
+	if (scripts || compiled)
+		panel_script_editor->openScripts(scripts, compiled);
 }
 
 bool nb_warned = false;
@@ -416,11 +435,6 @@ void MapEditorWindow::buildNodes(Archive* wad) {
 	// Check for undefined path
 	if (!wxFileExists(builder.path) && !nb_warned) {
 		// Open nodebuilder preferences
-		//PreferencesDialog pd(this);
-		//pd.showPage("Node Builders");
-		//if (pd.ShowModal() == wxID_OK)
-		//	pd.applyPreferences();
-		//theMainWindow->getArchiveManagerPanel()->refreshAllTabs();
 		PreferencesDialog::openPreferences(this, "Node Builders");
 
 		// Get new builder if one was selected
@@ -477,31 +491,35 @@ bool MapEditorWindow::saveMap() {
 		theGameConfiguration->scriptLanguage() == "acs_zdoom")
 		acs = true;
 
-	// Get current SCRIPTS and BEHAVIOUR entries (if ACS)
-	ArchiveEntry* scripts = NULL;
-	ArchiveEntry* behavior = NULL;
-	ArchiveEntry* entry = mdesc_current.head->nextEntry();
-	if (acs) {
-		while (entry && entry != mdesc_current.end->nextEntry()) {
-			if (S_CMPNOCASE(entry->getName(true), "SCRIPTS"))
-				scripts = entry;
-			else if (S_CMPNOCASE(entry->getName(true), "BEHAVIOR"))
-				behavior = entry;
-			entry = entry->nextEntry();
-		}
-	}
+	//// Get current SCRIPTS and BEHAVIOUR entries (if ACS)
+	//ArchiveEntry* scripts = NULL;
+	//ArchiveEntry* behavior = NULL;
+	//ArchiveEntry* entry = mdesc_current.head->nextEntry();
+	//if (acs) {
+	//	while (entry && entry != mdesc_current.end->nextEntry()) {
+	//		if (S_CMPNOCASE(entry->getName(true), "SCRIPTS"))
+	//			scripts = entry;
+	//		else if (S_CMPNOCASE(entry->getName(true), "BEHAVIOR"))
+	//			behavior = entry;
+	//		entry = entry->nextEntry();
+	//	}
+	//}
 
 	// Add map data to temporary wad
 	WadArchive* wad = new WadArchive();
 	wad->addNewEntry("MAP01");
 	for (unsigned a = 0; a < map_data.size(); a++)
 		wad->addEntry(map_data[a]);
+	if (acs) // BEHAVIOR
+		wad->addEntry(panel_script_editor->compiledEntry(), "", true);
 	if (mdesc_current.format == MAP_UDMF)
 		wad->addNewEntry("ENDMAP");
-	if (behavior)
+	if (acs && panel_script_editor->scriptEntry()->getSize() > 0) // SCRIPTS (if any)
+		wad->addEntry(panel_script_editor->scriptEntry(), "", true);
+	/*if (behavior)
 		wad->addEntry(behavior, "", true);
 	if (scripts)
-		wad->addEntry(scripts, "", true);
+		wad->addEntry(scripts, "", true);*/
 
 	// Check for map archive
 	Archive* tempwad = NULL;
@@ -523,7 +541,7 @@ bool MapEditorWindow::saveMap() {
 	lockMapEntries(false);
 
 	// Delete current map entries
-	entry = map.end;
+	ArchiveEntry* entry = map.end;
 	Archive* archive = map.head->getParent();
 	while (entry && entry != map.head) {
 		ArchiveEntry* prev = entry->prevEntry();
@@ -546,18 +564,18 @@ bool MapEditorWindow::saveMap() {
 		mdesc_current.end = entry;
 	}
 
-	// Update script editor
-	if (acs) {
-		entry = mdesc_current.head->nextEntry();
-		while (entry && entry != mdesc_current.end->nextEntry()) {
-			if (S_CMPNOCASE(entry->getName(true), "SCRIPTS"))
-				panel_script_editor->setScriptEntry(entry);
-			else if (S_CMPNOCASE(entry->getName(true), "BEHAVIOR"))
-				panel_script_editor->setCompiledEntry(entry);
+	//// Update script editor
+	//if (acs) {
+	//	entry = mdesc_current.head->nextEntry();
+	//	while (entry && entry != mdesc_current.end->nextEntry()) {
+	//		if (S_CMPNOCASE(entry->getName(true), "SCRIPTS"))
+	//			panel_script_editor->setScriptEntry(entry);
+	//		else if (S_CMPNOCASE(entry->getName(true), "BEHAVIOR"))
+	//			panel_script_editor->setCompiledEntry(entry);
 
-			entry = entry->nextEntry();
-		}
-	}
+	//		entry = entry->nextEntry();
+	//	}
+	//}
 
 	// Lock current map entries
 	lockMapEntries();

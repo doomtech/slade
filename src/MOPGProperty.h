@@ -33,6 +33,7 @@ public:
 		TYPE_COLOUR,
 		TYPE_TEXTURE,
 		TYPE_SPAC,
+		TYPE_ID,
 	};
 
 	int		getType() { return type; }

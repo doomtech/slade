@@ -2033,21 +2033,6 @@
     <None Include="dist\res\config\games\include\things_strife.cfg">
       <Filter>Map Editor\GameConfiguration\Configurations\Games\Include</Filter>
     </None>
-    <None Include="dist\res\config\games\include\udmfprops_all.cfg">
-      <Filter>Map Editor\GameConfiguration\Configurations\Games\Include</Filter>
-    </None>
-    <None Include="dist\res\config\games\include\udmfprops_base.cfg">
-      <Filter>Map Editor\GameConfiguration\Configurations\Games\Include</Filter>
-    </None>
-    <None Include="dist\res\config\games\include\udmfprops_boom.cfg">
-      <Filter>Map Editor\GameConfiguration\Configurations\Games\Include</Filter>
-    </None>
-    <None Include="dist\res\config\games\include\udmfprops_hexen.cfg">
-      <Filter>Map Editor\GameConfiguration\Configurations\Games\Include</Filter>
-    </None>
-    <None Include="dist\res\config\games\include\udmfprops_zdoom.cfg">
-      <Filter>Map Editor\GameConfiguration\Configurations\Games\Include</Filter>
-    </None>
     <None Include="dist\res\config\ports\boom.cfg">
       <Filter>Map Editor\GameConfiguration\Configurations\Ports</Filter>
     </None>

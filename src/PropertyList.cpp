@@ -116,17 +116,17 @@ string PropertyList::toString(bool condensed) {
 
 		// Add "key = value;\n" to the return string
 		string key = i->first;
-		string val = i->second;
+		string val = i->second.getStringValue();
 
 		if (i->second.getType() == PROP_STRING)
 			val = "\"" + val + "\"";
 
-		if (!val.empty()) {
+		//if (!val.empty()) {
 			if (condensed)
 				ret += key + "=" + val + ";\n";
 			else
 				ret += key + " = " + val + ";\n";
-		}
+		//}
 
 		//wxLogMessage("key %s type %s value %s", CHR(key), CHR(i->second.typeString()), CHR(val));
 

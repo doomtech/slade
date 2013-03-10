@@ -155,6 +155,8 @@ bool Property::getBoolValue(bool warn_wrong_type) {
 		return value.Boolean;
 	else if (type == PROP_INT)
 		return !!value.Integer;
+	else if (type == PROP_UINT)
+		return !!value.Unsigned;
 	else if (type == PROP_FLOAT)
 		return !!((int)value.Floating);
 	else if (type == PROP_STRING) {
@@ -190,6 +192,8 @@ int Property::getIntValue(bool warn_wrong_type) {
 	// Return value (convert if needed)
 	if (type == PROP_INT)
 		return value.Integer;
+	else if (type == PROP_UINT)
+		return (int)value.Unsigned;
 	else if (type == PROP_BOOL)
 		return (int)value.Boolean;
 	else if (type == PROP_FLOAT)
@@ -226,6 +230,8 @@ double Property::getFloatValue(bool warn_wrong_type) {
 		return (double)value.Boolean;
 	else if (type == PROP_INT)
 		return (double)value.Integer;
+	else if (type == PROP_UINT)
+		return (double)value.Unsigned;
 	else if (type == PROP_STRING)
 		return (double)atof(CHR(val_string));
 
@@ -256,6 +262,8 @@ string Property::getStringValue(bool warn_wrong_type) {
 		return val_string;
 	else if (type == PROP_INT)
 		return S_FMT("%d", value.Integer);
+	else if (type == PROP_UINT)
+		return S_FMT("%d", value.Unsigned);
 	else if (type == PROP_BOOL) {
 		if (value.Boolean)
 			return "true";

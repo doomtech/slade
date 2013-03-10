@@ -245,6 +245,7 @@ void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, strin
 	propname += prop->getProperty();
 
 	// Add property depending on type
+	//MOPGProperty* mopg_prop = NULL;
 	if (prop->getType() == UDMFProperty::TYPE_BOOL)
 		addBoolProperty(group, prop->getName(), propname, false, grid, prop);
 	else if (prop->getType() == UDMFProperty::TYPE_INT)
@@ -260,7 +261,6 @@ void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, strin
 		properties.push_back(prop_col);
 		grid->AppendIn(group, prop_col);
 	}
-		//addIntProperty(group, prop->getName(), propname, false, grid);
 	else if (prop->getType() == UDMFProperty::TYPE_ASPECIAL) {
 		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty(prop->getName(), propname);
 		prop_as->setParent(this);
@@ -293,6 +293,20 @@ void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, strin
 		addTextureProperty(group, prop->getName(), propname, 0, false, grid, prop);
 	else if (prop->getType() == UDMFProperty::TYPE_TEX_FLAT)
 		addTextureProperty(group, prop->getName(), propname, 1, false, grid, prop);
+	else if (prop->getType() == UDMFProperty::TYPE_ID) {
+		MOPGTagProperty* prop_id = new MOPGTagProperty(prop->getName(), propname);
+		prop_id->setParent(this);
+		prop_id->setUDMFProp(prop);
+		properties.push_back(prop_id);
+		grid->AppendIn(group, prop_id);
+	}
+
+	/*if (mopg_prop) {
+		mopg_prop->setParent(this);
+		mopg_prop->setUDMFProp(prop);
+		properties.push_back(mopg_prop);
+		grid->AppendIn(group, (wxPGProperty*)mopg_prop);
+	}*/
 }
 
 void MapObjectPropsPanel::setupType(int objtype) {
@@ -493,8 +507,12 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		pg_properties->AppendIn(g_basic, prop_tt);
 
 		// Add id
-		if (map_format != MAP_DOOM)
-			addIntProperty(g_basic, "ID", "id");
+		if (map_format != MAP_DOOM) {
+			MOPGTagProperty* prop_id = new MOPGTagProperty("ID", "id");
+			prop_id->setParent(this);
+			properties.push_back(prop_id);
+			pg_properties->AppendIn(g_basic, prop_id);
+		}
 
 		if (map_format == MAP_HEXEN) {
 			// Add 'Scripting Special' group
