@@ -46,7 +46,7 @@ using std::vector;
 
 // Logfile
 #include <wx/log.h>
-#define LOG_MESSAGE(level, message) if (Global::log_verbosity >= level) wxLogMessage(message)
+#define LOG_MESSAGE(level, ...) if (Global::log_verbosity >= level) wxLogMessage(__VA_ARGS__)
 
 // OpenGL
 #ifdef __WXMSW__

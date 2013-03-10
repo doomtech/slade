@@ -546,6 +546,20 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	sf_str.setColor(sf::Color(colour.r, colour.g, colour.b, colour.a));
 
 	// Set font
+#if 1
+	sf::Font* clone;
+	switch (font) {
+	case FONT_NORMAL:			clone = &font_normal; break;
+	case FONT_CONDENSED:		clone = &font_condensed; break;
+	case FONT_BOLD:				clone = &font_bold; break;
+	case FONT_BOLDCONDENSED:	clone = &font_boldcondensed; break;
+	case FONT_MONOSPACE:		clone = &font_mono; break;
+	case FONT_SMALL:			clone = &font_normal; break;
+	default:					clone = &font_normal; break;
+	};
+	sf::Font myfont(*clone);
+	sf_str.setFont(myfont);
+#else
 	switch (font) {
 	case FONT_NORMAL:			sf_str.setFont(font_normal); break;
 	case FONT_CONDENSED:		sf_str.setFont(font_condensed); break;
@@ -555,6 +569,7 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	case FONT_SMALL:			sf_str.setFont(font_normal); break;
 	default:					sf_str.setFont(font_normal); break;
 	};
+#endif
 	if (font == FONT_SMALL)
 		sf_str.setCharacterSize(8);
 	else
@@ -604,6 +619,20 @@ fpoint2_t Drawing::textExtents(string text, int font) {
 	sf_str.setString(CHR(text));
 
 	// Set font
+#if 1
+	sf::Font* clone;
+	switch (font) {
+	case FONT_NORMAL:			clone = &font_normal; break;
+	case FONT_CONDENSED:		clone = &font_condensed; break;
+	case FONT_BOLD:				clone = &font_bold; break;
+	case FONT_BOLDCONDENSED:	clone = &font_boldcondensed; break;
+	case FONT_MONOSPACE:		clone = &font_mono; break;
+	case FONT_SMALL:			clone = &font_normal; break;
+	default:					clone = &font_normal; break;
+	};
+	sf::Font myfont(*clone);
+	sf_str.setFont(myfont);
+#else
 	switch (font) {
 	case FONT_NORMAL:			sf_str.setFont(font_normal); break;
 	case FONT_CONDENSED:		sf_str.setFont(font_condensed); break;
@@ -613,6 +642,7 @@ fpoint2_t Drawing::textExtents(string text, int font) {
 	case FONT_SMALL:			sf_str.setFont(font_normal); break;
 	default:					sf_str.setFont(font_normal); break;
 	};
+#endif
 	if (font == FONT_SMALL)
 		sf_str.setCharacterSize(8);
 	else

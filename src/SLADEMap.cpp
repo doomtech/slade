@@ -671,7 +671,7 @@ bool SLADEMap::readDoomVertexes(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doomvertex_t); a++)
 		addVertex(vert_data[a]);
 
-	wxLogMessage("Read %d vertices", vertices.size());
+	LOG_MESSAGE(3, "Read %d vertices", vertices.size());
 
 	return true;
 }
@@ -685,7 +685,7 @@ bool SLADEMap::readDoomSidedefs(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(doomside_t)) {
-		wxLogMessage("Read 0 sides");
+		LOG_MESSAGE(3, "Read 0 sides");
 		return true;
 	}
 
@@ -693,7 +693,7 @@ bool SLADEMap::readDoomSidedefs(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doomside_t); a++)
 		addSide(side_data[a]);
 
-	wxLogMessage("Read %d sides", sides.size());
+	LOG_MESSAGE(3, "Read %d sides", sides.size());
 
 	return true;
 }
@@ -707,17 +707,17 @@ bool SLADEMap::readDoomLinedefs(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(doomline_t)) {
-		wxLogMessage("Read 0 lines");
+		LOG_MESSAGE(3, "Read 0 lines");
 		return true;
 	}
 
 	doomline_t* line_data = (doomline_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(doomline_t); a++) {
 		if (!addLine(line_data[a]))
-			wxLogMessage("Line %d invalid, not added", a);
+			LOG_MESSAGE(2, "Line %d invalid, not added", a);
 	}
 
-	wxLogMessage("Read %d lines", lines.size());
+	LOG_MESSAGE(3, "Read %d lines", lines.size());
 
 	return true;
 }
@@ -731,7 +731,7 @@ bool SLADEMap::readDoomSectors(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(doomsector_t)) {
-		wxLogMessage("Read 0 sectors");
+		LOG_MESSAGE(3, "Read 0 sectors");
 		return true;
 	}
 
@@ -739,7 +739,7 @@ bool SLADEMap::readDoomSectors(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doomsector_t); a++)
 		addSector(sect_data[a]);
 
-	wxLogMessage("Read %d sectors", sectors.size());
+	LOG_MESSAGE(3, "Read %d sectors", sectors.size());
 
 	return true;
 }
@@ -753,7 +753,7 @@ bool SLADEMap::readDoomThings(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(doomthing_t)) {
-		wxLogMessage("Read 0 things");
+		LOG_MESSAGE(3, "Read 0 things");
 		return true;
 	}
 
@@ -761,13 +761,13 @@ bool SLADEMap::readDoomThings(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doomthing_t); a++)
 		addThing(thng_data[a]);
 
-	wxLogMessage("Read %d things", things.size());
+	LOG_MESSAGE(3, "Read %d things", things.size());
 
 	return true;
 }
 
 bool SLADEMap::readDoomMap(Archive::mapdesc_t map) {
-	wxLogMessage("Reading Doom format map");
+	LOG_MESSAGE(2, "Reading Doom format map");
 
 	// Find map entries
 	ArchiveEntry* v = NULL;
@@ -924,7 +924,7 @@ bool SLADEMap::readHexenLinedefs(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(hexenline_t)) {
-		wxLogMessage("Read 0 lines");
+		LOG_MESSAGE(3, "Read 0 lines");
 		return true;
 	}
 
@@ -932,7 +932,7 @@ bool SLADEMap::readHexenLinedefs(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(hexenline_t); a++)
 		addLine(line_data[a]);
 
-	wxLogMessage("Read %d lines", lines.size());
+	LOG_MESSAGE(3, "Read %d lines", lines.size());
 
 	return true;
 }
@@ -945,7 +945,7 @@ bool SLADEMap::readHexenThings(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(hexenthing_t)) {
-		wxLogMessage("Read 0 things");
+		LOG_MESSAGE(3, "Read 0 things");
 		return true;
 	}
 
@@ -953,13 +953,13 @@ bool SLADEMap::readHexenThings(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(hexenthing_t); a++)
 		addThing(thng_data[a]);
 
-	wxLogMessage("Read %d things", things.size());
+	LOG_MESSAGE(3, "Read %d things", things.size());
 
 	return true;
 }
 
 bool SLADEMap::readHexenMap(Archive::mapdesc_t map) {
-	wxLogMessage("Reading Hexen format map");
+	LOG_MESSAGE(2, "Reading Hexen format map");
 
 	// Find map entries
 	ArchiveEntry* v = NULL;
@@ -1025,7 +1025,7 @@ bool SLADEMap::readDoom64Vertexes(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(doom64vertex_t)) {
-		wxLogMessage("Read 0 vertices");
+		LOG_MESSAGE(3, "Read 0 vertices");
 		return true;
 	}
 
@@ -1033,7 +1033,7 @@ bool SLADEMap::readDoom64Vertexes(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64vertex_t); a++)
 		addVertex(vert_data[a]);
 
-	wxLogMessage("Read %d vertices", vertices.size());
+	LOG_MESSAGE(3, "Read %d vertices", vertices.size());
 
 	return true;
 }
@@ -1046,7 +1046,7 @@ bool SLADEMap::readDoom64Sidedefs(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(doom64side_t)) {
-		wxLogMessage("Read 0 sides");
+		LOG_MESSAGE(3, "Read 0 sides");
 		return true;
 	}
 
@@ -1054,7 +1054,7 @@ bool SLADEMap::readDoom64Sidedefs(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64side_t); a++)
 		addSide(side_data[a]);
 
-	wxLogMessage("Read %d sides", sides.size());
+	LOG_MESSAGE(3, "Read %d sides", sides.size());
 
 	return true;
 }
@@ -1067,7 +1067,7 @@ bool SLADEMap::readDoom64Linedefs(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(doom64line_t)) {
-		wxLogMessage("Read 0 lines");
+		LOG_MESSAGE(3, "Read 0 lines");
 		return true;
 	}
 
@@ -1075,7 +1075,7 @@ bool SLADEMap::readDoom64Linedefs(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64line_t); a++)
 		addLine(line_data[a]);
 
-	wxLogMessage("Read %d lines", lines.size());
+	LOG_MESSAGE(3, "Read %d lines", lines.size());
 
 	return true;
 }
@@ -1088,7 +1088,7 @@ bool SLADEMap::readDoom64Sectors(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(doom64sector_t)) {
-		wxLogMessage("Read 0 sectors");
+		LOG_MESSAGE(3, "Read 0 sectors");
 		return true;
 	}
 
@@ -1096,7 +1096,7 @@ bool SLADEMap::readDoom64Sectors(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64sector_t); a++)
 		addSector(sect_data[a]);
 
-	wxLogMessage("Read %d sectors", sectors.size());
+	LOG_MESSAGE(3, "Read %d sectors", sectors.size());
 
 	return true;
 }
@@ -1109,7 +1109,7 @@ bool SLADEMap::readDoom64Things(ArchiveEntry * entry) {
 
 	// Check for empty entry
 	if (entry->getSize() < sizeof(doom64thing_t)) {
-		wxLogMessage("Read 0 things");
+		LOG_MESSAGE(3, "Read 0 things");
 		return true;
 	}
 
@@ -1117,13 +1117,13 @@ bool SLADEMap::readDoom64Things(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64thing_t); a++)
 		addThing(thng_data[a]);
 
-	wxLogMessage("Read %d things", things.size());
+	LOG_MESSAGE(3, "Read %d things", things.size());
 
 	return true;
 }
 
 bool SLADEMap::readDoom64Map(Archive::mapdesc_t map) {
-	wxLogMessage("Reading Doom 64 format map");
+	LOG_MESSAGE(2, "Reading Doom 64 format map");
 
 	// Find map entries
 	ArchiveEntry* v = NULL;
