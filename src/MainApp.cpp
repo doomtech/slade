@@ -53,6 +53,8 @@
 #include <wx/stackwalk.h>
 #include <wx/dir.h>
 #include <wx/sysopt.h>
+
+#undef BOOL
 #include <FreeImage.h>
 
 #ifdef UPDATEREVISION

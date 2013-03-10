@@ -48,8 +48,8 @@
  * VARIABLES
  *******************************************************************/
 typedef std::map<string, int> StrIntMap;
-typedef std::map<string, vector<ArchiveEntry*>> PathMap;
-typedef std::map<int, vector<ArchiveEntry*>> CRCMap;
+typedef std::map<string, vector<ArchiveEntry*> > PathMap;
+typedef std::map<int, vector<ArchiveEntry*> > CRCMap;
 
 
 /*******************************************************************
