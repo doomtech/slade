@@ -25,6 +25,7 @@ CVAR(Bool, map_animate_selection, false, CVAR_SAVE)
 CVAR(Bool, map_animate_tagged, true, CVAR_SAVE)
 CVAR(Float, arrow_alpha, 1.0f, CVAR_SAVE)
 CVAR(Bool, arrow_colour, false, CVAR_SAVE)
+CVAR(Bool, flats_use_vbo, true, CVAR_SAVE)
 
 CVAR(Bool, test_ssplit, false, CVAR_SAVE)
 
@@ -976,7 +977,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 		thing = map->getThing(a);
 		x = thing->xPos();
 		y = thing->yPos();
-		angle = thing->intProperty("angle");
+		angle = thing->getAngle();
 
 		// Set alpha
 		if (thing->isFiltered())
@@ -1014,7 +1015,6 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 			ThingType* tt = theGameConfiguration->thingType(thing->getType());
 			x = thing->xPos();
 			y = thing->yPos();
-			angle = thing->intProperty("angle");
 
 			// Set alpha
 			if (thing->isFiltered())
@@ -1022,7 +1022,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 			else
 				talpha = alpha;
 
-			if (renderSpriteThing(x, y, angle, tt, talpha, true))
+			if (renderSpriteThing(x, y, thing->getAngle(), tt, talpha, true))
 				things_arrows.push_back(a);
 		}
 	}
@@ -1054,7 +1054,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 
 				glPushMatrix();
 				glTranslated(x, y, 0);
-				glRotated(thing->intProperty("angle"), 0, 0, 1);
+				glRotated(thing->getAngle(), 0, 0, 1);
 
 				glBegin(GL_QUADS);
 				glTexCoord2f(0.0f, 1.0f);	glVertex2d(-32, -32);
@@ -1258,7 +1258,7 @@ void MapRenderer2D::renderFlats(int type, bool texture, float alpha) {
 	if (alpha <= 0.01f)
 		return;
 
-	if (OpenGL::vboSupport())
+	if (OpenGL::vboSupport() && flats_use_vbo)
 		renderFlatsVBO(type, texture, alpha);
 	else
 		renderFlatsImmediate(type, texture, alpha);
@@ -1831,7 +1831,7 @@ void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) 
 		thing = map->getThing(things[a]);
 		x = thing->xPos() + move_vec.x;
 		y = thing->yPos() + move_vec.y;
-		angle = thing->intProperty("angle");
+		angle = thing->getAngle();
 
 		// Get thing type properties from game configuration
 		ThingType* tt = theGameConfiguration->thingType(thing->getType());
@@ -1855,7 +1855,7 @@ void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) 
 			ThingType* tt = theGameConfiguration->thingType(thing->getType());
 			x = thing->xPos() + move_vec.x;
 			y = thing->yPos() + move_vec.y;
-			angle = thing->intProperty("angle");
+			angle = thing->getAngle();
 
 			renderSpriteThing(x, y, angle, tt, 1.0f, true);
 		}
@@ -1901,7 +1901,7 @@ void MapRenderer2D::renderPasteThings(vector<MapThing*>& things, fpoint2_t pos) 
 		thing = things[a];
 		x = thing->xPos() + pos.x;
 		y = thing->yPos() + pos.y;
-		angle = thing->intProperty("angle");
+		angle = thing->getAngle();
 
 		// Get thing type properties from game configuration
 		ThingType* tt = theGameConfiguration->thingType(thing->getType());
@@ -1925,7 +1925,7 @@ void MapRenderer2D::renderPasteThings(vector<MapThing*>& things, fpoint2_t pos) 
 			ThingType* tt = theGameConfiguration->thingType(thing->getType());
 			x = thing->xPos() + pos.x;
 			y = thing->yPos() + pos.y;
-			angle = thing->intProperty("angle");
+			angle = thing->getAngle();
 
 			renderSpriteThing(x, y, angle, tt, 1.0f, true);
 		}
@@ -2045,6 +2045,9 @@ void MapRenderer2D::updateLinesVBO(bool show_direction, float base_alpha) {
 }
 
 void MapRenderer2D::updateFlatsVBO() {
+	if (!flats_use_vbo)
+		return;
+
 	// Create VBO if needed
 	if (vbo_flats == 0)
 		glGenBuffers(1, &vbo_flats);

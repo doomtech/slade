@@ -634,7 +634,7 @@ bool SLADEMap::addThing(doomthing_t& t) {
 	MapThing* nt = new MapThing(t.x, t.y, t.type, this);
 
 	// Setup thing properties
-	nt->properties["angle"] = t.angle;
+	nt->angle = t.angle;
 	nt->properties["flags"] = t.flags;
 
 	// Add thing
@@ -647,7 +647,7 @@ bool SLADEMap::addThing(doom64thing_t& t) {
 	MapThing* nt = new MapThing(t.x, t.y, t.type, this);
 
 	// Setup thing properties
-	nt->properties["angle"] = t.angle;
+	nt->angle = t.angle;
 	nt->properties["height"] = (double)t.z;
 	nt->properties["flags"] = t.flags;
 	nt->properties["id"] = t.tid;
@@ -903,7 +903,7 @@ bool SLADEMap::addThing(hexenthing_t& t) {
 	MapThing* nt = new MapThing(t.x, t.y, t.type, this);
 
 	// Setup thing properties
-	nt->properties["angle"] = t.angle;
+	nt->angle = t.angle;
 	nt->properties["height"] = (double)t.z;
 	nt->properties["special"] = t.special;
 	nt->properties["flags"] = t.flags;
@@ -1637,7 +1637,7 @@ bool SLADEMap::writeDoomThings(ArchiveEntry* entry) {
 		thing.y = things[a]->yPos();
 
 		// Properties
-		thing.angle = things[a]->intProperty("angle");
+		thing.angle = things[a]->getAngle();
 		thing.type = things[a]->type;
 		thing.flags = things[a]->intProperty("flags");
 
@@ -1735,7 +1735,7 @@ bool SLADEMap::writeHexenThings(ArchiveEntry* entry) {
 		thing.z = things[a]->intProperty("height");
 
 		// Properties
-		thing.angle = things[a]->intProperty("angle");
+		thing.angle = things[a]->getAngle();
 		thing.type = things[a]->type;
 		thing.flags = things[a]->intProperty("flags");
 		thing.tid = things[a]->intProperty("id");
@@ -1935,7 +1935,7 @@ bool SLADEMap::writeDoom64Things(ArchiveEntry * entry) {
 		thing.z = things[a]->intProperty("height");
 
 		// Properties
-		thing.angle = things[a]->intProperty("angle");
+		thing.angle = things[a]->getAngle();
 		thing.type = things[a]->type;
 		thing.flags = things[a]->intProperty("flags");
 		thing.tid = things[a]->intProperty("id");
@@ -2006,6 +2006,7 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 
 		// Basic properties
 		object_def += S_FMT("x=%1.3f;\ny=%1.3f;\ntype=%d;\n", things[a]->x, things[a]->y, things[a]->type);
+		if (things[a]->angle != 0) object_def += S_FMT("angle=%d;\n", things[a]->angle);
 
 		// Remove internal 'flags' property if it exists
 		things[a]->props().removeProperty("flags");

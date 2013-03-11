@@ -84,6 +84,7 @@ private:
 		bool	ok;
 		bool	done;
 		bool	inpoly;
+		int		sister;
 	};
 	struct vertex_t {
 		double 			x, y;
@@ -127,6 +128,7 @@ public:
 	bool	detectUnclosed();
 
 	bool	tracePolyOutline(int edge_start);
+	bool	testTracePolyOutline(int edge_start);
 
 	bool	splitFromEdge(int splitter_edge);
 	bool	buildSubPoly(int edge_start, gl_polygon_t* poly);

@@ -8,6 +8,7 @@ MapThing::MapThing(SLADEMap* parent) : MapObject(MOBJ_THING, parent) {
 	this->x = 0;
 	this->y = 0;
 	this->type = 1;
+	this->angle = 0;
 }
 
 MapThing::MapThing(double x, double y, short type, SLADEMap* parent) : MapObject(MOBJ_THING, parent) {
@@ -15,6 +16,7 @@ MapThing::MapThing(double x, double y, short type, SLADEMap* parent) : MapObject
 	this->x = x;
 	this->y = y;
 	this->type = type;
+	this->angle = 0;
 }
 
 MapThing::~MapThing() {
@@ -27,6 +29,8 @@ int MapThing::intProperty(string key) {
 		return (int)x;
 	else if (key == "y")
 		return (int)y;
+	else if (key == "angle")
+		return angle;
 	else
 		return MapObject::intProperty(key);
 }
@@ -50,6 +54,8 @@ void MapThing::setIntProperty(string key, int value) {
 		x = value;
 	else if (key == "y")
 		y = value;
+	else if (key == "angle")
+		angle = value;
 	else
 		return MapObject::setIntProperty(key, value);
 }
@@ -76,6 +82,7 @@ void MapThing::copy(MapObject* c) {
 	this->x = thing->x;
 	this->y = thing->y;
 	this->type = thing->type;
+	this->angle = thing->angle;
 
 	// Other properties
 	MapObject::copy(c);
@@ -108,7 +115,8 @@ void MapThing::setAnglePoint(fpoint2_t point) {
 		angle = 315;
 
 	// Set thing angle
-	setIntProperty("angle", angle);
+	this->angle = angle;
+	//setIntProperty("angle", angle);
 }
 
 void MapThing::writeBackup(mobj_backup_t* backup) {
@@ -118,6 +126,9 @@ void MapThing::writeBackup(mobj_backup_t* backup) {
 	// Position
 	backup->props_internal["x"] = x;
 	backup->props_internal["y"] = y;
+
+	// Angle
+	backup->props_internal["angle"] = angle;
 }
 
 void MapThing::readBackup(mobj_backup_t* backup) {
@@ -127,4 +138,7 @@ void MapThing::readBackup(mobj_backup_t* backup) {
 	// Position
 	x = backup->props_internal["x"].getFloatValue();
 	y = backup->props_internal["y"].getFloatValue();
+
+	// Angle
+	angle = backup->props_internal["angle"].getIntValue();
 }

@@ -546,7 +546,7 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	sf_str.setColor(sf::Color(colour.r, colour.g, colour.b, colour.a));
 
 	// Set font
-#if 1
+#if 0
 	sf::Font* clone;
 	switch (font) {
 	case FONT_NORMAL:			clone = &font_normal; break;
@@ -619,7 +619,7 @@ fpoint2_t Drawing::textExtents(string text, int font) {
 	sf_str.setString(CHR(text));
 
 	// Set font
-#if 1
+#if 0
 	sf::Font* clone;
 	switch (font) {
 	case FONT_NORMAL:			clone = &font_normal; break;

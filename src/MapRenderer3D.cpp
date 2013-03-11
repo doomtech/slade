@@ -20,6 +20,8 @@ CVAR(Int, render_3d_things, 1, CVAR_SAVE)
 CVAR(Int, render_3d_things_style, 1, CVAR_SAVE)
 CVAR(Int, render_3d_hilight, 1, CVAR_SAVE)
 
+EXTERN_CVAR(Bool, flats_use_vbo)
+
 
 MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 	// Init variables
@@ -53,10 +55,11 @@ MapRenderer3D::MapRenderer3D(SLADEMap* map) {
 }
 
 MapRenderer3D::~MapRenderer3D() {
-	if (quads)
-		delete quads;
-	if (flats)
-		delete flats;
+	if (quads)				delete quads;
+	if (flats)				delete flats;
+	if (vbo_ceilings > 0)	glDeleteBuffers(1, &vbo_ceilings);
+	if (vbo_floors > 0)		glDeleteBuffers(1, &vbo_floors);
+	if (vbo_walls > 0)		glDeleteBuffers(1, &vbo_walls);
 }
 
 bool MapRenderer3D::init() {
@@ -700,7 +703,7 @@ void MapRenderer3D::renderFlat(flat_3d_t* flat) {
 	setLight(flat->colour, flat->light, alpha);
 
 	// Render flat
-	if (OpenGL::vboSupport()) {
+	if (OpenGL::vboSupport() && flats_use_vbo) {
 		// Setup for floor or ceiling
 		if (flat->flags & CEIL) {
 			if (flat_last != 2) {
@@ -1610,7 +1613,7 @@ void MapRenderer3D::renderThings() {
 			// Direction
 			glPushMatrix();
 			glTranslatef(thing->xPos(), thing->yPos(), bottom);
-			glRotated(thing->intProperty("angle"), 0, 0, 1);
+			glRotated(thing->getAngle(), 0, 0, 1);
 			glBegin(GL_LINES);
 			glVertex3f(0.0f, 0.0f, 0.0f);
 			glVertex3f(radius, 0.0f, 0.0f);
@@ -1697,6 +1700,9 @@ void MapRenderer3D::renderThingSelection(vector<selection_3d_t>& selection, floa
 }
 
 void MapRenderer3D::updateFlatsVBO() {
+	if (!flats_use_vbo)
+		return;
+
 	// Create VBOs if needed
 	if (vbo_floors == 0) {
 		glGenBuffers(1, &vbo_floors);
