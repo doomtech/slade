@@ -2516,8 +2516,7 @@ void MapEditor::paste(fpoint2_t mouse_pos) {
 
 #pragma endregion
 
-// Why won't it allow numbers for region names?
-#pragma region EDITING THREE-D
+#pragma region EDITING_3D
 
 bool MapEditor::set3dHilight(selection_3d_t item) {
 	bool changed = false;
@@ -2561,14 +2560,6 @@ bool MapEditor::wallMatches(MapSide* side, uint8_t part, string tex) {
 		return false;
 	if (part == SEL_SIDE_BOTTOM && side->stringProperty("texturebottom") != tex)
 		return false;
-
-	// Check it isn't already selected
-	/*
-	for (unsigned s = 0; s < selection_3d.size(); s++) {
-		if (selection_3d[s].type == part && selection_3d[s].index == side->getIndex())
-			return false;
-	}
-	*/
 
 	return true;
 }
@@ -2842,6 +2833,7 @@ void MapEditor::changeOffset3d(int amount, bool x) {
 
 	// Go through items
 	vector<int> done;
+	bool changed = false;
 	bool udmf_ext = (map.currentFormat() == MAP_UDMF && theGameConfiguration->udmfNamespace() == "zdoom");
 	for (unsigned a = 0; a < items.size(); a++) {
 		// Wall
@@ -2891,6 +2883,8 @@ void MapEditor::changeOffset3d(int amount, bool x) {
 				int offset = side->floatProperty(ofs);
 				side->setFloatProperty(ofs, offset + amount);
 			}
+
+			changed = true;
 		}
 
 		// Flat (UDMF+ZDoom only)
@@ -2906,6 +2900,8 @@ void MapEditor::changeOffset3d(int amount, bool x) {
 					double offset = sector->floatProperty("ypanningfloor");
 					sector->setFloatProperty("ypanningfloor", offset + amount);
 				}
+
+				changed = true;
 			}
 			else if (items[a].type == SEL_CEILING) {
 				if (x) {
@@ -2916,15 +2912,17 @@ void MapEditor::changeOffset3d(int amount, bool x) {
 					double offset = sector->floatProperty("ypanningceiling");
 					sector->setFloatProperty("ypanningceiling", offset + amount);
 				}
+
+				changed = true;
 			}
 		}
 	}
 
 	// End undo level
-	endUndoRecord();
+	endUndoRecord(changed);
 
 	// Editor message
-	if (items.size() > 0) {
+	if (items.size() > 0 && changed) {
 		string axis = "X";
 		if (!x) axis = "Y";
 
@@ -3399,12 +3397,17 @@ void MapEditor::changeThingZ3d(int amount) {
 }
 
 void MapEditor::deleteThing3d() {
+	// Begin undo level
+	beginUndoRecord("Delete Thing", false, false, true);
+
 	// Go through 3d selection
 	for (unsigned a = 0; a < selection_3d.size(); a++) {
 		// Check if thing
 		if (selection_3d[a].type == SEL_THING)
 			map.removeThing(selection_3d[a].index);
 	}
+
+	endUndoRecord();
 }
 
 void MapEditor::changeScale3d(double amount, bool x) {

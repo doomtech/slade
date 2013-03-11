@@ -1008,6 +1008,7 @@ void MapCanvas::draw() {
 			glEnable(GL_TEXTURE_2D);
 			col.set_gl(true);
 			Drawing::drawText(S_FMT("%d", renderer_3d->itemDistance()), midx+5, midy+5, rgba_t(255, 255, 255, 200), Drawing::FONT_SMALL);
+			//Drawing::drawText(S_FMT("%1.2f", renderer_3d->camPitch()), midx+5, midy+30, rgba_t(255, 255, 255, 200), Drawing::FONT_SMALL);
 		}
 	}
 

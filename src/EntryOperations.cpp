@@ -1086,7 +1086,13 @@ bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen, ArchiveEntry* 
 
 	// Execute acc
 	string command = path_acc + " " + opt + " \"" + srcfile + "\" \"" + ofile + "\"";
-	wxExecute(command, wxEXEC_SYNC);
+	wxArrayString output;
+	wxExecute(command, output, wxEXEC_SYNC);
+
+	// Log output
+	theConsole->logMessage("ACC.exe Output:");
+	for (unsigned a = 0; a < output.size(); a++)
+		theConsole->logMessage(output[a]);
 
 	// Deal with focus-stealing apps
 	if (parent)

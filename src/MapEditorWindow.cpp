@@ -406,8 +406,7 @@ void MapEditorWindow::loadMapScripts(Archive::mapdesc_t map) {
 	}
 
 	// Open scripts/compiled if found
-	if (scripts || compiled)
-		panel_script_editor->openScripts(scripts, compiled);
+	panel_script_editor->openScripts(scripts, compiled);
 }
 
 bool nb_warned = false;
@@ -491,20 +490,6 @@ bool MapEditorWindow::saveMap() {
 		theGameConfiguration->scriptLanguage() == "acs_zdoom")
 		acs = true;
 
-	//// Get current SCRIPTS and BEHAVIOUR entries (if ACS)
-	//ArchiveEntry* scripts = NULL;
-	//ArchiveEntry* behavior = NULL;
-	//ArchiveEntry* entry = mdesc_current.head->nextEntry();
-	//if (acs) {
-	//	while (entry && entry != mdesc_current.end->nextEntry()) {
-	//		if (S_CMPNOCASE(entry->getName(true), "SCRIPTS"))
-	//			scripts = entry;
-	//		else if (S_CMPNOCASE(entry->getName(true), "BEHAVIOR"))
-	//			behavior = entry;
-	//		entry = entry->nextEntry();
-	//	}
-	//}
-
 	// Add map data to temporary wad
 	WadArchive* wad = new WadArchive();
 	wad->addNewEntry("MAP01");
@@ -512,14 +497,10 @@ bool MapEditorWindow::saveMap() {
 		wad->addEntry(map_data[a]);
 	if (acs) // BEHAVIOR
 		wad->addEntry(panel_script_editor->compiledEntry(), "", true);
-	if (mdesc_current.format == MAP_UDMF)
-		wad->addNewEntry("ENDMAP");
 	if (acs && panel_script_editor->scriptEntry()->getSize() > 0) // SCRIPTS (if any)
 		wad->addEntry(panel_script_editor->scriptEntry(), "", true);
-	/*if (behavior)
-		wad->addEntry(behavior, "", true);
-	if (scripts)
-		wad->addEntry(scripts, "", true);*/
+	if (mdesc_current.format == MAP_UDMF)
+		wad->addNewEntry("ENDMAP");
 
 	// Check for map archive
 	Archive* tempwad = NULL;
@@ -563,19 +544,6 @@ bool MapEditorWindow::saveMap() {
 		// Update map description
 		mdesc_current.end = entry;
 	}
-
-	//// Update script editor
-	//if (acs) {
-	//	entry = mdesc_current.head->nextEntry();
-	//	while (entry && entry != mdesc_current.end->nextEntry()) {
-	//		if (S_CMPNOCASE(entry->getName(true), "SCRIPTS"))
-	//			panel_script_editor->setScriptEntry(entry);
-	//		else if (S_CMPNOCASE(entry->getName(true), "BEHAVIOR"))
-	//			panel_script_editor->setCompiledEntry(entry);
-
-	//		entry = entry->nextEntry();
-	//	}
-	//}
 
 	// Lock current map entries
 	lockMapEntries();

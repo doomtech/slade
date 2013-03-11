@@ -34,6 +34,7 @@ TODO List ---------------------------------------------------------------
 - Better UDMF property handling, proper support for unknown properties read with the map
 - (Possibly) better line/thing flag handling
 - Tag edit mode for TIDs/LineIDs(?)
+- Need to separate editor defaults from udmf defaults (eg. thing skill flags are all false by default in udmf)
 
 
 --- Map Editor post-3.1 ---

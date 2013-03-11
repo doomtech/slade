@@ -1371,19 +1371,6 @@ bool SLADEMap::addThing(ParseTreeNode* def) {
 	// Create new thing
 	MapThing* nt = new MapThing(prop_x->getFloatValue(), prop_y->getFloatValue(), prop_type->getIntValue(), this);
 
-	// Set some reasonable defaults
-	/*
-	nt->prop("height") = 0;
-	nt->prop("angle") = 0;
-	nt->prop("id") = 0;
-	nt->prop("special") = 0;
-	nt->prop("arg0") = 0;
-	nt->prop("arg1") = 0;
-	nt->prop("arg2") = 0;
-	nt->prop("arg3") = 0;
-	nt->prop("arg4") = 0;
-	*/
-
 	// Add extra thing info
 	ParseTreeNode* prop = NULL;
 	for (unsigned a = 0; a < def->nChildren(); a++) {
@@ -1393,7 +1380,11 @@ bool SLADEMap::addThing(ParseTreeNode* def) {
 		if (prop == prop_x || prop == prop_y || prop == prop_type)
 			continue;
 
-		nt->properties[prop->getName()] = prop->getValue();
+		// Builtin properties
+		if (S_CMPNOCASE(prop->getName(), "angle"))
+			nt->angle = prop->getIntValue();
+		else
+			nt->properties[prop->getName()] = prop->getValue();
 	}
 
 	// Add thing to map

@@ -1445,8 +1445,10 @@ void MapRenderer3D::renderThings() {
 		things[a].flags = things[a].flags & ~DRAWN;
 
 		// Check side of camera
-		if (MathStuff::lineSide(thing->xPos(), thing->yPos(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0)
-			continue;
+		if (cam_pitch > -0.9 && cam_pitch < 0.9) {
+			if (MathStuff::lineSide(thing->xPos(), thing->yPos(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0)
+				continue;
+		}
 
 		// Check thing distance if needed
 		if (mdist > 0) {
@@ -1791,13 +1793,15 @@ void MapRenderer3D::quickVisDiscard() {
 			continue;
 
 		// Check side of camera
-		if (MathStuff::lineSide(bbox.min.x, bbox.min.y, x, y, strafe.x, strafe.y) > 0 &&
-			MathStuff::lineSide(bbox.max.x, bbox.min.y, x, y, strafe.x, strafe.y) > 0 &&
-			MathStuff::lineSide(bbox.max.x, bbox.max.y, x, y, strafe.x, strafe.y) > 0 &&
-			MathStuff::lineSide(bbox.min.x, bbox.max.y, x, y, strafe.x, strafe.y) > 0) {
-			// Behind camera, invisible
-			dist_sectors[a] = -1.0f;
-			continue;
+		if (cam_pitch > -0.9 && cam_pitch < 0.9) {
+			if (MathStuff::lineSide(bbox.min.x, bbox.min.y, x, y, strafe.x, strafe.y) > 0 &&
+				MathStuff::lineSide(bbox.max.x, bbox.min.y, x, y, strafe.x, strafe.y) > 0 &&
+				MathStuff::lineSide(bbox.max.x, bbox.max.y, x, y, strafe.x, strafe.y) > 0 &&
+				MathStuff::lineSide(bbox.min.x, bbox.max.y, x, y, strafe.x, strafe.y) > 0) {
+				// Behind camera, invisible
+				dist_sectors[a] = -1.0f;
+				continue;
+			}
 		}
 
 		// Check distance to bbox
@@ -1857,9 +1861,11 @@ void MapRenderer3D::checkVisibleQuads() {
 			continue;
 
 		// Check side of camera
-		if (MathStuff::lineSide(line->x1(), line->y1(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0 &&
-			MathStuff::lineSide(line->x2(), line->y2(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0)
-			continue;
+		if (cam_pitch > -0.9 && cam_pitch < 0.9) {
+			if (MathStuff::lineSide(line->x1(), line->y1(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0 &&
+				MathStuff::lineSide(line->x2(), line->y2(), cam_position.x, cam_position.y, strafe.x, strafe.y) > 0)
+				continue;
+		}
 
 		// Check for distance fade
 		if (render_max_dist > 0)

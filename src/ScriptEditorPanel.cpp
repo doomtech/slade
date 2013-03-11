@@ -104,14 +104,16 @@ void ScriptEditorPanel::populateWordList() {
 bool ScriptEditorPanel::handleAction(string name) {
 	// Compile Script
 	if (name == "mapw_script_compile") {
-		string lang = theGameConfiguration->scriptLanguage();
+		// Write text to entry
+		wxCharBuffer buf = text_editor->GetText().mb_str();
+		entry_script->importMem(buf, buf.length());
 
+		// Compile depending on language
+		string lang = theGameConfiguration->scriptLanguage();
 		if (lang == "acs_hexen")
 			EntryOperations::compileACS(entry_script, true, entry_compiled, theMapEditor);
 		else if (lang == "acs_zdoom")
 			EntryOperations::compileACS(entry_script, false, entry_compiled, theMapEditor);
-
-		return true;
 	}
 
 	// Save Script
@@ -125,7 +127,11 @@ bool ScriptEditorPanel::handleAction(string name) {
 	else if (name == "mapw_script_jumpto")
 		text_editor->openJumpToDialog();
 
-	return false;
+	// Not handled
+	else
+		return false;
+
+	return true;
 }
 
 void ScriptEditorPanel::onWordListActivate(wxCommandEvent& e) {
