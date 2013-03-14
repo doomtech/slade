@@ -1397,11 +1397,14 @@ void MapCanvas::lockMouse(bool lock) {
 		img.SetMaskColour(0, 0, 0);
 		SetCursor(wxCursor(img));
 
+// TODO: check if sfml cursor show/hide is even really needed
+#ifndef __WXGTK__
 #ifdef USE_SFML_RENDERWINDOW
 #if SFML_VERSION_MAJOR < 2
 		ShowMouseCursor(false);
 #else
 		setMouseCursorVisible(false);
+#endif
 #endif
 #endif
 	}
@@ -1409,11 +1412,13 @@ void MapCanvas::lockMouse(bool lock) {
 		// Show cursor
 		SetCursor(wxNullCursor);
 
+#ifndef __WXGTK__
 #ifdef USE_SFML_RENDERWINDOW
 #if SFML_VERSION_MAJOR < 2
 		ShowMouseCursor(false);
 #else
 		setMouseCursorVisible(false);
+#endif
 #endif
 #endif
 	}
@@ -1828,6 +1833,7 @@ void MapCanvas::onKeyBindPress(string name) {
 
 	// Screenshot
 #ifdef USE_SFML_RENDERWINDOW
+#if SFML_VERSION_MAJOR >= 2
 	else if (name == "map_screenshot") {
 		// Capture shot
 		sf::Image shot = capture();
@@ -1852,6 +1858,7 @@ void MapCanvas::onKeyBindPress(string name) {
 		// Editor message
 		editor->addEditorMessage(S_FMT("Screenshot taken (%s)", CHR(filename)));
 	}
+#endif
 #endif
 
 	// Send to editor first
