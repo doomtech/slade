@@ -85,7 +85,16 @@ private:
 
 public:
 	FontManager() {}
-	~FontManager() {}
+	~FontManager() {
+#ifndef USE_SFML_RENDERWINDOW
+		if (font_normal)		{ delete font_normal;			font_normal = NULL;			}
+		if (font_condensed)		{ delete font_condensed;		font_condensed = NULL;		}
+		if (font_bold)			{ delete font_bold;				font_bold = NULL;			}
+		if (font_boldcondensed) { delete font_boldcondensed;	font_boldcondensed = NULL;	}
+		if (font_mono)			{ delete font_mono;				font_mono = NULL;			}
+		if (font_small)			{ delete font_small;			font_small = NULL;			}
+#endif
+	}
 
 	static FontManager*	getInstance() {
 		if (!instance)
