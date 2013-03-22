@@ -122,6 +122,7 @@ bool OGLCanvas::setContext() {
 }
 
 void OGLCanvas::createSFML() {
+#ifdef USE_SFML_RENDERWINDOW
 	// Code taken from SFML wxWidgets integration example
 	sf::WindowHandle handle;
 #ifdef __WXGTK__
@@ -146,6 +147,7 @@ void OGLCanvas::createSFML() {
 	settings.depthBits = 32;
 	settings.stencilBits = 8;
 	sf::RenderWindow::create(handle, settings);
+#endif
 #endif
 }
 
