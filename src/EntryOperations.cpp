@@ -52,6 +52,7 @@ CVAR(String, path_acc_libs, "", CVAR_SAVE);
 CVAR(String, path_pngout, "", CVAR_SAVE);
 CVAR(String, path_pngcrush, "", CVAR_SAVE);
 CVAR(String, path_deflopt, "", CVAR_SAVE);
+CVAR(String, path_db2, "", CVAR_SAVE)
 
 
 /*******************************************************************
@@ -408,15 +409,21 @@ bool EntryOperations::openExternal(ArchiveEntry* entry) {
  *******************************************************************/
 bool EntryOperations::openMapDB2(ArchiveEntry* entry) {
 #ifdef __WXMSW__	// Windows only
-	// First up, check for DB2 location registry key
-	wxRegKey key(wxRegKey::HKLM, "SOFTWARE\\CodeImp\\Doom Builder");
-	string path;
-	key.QueryValue("Location", path);
+	string path = path_db2;
 
-	// Can't if DB2 isn't installed
 	if (path.IsEmpty()) {
-		wxMessageBox("Doom Builder 2 must be installed to use this feature.", "Doom Builder 2 Not Found");
-		return false;
+		// Check for DB2 location registry key
+		wxRegKey key(wxRegKey::HKLM, "SOFTWARE\\CodeImp\\Doom Builder");
+		key.QueryValue("Location", path);
+
+		// Can't proceed if DB2 isn't installed
+		if (path.IsEmpty()) {
+			wxMessageBox("Doom Builder 2 must be installed to use this feature.", "Doom Builder 2 Not Found");
+			return false;
+		}
+
+		// Add default executable name
+		path += "\\Builder.exe";
 	}
 
 	// Get map info for entry
@@ -453,7 +460,7 @@ bool EntryOperations::openMapDB2(ArchiveEntry* entry) {
 	}
 
 	// Generate Doom Builder command line
-	string cmd = S_FMT("%s\\Builder.exe \"%s\" -map %s", CHR(path), CHR(filename), CHR(entry->getName()));
+	string cmd = S_FMT("%s \"%s\" -map %s", CHR(path), CHR(filename), CHR(entry->getName()));
 
 	// Add base resource archive to command line
 	Archive* base = theArchiveManager->baseResourceArchive();

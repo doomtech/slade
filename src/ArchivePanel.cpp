@@ -1604,7 +1604,6 @@ bool ArchivePanel::optimizePNG() {
 
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
-		theSplashWindow->Raise();
 		theSplashWindow->setProgressMessage(selection[a]->getName(true));
 		theSplashWindow->setProgress(float(a) / float(selection.size()));
 		if (selection[a]->getType()->getFormat() == "img_png") {
@@ -1613,7 +1612,6 @@ bool ArchivePanel::optimizePNG() {
 		}
 	}
 	theSplashWindow->hide();
-	theMainWindow->Raise();
 
 	// Finish recording undo level
 	undo_manager->endRecord(true);
