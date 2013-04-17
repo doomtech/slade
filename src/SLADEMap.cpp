@@ -431,6 +431,8 @@ bool SLADEMap::readMap(Archive::mapdesc_t map) {
 	if (ok)
 		current_format = map.format;
 
+	opened_time = theApp->runTimer() + 10;
+
 	return ok;
 }
 
@@ -1990,6 +1992,9 @@ bool SLADEMap::writeUDMFMap(ArchiveEntry* textmap) {
 
 	//sf::Clock clock;
 
+	// Locale for float number format
+	setlocale(LC_NUMERIC, "C");
+
 	// Write things
 	string object_def;
 	for (unsigned a = 0; a < things.size(); a++) {
@@ -3005,6 +3010,28 @@ vector<MapObject*> SLADEMap::getAllModifiedObjects(long since) {
 	return modified_objects;
 }
 
+long SLADEMap::getLastModifiedTime() {
+	long mod_time = 0;
+
+	for (unsigned a = 0; a < all_objects.size(); a++) {
+		if (all_objects[a].mobj && all_objects[a].mobj->modifiedTime() > mod_time)
+			mod_time = all_objects[a].mobj->modifiedTime();
+	}
+
+	return mod_time;
+}
+
+bool SLADEMap::isModified() {
+	if (getLastModifiedTime() > opened_time)
+		return true;
+	else
+		return false;
+}
+
+void SLADEMap::setOpenedTime() {
+	opened_time = theApp->runTimer();
+}
+
 MapVertex* SLADEMap::createVertex(double x, double y, double split_dist) {
 	// Round position to integral if fractional positions are disabled
 	if (!position_frac) {
@@ -3069,7 +3096,7 @@ MapLine* SLADEMap::createLine(double x1, double y1, double x2, double y2, double
 	return createLine(vertex1, vertex2);
 }
 
-MapLine* SLADEMap::createLine(MapVertex* vertex1, MapVertex* vertex2) {
+MapLine* SLADEMap::createLine(MapVertex* vertex1, MapVertex* vertex2, bool force) {
 	// Check both vertices were given
 	if (!vertex1 || vertex1->parent_map != this)
 		return NULL;
@@ -3077,11 +3104,13 @@ MapLine* SLADEMap::createLine(MapVertex* vertex1, MapVertex* vertex2) {
 		return NULL;
 
 	// Check if there is already a line along the two given vertices
-	for (unsigned a = 0; a < lines.size(); a++) {
-		if ((lines[a]->vertex1 == vertex1 && lines[a]->vertex2 == vertex2) ||
-			(lines[a]->vertex2 == vertex1 && lines[a]->vertex1 == vertex2))
-			return lines[a];
-	}
+        if(!force) {
+            for (unsigned a = 0; a < lines.size(); a++) {
+                    if ((lines[a]->vertex1 == vertex1 && lines[a]->vertex2 == vertex2) ||
+                            (lines[a]->vertex2 == vertex1 && lines[a]->vertex1 == vertex2))
+                            return lines[a];
+            }
+        }
 
 	// Create new line between vertices
 	MapLine* nl = new MapLine(vertex1, vertex2, NULL, NULL, this);
