@@ -48,7 +48,7 @@ SLADEMap::SLADEMap() {
 	all_objects.push_back(mobj_holder_t(NULL, false));
 
 	// Init opened time so it's not random leftover garbage values
-	setOpenedTime();
+	opened_time = theApp->runTimer() + 10;
 }
 
 SLADEMap::~SLADEMap() {
@@ -3476,8 +3476,7 @@ int SLADEMap::removeDetachedVertices() {
 	int count = 0;
 	for (int a = vertices.size() - 1; a >= 0; a--) {
 		if (vertices[a]->nConnectedLines() == 0) {
-			removeMapObject(vertices[a]);
-			vertices.erase(vertices.begin() + a);
+			removeVertex(a);
 			count++;
 		}
 	}
@@ -3491,8 +3490,7 @@ int SLADEMap::removeDetachedSides() {
 	int count = 0;
 	for (int a = sides.size() - 1; a >= 0; a--) {
 		if (!sides[a]->parent) {
-			removeMapObject(sides[a]);
-			sides.erase(sides.begin() + a);
+			removeSide(a, false);
 			count++;
 		}
 	}
@@ -3506,8 +3504,7 @@ int SLADEMap::removeDetachedSectors() {
 	int count = 0;
 	for (int a = sectors.size() - 1; a >= 0; a--) {
 		if (sectors[a]->connectedSides().size() == 0) {
-			removeMapObject(sectors[a]);
-			sectors.erase(sectors.begin() + a);
+			removeSector(a);
 			count++;
 		}
 	}
