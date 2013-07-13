@@ -324,6 +324,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 {
 	// Init variables
 	prev_translation.addRange(TRANS_PALETTE, 0);
+	offset_changing = false;
 
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
@@ -358,9 +359,9 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	btn_nextimg = new wxBitmapButton(this, -1, getIcon("t_right"));
 	btn_previmg = new wxBitmapButton(this, -1, getIcon("t_left"));
 	text_curimg = new wxStaticText(this, -1, "Image XX/XX");
-	sizer_bottom->Add(btn_previmg, 0, wxEXPAND|wxRIGHT, 4);
-	sizer_bottom->Add(btn_nextimg, 0, wxEXPAND|wxRIGHT, 4);
-	sizer_bottom->Add(text_curimg, 0, wxALIGN_CENTER, 0);
+	btn_nextimg->Show(false);
+	btn_previmg->Show(false);
+	text_curimg->Show(false);
 
 	// Palette chooser
 	listenTo(theMainWindow->getPaletteChooser());
@@ -434,6 +435,26 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry, int index)
 	// Attempt to load the image
 	if (!Misc::loadImageFromEntry(getImage(), this->entry, index))
 		return false;
+
+	// Only show next/prev image buttons if the entry contains multiple images
+	if (getImage()->getSize() > 1)
+	{
+		btn_nextimg->Show();
+		btn_previmg->Show();
+		text_curimg->Show();
+		sizer_bottom->Add(btn_previmg, 0, wxEXPAND|wxRIGHT, 4);
+		sizer_bottom->Add(btn_nextimg, 0, wxEXPAND|wxRIGHT, 4);
+		sizer_bottom->Add(text_curimg, 0, wxALIGN_CENTER, 0);
+	}
+	else
+	{
+		btn_nextimg->Show(false);
+		btn_previmg->Show(false);
+		text_curimg->Show(false);
+		sizer_bottom->Detach(btn_nextimg);
+		sizer_bottom->Detach(btn_previmg);
+		sizer_bottom->Detach(text_curimg);
+	}
 
 	// Refresh everything
 	refresh();
@@ -997,6 +1018,9 @@ void GfxEntryPanel::onZoomChanged(wxCommandEvent& e)
  *******************************************************************/
 void GfxEntryPanel::onXOffsetChanged(wxSpinEvent& e)
 {
+	if (offset_changing)
+		return;
+
 	// Change the image x-offset
 	int offset = spin_xoffset->GetValue();
 	getImage()->setXOffset(offset);
@@ -1013,6 +1037,9 @@ void GfxEntryPanel::onXOffsetChanged(wxSpinEvent& e)
  *******************************************************************/
 void GfxEntryPanel::onYOffsetChanged(wxSpinEvent& e)
 {
+	if (offset_changing)
+		return;
+
 	// Change image y-offset
 	int offset = spin_yoffset->GetValue();
 	getImage()->setYOffset(offset);
@@ -1056,8 +1083,10 @@ void GfxEntryPanel::onARCChanged(wxCommandEvent& e)
 void GfxEntryPanel::onGfxOffsetChanged(wxEvent& e)
 {
 	// Update spin controls
+	offset_changing = true;
 	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
 	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
+	offset_changing = false;
 
 	// Set changed
 	setModified();
